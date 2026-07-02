@@ -39,7 +39,7 @@ export function ScratchCapture({
   disabled,
 }: {
   images: string[];
-  onChange: (images: string[]) => void;
+  onChange: React.Dispatch<React.SetStateAction<string[]>>;
   disabled?: boolean;
 }) {
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -49,34 +49,28 @@ export function ScratchCapture({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Serialize adds and read the latest list, so paste + upload landing
-  // together can't clobber each other via a stale closure.
-  const imagesRef = useRef(images);
-  imagesRef.current = images;
-  const addQueueRef = useRef<Promise<void>>(Promise.resolve());
   const cameraSessionRef = useRef(0);
 
   const full = images.length >= MAX_IMAGES;
 
   const addBlobs = useCallback(
-    (blobs: (File | Blob)[]) => {
-      if (disabled) return addQueueRef.current;
-      const run = async () => {
-        setBusy(true);
-        try {
-          const current = imagesRef.current;
-          const room = MAX_IMAGES - current.length;
-          const added: string[] = [];
-          for (const blob of blobs.slice(0, room)) {
-            added.push(await toCompressedDataUrl(blob));
-          }
-          if (added.length > 0) onChange([...current, ...added]);
-        } finally {
-          setBusy(false);
+    async (blobs: (File | Blob)[]) => {
+      if (disabled) return;
+      setBusy(true);
+      try {
+        const added: string[] = [];
+        for (const blob of blobs.slice(0, MAX_IMAGES)) {
+          added.push(await toCompressedDataUrl(blob));
         }
-      };
-      addQueueRef.current = addQueueRef.current.then(run, run);
-      return addQueueRef.current;
+        if (added.length > 0) {
+          // Functional update: concurrent adds (paste during an upload's
+          // compression) append to the latest list instead of clobbering
+          // it, and the cap holds regardless of interleaving.
+          onChange((prev) => [...prev, ...added].slice(0, MAX_IMAGES));
+        }
+      } finally {
+        setBusy(false);
+      }
     },
     [onChange, disabled],
   );
@@ -254,7 +248,7 @@ export function ScratchCapture({
                 />
                 {!disabled && (
                   <button
-                    onClick={() => onChange(images.filter((_, j) => j !== i))}
+                    onClick={() => onChange((prev) => prev.filter((_, j) => j !== i))}
                     aria-label={`Remove image ${i + 1}`}
                     className="absolute -right-2 -top-2 rounded-full border border-grid bg-surface p-0.5 text-graphite hover:text-redpen"
                   >
