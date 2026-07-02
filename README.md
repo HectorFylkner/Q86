@@ -16,8 +16,8 @@ Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
 ## Run it
 
-Requires Node 20+ (Node 22+ recommended — the seed script uses native
-TypeScript type stripping) and pnpm.
+Requires Node 22.18+ (the seed script runs TypeScript via Node's native
+type stripping) and pnpm.
 
 ```sh
 pnpm install

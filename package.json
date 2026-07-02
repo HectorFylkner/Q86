@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Q86 — personal GMAT Focus quant training platform",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.18"
   },
   "scripts": {
     "dev": "next dev",

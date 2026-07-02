@@ -20,8 +20,15 @@ function tex(source: string, displayMode: boolean): string {
   });
 }
 
+// Math spans may contain backslash escapes (\$, \frac, …): consume
+// backslash-pairs atomically so "$\$1{,}200$" stays one math token.
 const INLINE_TOKEN =
-  /(\\\$)|(\$[^$\n]+?\$)|(\*\*(?:[^*\n]|\*(?!\*))+?\*\*)|(\*[^*\n]+?\*)|(`[^`\n]+?`)/g;
+  /(\\\$)|(\$(?:\\.|[^\\$\n])+?\$)|(\*\*(?:[^*\n]|\*(?!\*))+?\*\*)|(\*[^*\n]+?\*)|(`[^`\n]+?`)/g;
+
+/** KaTeX's thousands separator, harmless if it leaks into plain prose. */
+function plain(text: string): string {
+  return text.replaceAll("{,}", ",");
+}
 
 function renderInline(text: string, keyBase: string): ReactNode[] {
   const nodes: ReactNode[] = [];
@@ -29,7 +36,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
   let i = 0;
   for (const m of text.matchAll(INLINE_TOKEN)) {
     const idx = m.index ?? 0;
-    if (idx > last) nodes.push(text.slice(last, idx));
+    if (idx > last) nodes.push(plain(text.slice(last, idx)));
     const token = m[0];
     const key = `${keyBase}-${i++}`;
     if (m[1]) {
@@ -61,7 +68,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
     }
     last = idx + token.length;
   }
-  if (last < text.length) nodes.push(text.slice(last));
+  if (last < text.length) nodes.push(plain(text.slice(last)));
   return nodes;
 }
 
