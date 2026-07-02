@@ -2,6 +2,7 @@
   "name": "q86",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Q86 — personal GMAT Focus quant training platform",
   "engines": {
     "node": ">=20"
