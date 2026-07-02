@@ -4,15 +4,22 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
+  edits,
   questions,
   sessions,
   type Question,
 } from "./db/schema.ts";
-import { selectQuestions, type QuestionFilter } from "./engine.ts";
+import {
+  selectQuestions,
+  selectTimedSet,
+  type QuestionFilter,
+} from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
 import type {
   Confidence,
+  EditReason,
   ErrorType,
+  FundamentalSkill,
   SessionMode,
   Subtopic,
 } from "./taxonomy.ts";
@@ -131,4 +138,183 @@ export async function finishSession(
     .set({ endedAt: new Date(), summary })
     .where(eq(sessions.id, sessionId))
     .run();
+}
+
+// ---------------------------------------------------------------------------
+// Timed sets & section simulation (F3)
+// ---------------------------------------------------------------------------
+
+export type TimedKind = "full" | "mini";
+
+export type StartTimedResult = StartDrillResult & {
+  mode: "timed_set" | "section_sim" | null;
+};
+
+export async function startTimedSet(config: {
+  kind: TimedKind;
+  skill?: FundamentalSkill;
+  showTimer: boolean;
+}): Promise<StartTimedResult> {
+  const total = config.kind === "full" ? 21 : 7;
+  const picked = selectTimedSet(total, config.skill);
+  if (picked.length < total) {
+    return {
+      error: `Not enough verified questions for a ${total}-question set (${picked.length} available). Run pnpm seed or generate more from the drill screen.`,
+      sessionId: null,
+      questions: [],
+      mode: null,
+    };
+  }
+  const mode = config.kind === "full" ? "section_sim" : "timed_set";
+  const session = db
+    .insert(sessions)
+    .values({ mode, config: config as unknown as Record<string, unknown> })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: picked, mode };
+}
+
+export type TimedResultInput = {
+  questionId: number;
+  selectedIndex: number;
+  timeSeconds: number;
+  confidence: Confidence;
+  bookmarked: boolean;
+  timeViolation: boolean;
+};
+
+export type TimedEditInput = {
+  questionId: number;
+  fromIndex: number;
+  toIndex: number;
+  reason: EditReason;
+  justification: string;
+};
+
+export type SaveTimedResponse = {
+  attemptIdByQuestionId: Record<number, number>;
+  correctByQuestionId: Record<number, boolean>;
+  sessionEditNet: number;
+  lifetimeEditNet: number;
+};
+
+export async function saveTimedSession(input: {
+  sessionId: number;
+  mode: "timed_set" | "section_sim";
+  results: TimedResultInput[];
+  edits: TimedEditInput[];
+  durationSeconds: number;
+  notReachedCount: number;
+}): Promise<SaveTimedResponse> {
+  for (const edit of input.edits) {
+    if (edit.justification.trim().length < 20) {
+      throw new Error(
+        "Every edit needs a justification of at least 20 characters.",
+      );
+    }
+  }
+
+  const questionRows = db
+    .select()
+    .from(questions)
+    .where(
+      inArray(
+        questions.id,
+        input.results.map((r) => r.questionId),
+      ),
+    )
+    .all();
+  const byId = new Map(questionRows.map((q) => [q.id, q]));
+
+  const attemptIdByQuestionId: Record<number, number> = {};
+  const correctByQuestionId: Record<number, boolean> = {};
+
+  db.transaction((tx) => {
+    for (const result of input.results) {
+      const q = byId.get(result.questionId);
+      if (!q) throw new Error(`Question ${result.questionId} not found`);
+      const correct = result.selectedIndex === q.correctIndex;
+      correctByQuestionId[q.id] = correct;
+      const attempt = tx
+        .insert(attempts)
+        .values({
+          questionId: q.id,
+          sessionId: input.sessionId,
+          mode: input.mode,
+          selectedIndex: result.selectedIndex,
+          correct,
+          timeSeconds: result.timeSeconds,
+          confidence: result.confidence,
+        })
+        .returning()
+        .get();
+      attemptIdByQuestionId[q.id] = attempt.id;
+    }
+
+    for (const edit of input.edits) {
+      const q = byId.get(edit.questionId);
+      if (!q) continue;
+      tx.insert(edits)
+        .values({
+          sessionId: input.sessionId,
+          questionId: edit.questionId,
+          fromIndex: edit.fromIndex,
+          toIndex: edit.toIndex,
+          fromCorrect: edit.fromIndex === q.correctIndex,
+          toCorrect: edit.toIndex === q.correctIndex,
+          reason: edit.reason,
+          justification: edit.justification.trim(),
+        })
+        .run();
+    }
+  });
+
+  // Redo enqueue outside the transaction: it has its own dedupe logic.
+  for (const result of input.results) {
+    if (!correctByQuestionId[result.questionId]) {
+      enqueueMiss(result.questionId, attemptIdByQuestionId[result.questionId]);
+    }
+  }
+
+  const sessionEditNet = input.edits.reduce((net, edit) => {
+    const q = byId.get(edit.questionId);
+    if (!q) return net;
+    return (
+      net +
+      (edit.toIndex === q.correctIndex ? 1 : 0) -
+      (edit.fromIndex === q.correctIndex ? 1 : 0)
+    );
+  }, 0);
+
+  const allEdits = db.select().from(edits).all();
+  const lifetimeEditNet = allEdits.reduce(
+    (net, e) => net + (e.toCorrect ? 1 : 0) - (e.fromCorrect ? 1 : 0),
+    0,
+  );
+
+  const correctCount = Object.values(correctByQuestionId).filter(Boolean).length;
+  const summary = {
+    total: input.results.length + input.notReachedCount,
+    answered: input.results.length,
+    correct: correctCount,
+    timeViolations: input.results.filter((r) => r.timeViolation).length,
+    sub60Wrong: input.results.filter(
+      (r) => r.timeSeconds < 60 && !correctByQuestionId[r.questionId],
+    ).length,
+    editCount: input.edits.length,
+    editNet: sessionEditNet,
+    notReached: input.notReachedCount,
+    durationSeconds: input.durationSeconds,
+  };
+  db.update(sessions)
+    .set({ endedAt: new Date(), summary })
+    .where(eq(sessions.id, input.sessionId))
+    .run();
+
+  return {
+    attemptIdByQuestionId,
+    correctByQuestionId,
+    sessionEditNet,
+    lifetimeEditNet,
+  };
 }
