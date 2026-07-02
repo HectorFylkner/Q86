@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { CONTENT_DOMAINS } from "../taxonomy.ts";
+import {
+  ALL_SUBTOPICS,
+  CONTENT_DOMAINS,
+  ERROR_TYPES,
+  type Subtopic,
+} from "../taxonomy.ts";
 
 /** What the generator model returns (§8.1). Taxonomy fields we dictate in
  *  the request are not echoed back; content_domain is the model's call. */
@@ -46,3 +51,25 @@ export const verifierResultSchema = z.object({
 });
 
 export type VerifierResult = z.infer<typeof verifierResultSchema>;
+
+/** What the post-mortem coach returns (§8.3). */
+export const coachResponseSchema = z.object({
+  error_type: z.enum(ERROR_TYPES),
+  error_subtag: z.enum(ALL_SUBTOPICS as [Subtopic, ...Subtopic[]]),
+  divergence_point_md: z
+    .string()
+    .min(10)
+    .describe(
+      "The first written line where the work leaves the correct path, or a plain statement that the work is illegible plus what to re-shoot.",
+    ),
+  diagnosis_md: z.string().min(10),
+  fastest_path_md: z.string().min(10),
+  trigger_cue_md: z.string().min(10),
+  prescription: z.object({
+    subtopic: z.enum(ALL_SUBTOPICS as [Subtopic, ...Subtopic[]]),
+    count: z.number().int().min(5).max(15),
+  }),
+  takeaway_15_words: z.string().min(3),
+});
+
+export type CoachResponse = z.infer<typeof coachResponseSchema>;

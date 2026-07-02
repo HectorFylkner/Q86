@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { startDrill, type DrillTiming } from "@/lib/actions";
+import { useEffect, useRef, useState } from "react";
+import {
+  startDrill,
+  startDrillWithQuestions,
+  type DrillTiming,
+} from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import { DrillSetup, type CountRow, type DrillConfigValue } from "./drill-setup";
 import { QuestionRunner } from "./question-runner";
@@ -16,8 +20,41 @@ type Stage =
       timing: DrillTiming;
     };
 
-export function DrillClient({ rows }: { rows: CountRow[] }) {
+export function DrillClient({
+  rows,
+  autoStartIds,
+}: {
+  rows: CountRow[];
+  autoStartIds?: number[] | null;
+}) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
+  const autoStartedRef = useRef(false);
+
+  // Twin drills and coach prescriptions arrive as /drill?qids=…
+  useEffect(() => {
+    if (!autoStartIds?.length || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    setStage({ kind: "loading" });
+    startDrillWithQuestions(autoStartIds)
+      .then((res) => {
+        if (res.error != null || res.sessionId == null) {
+          setStage({ kind: "setup", error: res.error ?? "Could not start." });
+        } else {
+          setStage({
+            kind: "running",
+            sessionId: res.sessionId,
+            questions: res.questions,
+            timing: "soft",
+          });
+        }
+      })
+      .catch(() =>
+        setStage({
+          kind: "setup",
+          error: "Could not start the drill — the server did not respond.",
+        }),
+      );
+  }, [autoStartIds]);
 
   async function handleStart(config: DrillConfigValue) {
     setStage({ kind: "loading" });

@@ -80,6 +80,38 @@ export async function startRedoSession(
   return { error: null, sessionId: session.id, questions: ordered };
 }
 
+/** Start a drill with an exact question list (redo of twins, coach
+ *  prescriptions, queue redos run through the normal drill runner). */
+export async function startDrillWithQuestions(
+  questionIds: number[],
+): Promise<StartDrillResult> {
+  if (questionIds.length === 0) {
+    return { error: "No questions to drill.", sessionId: null, questions: [] };
+  }
+  const rows = db
+    .select()
+    .from(questions)
+    .where(inArray(questions.id, questionIds))
+    .all();
+  const byId = new Map(rows.map((q) => [q.id, q]));
+  const ordered = questionIds
+    .map((id) => byId.get(id))
+    .filter((q): q is Question => Boolean(q));
+  if (ordered.length === 0) {
+    return {
+      error: "Those questions no longer exist.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const session = db
+    .insert(sessions)
+    .values({ mode: "drill", config: { questionIds } })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: ordered };
+}
+
 export async function logAttempt(input: {
   sessionId: number | null;
   questionId: number;
