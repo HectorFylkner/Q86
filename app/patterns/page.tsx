@@ -13,7 +13,17 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default function PatternsPage() {
+export default async function PatternsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ start?: string }>;
+}) {
+  const { start } = await searchParams;
+  const autoStart = PATTERN_CATEGORIES.some((c) => c.key === start)
+    ? (start as (typeof PATTERN_CATEGORIES)[number]["key"])
+    : start === "mixed"
+      ? ("mixed" as const)
+      : null;
   const ratings = new Map(
     db
       .select()
@@ -46,6 +56,7 @@ export default function PatternsPage() {
         stats={stats}
         dayStreak={computeDayStreak()}
         mixedBest={bestRoundScore("mixed")}
+        autoStart={autoStart}
       />
     </div>
   );

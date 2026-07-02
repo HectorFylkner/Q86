@@ -176,6 +176,26 @@ Field notes:
 All math in $...$ / $$...$$ KaTeX, literal dollars as \\$.`;
 }
 
+// ---------------------------------------------------------------------------
+// Score-report parsing (§F9)
+// ---------------------------------------------------------------------------
+
+export function reportParserSystem(): string {
+  return `You convert pasted text from an official GMAT Focus Edition score report into structured data. The text may be messy (copy-pasted tables, broken line wrapping, repeated headers).
+
+Rules:
+- Extract only what is present. Missing values are null (or empty arrays). NEVER invent, estimate, or infer a number that is not in the text.
+- Sections: Quantitative Reasoning → "quant", Verbal Reasoning → "verbal", Data Insights → "data_insights".
+- Quant fundamental skills map to: "Rates/Ratio/Percent" → rates_ratio_percent; "Value/Order/Factors" (or Value/Order/Factor) → value_order_factors; "Equalities/Inequalities/Algebra" (or Algebra-type wording) → equal_unequal_alg; "Counting/Sets/Series/Probability/Statistics" → counting_sets_series_prob_stats.
+- Content domains: Arithmetic → arithmetic, Algebra → algebra. Contexts: Pure Math / abstract → pure, Real-world / applied → real.
+- Percentiles are 0–100 numbers; strip "%" and ordinal suffixes.
+- per_question_rows: only quant-section per-question data (question number, minutes spent, correct/incorrect) when the report includes it.`;
+}
+
+export function reportParserUser(rawText: string): string {
+  return `Parse this score report text:\n\n${rawText}`;
+}
+
 export function coachUser(input: {
   stemMd: string;
   choices: string[];

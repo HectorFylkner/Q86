@@ -4,6 +4,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
+  baselineReports,
   edits,
   eloRatings,
   patternAttempts,
@@ -17,6 +18,8 @@ import {
   computeCategoryStreak,
   computeDayStreak,
 } from "./pattern-stats.ts";
+import { putSetting } from "./settings.ts";
+import type { ParsedReport } from "./ai/schemas.ts";
 import {
   selectQuestions,
   selectTimedSet,
@@ -461,4 +464,30 @@ export async function savePatternRound(input: {
       isNew: score > previousBest,
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// Settings & baseline import (F8, F9)
+// ---------------------------------------------------------------------------
+
+export async function saveSetting(
+  key: "test_date" | "timed_set_cadence" | "weight_overrides" | "model",
+  value: string,
+): Promise<void> {
+  putSetting(key, value);
+}
+
+export async function saveBaselineReport(input: {
+  rawText: string;
+  parsed: ParsedReport;
+}): Promise<{ id: number }> {
+  const row = db
+    .insert(baselineReports)
+    .values({
+      rawText: input.rawText,
+      parsed: input.parsed as unknown as Record<string, unknown>,
+    })
+    .returning()
+    .get();
+  return { id: row.id };
 }

@@ -2,7 +2,9 @@ import { z } from "zod";
 import {
   ALL_SUBTOPICS,
   CONTENT_DOMAINS,
+  CONTEXTS,
   ERROR_TYPES,
+  FUNDAMENTAL_SKILLS,
   type Subtopic,
 } from "../taxonomy.ts";
 
@@ -73,3 +75,51 @@ export const coachResponseSchema = z.object({
 });
 
 export type CoachResponse = z.infer<typeof coachResponseSchema>;
+
+/** Parsed official score report (§F9). Everything optional-ish: reports
+ *  vary, and absent data must stay absent — never invented. */
+export const parsedReportSchema = z.object({
+  test_date: z
+    .string()
+    .nullable()
+    .describe("Exam date as YYYY-MM-DD when present, else null."),
+  total_score: z.number().nullable(),
+  sections: z.array(
+    z.object({
+      section: z.enum(["quant", "verbal", "data_insights"]),
+      scaled_score: z.number().nullable(),
+      percentile: z.number().min(0).max(100).nullable(),
+    }),
+  ),
+  fundamental_skills: z
+    .array(
+      z.object({
+        skill: z.enum(FUNDAMENTAL_SKILLS),
+        percentile: z.number().min(0).max(100),
+      }),
+    )
+    .describe("Quant fundamental-skill percentiles found in the report."),
+  content_domains: z.array(
+    z.object({
+      domain: z.enum(CONTENT_DOMAINS),
+      percentile: z.number().min(0).max(100),
+    }),
+  ),
+  contexts: z.array(
+    z.object({
+      context: z.enum(CONTEXTS),
+      percentile: z.number().min(0).max(100),
+    }),
+  ),
+  per_question_rows: z
+    .array(
+      z.object({
+        number: z.number().int(),
+        time_minutes: z.number().nullable(),
+        result: z.enum(["correct", "incorrect"]).nullable(),
+      }),
+    )
+    .describe("Quant per-question timing rows when present, else empty."),
+});
+
+export type ParsedReport = z.infer<typeof parsedReportSchema>;

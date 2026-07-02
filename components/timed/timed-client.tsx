@@ -44,8 +44,15 @@ type Stage =
   | { kind: "summary"; saved: SaveTimedResponse }
   | { kind: "error"; message: string };
 
-export function TimedClient({ verifiedTotal }: { verifiedTotal: number }) {
+export function TimedClient({
+  verifiedTotal,
+  autoStart,
+}: {
+  verifiedTotal: number;
+  autoStart?: TimedKind | null;
+}) {
   const [stage, setStage] = useState<Stage>({ kind: "config", error: null });
+  const autoStartedRef = useRef(false);
   const [kind, setKind] = useState<TimedKind>("full");
   const [miniSkill, setMiniSkill] = useState<FundamentalSkill | "mix">("mix");
   const [showTimer, setShowTimer] = useState(false);
@@ -80,6 +87,15 @@ export function TimedClient({ verifiedTotal }: { verifiedTotal: number }) {
           { remainingTarget: 10 * 60, label: "Q3 · 10:00" },
           { remainingTarget: 5 * 60, label: "Q5 · 5:00" },
         ];
+
+  // One-click launch from the daily plan (/timed?start=full|mini).
+  useEffect(() => {
+    if (autoStart && !autoStartedRef.current) {
+      autoStartedRef.current = true;
+      void handleStart(autoStart);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ------------------------------------------------------------------ start
   async function handleStart(selectedKind: TimedKind) {

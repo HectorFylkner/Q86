@@ -10,14 +10,20 @@ export const runtime = "nodejs";
 export default async function DrillPage({
   searchParams,
 }: {
-  searchParams: Promise<{ qids?: string }>;
+  searchParams: Promise<{ qids?: string; plan?: string }>;
 }) {
-  const { qids } = await searchParams;
-  const autoStartIds =
+  const { qids, plan } = await searchParams;
+  let autoStartIds =
     qids
       ?.split(",")
       .map(Number)
       .filter((n) => Number.isInteger(n) && n > 0) ?? null;
+
+  // One-click launch of today's weighted drill block (F8).
+  if (!autoStartIds?.length && plan === "1") {
+    const { todaysPlan, selectPlanDrillIds } = await import("@/lib/plan-server");
+    autoStartIds = selectPlanDrillIds(todaysPlan());
+  }
 
   const rows = db
     .select({

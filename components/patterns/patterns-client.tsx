@@ -51,14 +51,17 @@ export function PatternsClient({
   stats,
   dayStreak,
   mixedBest,
+  autoStart,
 }: {
   stats: CategoryStats[];
   dayStreak: number;
   mixedBest: number;
+  autoStart?: Selection | null;
 }) {
   const router = useRouter();
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
-  const [selection, setSelection] = useState<Selection>("mixed");
+  const [selection, setSelection] = useState<Selection>(autoStart ?? "mixed");
+  const autoStartedRef = useRef(false);
   const [remaining, setRemaining] = useState(ROUND_SECONDS);
   const [active, setActive] = useState<ActiveItem | null>(null);
   const [typed, setTyped] = useState("");
@@ -116,6 +119,15 @@ export function PatternsClient({
   useEffect(() => {
     if (stage.kind === "running" && active == null) nextItem();
   }, [stage.kind, active, nextItem]);
+
+  // One-click launch from the daily plan (/patterns?start=…).
+  useEffect(() => {
+    if (autoStart && !autoStartedRef.current) {
+      autoStartedRef.current = true;
+      startRound();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const finishRound = useCallback(() => {
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
