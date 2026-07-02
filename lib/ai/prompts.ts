@@ -118,7 +118,7 @@ export function verifierSystem(): string {
 
 - Do the math fully; check edge cases (zero, negatives, fractions) before committing.
 - If the choices are the five standard data-sufficiency options, apply standard sufficiency analysis: test each statement alone, then together, and remember a statement is sufficient only if it forces a single answer to the question asked.
-- If no choice matches your result, re-check your work once; if still no match, pick the closest and say so in your reason.
+- If no choice exactly matches your result, re-check your work once. If there is still no exact match, the question is defective: return the closest index but begin your reason with exactly "NO-MATCH:" — never silently endorse a closest guess.
 
 Return the zero-based index of the correct choice and a one-line reason.`;
 }

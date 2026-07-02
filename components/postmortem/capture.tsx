@@ -49,25 +49,36 @@ export function ScratchCapture({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Serialize adds and read the latest list, so paste + upload landing
+  // together can't clobber each other via a stale closure.
+  const imagesRef = useRef(images);
+  imagesRef.current = images;
+  const addQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const cameraSessionRef = useRef(0);
 
   const full = images.length >= MAX_IMAGES;
 
   const addBlobs = useCallback(
-    async (blobs: (File | Blob)[]) => {
-      if (disabled) return;
-      setBusy(true);
-      try {
-        const room = MAX_IMAGES - images.length;
-        const added: string[] = [];
-        for (const blob of blobs.slice(0, room)) {
-          added.push(await toCompressedDataUrl(blob));
+    (blobs: (File | Blob)[]) => {
+      if (disabled) return addQueueRef.current;
+      const run = async () => {
+        setBusy(true);
+        try {
+          const current = imagesRef.current;
+          const room = MAX_IMAGES - current.length;
+          const added: string[] = [];
+          for (const blob of blobs.slice(0, room)) {
+            added.push(await toCompressedDataUrl(blob));
+          }
+          if (added.length > 0) onChange([...current, ...added]);
+        } finally {
+          setBusy(false);
         }
-        if (added.length > 0) onChange([...images, ...added]);
-      } finally {
-        setBusy(false);
-      }
+      };
+      addQueueRef.current = addQueueRef.current.then(run, run);
+      return addQueueRef.current;
     },
-    [images, onChange, disabled],
+    [onChange, disabled],
   );
 
   // Clipboard paste anywhere on the page.
@@ -86,10 +97,16 @@ export function ScratchCapture({
 
   async function openCamera() {
     setCameraError(null);
+    const session = ++cameraSessionRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment", width: { ideal: 1920 } },
       });
+      if (cameraSessionRef.current !== session) {
+        // Closed or unmounted while waiting for permission — release it.
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
       streamRef.current = stream;
       setCameraOpen(true);
     } catch {
@@ -106,6 +123,7 @@ export function ScratchCapture({
   }, [cameraOpen]);
 
   function closeCamera() {
+    cameraSessionRef.current++;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     setCameraOpen(false);

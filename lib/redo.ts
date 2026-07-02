@@ -12,14 +12,21 @@ function dueAt(stage: 0 | 1 | 2): Date {
   return new Date(Date.now() + STAGE_DELAY_DAYS[stage] * 24 * 60 * 60 * 1000);
 }
 
-/** Enqueue a miss at stage 0 (+2d). No-op if the question is already queued. */
+/** Enqueue a miss at stage 0 (+2d). If the question is already queued
+ *  (missed again outside a redo run), it resets to stage 0. */
 export function enqueueMiss(questionId: number, sourceAttemptId: number): void {
   const existing = db
     .select({ id: redoQueue.id })
     .from(redoQueue)
     .where(and(eq(redoQueue.questionId, questionId), eq(redoQueue.cleared, false)))
     .get();
-  if (existing) return;
+  if (existing) {
+    db.update(redoQueue)
+      .set({ stage: 0, dueAt: dueAt(0) })
+      .where(eq(redoQueue.id, existing.id))
+      .run();
+    return;
+  }
   db.insert(redoQueue)
     .values({
       questionId,

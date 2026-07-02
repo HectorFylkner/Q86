@@ -67,7 +67,8 @@ export async function POST(request: Request) {
   for (let i = 0; i < body.images.length; i++) {
     const match = body.images[i].match(/^data:image\/(\w+);base64,(.+)$/);
     if (!match) continue;
-    const filename = `attempt-${attempt.id}-${i + 1}.jpg`;
+    const ext = match[1] === "jpeg" ? "jpg" : match[1];
+    const filename = `attempt-${attempt.id}-${i + 1}.${ext}`;
     fs.writeFileSync(
       path.join(SCRATCH_DIR, filename),
       Buffer.from(match[2], "base64"),

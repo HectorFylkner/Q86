@@ -74,6 +74,8 @@ export function TimedClient({
 
   const endsAtRef = useRef<number | null>(null);
   const questionStartRef = useRef<number>(0);
+  const finalizedRef = useRef(false);
+  const violatedRef = useRef(false);
   const totalSeconds = kind === "full" ? 45 * 60 : 15 * 60;
   const questionCount = kind === "full" ? 21 : 7;
 
@@ -112,6 +114,7 @@ export function TimedClient({
         setStage({ kind: "config", error: res.error ?? "Could not start." });
         return;
       }
+      finalizedRef.current = false;
       setSessionId(res.sessionId);
       setMode(res.mode);
       setQuestions(res.questions);
@@ -121,6 +124,7 @@ export function TimedClient({
       setCurrentIndex(0);
       setSelected(null);
       setConfidence(null);
+      violatedRef.current = false;
       setViolatedCurrent(false);
       setPulseKey(0);
       setStage({ kind: "ritual", countdown: 3 });
@@ -163,11 +167,10 @@ export function TimedClient({
       if (stage.kind === "running") {
         const elapsed = (Date.now() - questionStartRef.current) / 1000;
         setElapsedCurrent(elapsed);
-        if (elapsed > PULSE_THRESHOLD_SECONDS) {
-          setViolatedCurrent((was) => {
-            if (!was) setPulseKey((k) => k + 1);
-            return true;
-          });
+        if (elapsed > PULSE_THRESHOLD_SECONDS && !violatedRef.current) {
+          violatedRef.current = true;
+          setViolatedCurrent(true);
+          setPulseKey((k) => k + 1);
         }
       }
       if (rem <= 0) finalizeRef.current();
@@ -183,6 +186,10 @@ export function TimedClient({
       finalBookmarks: boolean[],
     ) => {
       if (sessionId == null) return;
+      // Clock expiry ticks and a simultaneous user submit can both land
+      // here — only the first one saves the section.
+      if (finalizedRef.current) return;
+      finalizedRef.current = true;
       setStage({ kind: "saving" });
       const results = questions.flatMap((q, i) => {
         const a = finalAnswers[i];
@@ -210,15 +217,16 @@ export function TimedClient({
         notReachedCount,
       })
         .then((saved) => setStage({ kind: "summary", saved }))
-        .catch((e) =>
+        .catch((e) => {
+          finalizedRef.current = false; // allow the retry button to re-save
           setStage({
             kind: "error",
             message:
               e instanceof Error
                 ? e.message
                 : "Saving failed. Your results are still on this screen — retry.",
-          }),
-        );
+          });
+        });
     },
     [sessionId, mode, questions, totalSeconds],
   );
@@ -260,6 +268,7 @@ export function TimedClient({
       setCurrentIndex(currentIndex + 1);
       setSelected(null);
       setConfidence(null);
+      violatedRef.current = false;
       setViolatedCurrent(false);
       setElapsedCurrent(0);
       questionStartRef.current = Date.now();
@@ -320,7 +329,7 @@ export function TimedClient({
         setConfidence(k === "g" ? "guess" : k === "l" ? "lean" : "lock");
         setHint(null);
         e.preventDefault();
-      } else if (e.key === "Enter") {
+      } else if (e.key === "Enter" && !e.repeat) {
         confirmAnswer();
         e.preventDefault();
       }

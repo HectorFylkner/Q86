@@ -75,6 +75,7 @@ export function PatternsClient({
   const rngRef = useRef<() => number>(() => 0);
   const endsAtRef = useRef(0);
   const itemStartRef = useRef(0);
+  const finishedRef = useRef(false);
   const itemsRef = useRef<PatternRoundItem[]>([]);
   const recentPromptsRef = useRef<string[]>([]);
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -106,6 +107,7 @@ export function PatternsClient({
 
   function startRound() {
     rngRef.current = mulberry32((Date.now() % 2147483647) + 1);
+    finishedRef.current = false;
     itemsRef.current = [];
     recentPromptsRef.current = [];
     setScore(0);
@@ -130,6 +132,10 @@ export function PatternsClient({
   }, []);
 
   const finishRound = useCallback(() => {
+    // The clock tick and the feedback timer can both land here at 0:00 —
+    // only the first one saves the round.
+    if (finishedRef.current) return;
+    finishedRef.current = true;
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     setStage({ kind: "saving" });
     setActive(null);

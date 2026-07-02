@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
@@ -77,7 +77,9 @@ export async function startRedoSession(
   const rows = db
     .select()
     .from(questions)
-    .where(inArray(questions.id, questionIds))
+    .where(
+      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+    )
     .all();
   const byId = new Map(rows.map((q) => [q.id, q]));
   const ordered = questionIds
@@ -102,7 +104,9 @@ export async function startDrillWithQuestions(
   const rows = db
     .select()
     .from(questions)
-    .where(inArray(questions.id, questionIds))
+    .where(
+      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+    )
     .all();
   const byId = new Map(rows.map((q) => [q.id, q]));
   const ordered = questionIds
@@ -249,6 +253,9 @@ export async function saveTimedSession(input: {
   durationSeconds: number;
   notReachedCount: number;
 }): Promise<SaveTimedResponse> {
+  if (input.edits.length > 3) {
+    throw new Error("A section allows at most 3 edits.");
+  }
   for (const edit of input.edits) {
     if (edit.justification.trim().length < 20) {
       throw new Error(
@@ -393,15 +400,6 @@ export async function savePatternRound(input: {
   // Previous best round score for this selection, from session summaries.
   const previousBest = bestRoundScore(input.category);
 
-  db.insert(sessions)
-    .values({
-      mode: "pattern",
-      config: { category: input.category },
-      endedAt: new Date(),
-      summary: { category: input.category, score, total: input.items.length },
-    })
-    .run();
-
   const touched = [...new Set(input.items.map((i) => i.category))];
   const oldRatings: Record<string, number> = {};
   for (const category of touched) {
@@ -415,6 +413,14 @@ export async function savePatternRound(input: {
 
   const newRatings = { ...oldRatings };
   db.transaction((tx) => {
+    tx.insert(sessions)
+      .values({
+        mode: "pattern",
+        config: { category: input.category },
+        endedAt: new Date(),
+        summary: { category: input.category, score, total: input.items.length },
+      })
+      .run();
     for (const item of input.items) {
       tx.insert(patternAttempts)
         .values({

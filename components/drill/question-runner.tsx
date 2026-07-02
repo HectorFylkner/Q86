@@ -187,12 +187,12 @@ export function QuestionRunner({
           setConfidence(k === "g" ? "guess" : k === "l" ? "lean" : "lock");
           setHint(null);
           e.preventDefault();
-        } else if (e.key === "Enter") {
+        } else if (e.key === "Enter" && !e.repeat) {
           submit();
           e.preventDefault();
         }
       } else if (phase === "revealed") {
-        if (e.key === "Enter" || k === "n") {
+        if ((e.key === "Enter" || k === "n") && !e.repeat) {
           next();
           e.preventDefault();
         } else if (k === "p") {

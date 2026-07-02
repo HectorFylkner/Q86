@@ -18,6 +18,11 @@ export function latexChoiceToExpression(choice: string): string | null {
   s = s.replace(/\\left|\\right|\\,|\\;|\\!|~/g, "");
   s = s.replace(/\\(cdot|times)/g, "*");
   s = s.replaceAll("\\pi", "pi");
+  // Mixed numbers: a digit directly before \frac means addition by
+  // convention ("3 1/2" = 3.5), not implicit multiplication. A negative
+  // mixed number would need distribution — bail out instead of guessing.
+  if (/-\s*\d+\s*\\[dt]?frac/.test(s)) return null;
+  s = s.replace(/(\d)\s*(\\[dt]?frac)/g, "$1+$2");
   // \frac{a}{b} → ((a)/(b)) — repeat for nesting
   for (let i = 0; i < 5 && /\\[dt]?frac/.test(s); i++) {
     s = s.replace(
@@ -99,6 +104,18 @@ export async function verifyCandidate(
       solverReason: object.one_line_reason,
       numericCheckRan: false,
       detail: `Independent solver picked index ${object.answer_index} (intended ${candidate.correct_index}): ${object.one_line_reason}`,
+    };
+  }
+
+  // The solver flagging "no exact match" means the question is defective
+  // even when its closest pick coincides with the intended key.
+  if (/^\s*NO[\s-]?MATCH/i.test(object.one_line_reason)) {
+    return {
+      passed: false,
+      solverIndex: object.answer_index,
+      solverReason: object.one_line_reason,
+      numericCheckRan: false,
+      detail: `Independent solver found no exactly matching choice: ${object.one_line_reason}`,
     };
   }
 

@@ -57,7 +57,8 @@ export function computeWeights(
   >;
   for (const skill of FUNDAMENTAL_SKILLS) {
     const override = inputs.weightOverrides?.[skill];
-    if (override != null && override > 0) {
+    if (override != null && override >= 0) {
+      // Manual override wins outright; the 5% floor still applies below.
       raw[skill] = override;
       continue;
     }
@@ -81,11 +82,29 @@ export function computeWeights(
     return weights;
   }
   for (const skill of FUNDAMENTAL_SKILLS) {
-    weights[skill] = Math.max(WEIGHT_FLOOR, raw[skill] / sum);
+    weights[skill] = raw[skill] / sum;
   }
-  // Renormalize after flooring.
-  const floored = FUNDAMENTAL_SKILLS.reduce((s, k) => s + weights[k], 0);
-  for (const skill of FUNDAMENTAL_SKILLS) weights[skill] /= floored;
+  // Pin skills to the 5% floor, redistributing the rest proportionally so
+  // the floor holds exactly after normalization. Converges in ≤ 4 passes.
+  for (let pass = 0; pass < FUNDAMENTAL_SKILLS.length; pass++) {
+    const pinned = FUNDAMENTAL_SKILLS.filter(
+      (k) => weights[k] <= WEIGHT_FLOOR + 1e-12,
+    );
+    const free = FUNDAMENTAL_SKILLS.filter((k) => !pinned.includes(k));
+    if (free.length === 0) {
+      for (const skill of FUNDAMENTAL_SKILLS) weights[skill] = 0.25;
+      return weights;
+    }
+    const freeBudget = 1 - WEIGHT_FLOOR * pinned.length;
+    const freeSum = free.reduce((s, k) => s + weights[k], 0);
+    let violated = false;
+    for (const skill of pinned) weights[skill] = WEIGHT_FLOOR;
+    for (const skill of free) {
+      weights[skill] = (weights[skill] / freeSum) * freeBudget;
+      if (weights[skill] < WEIGHT_FLOOR) violated = true;
+    }
+    if (!violated) break;
+  }
   return weights;
 }
 

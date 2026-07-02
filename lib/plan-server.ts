@@ -71,6 +71,11 @@ export function gatherPlanInputs(): PlanInputs {
   ) as Record<PatternCategoryKey, number>;
 
   const cadenceRaw = Number(getSetting("timed_set_cadence") ?? "3");
+  // Local-calendar day index so the cadence flips at local midnight.
+  const now = new Date();
+  const localDayIndex = Math.floor(
+    (now.getTime() - now.getTimezoneOffset() * 60_000) / 86_400_000,
+  );
   return {
     daysToTest: daysToTest(),
     skillAccuracy: skillAccuracy(),
@@ -79,7 +84,7 @@ export function gatherPlanInputs(): PlanInputs {
     dueRedoCount: dueRedoCount(),
     cadenceDays:
       Number.isInteger(cadenceRaw) && cadenceRaw > 0 ? cadenceRaw : 3,
-    dayIndex: Math.floor(Date.now() / 86_400_000),
+    dayIndex: localDayIndex,
     eloByCategory,
   };
 }

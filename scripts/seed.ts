@@ -240,7 +240,7 @@ async function main() {
   const recentFailures: string[] = [];
   let aborted = false;
 
-  async function runItem(item: PlanItem, fromPlan: boolean): Promise<void> {
+  async function runItem(item: PlanItem): Promise<void> {
     const skill = SKILL_BY_SUBTOPIC[item.subtopic];
     const label = `${skill}/${item.subtopic} D${item.difficulty} ${
       item.format === "data_sufficiency" ? "DS" : "PS"
@@ -264,10 +264,6 @@ async function main() {
       reason = `API error: ${e instanceof Error ? e.message : String(e)}`;
     }
 
-    if (fromPlan) {
-      consumed++;
-      setProgress(consumed);
-    }
     if (ok) {
       verified++;
       consecutiveFailures = 0;
@@ -293,7 +289,14 @@ async function main() {
     async function worker() {
       while (next < queue.length && !aborted) {
         const item = queue[next++];
-        await runItem(item, fromPlan);
+        if (fromPlan) {
+          // Progress advances at dispatch, not completion, so a rerun
+          // never replays items other workers already picked up; any
+          // in-flight losses are restored by the top-up phase.
+          consumed++;
+          setProgress(consumed);
+        }
+        await runItem(item);
         if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) aborted = true;
       }
     }

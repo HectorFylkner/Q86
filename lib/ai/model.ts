@@ -24,9 +24,17 @@ export function getModel() {
   return anthropic(getModelId());
 }
 
+/** Deterministic failures that a retry cannot fix (bad key, bad request). */
+function isNonRetryable(e: unknown): boolean {
+  const status = (e as { statusCode?: number })?.statusCode;
+  if (status == null) return false;
+  return status < 500 && status !== 408 && status !== 429;
+}
+
 /**
  * Retry failed API calls max 2 times with backoff (§8.4), then rethrow so
- * callers can show a specific error state.
+ * callers can show a specific error state. Non-transient errors (auth,
+ * invalid request) are rethrown immediately.
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
@@ -37,6 +45,7 @@ export async function withRetry<T>(
     try {
       return await fn();
     } catch (e) {
+      if (isNonRetryable(e)) throw e;
       lastError = e;
       if (attempt < retries) {
         await new Promise((r) => setTimeout(r, baseMs * 2 ** attempt));

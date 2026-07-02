@@ -21,7 +21,7 @@ function tex(source: string, displayMode: boolean): string {
 }
 
 const INLINE_TOKEN =
-  /(\\\$)|(\$[^$\n]+?\$)|(\*\*[^*\n]+?\*\*)|(\*[^*\n]+?\*)|(`[^`\n]+?`)/g;
+  /(\\\$)|(\$[^$\n]+?\$)|(\*\*(?:[^*\n]|\*(?!\*))+?\*\*)|(\*[^*\n]+?\*)|(`[^`\n]+?`)/g;
 
 function renderInline(text: string, keyBase: string): ReactNode[] {
   const nodes: ReactNode[] = [];

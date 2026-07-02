@@ -24,7 +24,7 @@ export const runtime = "nodejs";
 export const maxDuration = 600;
 
 const requestSchema = z.object({
-  count: z.number().int().min(1).max(15).default(10),
+  count: z.number().int().min(1).max(15).optional(),
   skill: z.enum(FUNDAMENTAL_SKILLS).optional(),
   subtopics: z
     .array(z.enum(ALL_SUBTOPICS as [Subtopic, ...Subtopic[]]))
@@ -58,9 +58,12 @@ function sampleDifficulty(min: number, max: number): number {
   return allowed[allowed.length - 1] ?? 3;
 }
 
-function buildSpecs(req: z.infer<typeof requestSchema>): GenerationSpec[] {
+function buildSpecs(
+  req: z.infer<typeof requestSchema>,
+  count: number,
+): GenerationSpec[] {
   const specs: GenerationSpec[] = [];
-  for (let i = 0; i < req.count; i++) {
+  for (let i = 0; i < count; i++) {
     let subtopic: Subtopic;
     if (req.subtopics?.length) {
       subtopic = req.subtopics[i % req.subtopics.length];
@@ -148,7 +151,7 @@ export async function POST(request: Request) {
     source = "twin";
     twinOf = body.twinOf;
     const flipped: Context = sourceQuestion.context === "pure" ? "real" : "pure";
-    specs = Array.from({ length: body.count === 10 ? 1 : body.count }, () => ({
+    specs = Array.from({ length: body.count ?? 1 }, () => ({
       skill: sourceQuestion.fundamentalSkill,
       subtopic: sourceQuestion.subtopic,
       difficulty: sourceQuestion.difficulty,
@@ -156,26 +159,41 @@ export async function POST(request: Request) {
       context: body.context ?? flipped,
     }));
   } else {
-    specs = buildSpecs(body);
+    specs = buildSpecs(body, body.count ?? 10);
   }
 
-  let results: PipelineResult[];
-  try {
-    results = await runPool(
-      specs.map((spec) => () => createVerifiedQuestion(spec, { source, twinOf })),
-      3,
-    );
-  } catch (e) {
-    const message =
-      e instanceof Error ? e.message : "The generation call failed.";
-    return NextResponse.json(
-      { error: `Generation failed after retries: ${message}` },
-      { status: 502 },
-    );
-  }
+  // Isolate item failures: one thrown pipeline task must not abort the
+  // batch while sibling workers keep inserting.
+  const results: PipelineResult[] = await runPool(
+    specs.map((spec) => async (): Promise<PipelineResult> => {
+      try {
+        return await createVerifiedQuestion(spec, { source, twinOf });
+      } catch (e) {
+        return {
+          ok: false,
+          attemptsUsed: 0,
+          failures: [
+            `API error after retries: ${e instanceof Error ? e.message : String(e)}`,
+          ],
+        };
+      }
+    }),
+    3,
+  );
 
   const verified = results.filter((r) => r.ok);
   const failed = results.filter((r) => !r.ok);
+
+  if (
+    verified.length === 0 &&
+    failed.length > 0 &&
+    failed.every((r) => !r.ok && r.failures[0]?.startsWith("API error"))
+  ) {
+    return NextResponse.json(
+      { error: `Generation failed: ${(failed[0] as { failures: string[] }).failures[0]}` },
+      { status: 502 },
+    );
+  }
   const response = {
     requested: specs.length,
     verified: verified.length,
