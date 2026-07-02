@@ -5,10 +5,18 @@ import { db } from "./db/index.ts";
 import {
   attempts,
   edits,
+  eloRatings,
+  patternAttempts,
   questions,
   sessions,
   type Question,
 } from "./db/schema.ts";
+import { ELO_START, nextRating } from "./elo.ts";
+import {
+  bestRoundScore,
+  computeCategoryStreak,
+  computeDayStreak,
+} from "./pattern-stats.ts";
 import {
   selectQuestions,
   selectTimedSet,
@@ -348,5 +356,109 @@ export async function saveTimedSession(input: {
     correctByQuestionId,
     sessionEditNet,
     lifetimeEditNet,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Pattern trainer (F6)
+// ---------------------------------------------------------------------------
+
+export type PatternRoundItem = {
+  category: string;
+  promptText: string;
+  correctAnswer: string;
+  userAnswer: string;
+  ms: number;
+  correct: boolean;
+  difficultyRating: number;
+};
+
+export type PatternRoundResult = {
+  oldRatings: Record<string, number>;
+  newRatings: Record<string, number>;
+  dayStreak: number;
+  categoryStreaks: Record<string, number>;
+  personalBest: { previous: number; current: number; isNew: boolean };
+};
+
+export async function savePatternRound(input: {
+  category: string; // a category key or "mixed"
+  items: PatternRoundItem[];
+}): Promise<PatternRoundResult> {
+  const score = input.items.filter((i) => i.correct).length;
+
+  // Previous best round score for this selection, from session summaries.
+  const previousBest = bestRoundScore(input.category);
+
+  db.insert(sessions)
+    .values({
+      mode: "pattern",
+      config: { category: input.category },
+      endedAt: new Date(),
+      summary: { category: input.category, score, total: input.items.length },
+    })
+    .run();
+
+  const touched = [...new Set(input.items.map((i) => i.category))];
+  const oldRatings: Record<string, number> = {};
+  for (const category of touched) {
+    const row = db
+      .select()
+      .from(eloRatings)
+      .where(eq(eloRatings.category, category))
+      .get();
+    oldRatings[category] = row?.rating ?? ELO_START;
+  }
+
+  const newRatings = { ...oldRatings };
+  db.transaction((tx) => {
+    for (const item of input.items) {
+      tx.insert(patternAttempts)
+        .values({
+          category: item.category,
+          promptText: item.promptText,
+          correctAnswer: item.correctAnswer,
+          userAnswer: item.userAnswer,
+          ms: item.ms,
+          correct: item.correct,
+        })
+        .run();
+      newRatings[item.category] = nextRating(
+        newRatings[item.category],
+        item.difficultyRating,
+        item.correct,
+      );
+    }
+    for (const category of touched) {
+      tx.insert(eloRatings)
+        .values({
+          category,
+          rating: newRatings[category],
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: eloRatings.category,
+          set: { rating: newRatings[category], updatedAt: new Date() },
+        })
+        .run();
+    }
+  });
+
+  const dayStreak = computeDayStreak();
+  const categoryStreaks: Record<string, number> = {};
+  for (const category of touched) {
+    categoryStreaks[category] = computeCategoryStreak(category);
+  }
+
+  return {
+    oldRatings,
+    newRatings,
+    dayStreak,
+    categoryStreaks,
+    personalBest: {
+      previous: previousBest,
+      current: score,
+      isNew: score > previousBest,
+    },
   };
 }
