@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Q86 design tokens — "the marked exam".
+   Exam paper, graphite, ballpoint ink, and the reviewer's red pen.
+   Light theme only, deliberately: training happens under match conditions.
+--------------------------------------------------------------------------- */
+
+:root {
+  --paper: #fafaf7;
+  --surface: #ffffff;
+  --grid: #e9e6dd;
+  --ink: #17181a;
+  --graphite: #5e6268;
+  --ballpoint: #2239c4;
+  --redpen: #c63b2f;
+  --amber: #b7791f;
+  --highlight: #f5efd9;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-grid: var(--grid);
+  --color-ink: var(--ink);
+  --color-graphite: var(--graphite);
+  --color-ballpoint: var(--ballpoint);
+  --color-redpen: var(--redpen);
+  --color-amber: var(--amber);
+  --color-highlight: var(--highlight);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
+    sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
+    monospace;
+
+  --radius-card: 10px;
+  --radius-control: 6px;
+
+  --shadow-ambient: 0 1px 2px rgb(23 24 26 / 0.04),
+    0 4px 12px rgb(23 24 26 / 0.03);
+}
+
+html {
+  /* Tabular figures everywhere — timers, tables, counters never wobble. */
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  color: var(--ink);
+  background-color: var(--paper);
+  /* Faint graph-paper grid, 24 px cell, on the app shell only.
+     Cards are solid --surface, so the grid never shows inside them. */
+  background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 23px,
+      color-mix(in srgb, var(--grid) 42%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 42%, transparent) 24px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 23px,
+      color-mix(in srgb, var(--grid) 42%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 42%, transparent) 24px
+    );
+}
+
+/* Visible keyboard focus, always. */
+:focus-visible {
+  outline: 2px solid var(--ballpoint);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--highlight);
+}
+
+/* KaTeX display math should scroll, never overflow the card. */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+/* Loading skeleton shimmer (opacity only — safe under reduced motion). */
+@keyframes q86-skeleton {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.skeleton {
+  background: var(--grid);
+  border-radius: 6px;
+  animation: q86-skeleton 1.4s ease-in-out infinite;
+}
