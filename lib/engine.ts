@@ -113,8 +113,12 @@ export async function selectTimedSet(
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
 ): Promise<Question[]> {
+  // Faithful to the GMAT Focus Quant section: problem solving only. Data
+  // Sufficiency lives in the Data Insights section on the real exam, so
+  // DS questions train through drills, never inside a section sim.
+  const formats: QuestionFormat[] = ["problem_solving"];
   if (singleSkill) {
-    return selectQuestions({ skills: [singleSkill] }, total);
+    return selectQuestions({ skills: [singleSkill], formats }, total);
   }
   const blend: Array<[FundamentalSkill, number]> =
     total === 21
@@ -135,7 +139,7 @@ export async function selectTimedSet(
   for (const [skill, n] of blend) {
     picked.push(
       ...(await selectQuestions(
-        { skills: [skill], excludeIds: picked.map((q) => q.id) },
+        { skills: [skill], formats, excludeIds: picked.map((q) => q.id) },
         n,
       )),
     );
@@ -143,7 +147,7 @@ export async function selectTimedSet(
   if (picked.length < total) {
     picked.push(
       ...(await selectQuestions(
-        { excludeIds: picked.map((q) => q.id) },
+        { formats, excludeIds: picked.map((q) => q.id) },
         total - picked.length,
       )),
     );

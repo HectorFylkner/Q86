@@ -29,8 +29,6 @@ try {
   // .env.local may not exist; the key may come from the environment
 }
 
-import fs from "node:fs";
-import path from "node:path";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
 import { ensureDbReady } from "../lib/db/bootstrap.ts";

@@ -130,6 +130,100 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         )}
       </Section>
 
+      {/* 2b — accuracy × difficulty matrix */}
+      <Section
+        title="Accuracy by difficulty"
+        subtitle="Where exactly each subtopic breaks: accuracy per difficulty tier, focused attempts only."
+      >
+        {data.difficultyMatrix.length === 0 ? (
+          <p className="text-sm text-graphite">
+            No attempts yet — the matrix fills in as you train.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[520px] text-xs">
+              <thead>
+                <tr className="text-left text-graphite">
+                  <th className="py-1 pr-2 font-medium">Subtopic</th>
+                  {[2, 3, 4, 5].map((d) => (
+                    <th key={d} className="w-24 py-1 pr-2 font-medium">
+                      D{d}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.difficultyMatrix.map((row) => (
+                  <tr key={row.subtopic} className="border-t border-grid">
+                    <td className="py-1.5 pr-2">{SUBTOPIC_LABELS[row.subtopic]}</td>
+                    {[2, 3, 4, 5].map((d) => {
+                      const cell = row.cells[d];
+                      if (!cell || cell.total === 0) {
+                        return (
+                          <td key={d} className="py-1.5 pr-2 text-graphite/50">
+                            —
+                          </td>
+                        );
+                      }
+                      const pct = Math.round((cell.correct / cell.total) * 100);
+                      return (
+                        <td key={d} className="py-1.5 pr-2">
+                          <span
+                            className={cn(
+                              "inline-block rounded-[4px] px-1.5 py-0.5 font-mono",
+                              pct >= 80
+                                ? "bg-ballpoint/10 text-ballpoint"
+                                : pct >= 60
+                                  ? "bg-amber/10 text-amber"
+                                  : "bg-redpen/10 text-redpen",
+                            )}
+                          >
+                            {pct}%
+                          </span>{" "}
+                          <span className="text-graphite">
+                            {cell.correct}/{cell.total}
+                          </span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Section>
+
+      {/* 2c — training volume calendar */}
+      <Section
+        title="Training volume"
+        subtitle="Focused attempts per day, last 12 weeks. Consistency beats intensity."
+      >
+        <div className="flex flex-wrap items-end gap-[3px]">
+          {data.volume.map((day) => {
+            const level =
+              day.count === 0
+                ? "bg-grid/60"
+                : day.count < 10
+                  ? "bg-ballpoint/25"
+                  : day.count < 25
+                    ? "bg-ballpoint/55"
+                    : "bg-ballpoint";
+            return (
+              <div
+                key={day.date}
+                title={`${day.date}: ${day.count} attempt${day.count === 1 ? "" : "s"}`}
+                className={cn("h-4 w-4 rounded-[3px]", level)}
+              />
+            );
+          })}
+        </div>
+        <p className="mt-2 text-[11px] text-graphite">
+          Each square is a day: blank → none, light → under 10, mid → under 25,
+          full → 25+.
+        </p>
+      </Section>
+
       {/* 3 — time vs accuracy scatter */}
       <Section
         title="Time vs. accuracy"

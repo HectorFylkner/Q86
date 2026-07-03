@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
+import { getQuestionHistory, type QuestionHistoryRow } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
 
@@ -20,6 +23,22 @@ export function SolutionPanel({
     .map(([k, v]) => ({ index: Number(k), text: v }))
     .filter((t) => t.index !== question.correctIndex && t.text)
     .sort((a, b) => a.index - b.index);
+
+  // Attempts on this exact question, newest first; the first row is the
+  // attempt that just revealed this panel, so history means length > 1.
+  const [history, setHistory] = useState<QuestionHistoryRow[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getQuestionHistory(question.id)
+      .then((rows) => {
+        if (!cancelled) setHistory(rows);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [question.id]);
+  const priorAttempts = history && history.length > 1 ? history.slice(1) : [];
 
   return (
     <motion.div
@@ -65,6 +84,38 @@ export function SolutionPanel({
                     your pick
                   </span>
                 )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {priorAttempts.length > 0 && (
+        <section className="mt-4 border-t border-grid pt-3">
+          <h3 className="font-display text-xs font-semibold text-graphite">
+            Your history on this question
+          </h3>
+          <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite">
+            {priorAttempts.map((a, i) => (
+              <li key={i} className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    "font-mono font-semibold",
+                    a.correct ? "text-ballpoint" : "text-redpen",
+                  )}
+                >
+                  {a.correct ? "✓" : "✗"}
+                </span>
+                <span className="font-mono">
+                  {Math.round(a.timeSeconds)}s
+                </span>
+                <span>
+                  {formatDistanceToNow(new Date(a.createdAt), {
+                    addSuffix: true,
+                  })}
+                  {a.mode === "redo" && " · redo"}
+                  {a.focus === "casual" && " · casual"}
+                </span>
               </li>
             ))}
           </ul>

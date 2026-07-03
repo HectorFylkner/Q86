@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
@@ -168,6 +168,33 @@ export async function logAttempt(input: {
   }
 
   return { attemptId: attempt.id, correct };
+}
+
+export type QuestionHistoryRow = {
+  correct: boolean;
+  timeSeconds: number;
+  mode: SessionMode;
+  focus: SessionFocus;
+  createdAt: Date;
+};
+
+/** Every recorded attempt on one question, newest first (max 12). */
+export async function getQuestionHistory(
+  questionId: number,
+): Promise<QuestionHistoryRow[]> {
+  return db
+    .select({
+      correct: attempts.correct,
+      timeSeconds: attempts.timeSeconds,
+      mode: attempts.mode,
+      focus: attempts.focus,
+      createdAt: attempts.createdAt,
+    })
+    .from(attempts)
+    .where(eq(attempts.questionId, questionId))
+    .orderBy(desc(attempts.id))
+    .limit(12)
+    .all();
 }
 
 export async function tagAttempt(

@@ -54,6 +54,13 @@ export type EditLedgerRow = {
   justification: string;
 };
 
+export type DifficultyMatrixRow = {
+  subtopic: Subtopic;
+  cells: Record<number, { correct: number; total: number }>;
+};
+
+export type VolumeDay = { date: string; count: number };
+
 export type AnalyticsData = {
   attemptCount: number;
   /** Attempts tagged casual at session start, excluded from every number here. */
@@ -89,6 +96,10 @@ export type AnalyticsData = {
     total: number;
   }>;
   trend: TrendPoint[];
+  /** Accuracy per subtopic × difficulty (focused attempts only). */
+  difficultyMatrix: DifficultyMatrixRow[];
+  /** Attempts per local day, most recent 84 days (includes zero days). */
+  volume: VolumeDay[];
   redoCompliance: {
     open: number;
     overdue: number;
@@ -278,6 +289,41 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     trend.push(point);
   }
 
+  // --- accuracy × difficulty matrix -----------------------------------------
+  const difficultyMatrix: DifficultyMatrixRow[] = ALL_SUBTOPICS.map(
+    (subtopic) => {
+      const cells: Record<number, { correct: number; total: number }> = {};
+      for (const d of [2, 3, 4, 5]) cells[d] = { correct: 0, total: 0 };
+      for (const r of rows) {
+        if (r.subtopic !== subtopic || cells[r.difficulty] == null) continue;
+        cells[r.difficulty].total++;
+        if (r.correct) cells[r.difficulty].correct++;
+      }
+      return { subtopic, cells };
+    },
+  ).filter((row) => Object.values(row.cells).some((c) => c.total > 0));
+
+  // --- training volume, last 84 local days -----------------------------------
+  const volume: VolumeDay[] = [];
+  {
+    const counts = new Map<string, number>();
+    for (const r of rows) {
+      const d = new Date(r.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const today = new Date();
+    for (let back = 83; back >= 0; back--) {
+      const d = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() - back,
+      );
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      volume.push({ date: key, count: counts.get(key) ?? 0 });
+    }
+  }
+
   // --- redo compliance ---------------------------------------------------------
   const redoRows = await db.select().from(redoQueue).all();
   const nowMs = Date.now();
@@ -335,6 +381,8 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     },
     calibration,
     trend,
+    difficultyMatrix,
+    volume,
     redoCompliance,
     eloBars,
   };

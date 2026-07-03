@@ -287,7 +287,7 @@ export function DrillSetup({
                 [
                   ["all", "Both"],
                   ["problem_solving", "PS"],
-                  ["data_sufficiency", "DS"],
+                  ["data_sufficiency", "DS · Data Insights"],
                 ] as const
               ).map(([value, label]) => (
                 <button
