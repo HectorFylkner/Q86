@@ -3024,6 +3024,681 @@
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "stem_md": "A café sells only muffins and scones. One muffin and two scones cost \\$7.10; two muffins and one scone cost \\$7.60. What is the price of one muffin?",
+   "choices": [
+    "\\$2.20",
+    "\\$2.45",
+    "\\$2.70",
+    "\\$2.90",
+    "\\$3.10"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Add the equations: $3m + 3s = 14.70$, so $m + s = 4.90$. Subtract from the second: $m = 7.60 - 4.90 - s + s$… cleaner: $(2m + s) - (m + s) = 7.60 - 4.90 = 2.70$.",
+   "solution_md": "**Formal path**\n\nLet $m, s$ be the prices. $m + 2s = 7.10$ and $2m + s = 7.60$. Adding gives $3(m + s) = 14.70$, so $m + s = 4.90$. Then $m = (2m + s) - (m + s) = 7.60 - 4.90 = 2.70$.\n\n**Trigger cue**\n\nWhen two symmetric combos are given, reach for adding the equations to get the pair sum.\n\n**Takeaway**\n\nSum the equations first; symmetric systems collapse fast.",
+   "trap_map": {
+    "0": "Reporting the scone price ($s = 2.20$).",
+    "1": "Averaging the two totals and halving.",
+    "3": "Subtracting the equations and mis-assigning the $0.50$ gap.",
+    "4": "Adding the $0.50$ gap to the wrong base."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "stem_md": "For which value of $k$ does the system\n\n$$3x - 6y = 9$$\n\n$$kx - 10y = 15$$\n\nhave infinitely many solutions?",
+   "choices": [
+    "$3$",
+    "$5$",
+    "$6$",
+    "$9$",
+    "$15$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Infinitely many solutions means the equations are the same line: scale the first by $\\tfrac{15}{9} = \\tfrac{5}{3}$: $5x - 10y = 15$. So $k = 5$.",
+   "solution_md": "**Formal path**\n\nProportional coefficients: $\\tfrac{k}{3} = \\tfrac{-10}{-6} = \\tfrac{15}{9} = \\tfrac{5}{3}$. All three ratios agree at $\\tfrac53$, giving $k = 5$.\n\n**Trigger cue**\n\nWhen \"infinitely many solutions\" appears, reach for making one equation a multiple of the other.\n\n**Takeaway**\n\nSame line means proportional coefficients — all three.",
+   "trap_map": {
+    "0": "Matching only the $x$-coefficients as equal.",
+    "2": "Doubling $3$ because $-10$ looks like $-6$ scaled by $\\tfrac{5}{3}$ misread as $2$.",
+    "3": "Matching the constants $9 \\to 15$ by adding $6$ to $k = 3$.",
+    "4": "Using the constant $15$ itself."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "stem_md": "At a fundraiser, adult tickets cost \\$12 each and child tickets cost \\$5 each. How many adult tickets were sold?\n\n(1) Ticket revenue was \\$93 in total.\n\n(2) A total of $13$ tickets were sold.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "(1): $12a + 5c = 93$ in whole tickets. Mod $5$: $2a \\equiv 3$, so $a \\equiv 4 \\pmod 5$; and $12a \\le 93$ caps $a \\le 7$. Only $a = 4$ works ($c = 9$) — sufficient. (2): $a + c = 13$ alone allows many splits — not sufficient.",
+   "solution_md": "**Formal path**\n\n(1): one equation, two unknowns — but tickets are nonnegative integers. Reducing $12a + 5c = 93$ modulo $5$: $2a \\equiv 3 \\pmod 5$, giving $a \\equiv 4 \\pmod 5$, so $a \\in \\{4, 9, \\ldots\\}$; the budget caps $a \\le 7$, leaving $a = 4$ uniquely ($c = 9$). Sufficient. (2): $(a, c)$ could be $(1,12)$, $(4,9)$, $(10,3)$, … — not sufficient.\n\n**Trigger cue**\n\nWhen one equation has two integer unknowns, reach for modular constraints before declaring it insufficient.\n\n**Takeaway**\n\nInteger constraints can make one equation sufficient.",
+   "trap_map": {
+    "1": "Trusting the ticket count while ignoring that prices alone can pin the split.",
+    "2": "Reflexively combining because one equation with two unknowns \"can't\" suffice.",
+    "3": "Granting (2) alone after finding a single convenient split.",
+    "4": "Declaring both hopeless by the equations-versus-unknowns rule."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "Real numbers $x$, $y$, and $z$ satisfy\n\n$$x + y = 12, \\qquad y + z = 17, \\qquad x + z = 15.$$\n\nWhat is the value of $y \\cdot z$?",
+   "choices": [
+    "$63$",
+    "$70$",
+    "$77$",
+    "$80$",
+    "$84$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Add all three: $2(x + y + z) = 44$, so $x + y + z = 22$. Then $z = 22 - 12 = 10$, $y = 22 - 15 = 7$: $yz = 70$.",
+   "solution_md": "**Formal path**\n\nSumming the equations counts each variable twice: $x + y + z = 22$. Subtract each pair equation from the total: $z = 22 - (x + y) = 10$, $x = 22 - (y+z) = 5$, $y = 22 - (x+z) = 7$. Product: $yz = 70$.\n\n**Trigger cue**\n\nWhen all pairwise sums are given, reach for adding everything and halving.\n\n**Takeaway**\n\nPairwise sums: total first, then subtract each pair.",
+   "trap_map": {
+    "0": "A subtraction slip gives $y = 9$: computing $7 \\cdot 9$.",
+    "2": "Computing $7 \\cdot 11$ after halving $22$ wrong.",
+    "3": "Computing $8 \\cdot 10$ from swapped assignments.",
+    "4": "Multiplying the wrong pair: $12 \\cdot 7$ from the first equation."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "In the system\n\n$$2x + 3y = 7$$\n\n$$4x + cy = 14$$\n\n$c$ is a constant. If the system has MORE than one solution, what is the value of $x + y$ when $y = 3$?",
+   "choices": [
+    "$-1$",
+    "$0$",
+    "$1$",
+    "$2$",
+    "$3$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "More than one solution forces the second equation to be double the first: $c = 6$. Then only $2x + 3y = 7$ matters: at $y = 3$, $x = -1$, so $x + y = 2$.",
+   "solution_md": "**Formal path**\n\nA linear system with more than one solution is dependent: $(4, c, 14) = 2 \\cdot (2, 3, 7)$, so $c = 6$ and both equations describe the line $2x + 3y = 7$. Substituting $y = 3$: $2x = 7 - 9 = -2$, $x = -1$, giving $x + y = 2$.\n\n**Trigger cue**\n\nWhen a system has multiple solutions, reach for dependency — the equations carry one line's worth of information.\n\n**Takeaway**\n\nDependent systems leave one equation of information.",
+   "trap_map": {
+    "0": "Reporting $x$ alone.",
+    "1": "Adding $x + y$ with a sign slip on $x$.",
+    "2": "Halving the constant: solving $2x + 3y = 3.5$.",
+    "4": "Reporting $y$ alone."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "stem_md": "A storage plan charges a \\$40 setup fee plus \\$15 per month. If a customer's total budget is \\$250, what is the greatest whole number of months of storage she can buy?",
+   "choices": [
+    "$12$",
+    "$13$",
+    "$14$",
+    "$15$",
+    "$16$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Months cost $250 - 40 = 210$ at most: $\\tfrac{210}{15} = 14$ exactly.",
+   "solution_md": "**Formal path**\n\n$40 + 15m \\le 250 \\Rightarrow 15m \\le 210 \\Rightarrow m \\le 14$. The maximum whole number is $14$.\n\n**Trigger cue**\n\nWhen a budget caps a linear cost, reach for subtracting the fixed part first.\n\n**Takeaway**\n\nStrip the fixed fee, then divide.",
+   "trap_map": {
+    "0": "Reserving a month of budget as imagined slack.",
+    "1": "Rounding $14.0$ down one extra step \"to be safe.\"",
+    "3": "Ignoring the fee, then subtracting one month as a guess at it.",
+    "4": "Dividing $250$ by $15$ and rounding down, ignoring the setup fee."
+   },
+   "numeric_check": "(250 - 40) / 15",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "stem_md": "If $x$ and $y$ are integers with $x \\le 8$ and $y \\ge -3$, what is the greatest possible value of $x - y$?",
+   "choices": [
+    "$5$",
+    "$8$",
+    "$11$",
+    "$24$",
+    "There is no greatest value"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Maximize $x$ (take $8$) and minimize $y$ (take $-3$): $8 - (-3) = 11$.",
+   "solution_md": "**Formal path**\n\n$x - y$ increases with $x$ and decreases with $y$. The extremes allowed are $x = 8$ and $y = -3$, giving $8 - (-3) = 11$. Both bounds are attainable, so $11$ is the maximum.\n\n**Trigger cue**\n\nWhen maximizing a difference over ranges, reach for the top of the first and the bottom of the second.\n\n**Takeaway**\n\nSubtracting the smallest allowed value adds the most.",
+   "trap_map": {
+    "0": "Computing $8 - 3$.",
+    "1": "Ignoring $y$ entirely.",
+    "3": "Multiplying the bounds: $8 \\cdot 3$.",
+    "4": "Believing the one-sided bounds leave the difference unbounded above."
+   },
+   "numeric_check": "8 - (-3)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "What is the maximum value that the expression $-(x - 4)^2 + k$ attains?\n\n(1) $k = 25$\n\n(2) The expression equals $9$ when $x = 0$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "The vertex form peaks at $x = 4$ with value $k$. (1) hands over $k$ — sufficient. (2): $-(0-4)^2 + k = 9$ gives $k = 25$ — sufficient. Each alone.",
+   "solution_md": "**Formal path**\n\n$-(x-4)^2 \\le 0$ with equality at $x = 4$, so the maximum is exactly $k$. (1) states $k = 25$. (2) solves to $-16 + k = 9$, i.e. $k = 25$. Either statement pins the maximum at $25$.\n\n**Trigger cue**\n\nWhen a quadratic is in vertex form, reach for reading the extreme value straight off.\n\n**Takeaway**\n\nVertex form hands you the max for free.",
+   "trap_map": {
+    "0": "Discounting (2) as a single point that \"can't reveal the peak.\"",
+    "1": "Discounting (1) because the peak location $x = 4$ is not restated.",
+    "2": "Combining although either alone determines $k$.",
+    "4": "Believing a maximum needs calculus or more data."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "A team of $5$ analysts has an average of $32$ completed reports each. If no analyst completed more than $40$ reports and every analyst completed a whole number of reports, what is the minimum possible number of reports completed by the least productive analyst?",
+   "choices": [
+    "$0$",
+    "$8$",
+    "$16$",
+    "$20$",
+    "$32$"
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "Total is $160$. To minimize one analyst, maximize the other four at $40$ each: $160 - 4 \\cdot 40 = 0$.",
+   "solution_md": "**Formal path**\n\nThe five totals sum to $5 \\cdot 32 = 160$. Pushing four analysts to the cap of $40$ uses $160$, leaving $0$ for the fifth — attainable, so the minimum is $0$.\n\n**Trigger cue**\n\nWhen minimizing one member under a fixed total, reach for maxing out everyone else.\n\n**Takeaway**\n\nMinimize one by maximizing the rest.",
+   "trap_map": {
+    "1": "Capping the others at the average $+\\,$half the cap.",
+    "2": "Using a cap of $36$ from an averaging slip.",
+    "3": "Assuming the minimum must be within $12$ of the mean.",
+    "4": "Assuming the least must equal the average."
+   },
+   "numeric_check": "160 - 4*40",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "The function $y = x^2 + bx + c$ has constants $b$ and $c$. What is the minimum value of $y$?\n\n(1) $b = -8$\n\n(2) $c = 19$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Completing the square: minimum $= c - \\tfrac{b^2}{4}$. It needs BOTH constants: (1) alone leaves $c$ free, (2) alone leaves $b$ free; together the minimum is $19 - 16 = 3$.",
+   "solution_md": "**Formal path**\n\n$y = \\left(x + \\tfrac{b}{2}\\right)^2 + c - \\tfrac{b^2}{4}$, so the minimum equals $c - \\tfrac{b^2}{4}$. Each statement supplies one constant and leaves the other free — insufficient alone. Together: $19 - \\tfrac{64}{4} = 3$ — sufficient.\n\n**Trigger cue**\n\nWhen a quadratic's extreme is asked, reach for completing the square and see which constants the formula needs.\n\n**Takeaway**\n\nThe minimum reads $c - b^2/4$: both constants required.",
+   "trap_map": {
+    "0": "Believing the vertex location $-b/2$ alone yields the minimum value.",
+    "1": "Believing the constant term is the minimum (true only when $b = 0$).",
+    "3": "Granting each alone after conflating vertex location with vertex value.",
+    "4": "Missing that the two constants plug straight into one formula."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "stem_md": "Seven distinct positive integers have an average of $20$, and their median is $22$. What is the greatest possible value of the largest of the seven integers?",
+   "choices": [
+    "$59$",
+    "$62$",
+    "$65$",
+    "$68$",
+    "$71$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Total $= 7 \\cdot 20 = 140$. Starve every other slot: the three below the median take $1, 2, 3$; the median is $22$; the two between the median and the top take $23, 24$. Largest $= 140 - (1+2+3+22+23+24) = 65$.",
+   "solution_md": "**Formal path**\n\nWith seven distinct values and median $22$, three sit below ($\\le 21$) and three above ($\\ge 23$). To maximize the top value, minimize all six others: $1, 2, 3$ below; $23, 24$ as the two smallest values above. The top gets $140 - 75 = 65$, and $65 > 24$ keeps the ordering valid.\n\n**Trigger cue**\n\nWhen maximizing one slot under a fixed mean and median, reach for minimizing every other slot within the ordering constraints.\n\n**Takeaway**\n\nFix the median, starve the rest, feed the max.",
+   "trap_map": {
+    "0": "Minimizing the two above the median at $23, 25$ and slipping on distinctness.",
+    "1": "Using $1, 2, 3$ but $24, 25$ above the median.",
+    "3": "Allowing a lower value to equal the median.",
+    "4": "Using $0$ among the positive integers."
+   },
+   "numeric_check": "140 - (1+2+3+22+23+24)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "stem_md": "The function $f$ is defined by $f(x) = 3x^2 - 2x + 1$. What is the value of $f(-2)$?",
+   "choices": [
+    "$-15$",
+    "$-7$",
+    "$9$",
+    "$13$",
+    "$17$"
+   ],
+   "correct_index": 4,
+   "fastest_path_md": "Substitute carefully: $3(-2)^2 - 2(-2) + 1 = 12 + 4 + 1 = 17$.",
+   "solution_md": "**Formal path**\n\n$f(-2) = 3 \\cdot 4 - 2 \\cdot (-2) + 1 = 12 + 4 + 1 = 17$. The two classic slips: squaring the sign away wrong, and mishandling $-2 \\cdot (-2)$.\n\n**Trigger cue**\n\nWhen evaluating at a negative, reach for parentheses around every substitution.\n\n**Takeaway**\n\nParenthesize the input; signs survive.",
+   "trap_map": {
+    "0": "Computing $3(-4) - 4 + 1$: squaring to $-4$.",
+    "1": "Computing $-12 + 4 + 1$: sign lost on the square only.",
+    "2": "Computing $12 - 4 + 1$: sign lost on the linear term.",
+    "3": "Dropping the constant."
+   },
+   "numeric_check": "3*(-2)^2 - 2*(-2) + 1",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "stem_md": "In a sequence, $a_1 = 5$ and $a_{n+1} = 2a_n - 3$ for all $n \\ge 1$. What is $a_4$?",
+   "choices": [
+    "$11$",
+    "$15$",
+    "$19$",
+    "$23$",
+    "$35$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Iterate: $a_2 = 7$, $a_3 = 11$, $a_4 = 19$.",
+   "solution_md": "**Formal path**\n\n$a_2 = 2 \\cdot 5 - 3 = 7$; $a_3 = 2 \\cdot 7 - 3 = 11$; $a_4 = 2 \\cdot 11 - 3 = 19$. Three applications, not four.\n\n**Trigger cue**\n\nWhen a recursion asks for a nearby term, reach for direct iteration with an index count.\n\n**Takeaway**\n\nCount the steps: reaching $a_4$ takes three applications.",
+   "trap_map": {
+    "0": "Stopping at $a_3$.",
+    "1": "Computing $2a_3 - 7$ by reusing the wrong constant.",
+    "3": "Adding one extra iteration's worth by sign slip.",
+    "4": "Iterating once too many: $a_5 = 35$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "stem_md": "The sequence $b_1, b_2, b_3, \\ldots$ is arithmetic. What is the value of $b_{10}$?\n\n(1) $b_3 = 11$\n\n(2) $b_7 = 27$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "An arithmetic sequence has two unknowns (start and step). One term alone leaves the step free; two terms pin both: step $= \\tfrac{27 - 11}{4} = 4$, so $b_{10} = 27 + 3 \\cdot 4 = 39$.",
+   "solution_md": "**Formal path**\n\n$b_n = b_1 + (n-1)d$. (1) alone or (2) alone fixes one linear equation in two unknowns — insufficient. Together: $b_7 - b_3 = 4d = 16$, so $d = 4$ and $b_{10} = b_7 + 3d = 39$ — sufficient.\n\n**Trigger cue**\n\nWhen an arithmetic sequence hides two parameters, reach for counting equations against unknowns.\n\n**Takeaway**\n\nTwo parameters need two independent facts.",
+   "trap_map": {
+    "0": "Treating one anchor term as enough.",
+    "1": "Same slip on the other anchor.",
+    "3": "Granting each alone by assuming a default step of 1.",
+    "4": "Missing that the term gap divides evenly into the index gap."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "stem_md": "A gym's membership doubled every year for four years: at the end of year $4$ it reached $4{,}800$ members. The gym opened at the start of year $1$ with $m$ members. What is $m$?",
+   "choices": [
+    "$150$",
+    "$300$",
+    "$600$",
+    "$1{,}200$",
+    "$2{,}400$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Four doublings multiply by $2^4 = 16$… careful: doubling each year for 4 years from the start gives $m \\cdot 2^4 = 4800$, so $m = 300$.",
+   "solution_md": "**Formal path**\n\nEnd of year $k$ count: $m \\cdot 2^k$. End of year 4: $m \\cdot 2^4 = 16m = 4800$, so $m = 300$.\n\n**Trigger cue**\n\nWhen repeated doubling appears, reach for powers of two and count the doublings exactly.\n\n**Takeaway**\n\nCount the doublings; divide by the full power.",
+   "trap_map": {
+    "0": "Dividing by $2^5$ — one doubling too many.",
+    "2": "Dividing by $2^3$ — one too few.",
+    "3": "Dividing by $4$ (years) instead of $2^4$.",
+    "4": "Halving once."
+   },
+   "numeric_check": "4800 / 16",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "stem_md": "A bookstore sold twice as many paperbacks as hardcovers. If it sold $87$ books in total, how many paperbacks did it sell?",
+   "choices": [
+    "$29$",
+    "$43$",
+    "$54$",
+    "$58$",
+    "$64$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "Paperbacks are $2$ of every $3$ books: $\\tfrac{2}{3} \\cdot 87 = 58$.",
+   "solution_md": "**Formal path**\n\nLet hardcovers be $h$; paperbacks are $2h$. Then $3h = 87$, so $h = 29$ and paperbacks $= 58$.\n\n**Trigger cue**\n\nWhen \"twice as many X as Y\" appears, reach for writing $x = 2y$ — X gets the multiplier.\n\n**Takeaway**\n\n\"Twice as many X as Y\" means X is bigger.",
+   "trap_map": {
+    "0": "Reporting the hardcover count.",
+    "1": "Splitting $87$ evenly and rounding.",
+    "2": "Using a $5{:}3$ split from a misread.",
+    "4": "Computing $\\tfrac{3}{4} \\cdot 87$ rounded — a ratio slip."
+   },
+   "numeric_check": "2/3 * 87",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "stem_md": "When $7$ is subtracted from three times a number $n$, the result is the same as when the number is increased by $9$. What is $n$?",
+   "choices": [
+    "$1$",
+    "$4$",
+    "$8$",
+    "$11$",
+    "$16$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Translate directly: $3n - 7 = n + 9 \\Rightarrow 2n = 16 \\Rightarrow n = 8$.",
+   "solution_md": "**Formal path**\n\n\"Three times a number, minus $7$\": $3n - 7$. \"The number increased by $9$\": $n + 9$. Setting them equal: $3n - 7 = n + 9$, so $2n = 16$ and $n = 8$.\n\n**Trigger cue**\n\nWhen a sentence equates two quantities, reach for translating each side before simplifying anything.\n\n**Takeaway**\n\nTranslate phrase by phrase; solve after.",
+   "trap_map": {
+    "0": "Solving $3n + 7 = n + 9$ — sign slip on the subtraction.",
+    "1": "Solving $3(n - 7) = n + 9$ — misplaced parentheses.",
+    "3": "Solving $3n - 7 = 9n$? — attaching the increase multiplicatively... yielding a fraction rounded to $11$ via $2n = 22$ slip.",
+    "4": "Solving $3n - 7 = n + 9$ but computing $2n = 32$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "A landscaping job pays a crew a fixed total amount. If the crew has $6$ workers, each earns \\$40 more than each would earn if the crew had $8$ workers. What is the fixed total payment, in dollars?",
+   "choices": [
+    "\\$720",
+    "\\$840",
+    "\\$960",
+    "\\$1{,}080",
+    "\\$1{,}200"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Backsolve: try \\$960 — six workers get \\$160 each, eight get \\$120: difference \\$40 ✓.",
+   "solution_md": "**Formal path**\n\nLet the total be $T$: $\\tfrac{T}{6} = \\tfrac{T}{8} + 40$. Multiply by $24$: $4T = 3T + 960$, so $T = 960$.\n\n**Trigger cue**\n\nWhen a fixed pot is split among different headcounts, reach for equating per-person shares.\n\n**Takeaway**\n\nFixed totals: per-share equations, then clear denominators.",
+   "trap_map": {
+    "0": "Setting $\\tfrac{T}{8} - \\tfrac{T}{6} = 40$ and dropping the sign.",
+    "1": "Using headcounts $7$ and $8$ after misreading.",
+    "3": "Multiplying by $27$ instead of $24$ when clearing denominators.",
+    "4": "Solving $\\tfrac{T}{6} - \\tfrac{T}{8} = 50$ from a \\$-slip."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "The sum of two numbers is $34$, and their difference is $6$. What is the product of the two numbers?",
+   "choices": [
+    "$240$",
+    "$260$",
+    "$280$",
+    "$289$",
+    "$320$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Numbers are $\\tfrac{34 \\pm 6}{2} = 20$ and $14$: product $280$.",
+   "solution_md": "**Formal path**\n\n$x + y = 34$, $x - y = 6$. Adding: $2x = 40$, $x = 20$; then $y = 14$. Product: $280$. (Or: $xy = \\tfrac{(x+y)^2 - (x-y)^2}{4} = \\tfrac{1156 - 36}{4} = 280$.)\n\n**Trigger cue**\n\nWhen a sum and difference are both given, reach for half their sum and half their difference.\n\n**Takeaway**\n\nSum-and-difference pairs solve in one step each.",
+   "trap_map": {
+    "0": "Using $20$ and $12$ after halving the difference wrong.",
+    "1": "Using $13$ and $20$ from adding before halving.",
+    "3": "Squaring half the sum: $17^2$ — the equal-pair product.",
+    "4": "Using $16$ and $20$ from subtracting $6$ once only."
+   },
+   "numeric_check": "20 * 14",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "Nadia is now three times as old as her son. In $12$ years, she will be twice as old as he will be then. How old is Nadia now?",
+   "choices": [
+    "$24$",
+    "$30$",
+    "$36$",
+    "$42$",
+    "$48$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Backsolve with the ratio: try Nadia $36$, son $12$. In $12$ years: $48$ vs $24$ — exactly twice ✓.",
+   "solution_md": "**Formal path**\n\nSon's age $s$; Nadia's $3s$. In $12$ years: $3s + 12 = 2(s + 12)$, so $3s + 12 = 2s + 24$ and $s = 12$: Nadia is $36$.\n\n**Trigger cue**\n\nWhen ages shift by the same number of years, reach for adding that shift to BOTH sides before equating.\n\n**Takeaway**\n\nEveryone ages together; ratios do not.",
+   "trap_map": {
+    "0": "Applying the future ratio $2{:}1$ to today.",
+    "1": "Adding $12$ only to the son's side.",
+    "3": "Adding $12$ only to Nadia's side.",
+    "4": "Doubling Nadia's current age check: using $s = 16$ from a slip."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "A drawer contains only silver coins worth $5$ points each and gold coins worth $8$ points each. How many gold coins are in the drawer?\n\n(1) The coins are worth $79$ points in total.\n\n(2) The drawer contains $11$ coins in total.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1): $5s + 8g = 79$ has TWO integer solutions: $(s, g) = (11, 3)$ and $(3, 8)$ — not sufficient. (2): eleven coins split many ways — not sufficient. Together: only $(3, 8)$ has $s + g = 11$, so $g = 8$.",
+   "solution_md": "**Formal path**\n\n(1): modulo $5$, $3g \\equiv 4 \\pmod 5$ gives $g \\equiv 3 \\pmod 5$, so $g \\in \\{3, 8\\}$ within the point budget; both $(11, 3)$ and $(3, 8)$ work — insufficient. (2): the count alone fixes nothing — insufficient. Together: $(11, 3)$ has $14$ coins, $(3, 8)$ has $11$ ✓ — unique, $g = 8$. Sufficient combined.\n\n**Trigger cue**\n\nWhen a coin equation has several integer solutions, reach for intersecting with the count.\n\n**Takeaway**\n\nSieve the integer solutions, then intersect the statements.",
+   "trap_map": {
+    "0": "Stopping the mod-5 sieve at $g = 3$ and missing $g = 8$.",
+    "1": "Trusting the coin count alone.",
+    "3": "Granting each alone after finding one solution for each.",
+    "4": "Declaring one equation with two unknowns hopeless despite the integer sieve."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "Rana and Tomás each donated a whole number of dollars to a fund. How much did Rana donate?\n\n(1) Rana donated \\$15 more than Tomás.\n\n(2) Together they donated \\$95.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1) alone: any pair with a \\$15 gap. (2) alone: any split of \\$95. Together: $r = t + 15$ and $r + t = 95$ give $2t = 80$, $t = 40$, $r = 55$ — one value.",
+   "solution_md": "**Formal path**\n\nTwo unknowns need two independent equations. (1): $r = t + 15$ — a line of possibilities. (2): $r + t = 95$ — another line. Intersecting: $t + 15 + t = 95$, $t = 40$, $r = 55$ — sufficient together only.\n\n**Trigger cue**\n\nWhen a word problem hides a two-variable system, reach for counting independent equations.\n\n**Takeaway**\n\nTwo unknowns, two equations — no fewer.",
+   "trap_map": {
+    "0": "Treating the gap alone as if anchored to a known base.",
+    "1": "Treating the total alone as if split evenly.",
+    "3": "Granting each alone by assuming the other fact silently.",
+    "4": "Missing that the two lines intersect at one point."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "A vending machine sells snacks for \\$2 each and drinks for \\$3 each. Yesterday it sold snacks and drinks only. Did it sell more snacks than drinks yesterday?\n\n(1) Yesterday's revenue was \\$36.\n\n(2) It sold $15$ items in total yesterday.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1): $2s + 3d = 36$ allows $(s, d) = (15, 2)$ (yes) and $(3, 10)$ (no) — not sufficient. (2): $s + d = 15$ allows both orders — not sufficient. Together: $2s + 3(15 - s) = 36$ gives $s = 9$, $d = 6$: yes — sufficient.",
+   "solution_md": "**Formal path**\n\n(1) has many integer solutions with either ordering — insufficient. (2) fixes only the count — insufficient. Together: substitute $d = 15 - s$ into the revenue: $2s + 45 - 3s = 36$, so $s = 9$ and $d = 6$; $9 > 6$ answers yes — sufficient.\n\n**Trigger cue**\n\nWhen a yes/no question sits on a hidden system, reach for solving the system fully before judging.\n\n**Takeaway**\n\nAnswer the question after the system collapses.",
+   "trap_map": {
+    "0": "Believing revenue alone orders the counts.",
+    "1": "Believing the item count alone orders the split.",
+    "3": "Granting each alone after finding one convenient solution.",
+    "4": "Stopping at \"two unknowns\" without combining."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "stem_md": "The positive integer $q$ is the number of questions on a quiz. What is $q$?\n\n(1) If the quiz had $5$ more questions, it would have more than $31$ questions.\n\n(2) If the quiz had $4$ fewer questions, it would have fewer than $24$ questions.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1): $q + 5 > 31$ means $q > 26$, i.e. $q \\ge 27$ — many values. (2): $q - 4 < 24$ means $q < 28$, i.e. $q \\le 27$ — many values. Together the integer bounds pinch: $q = 27$.",
+   "solution_md": "**Formal path**\n\nTranslate each: (1) $q + 5 > 31 \\Rightarrow q \\ge 27$ (integers); (2) $q - 4 < 24 \\Rightarrow q \\le 27$. Each alone leaves infinitely (or many) values — insufficient. Their intersection is the single integer $27$ — sufficient together.\n\n**Trigger cue**\n\nWhen verbal inequalities bracket an integer, reach for sharpening each strict bound to its integer endpoint.\n\n**Takeaway**\n\nStrict bounds on integers pinch to endpoints.",
+   "trap_map": {
+    "0": "Reading (1) as the equality $q + 5 = 31$.",
+    "1": "Reading (2) as the equality $q - 4 = 24$.",
+    "3": "Granting each alone by treating one bound as an exact value.",
+    "4": "Missing that the two integer bounds meet at exactly one value."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 5,
+   "stem_md": "A three-digit number has digits that sum to $15$. Its tens digit is twice its hundreds digit, and reversing its digits increases the number by $297$. What is the units digit of the number?",
+   "choices": [
+    "$3$",
+    "$4$",
+    "$6$",
+    "$8$",
+    "$9$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Reversal identity: the reversed number exceeds the original by $99(u - h)$, so $u - h = 3$. With $t = 2h$ and digit sum $15$: $h + 2h + (h + 3) = 15$, so $4h = 12$, $h = 3$, $t = 6$, $u = 6$. Check: $366 + 297 = 663$ ✓.",
+   "solution_md": "**Formal path**\n\nWrite the number as $100h + 10t + u$. Reversing gives $100u + 10t + h$; the difference is $99(u - h) = 297$, so $u = h + 3$. Substituting $t = 2h$ into $h + t + u = 15$: $4h + 3 = 15$, so $h = 3$, $t = 6$, $u = 6$ — the number is $366$ and its reversal $663$ is exactly $297$ more.\n\n**Trigger cue**\n\nWhen a number is compared with its digit reversal, reach for the $99 \\times (u - h)$ identity.\n\n**Takeaway**\n\nReversal gaps are multiples of ninety-nine.",
+   "trap_map": {
+    "0": "Reporting the hundreds digit.",
+    "1": "Solving $u - h = 3$ but taking $h = 1$ from a sum slip.",
+    "3": "Using $u - h = 3$ backwards ($h - u = 3$) and compensating.",
+    "4": "Assigning the tens digit's doubled value to the units place."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
   }
  ]
 }
