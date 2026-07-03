@@ -122,7 +122,15 @@ function parseBlocks(source: string): Block[] {
       }
     }
   }
-  return blocks;
+  // Blank-line-separated "1." items arrive as single-item lists; merge
+  // adjacent ordered lists so numbering continues instead of restarting.
+  const merged: Block[] = [];
+  for (const b of blocks) {
+    const prev = merged[merged.length - 1];
+    if (b.kind === "ol" && prev?.kind === "ol") prev.items.push(...b.items);
+    else merged.push(b);
+  }
+  return merged;
 }
 
 export function Md({
