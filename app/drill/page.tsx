@@ -10,9 +10,9 @@ export const runtime = "nodejs";
 export default async function DrillPage({
   searchParams,
 }: {
-  searchParams: Promise<{ qids?: string; plan?: string }>;
+  searchParams: Promise<{ qids?: string; plan?: string; sub?: string; d?: string }>;
 }) {
-  const { qids, plan } = await searchParams;
+  const { qids, plan, sub, d } = await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -37,12 +37,20 @@ export default async function DrillPage({
     .groupBy(questions.subtopic, questions.difficulty, questions.format)
     .all()) as CountRow[];
 
+  // Mastery-ladder deep link: /drill?sub=<subtopic>&d=<difficulty>
+  const rungDifficulty = Number(d);
+  const autoStartRung =
+    sub && Number.isInteger(rungDifficulty) && rungDifficulty >= 2 && rungDifficulty <= 5
+      ? { subtopic: sub, difficulty: rungDifficulty }
+      : null;
+
   return (
     <div className="space-y-4">
       <h1 className="font-display text-xl font-semibold">Drill</h1>
       <DrillClient
         rows={rows}
         autoStartIds={autoStartIds?.length ? autoStartIds : null}
+        autoStartRung={autoStartRung}
       />
     </div>
   );

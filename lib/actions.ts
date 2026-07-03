@@ -516,6 +516,31 @@ export async function savePatternRound(input: {
 }
 
 // ---------------------------------------------------------------------------
+// Decision drills
+// ---------------------------------------------------------------------------
+
+export async function saveDecisionRound(input: {
+  total: number;
+  aligned: number;
+  calls: Array<{ questionId: number; call: string; recommendation: string }>;
+}): Promise<void> {
+  await db
+    .insert(sessions)
+    .values({
+      mode: "pattern",
+      config: { kind: "decision" },
+      endedAt: new Date(),
+      summary: {
+        kind: "decision",
+        total: input.total,
+        aligned: input.aligned,
+        calls: input.calls,
+      },
+    })
+    .run();
+}
+
+// ---------------------------------------------------------------------------
 // Settings & baseline import (F8, F9)
 // ---------------------------------------------------------------------------
 

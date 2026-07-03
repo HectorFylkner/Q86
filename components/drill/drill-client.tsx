@@ -25,12 +25,31 @@ type Stage =
 export function DrillClient({
   rows,
   autoStartIds,
+  autoStartRung,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
+  autoStartRung?: { subtopic: string; difficulty: number } | null;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
+
+  // Mastery-ladder rung drills arrive as /drill?sub=…&d=…
+  useEffect(() => {
+    if (!autoStartRung || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    void handleStart({
+      filter: {
+        subtopics: [autoStartRung.subtopic as never],
+        difficultyMin: autoStartRung.difficulty,
+        difficultyMax: autoStartRung.difficulty,
+      },
+      count: 6,
+      timing: "soft",
+      focus: "focused",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStartRung]);
 
   // Twin drills and coach prescriptions arrive as /drill?qids=…
   useEffect(() => {

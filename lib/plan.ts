@@ -11,6 +11,48 @@ import type { PatternCategoryKey } from "./generators/index.ts";
 
 export type SkillRecord = { correct: number; total: number };
 
+/** Training phase from days-to-test (Manhattan-style arc). */
+export type TrainingPhase = "foundations" | "accuracy" | "speed" | "peak";
+
+export function phaseOf(daysToTest: number | null): TrainingPhase | null {
+  if (daysToTest == null) return null;
+  if (daysToTest > 45) return "foundations";
+  if (daysToTest > 21) return "accuracy";
+  if (daysToTest > 7) return "speed";
+  return "peak";
+}
+
+export const PHASE_LABELS: Record<TrainingPhase, string> = {
+  foundations: "Foundations",
+  accuracy: "Accuracy",
+  speed: "Speed",
+  peak: "Peak week",
+};
+
+export const PHASE_NOTES: Record<TrainingPhase, string> = {
+  foundations:
+    "Build coverage: climb the mastery ladders and keep every skill in rotation.",
+  accuracy:
+    "Error discipline: clear the redo queue daily and post-mortem every miss.",
+  speed:
+    "Pacing under pressure: timed sets every other day; decisions beat perfection.",
+  peak: "Taper: light mixed review, takeaway deck, sleep. No new material.",
+};
+
+/** Official-mock milestones, in days before the test. The plan surfaces
+ *  the next one; scores come only from importing the official report. */
+const MOCK_MILESTONES = [35, 21, 10];
+
+export function nextMock(
+  daysToTest: number | null,
+): { inDays: number; today: boolean } | null {
+  if (daysToTest == null || daysToTest < 0) return null;
+  const upcoming = MOCK_MILESTONES.filter((m) => m <= daysToTest);
+  if (upcoming.length === 0) return null;
+  const m = upcoming[0];
+  return { inDays: daysToTest - m, today: daysToTest === m };
+}
+
 export type PlanInputs = {
   /** Whole days until test_date; null when unset. */
   daysToTest: number | null;
@@ -32,6 +74,9 @@ export type PlanInputs = {
 };
 
 export type DailyPlan = {
+  phase: TrainingPhase | null;
+  /** Next official-mock milestone, when a test date is set. */
+  mock: { inDays: number; today: boolean } | null;
   patternRounds: PatternCategoryKey[];
   drill: {
     total: number;
@@ -108,11 +153,14 @@ export function computeWeights(
   return weights;
 }
 
-/** Drill volume scales as the test approaches. */
+/** Drill volume follows the phase arc: ramp through Speed, taper in
+ *  Peak week (fresh volume days before the test costs more than it pays). */
 function drillTotal(daysToTest: number | null): number {
-  if (daysToTest == null) return 12;
-  if (daysToTest <= 7) return 20;
-  if (daysToTest <= 14) return 16;
+  const phase = phaseOf(daysToTest);
+  if (phase == null) return 12;
+  if (phase === "peak") return 10;
+  if (phase === "speed") return 16;
+  if (phase === "accuracy") return 14;
   return 12;
 }
 
@@ -145,7 +193,19 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     .slice(0, 2)
     .map(([key]) => key);
 
+  // The Speed phase forces timed work at least every other day, whatever
+  // the configured cadence; Peak week backs off to every third day.
+  const phase = phaseOf(inputs.daysToTest);
+  const effectiveCadence =
+    phase === "speed"
+      ? Math.min(inputs.cadenceDays, 2)
+      : phase === "peak"
+        ? Math.max(inputs.cadenceDays, 3)
+        : inputs.cadenceDays;
+
   return {
+    phase,
+    mock: nextMock(inputs.daysToTest),
     patternRounds,
     drill: {
       total,
@@ -154,6 +214,6 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     weights,
     dueRedoCount: inputs.dueRedoCount,
     timedSetToday:
-      inputs.cadenceDays > 0 && inputs.dayIndex % inputs.cadenceDays === 0,
+      effectiveCadence > 0 && inputs.dayIndex % effectiveCadence === 0,
   };
 }

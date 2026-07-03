@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
-import { computeDailyPlan } from "@/lib/plan";
+import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
 import { getSetting } from "@/lib/settings";
 import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -54,6 +54,24 @@ export default async function TodayPage() {
         </div>
         <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
       </div>
+
+      {plan.phase && (
+        <section className="rounded-[10px] border border-grid bg-surface px-4 py-3 shadow-ambient">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="rounded-[6px] bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
+              {PHASE_LABELS[plan.phase]}
+            </span>
+            <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
+            {plan.mock && (
+              <p className={plan.mock.today ? "text-sm font-medium text-ballpoint" : "text-sm text-graphite"}>
+                {plan.mock.today
+                  ? "Official mock today — take it, then import the score report."
+                  : `Next official mock in ${plan.mock.inDays} day${plan.mock.inDays === 1 ? "" : "s"}.`}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PlanCard
