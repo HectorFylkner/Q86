@@ -7776,6 +7776,951 @@
    },
    "numeric_check": "7.8+4.6",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 2,
+   "stem_md": "Of the $80$ diners at a food festival, $47$ visited the taco stand, $36$ visited the noodle stand, and $12$ visited both stands. How many diners visited exactly one of the two stands?",
+   "choices": [
+    "$9$",
+    "$35$",
+    "$59$",
+    "$71$",
+    "$83$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nDiners at the taco stand only: $47 - 12 = 35$. Diners at the noodle stand only: $36 - 12 = 24$. Exactly one stand: $35 + 24 = 59$.\n\n**Trigger cue**\n\nWhen the question asks for \"exactly one,\" strip the overlap out of each set before adding.\n\n**Takeaway**\n\nExactly one means each set minus the overlap, summed.",
+   "fastest_path_md": "Taco only $47 - 12 = 35$; noodle only $36 - 12 = 24$; total $35 + 24 = 59$.",
+   "trap_map": {
+    "0": "Computes the diners who visited neither stand, $80 - (47 + 36 - 12)$.",
+    "1": "Counts only the taco-only group, $47 - 12$, forgetting the noodle-only diners.",
+    "3": "Reports the union $47 + 36 - 12$, which still includes the both-stand diners.",
+    "4": "Adds $47 + 36$ without removing the overlap at all."
+   },
+   "numeric_check": "(47-12)+(36-12)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 2,
+   "stem_md": "Sets $A$ and $B$ satisfy $|A| = 33$, $|B| = 24$, and $|A \\cup B| = 49$. How many elements are in $A \\cap B$?",
+   "choices": [
+    "$8$",
+    "$16$",
+    "$25$",
+    "$41$",
+    "$57$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nBy inclusion–exclusion, $|A \\cap B| = |A| + |B| - |A \\cup B| = 33 + 24 - 49 = 8$.\n\n**Trigger cue**\n\nWhen both set sizes and the union are given, apply inclusion–exclusion in one step.\n\n**Takeaway**\n\nOverlap equals the sum of the sizes minus the union.",
+   "fastest_path_md": "$33 + 24 = 57$ counts the overlap twice; the union counts it once, so overlap $= 57 - 49 = 8$.",
+   "trap_map": {
+    "1": "Computes $49 - 33$, the elements in $B$ only, and mistakes it for the overlap.",
+    "2": "Computes $49 - 24$, the elements in $A$ only, and mistakes it for the overlap.",
+    "3": "Reports the number of elements in exactly one of the sets.",
+    "4": "Adds $33 + 24$ and ignores the union constraint entirely."
+   },
+   "numeric_check": "33+24-49",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 3,
+   "stem_md": "In a group of $90$ elements, the number of elements having property $R$ is twice the number having property $S$. If $15$ elements have both properties and $21$ elements have neither, how many elements have property $R$?",
+   "choices": [
+    "$28$",
+    "$41$",
+    "$46$",
+    "$56$",
+    "$69$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nElements with at least one property: $90 - 21 = 69$. Inclusion–exclusion gives $R + S - 15 = 69$, so $R + S = 84$. With $R = 2S$, $3S = 84$, so $S = 28$ and $R = 56$.\n\n**Trigger cue**\n\nA ratio between set sizes plus a neither count: set one variable and write the inclusion–exclusion equation.\n\n**Takeaway**\n\nTranslate the ratio into one variable inside inclusion–exclusion.",
+   "fastest_path_md": "Backsolve: try $R = 56$, so $S = 28$; union $= 56 + 28 - 15 = 69$ and $69 + 21 = 90$. Done.",
+   "trap_map": {
+    "0": "Solves correctly but reports $S$ instead of $R$.",
+    "1": "Reports the elements with $R$ only, $56 - 15$.",
+    "2": "Sets $R + S = 69$, forgetting to add the overlap back into the union equation.",
+    "4": "Reports the union, the count with at least one property."
+   },
+   "numeric_check": "2*(90-21+15)/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "stem_md": "Sets $A$ and $B$ are each subsets of a set $T$ that has exactly $100$ elements. If $A$ has $63$ elements and $B$ has $58$ elements, what is the least possible number of elements in $A \\cap B$?",
+   "choices": [
+    "$0$",
+    "$21$",
+    "$37$",
+    "$42$",
+    "$58$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nSince $A \\cup B \\subseteq T$, $|A \\cup B| \\le 100$. Then $|A \\cap B| = |A| + |B| - |A \\cup B| \\ge 63 + 58 - 100 = 21$, achieved when the union fills all of $T$.\n\n**Trigger cue**\n\n\"Least possible overlap\" with a fixed universe: push the union to its maximum, the whole set.\n\n**Takeaway**\n\nMinimum overlap is the amount the sizes' sum exceeds the total.",
+   "fastest_path_md": "$63 + 58 = 121$ memberships must fit into $100$ slots, so at least $21$ elements are counted twice.",
+   "trap_map": {
+    "0": "Assumes the sets could be disjoint, ignoring that $63 + 58$ exceeds $100$.",
+    "2": "Reports $100 - 63$, the complement of $A$.",
+    "3": "Reports $100 - 58$, the complement of $B$.",
+    "4": "Finds the greatest possible overlap, $\\min(63, 58)$, instead of the least."
+   },
+   "numeric_check": "63+58-100",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "stem_md": "In a certain finite set, $45\\%$ of the elements have property $P$, $30\\%$ have property $Q$, and $40\\%$ have neither property. What fraction of the elements that have property $P$ also have property $Q$?",
+   "choices": [
+    "$\\frac{3}{20}$",
+    "$\\frac{1}{4}$",
+    "$\\frac{1}{3}$",
+    "$\\frac{1}{2}$",
+    "$\\frac{2}{3}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nElements with at least one property: $100\\% - 40\\% = 60\\%$. Both: $45\\% + 30\\% - 60\\% = 15\\%$. The question asks for a fraction of $P$, not of the whole set: $\\frac{15}{45} = \\frac{1}{3}$.\n\n**Trigger cue**\n\n\"What fraction of the elements in $X$...\" signals a conditional ratio: divide by $|X|$, never by the total.\n\n**Takeaway**\n\nUse the asked-about group, not the total, as denominator.",
+   "fastest_path_md": "Neither $40\\%$ gives union $60\\%$, so both $= 15\\%$; then $\\frac{15}{45} = \\frac{1}{3}$.",
+   "trap_map": {
+    "0": "Finds both correctly as $15\\%$ but divides by the whole set instead of by $P$.",
+    "1": "Divides $15$ by the union $60$ rather than by the $45$ in $P$.",
+    "3": "Divides $15$ by the $30$ in $Q$, answering the reverse question.",
+    "4": "Computes the fraction of $P$ that is not in $Q$."
+   },
+   "numeric_check": "15/45",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "stem_md": "Each element of a $90$-element set belongs to at least one of the sets $X$, $Y$, and $Z$. Set $X$ has $52$ elements, set $Y$ has $44$ elements, and set $Z$ has $38$ elements. If exactly $12$ elements belong to all three sets, how many elements belong to at least two of the sets?",
+   "choices": [
+    "$12$",
+    "$20$",
+    "$32$",
+    "$44$",
+    "$56$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLet $d$ be the count in exactly two sets and $t = 12$ the count in all three. Summing the set sizes counts doubles twice and triples three times: $52 + 44 + 38 = 90 + d + 2t$. So $134 = 90 + d + 24$, giving $d = 20$. At least two: $d + t = 20 + 12 = 32$.\n\n**Trigger cue**\n\nThree set sizes plus a union: the surplus $\\sum|S_i| - |\\text{union}|$ counts doubles once and triples twice.\n\n**Takeaway**\n\nSize surplus over the union counts doubles once, triples twice.",
+   "fastest_path_md": "Surplus $= 52 + 44 + 38 - 90 = 44$; it counts the $12$ triples twice, so at least two $= 44 - 12 = 32$.",
+   "trap_map": {
+    "0": "Reports only the elements that belong to all three sets.",
+    "1": "Finds the exactly-two count $20$ but forgets to add back the all-three elements.",
+    "3": "Treats the surplus $52 + 44 + 38 - 90$ as the at-least-two count, double-counting the triple overlap.",
+    "4": "Adds the all-three count to the surplus $44$, which already counts those elements twice."
+   },
+   "numeric_check": "52+44+38-90-12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "stem_md": "A consulting firm employs $180$ people, of whom $110$ are analysts and the rest are support staff. Exactly $85$ of the employees work remotely and the others work in the office. If the number of analysts who work remotely is twice the number of support staff who work in the office, how many analysts work in the office?",
+   "choices": [
+    "$15$",
+    "$30$",
+    "$55$",
+    "$80$",
+    "$95$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSupport staff: $180 - 110 = 70$. Let $s$ be the support staff in the office, so the analysts working remotely number $2s$ and the support staff working remotely number $70 - s$. Remote total: $2s + (70 - s) = 85$, so $s = 15$. Analysts remotely: $30$; analysts in the office: $110 - 30 = 80$.\n\n**Trigger cue**\n\nTwo binary attributes with a relation linking cells across categories: build the double-set matrix and put one variable in the linked cell.\n\n**Takeaway**\n\nOne variable in the linked cell; rows and columns close themselves.",
+   "fastest_path_md": "Backsolve: analysts in office $80$ gives analysts remote $30$, support remote $55$, support office $15$, and $30 = 2 \\cdot 15$ checks.",
+   "trap_map": {
+    "0": "Solves for the support staff in the office, the variable itself.",
+    "1": "Reports the analysts who work remotely.",
+    "2": "Reports the support staff who work remotely.",
+    "4": "Reports the total number of employees in the office."
+   },
+   "numeric_check": "110-2*15",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 2,
+   "stem_md": "If $(x - 3)^2 = 25$, what is the sum of all possible values of $x$?",
+   "choices": [
+    "$-2$",
+    "$2$",
+    "$6$",
+    "$8$",
+    "$16$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nTake square roots with both signs: $x - 3 = \\pm 5$, so $x = 8$ or $x = -2$. The sum is $8 + (-2) = 6$. Equivalently, expanding gives $x^2 - 6x - 16 = 0$, whose root sum is $6$.\n\n**Trigger cue**\n\nA squared binomial equal to a constant: unwrap with $\\pm$ before expanding anything.\n\n**Takeaway**\n\nEvery positive square has two square roots.",
+   "fastest_path_md": "Unwrap directly: $x - 3 = \\pm 5$, so $x = 8$ or $x = -2$; the sum is $6$. No expansion needed.",
+   "trap_map": {
+    "0": "Reports only the root that comes from the negative square root.",
+    "1": "Sign slip on the binomial: solving $x + 3 = 5$ instead of $x - 3 = 5$.",
+    "3": "Takes only the positive square root and reports that single root.",
+    "4": "Reports the constant $16$ from the expanded quadratic $x^2 - 6x - 16 = 0$ instead of the root sum."
+   },
+   "numeric_check": "8 + (-2)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "stem_md": "If $x \\neq y$, and both $x$ and $y$ satisfy $t^2 - 5t + 6 = 0$, what is the value of $xy$?",
+   "choices": [
+    "$-6$",
+    "$-5$",
+    "$5$",
+    "$6$",
+    "$13$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFactor: $t^2 - 5t + 6 = (t - 2)(t - 3)$, so the equation's only solutions are $2$ and $3$. Since $x$ and $y$ are distinct solutions, $\\{x, y\\} = \\{2, 3\\}$, and $xy = 2 \\cdot 3 = 6$ — the constant term, exactly as Vieta guarantees.\n\n**Trigger cue**\n\nTwo different variables satisfying the same quadratic must be that quadratic's two roots.\n\n**Takeaway**\n\nDistinct solutions of one quadratic are its two roots.",
+   "fastest_path_md": "Distinct $x$ and $y$ solving the same monic quadratic are its two roots, so $xy$ is the constant term: $6$. No factoring needed.",
+   "trap_map": {
+    "0": "Flips the sign of the constant term when reading off the product.",
+    "1": "Reports the raw middle coefficient $-5$, confusing the product with the (sign-flipped) sum.",
+    "2": "Computes the root sum $x + y$ instead of the product.",
+    "4": "Computes $x^2 + y^2 = 4 + 9$ instead of $xy$."
+   },
+   "numeric_check": "2*3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "stem_md": "An emergency flare is fired straight up from the ground, and its height, in meters, $t$ seconds after firing is $40t - 5t^2$. At what value of $t$, in seconds, is the flare at a height of $60$ meters while descending?",
+   "choices": [
+    "$2$",
+    "$4$",
+    "$6$",
+    "$8$",
+    "$12$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nSet $40t - 5t^2 = 60$. Dividing by $5$ gives $t^2 - 8t + 12 = 0$, which factors as $(t - 2)(t - 6) = 0$. The flare is at $60$ meters at $t = 2$ (rising) and at $t = 6$ (falling, since the peak occurs at $t = 4$). The descending pass is at $t = 6$.\n\n**Trigger cue**\n\nA projectile height reached twice: the larger root of the crossing equation is the way down.\n\n**Takeaway**\n\nOf two crossing times, the later one is descending.",
+   "fastest_path_md": "Backsolve: $t = 6$ gives $240 - 180 = 60$ ✓, and $6$ is past the peak at $t = 4$, so the flare is descending.",
+   "trap_map": {
+    "0": "Takes the first time the flare reaches $60$ meters, which is on the way up.",
+    "1": "Reports the time of the peak instead of the descending crossing.",
+    "3": "Reports the time the flare returns to the ground ($h = 0$).",
+    "4": "Reports the product of the two crossing times from the reduced quadratic."
+   },
+   "numeric_check": "8 - 2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "If $x^2 - 4x - 3 = 0$, what is the value of $x^4 - 8x^3 + 16x^2$?",
+   "choices": [
+    "$-3$",
+    "$3$",
+    "$6$",
+    "$9$",
+    "$16$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFrom $x^2 - 4x - 3 = 0$, isolate the repeated block: $x^2 - 4x = 3$. The target is a perfect square of that block: $x^4 - 8x^3 + 16x^2 = (x^2 - 4x)^2 = 3^2 = 9$.\n\n**Trigger cue**\n\nA quartic whose coefficients echo the given quadratic: hunt for $(x^2 + bx)^2$ structure instead of solving for $x$.\n\n**Takeaway**\n\nRewrite ugly polynomials as powers of a known expression.",
+   "fastest_path_md": "Spot the structure: $x^4 - 8x^3 + 16x^2 = (x^2 - 4x)^2$, and the equation says $x^2 - 4x = 3$, so the value is $9$. Never solve for $x$ (the roots are irrational).",
+   "trap_map": {
+    "0": "Reports the quadratic's constant term with its sign.",
+    "1": "Finds $x^2 - 4x = 3$ but forgets to square it.",
+    "2": "Doubles $3$ instead of squaring it.",
+    "4": "Grabs the coefficient $16$ from the target expression."
+   },
+   "numeric_check": "3^2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "What is the value of $x$?\n\n(1) $x^2 = 5x$\n\n(2) $x^2 + x - 30 = 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n(1): Move everything to one side — $x^2 - 5x = x(x - 5) = 0$, so $x = 0$ or $x = 5$: two values, not sufficient. (2): $x^2 + x - 30 = (x + 6)(x - 5) = 0$, so $x = -6$ or $x = 5$: not sufficient. Together, the only value in both root sets is $x = 5$ — sufficient. Answer: both statements together.\n\n**Trigger cue**\n\nTwo quadratic statements about one unknown: list each root set fully, then intersect — and never divide by a variable that could be zero.\n\n**Takeaway**\n\nIntersect root sets; dividing by $x$ deletes the root zero.",
+   "fastest_path_md": "(1) $x(x - 5) = 0$: $\\{0, 5\\}$. (2) $(x + 6)(x - 5) = 0$: $\\{-6, 5\\}$. Each set has two values, but they share only $5$ — combined sufficient.",
+   "trap_map": {
+    "0": "Divides statement (1) by $x$, silently discarding the root $x = 0$ and making (1) look sufficient.",
+    "1": "Drops statement (2)'s negative root $-6$ as if it were extraneous, leaving $x = 5$ alone.",
+    "3": "Makes both slips at once: divides by $x$ in (1) and discards the negative root in (2).",
+    "4": "Sees two candidates from each statement but never intersects the two root sets."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "The roots of $x^2 - 8x + 12 = 0$ are $r$ and $s$. Which of the following equations has roots $r + 2$ and $s + 2$?",
+   "choices": [
+    "$x^2 - 10x + 14 = 0$",
+    "$x^2 - 10x + 32 = 0$",
+    "$x^2 - 12x + 16 = 0$",
+    "$x^2 - 12x + 32 = 0$",
+    "$x^2 + 12x + 32 = 0$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFactor: $x^2 - 8x + 12 = (x - 2)(x - 6)$, so $\\{r, s\\} = \\{2, 6\\}$. The new roots are $4$ and $8$, with sum $12$ and product $32$. The monic equation with those roots is $x^2 - 12x + 32 = 0$.\n\n**Trigger cue**\n\n\"Equation whose roots are shifted copies of the old roots\": rebuild from the new sum and product rather than manipulating the original equation.\n\n**Takeaway**\n\nShifting each root by $k$ adds $2k$ to the sum.",
+   "fastest_path_md": "Roots of the original: factor pair of $12$ summing to $8$, i.e. $2$ and $6$. New roots $4$ and $8$: sum $12$, product $32$, so $x^2 - 12x + 32 = 0$. Confirm by plugging $x = 4$ into the choice.",
+   "trap_map": {
+    "0": "Adds $2$ to each original coefficient instead of to each root.",
+    "1": "Shifts the root sum by only $2$ (one root moved) even though the product is handled correctly.",
+    "2": "Computes the new product as $12 + 4$ instead of $(2+2)(6+2)$.",
+    "4": "Sign error rebuilding from Vieta: this equation's roots are $-4$ and $-8$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "stem_md": "If $x$ and $y$ are positive integers with $x > y$, what is the value of $xy$?\n\n(1) $x^2 - y^2 = 13$\n\n(2) $x + y = 13$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n(1): $x^2 - y^2 = (x - y)(x + y) = 13$. Both factors are positive integers with $x + y > x - y$, and $13$ is prime, so the only split is $x - y = 1$, $x + y = 13$, forcing $(x, y) = (7, 6)$ and $xy = 42$ — sufficient. (2): $x + y = 13$ allows $(12, 1), (11, 2), \\ldots, (7, 6)$, whose products differ — not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA difference of squares equal to a prime, with integer variables: factor it and match the factor pairs — one equation can pin two unknowns.\n\n**Takeaway**\n\nInteger constraints can make one equation sufficient.",
+   "fastest_path_md": "$13$ is prime, so $(x - y)(x + y) = 13$ forces $x - y = 1$ and $x + y = 13$: statement (1) alone pins $(7, 6)$. A bare sum, statement (2), leaves many pairs.",
+   "trap_map": {
+    "1": "Dismisses (1) as one equation with two unknowns while assuming the sum in (2) pins the pair.",
+    "2": "Combines the statements after reflexively dismissing (1) as one equation in two unknowns.",
+    "3": "Assumes any statement that fixes $x + y$ also fixes $xy$, granting (2) alongside (1).",
+    "4": "Treats both statements as underdetermined and never tests the integer factor pairs of $13$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "How many integers $n$ satisfy $-4 \\le 3n + 5 < 20$?",
+   "choices": [
+    "$4$",
+    "$5$",
+    "$7$",
+    "$8$",
+    "$9$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSubtract $5$ from all three parts: $-9 \\le 3n < 15$. Divide by $3$: $-3 \\le n < 5$. The integers are $-3, -2, \\dots, 4$, and there are $4 - (-3) + 1 = 8$ of them.\n\n**Trigger cue**\n\nA compound inequality with the unknown in the middle: operate on all three parts at once, then count endpoints carefully.\n\n**Takeaway**\n\nUndo operations across all three parts, then count integers inclusively.",
+   "fastest_path_md": "Only the boundaries matter: $n = -3$ gives $3n + 5 = -4$ (kept by $\\le$); $n = 5$ gives $20$ (excluded by $<$). Count $-3$ through $4$: $8$ integers.",
+   "trap_map": {
+    "0": "Counts only the positive solutions $1$ through $4$.",
+    "1": "Counts only the nonnegative solutions $0$ through $4$, dropping the negatives.",
+    "2": "Drops $n = -3$ by treating the left-hand $\\le$ as strict.",
+    "4": "Includes $n = 5$ by treating the right-hand $<$ as $\\le$."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "If $-6 \\le a \\le 3$ and $-2 \\le b \\le 4$, what is the least possible value of $ab$?",
+   "choices": [
+    "$-24$",
+    "$-12$",
+    "$-8$",
+    "$-6$",
+    "$12$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nA product of two bounded variables attains its extremes at endpoint pairs. The four candidates are $(-6)(-2) = 12$, $(-6)(4) = -24$, $(3)(-2) = -6$, and $(3)(4) = 12$. The least is $-24$.\n\n**Trigger cue**\n\nOptimizing a product over intervals that include negatives: check all four endpoint pairings — sign behavior makes intuition unreliable.\n\n**Takeaway**\n\nExtreme products come from testing all four endpoint pairs.",
+   "fastest_path_md": "The most negative product pairs opposite signs with the largest magnitudes: $-6$ and $4$ give $-24$; no other endpoint pair goes lower.",
+   "trap_map": {
+    "1": "Attaches the negative sign to the wrong bound of $b$, computing $3 \\cdot (-4)$.",
+    "2": "Multiplies $b$'s own two endpoints, $(-2)(4)$.",
+    "3": "Pairs $a$'s maximum with $b$'s minimum, $(3)(-2)$, without testing the other cross pair.",
+    "4": "Multiplies minimum by minimum, $(-6)(-2)$, assuming the least inputs give the least product."
+   },
+   "numeric_check": "-24",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "A school club sells raffle tickets for $\\$7$ each and paid $\\$134$ to have the tickets printed. What is the least number of tickets the club must sell for its profit to be more than $\\$500$?",
+   "choices": [
+    "$53$",
+    "$72$",
+    "$90$",
+    "$91$",
+    "$92$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nLet $n$ be the number of tickets sold. Profit is $7n - 134$, so require $7n - 134 > 500$, i.e. $7n > 634$, i.e. $n > \\dfrac{634}{7} = 90\\dfrac{4}{7}$. The least integer above this is $91$. Check: $7(91) - 134 = 503 > 500$.\n\n**Trigger cue**\n\nA \"least number needed to exceed\" question: build the strict inequality, solve for the boundary, then round up.\n\n**Takeaway**\n\nRound the boundary value in the direction the inequality demands.",
+   "fastest_path_md": "Backsolve at the boundary: $n = 90$ gives $630 - 134 = 496$ — not enough; $n = 91$ gives $637 - 134 = 503$ — done.",
+   "trap_map": {
+    "0": "Subtracts the printing cost from the target, solving $7n > 500 - 134$.",
+    "1": "Ignores the printing cost entirely, solving $7n > 500$.",
+    "2": "Rounds $\\dfrac{634}{7} \\approx 90.6$ down instead of up.",
+    "4": "Rounds up correctly to $91$, then adds one more ticket \"to be safe\" because the inequality is strict."
+   },
+   "numeric_check": "91",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "stem_md": "If $2 < x < 7$ and $1 < y < 4$, which of the following describes all possible values of $\\dfrac{x}{y}$?",
+   "choices": [
+    "$\\dfrac{1}{2} < \\dfrac{x}{y} < \\dfrac{7}{4}$",
+    "$\\dfrac{7}{4} < \\dfrac{x}{y} < 2$",
+    "$1 < \\dfrac{x}{y} < 7$",
+    "$\\dfrac{1}{2} < \\dfrac{x}{y} < 7$",
+    "$2 < \\dfrac{x}{y} < 7$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nAll quantities are positive, so $\\dfrac{x}{y}$ increases with $x$ and decreases with $y$. Largest values: $x$ near $7$ over $y$ near $1$, approaching $7$. Smallest values: $x$ near $2$ over $y$ near $4$, approaching $\\dfrac{2}{4} = \\dfrac{1}{2}$. Every original bound is strict, so neither extreme is attained: $\\dfrac{1}{2} < \\dfrac{x}{y} < 7$.\n\n**Trigger cue**\n\nRange of a quotient of bounded positive quantities: pair each numerator bound with the opposite denominator bound.\n\n**Takeaway**\n\nQuotient extremes pair numerator bounds with opposite denominator bounds.",
+   "fastest_path_md": "Biggest fraction = biggest top over smallest bottom: $\\dfrac{7}{1} = 7$. Smallest = smallest top over biggest bottom: $\\dfrac{2}{4} = \\dfrac{1}{2}$. Strict bounds stay strict.",
+   "trap_map": {
+    "0": "Divides both of $x$'s bounds by $y$'s largest value, getting $\\dfrac{2}{4}$ and $\\dfrac{7}{4}$.",
+    "1": "Pairs the bounds coordinate-wise — $\\dfrac{2}{1}$ and $\\dfrac{7}{4}$ — then lists them in increasing order.",
+    "2": "Assumes the quotient must exceed $1$ because $x$'s bounds are larger than $y$'s.",
+    "4": "Divides both of $x$'s bounds by $y$'s smallest value, getting $\\dfrac{2}{1}$ and $\\dfrac{7}{1}$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "stem_md": "Is $3x + 5y > 19$?\n\n(1) $x + y > 5$\n\n(2) $x - y < 1$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n(1) alone: $(x, y) = (0, 6)$ gives $3x + 5y = 30$ — yes; $(x, y) = \\left(6, -\\tfrac{1}{2}\\right)$ gives $x + y = 5\\tfrac{1}{2} > 5$ but $3x + 5y = 15\\tfrac{1}{2}$ — no. Not sufficient. (2) alone: $(0, 6)$ gives yes; $(0, 0)$ gives no. Not sufficient. Together: $3x + 5y = 4(x + y) - (x - y)$. Statement (1) gives $4(x + y) > 20$ and statement (2) gives $-(x - y) > -1$; adding, $3x + 5y > 19$ — sufficient.\n\n**Trigger cue**\n\nA question about a linear combination of variables: try to build the target expression from the statements with positive multipliers before hunting for values.\n\n**Takeaway**\n\nCombine inequalities by adding positive multiples; never subtract or solve them like equations.",
+   "fastest_path_md": "Spot $3x + 5y = 4(x + y) - (x - y)$: four times (1) plus the reversed (2) gives $3x + 5y > 4(5) - 1 = 19$ exactly. Quick counterexamples like $\\left(6, -\\tfrac{1}{2}\\right)$ and $(0, 0)$ kill each statement alone.",
+   "trap_map": {
+    "0": "Declares (1) sufficient after testing only balanced pairs, missing cases like $\\left(6, -\\tfrac{1}{2}\\right)$ where $x + y > 5$ but $3x + 5y = 15\\tfrac{1}{2}$.",
+    "1": "Declares (2) sufficient even though $x - y < 1$ puts no floor under $x$ and $y$, e.g. $(0, 0)$ versus $(0, 6)$.",
+    "3": "Confirms each statement with one convenient example instead of searching for a counterexample.",
+    "4": "Tries to solve for $x$ and $y$ individually, finds no unique point, and concludes the inequalities cannot bound $3x + 5y$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "stem_md": "If $x$ and $y$ are positive integers such that $5x + 3y < 40$, what is the greatest possible value of $xy$?",
+   "choices": [
+    "$11$",
+    "$20$",
+    "$24$",
+    "$25$",
+    "$26$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nSince $x$ and $y$ are integers, $5x + 3y < 40$ means $5x + 3y \\le 39$, so $x$ runs from $1$ to $7$. For each $x$ the largest $y$ is $\\left\\lfloor \\dfrac{39 - 5x}{3} \\right\\rfloor$, giving pairs $(1, 11), (2, 9), (3, 8), (4, 6), (5, 4), (6, 3), (7, 1)$ with products $11, 18, 24, 24, 20, 18, 7$. The maximum is $24$.\n\n**Trigger cue**\n\nInteger optimization under a strict linear constraint: convert the strict inequality to its attainable $\\le$ bound, then scan the short feasible list.\n\n**Takeaway**\n\nWith integers, convert strict inequalities to attainable bounds first.",
+   "fastest_path_md": "Only $x = 1$ through $7$ are feasible; pair each with its biggest legal $y$ and compare the seven products — they peak at $24$ for $(3, 8)$ and $(4, 6)$.",
+   "trap_map": {
+    "0": "Maximizes one variable alone, taking $x = 1$ and $y = 11$.",
+    "1": "Greedily maxes out $x$ first: $x = 5$, $y = 4$ gives $20$.",
+    "3": "Treats the strict $< 40$ as $\\le 40$, admitting $x = y = 5$ since $5(5) + 3(5) = 40$.",
+    "4": "Optimizes over real numbers — maximum $\\dfrac{40^2}{60} = 26.\\overline{6}$ — then rounds down."
+   },
+   "numeric_check": "24",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "stem_md": "If $-\\dfrac{1}{4} \\le x < \\dfrac{1}{5}$ and $x \\ne 0$, which of the following describes all possible values of $\\dfrac{1}{x}$?",
+   "choices": [
+    "$-4 \\le \\dfrac{1}{x} < 5$",
+    "$\\dfrac{1}{x} \\le -4$",
+    "$\\dfrac{1}{x} > 5$",
+    "$\\dfrac{1}{x} \\le -4$ or $\\dfrac{1}{x} > 5$",
+    "$\\dfrac{1}{x} < -4$ or $\\dfrac{1}{x} \\ge 5$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSplit at zero, since reciprocation only preserves comparisons within one sign. For $-\\dfrac{1}{4} \\le x < 0$: reciprocals of same-sign numbers reverse order, so $\\dfrac{1}{x} \\le -4$, with equality at $x = -\\dfrac{1}{4}$ and values plunging to $-\\infty$ as $x \\to 0^-$. For $0 < x < \\dfrac{1}{5}$: $\\dfrac{1}{x} > 5$, unbounded above as $x \\to 0^+$. Union: $\\dfrac{1}{x} \\le -4$ or $\\dfrac{1}{x} > 5$.\n\n**Trigger cue**\n\nTaking reciprocals over an interval that contains zero: split into sign-pure pieces; never reciprocate the endpoints blindly.\n\n**Takeaway**\n\nReciprocating an interval straddling zero yields two unbounded rays.",
+   "fastest_path_md": "Probe values: $x = -\\dfrac{1}{4} \\Rightarrow -4$; $x = -\\dfrac{1}{100} \\Rightarrow -100$; $x = \\dfrac{1}{10} \\Rightarrow 10$. Only one choice contains all three, with $-4$ itself included.",
+   "trap_map": {
+    "0": "Reciprocates the endpoints but keeps a single interval, ignoring the break at $x = 0$.",
+    "1": "Uses only the negative values of $x$.",
+    "2": "Uses only the positive values of $x$.",
+    "4": "Attaches the equalities to the wrong endpoints: $x = -\\dfrac{1}{4}$ is attainable, so $-4$ must be included, while $5$ is not."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "stem_md": "A vending machine is stocked with only bottles of juice and bottles of water — $60$ bottles in all. Each bottle of juice sells for $\\$2.25$ and each bottle of water sells for $\\$1.50$. If selling the entire stock would bring in exactly $\\$105.00$, how many bottles of juice are in the machine?",
+   "choices": [
+    "15",
+    "20",
+    "28",
+    "30",
+    "40"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $j$ and $w$ count juice and water bottles: $j + w = 60$ and $2.25j + 1.50w = 105$. Multiply the first equation by $1.50$: $1.50j + 1.50w = 90$. Subtract from the revenue equation: $0.75j = 15$, so $j = 20$ (and $w = 40$ checks: $45 + 60 = 105$).\n\n**Trigger cue**\nA total count paired with a total value at two unit prices: price the all-cheap baseline, then let the price gap absorb the surplus.\n\n**Takeaway**\nPrice the all-cheap baseline; the surplus counts the expensive items.",
+   "fastest_path_md": "All water would bring $1.50 \\times 60 = \\$90$. Each swap to juice adds $\\$0.75$, so the extra $\\$15$ means $15/0.75 = 20$ juice bottles.",
+   "trap_map": {
+    "0": "Reports the $\\$15$ revenue surplus over an all-water stock as the number of juice bottles.",
+    "2": "Divides the $\\$105$ total by $\\$3.75$, the combined price of one juice and one water.",
+    "3": "Assumes the $60$ bottles split evenly between juice and water.",
+    "4": "Solves the system correctly but reports the number of water bottles."
+   },
+   "numeric_check": "15/0.75",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "stem_md": "If $x + 4y = 18$ and $3x + 2y = 14$, what is the value of $2x + 3y$?",
+   "choices": [
+    "6",
+    "14",
+    "16",
+    "18",
+    "32"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nFrom the first equation, $x = 18 - 4y$. Substitute into the second: $3(18 - 4y) + 2y = 14$, so $54 - 10y = 14$ and $y = 4$, giving $x = 2$. Then $2x + 3y = 4 + 12 = 16$.\n\n**Trigger cue**\nWhen a question asks for a combination of $x$ and $y$ rather than either variable, test whether adding or subtracting the given equations produces the target coefficients directly.\n\n**Takeaway**\nTarget combinations often come straight from adding or subtracting the equations.",
+   "fastest_path_md": "Add the equations: $4x + 6y = 32$. Halve it: $2x + 3y = 16$ — no need to find $x$ or $y$.",
+   "trap_map": {
+    "0": "Solves the system but reports $x + y$ instead of $2x + 3y$.",
+    "1": "Swaps the solved values, computing $2x + 3y$ with $x = 4$ and $y = 2$.",
+    "3": "Reads off the right side of the first equation as the target value.",
+    "4": "Adds the two equations but forgets to divide the result by $2$."
+   },
+   "numeric_check": "2*2+3*4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "stem_md": "A shipping crate contains only $3$-kilogram boxes and $8$-kilogram boxes, with at least one box of each kind. How many $8$-kilogram boxes does the crate contain?\n\n(1) The boxes in the crate weigh $69$ kilograms in total.\n\n(2) The crate contains exactly $13$ boxes.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $s$ and $e$ count the $3$-kg and $8$-kg boxes, with $s \\ge 1$, $e \\ge 1$ integers. (1): $3s + 8e = 69$ admits $(s, e) = (15, 3)$ and $(7, 6)$, so $e$ is not pinned down — insufficient. (2): $s + e = 13$ allows $e$ from $1$ to $12$ — insufficient. Together: $3(13 - e) + 8e = 69$ gives $5e = 30$, so $e = 6$ uniquely — sufficient. Both statements together, neither alone.\n\n**Trigger cue**\nOne equation with two positive-integer unknowns: list its integer solutions before judging — the integer constraint sometimes rescues a lone equation and sometimes does not.\n\n**Takeaway**\nCheck integer solutions explicitly; the constraint does not always force uniqueness.",
+   "fastest_path_md": "(1): $3s + 8e = 69$ needs $e \\equiv 0 \\pmod 3$, so $(15, 3)$ and $(7, 6)$ both work — not sufficient. (2): a bare count — not sufficient. Together the linear system solves to $e = 6$.",
+   "trap_map": {
+    "0": "Assumes the integer constraint pins down statement (1), missing that both $(15, 3)$ and $(7, 6)$ satisfy it.",
+    "1": "Treats the box count alone as determining the split between the two weights.",
+    "3": "Grants each statement sufficiency after finding one convenient combination for each.",
+    "4": "Dismisses the combined statements because statement (1) alone had multiple solutions."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "If $2x + 3y + 4z = 20$ and $3x + 5y + 7z = 31$, what is the value of $x + y + z$?",
+   "choices": [
+    "-9",
+    "9",
+    "11",
+    "20",
+    "51"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nSeek constants $p$ and $q$ with $p(2x + 3y + 4z) + q(3x + 5y + 7z) = x + y + z$. Matching the $x$ and $y$ coefficients: $2p + 3q = 1$ and $3p + 5q = 1$, which give $p = 2$, $q = -1$; the $z$ coefficient confirms: $4(2) + 7(-1) = 1$. Therefore $x + y + z = 2(20) - 31 = 9$.\n\n**Trigger cue**\nTwo equations, three unknowns, and a specific combination requested: match coefficients of a linear combination instead of solving for the variables.\n\n**Takeaway**\nAn underdetermined system can still determine the requested combination.",
+   "fastest_path_md": "Twice the first equation minus the second: $(4-3)x + (6-5)y + (8-7)z = 40 - 31 = 9$.",
+   "trap_map": {
+    "0": "Forms the right combination with reversed signs, computing $31 - 2 \\cdot 20$.",
+    "2": "Subtracts the equations and mistakes $x + 2y + 3z = 11$ for the target sum.",
+    "3": "Assumes the first equation's total already equals $x + y + z$.",
+    "4": "Adds the two equations and reports the combined total."
+   },
+   "numeric_check": "2*20-31",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "If $x - y = y - z = 5$ and $x + y + z = 21$, what is the value of $xz$?",
+   "choices": [
+    "14",
+    "24",
+    "49",
+    "84",
+    "144"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe chained equality splits into $x - y = 5$ and $y - z = 5$, so $x = y + 5$ and $z = y - 5$. Substituting into the sum: $(y + 5) + y + (y - 5) = 21$, so $3y = 21$ and $y = 7$. Then $x = 12$, $z = 2$, and $xz = 24$.\n\n**Trigger cue**\nA chained equality such as $a - b = b - c$: the three values are equally spaced, so express the outer two around the middle one.\n\n**Takeaway**\nEqual chained differences make the middle variable the average.",
+   "fastest_path_md": "Equal gaps of $5$ mean $x$, $y$, $z$ are evenly spaced, so $y$ is their average: $21/3 = 7$. Then $x = 12$, $z = 2$, and $xz = 24$.",
+   "trap_map": {
+    "0": "Computes $yz = 7 \\cdot 2$ instead of $xz$.",
+    "2": "Assumes all three variables equal $7$ and squares it.",
+    "3": "Computes $xy = 12 \\cdot 7$ instead of $xz$.",
+    "4": "Adds $5$ on both sides of $y$, making $x = z = 12$."
+   },
+   "numeric_check": "12*2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "stem_md": "Priya is now $3$ times as old as her brother Dev. In $10$ years, Priya will be exactly twice as old as Dev will be then. How old is Dev now?",
+   "choices": [
+    "5",
+    "10",
+    "20",
+    "30",
+    "40"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $d$ be Dev's age and $p$ Priya's: $p = 3d$ now, and $p + 10 = 2(d + 10)$ in ten years. Substituting: $3d + 10 = 2d + 20$, so $d = 10$. Check: Priya is $30$; in ten years, $40 = 2 \\cdot 20$.\n\n**Trigger cue**\nAges compared at two points in time: write one equation per time point, and add the elapsed years to every person's age.\n\n**Takeaway**\nEveryone ages by the same amount; the ratio still changes.",
+   "fastest_path_md": "Backsolve from the middle: $d = 10$ makes Priya $30$; in $10$ years they are $40$ and $20$ — exactly double. Done.",
+   "trap_map": {
+    "0": "Divides the $10$-year horizon by the future ratio $2$ instead of solving the system.",
+    "2": "Reports Dev's age in $10$ years rather than his age now.",
+    "3": "Reports Priya's current age instead of Dev's.",
+    "4": "Reports Priya's age in $10$ years."
+   },
+   "numeric_check": "10",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "stem_md": "A ride service charges a fixed booking fee plus a constant rate per mile. An $8$-mile ride costs $\\$19.50$, and a $14$-mile ride costs $\\$30.00$. At these rates, what is the cost of a $20$-mile ride?",
+   "choices": [
+    "$\\$35.00$",
+    "$\\$39.00$",
+    "$\\$40.50$",
+    "$\\$46.00$",
+    "$\\$48.75$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWith booking fee $b$ and rate $r$ per mile: $b + 8r = 19.50$ and $b + 14r = 30.00$. Subtracting: $6r = 10.50$, so $r = 1.75$ and $b = 19.50 - 14.00 = 5.50$. A $20$-mile ride costs $5.50 + 20(1.75) = \\$40.50$.\n\n**Trigger cue**\nFixed fee plus constant rate with two data points: subtract the equations to isolate the rate — equal mileage steps add equal cost.\n\n**Takeaway**\nIn linear pricing, equal input increments add equal cost.",
+   "fastest_path_md": "Going from $8$ to $14$ miles added $\\$10.50$; $20$ miles is one more $6$-mile step, so the fare is $30.00 + 10.50 = \\$40.50$.",
+   "trap_map": {
+    "0": "Drops the booking fee and charges only $20$ miles at $\\$1.75$ per mile.",
+    "1": "Doubles the $\\$19.50$ fare as if a $20$-mile ride were two $8$-mile rides.",
+    "3": "Counts the booking fee twice when extending the fare to $20$ miles.",
+    "4": "Scales the $8$-mile fare proportionally to $20$ miles, ignoring the fixed fee."
+   },
+   "numeric_check": "5.5+1.75*20",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "stem_md": "In a certain sequence of nonzero numbers, each term after the first is $-2$ times the term immediately before it. If the fifth term of the sequence is $48$, what is the second term?",
+   "choices": [
+    "$-24$",
+    "$-6$",
+    "$-3$",
+    "$3$",
+    "$6$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet the first term be $t$. Each step multiplies by $-2$, so the fifth term is $t \\cdot (-2)^4 = 16t$. From $16t = 48$ we get $t = 3$, and the second term is $t \\cdot (-2) = -6$.\n\n**Trigger cue**\nA geometric sequence with one far term given: write that term as first term times a power of the ratio.\n\n**Takeaway**\nEven powers of a negative ratio are positive; track signs term by term.",
+   "fastest_path_md": "Walk backward from $48$, dividing by $-2$ each step: fourth term $-24$, third term $12$, second term $-6$.",
+   "trap_map": {
+    "0": "Divides $48$ by $-2$ only once, landing on the fourth term instead of the second.",
+    "2": "Solves $16t = 48$ correctly but then attaches the ratio's negative sign to the first term itself.",
+    "3": "Reports the first term $t = 3$ instead of the second term.",
+    "4": "Uses ratio $2$ throughout, losing the sign of $-2$."
+   },
+   "numeric_check": "-6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "stem_md": "The function $f$ is defined for all real numbers and satisfies $f(x) = f(4 - x)$ for every real number $x$. What is the value of $f(3)$?\n\n(1) $f(1) = 9$\n\n(2) $f(2) = 9$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nThe identity $f(x) = f(4 - x)$ pairs each input with its mirror across $x = 2$. Setting $x = 3$ gives $f(3) = f(1)$, so statement (1) forces $f(3) = 9$: sufficient. Setting $x = 2$ gives $f(2) = f(2)$ — the point $x = 2$ is its own mirror, so statement (2) constrains nothing beyond $x = 2$. Both $f(x) = 9$ and $f(x) = (x-2)^2 + 9$ satisfy the identity with $f(2) = 9$, yet give $f(3) = 9$ and $f(3) = 10$: insufficient.\n\n**Trigger cue**\nA relation $f(x) = f(c - x)$: substitute the queried input to locate its mirror point.\n\n**Takeaway**\nSymmetry $f(x) = f(c-x)$ equates values at inputs summing to $c$.",
+   "fastest_path_md": "Plug $x = 3$ into the identity: $f(3) = f(1)$, so (1) answers the question at once. The mirror of $2$ is $2$ itself, so (2) says nothing about $f(3)$.",
+   "trap_map": {
+    "1": "Assumes the value at the axis of symmetry pins down nearby values, so takes (2) alone as sufficient.",
+    "2": "Treats $f$ as an unknown curve needing two data points, so demands both statements.",
+    "3": "Believes (2) also transfers by symmetry, missing that $4 - 2 = 2$ pairs $x = 2$ with itself.",
+    "4": "Misses the pairing of $x = 1$ with $x = 3$ entirely and concludes nothing suffices."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "stem_md": "A film student edits a montage of $12$ clips. The first clip runs $45$ seconds, and each clip after the first runs $20$ seconds longer than the clip before it. What is the total running time, in seconds, of the montage?",
+   "choices": [
+    "$930$",
+    "$1{,}740$",
+    "$1{,}860$",
+    "$1{,}980$",
+    "$3{,}180$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe clip lengths form an arithmetic sequence with first term $45$, common difference $20$, and $12$ terms. The last clip runs $45 + 11 \\cdot 20 = 265$ seconds. The total is $\\frac{12(45 + 265)}{2} = 6 \\cdot 310 = 1{,}860$ seconds.\n\n**Trigger cue**\nA total of evenly increasing quantities: arithmetic series, count times the average of first and last.\n\n**Takeaway**\nArithmetic series total equals count times average of first and last terms.",
+   "fastest_path_md": "Pair the ends: $45 + 265 = 310$, and $12$ clips make $6$ such pairs, so $6 \\cdot 310 = 1{,}860$.",
+   "trap_map": {
+    "0": "Multiplies the average of the first and last clips by $6$ instead of by all $12$ clips.",
+    "1": "Uses only $10$ steps of $20$ seconds, making the last clip $245$ seconds long.",
+    "3": "Uses $12$ steps instead of $11$, making the last clip $285$ seconds long.",
+    "4": "Multiplies the longest clip, $265$ seconds, by all $12$ clips."
+   },
+   "numeric_check": "12*(45+265)/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "stem_md": "Leah waters the ferns in her greenhouse every $4$ days, starting on day $3$ of a $100$-day season, and she waters the orchids every $6$ days, starting on day $5$ of the season. On how many days of the season does Leah water both the ferns and the orchids?",
+   "choices": [
+    "$4$",
+    "$7$",
+    "$8$",
+    "$9$",
+    "$16$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nFern days satisfy $d \\equiv 3 \\pmod{4}$; orchid days satisfy $d \\equiv 5 \\pmod{6}$. Days that are $5 \\pmod 6$ are $5$ or $11 \\pmod{12}$; of these, only $11 \\pmod{12}$ is also $3 \\pmod 4$. So the shared days are $11, 23, 35, \\ldots$, stepping by $\\operatorname{lcm}(4,6) = 12$. Up to day $100$ the last is $95$, giving $\\frac{95 - 11}{12} + 1 = 8$ days.\n\n**Trigger cue**\nTwo repeating schedules asked to coincide: find the first common day, then step by the lcm.\n\n**Takeaway**\nCommon terms of two arithmetic sequences recur every lcm of the gaps.",
+   "fastest_path_md": "List briefly: ferns $3, 7, 11, \\ldots$; orchids $5, 11, \\ldots$ First match is day $11$, then every $12$ days: $11, 23, \\ldots, 95$ — that is $8$ days.",
+   "trap_map": {
+    "0": "Steps the matches by $4 \\cdot 6 = 24$ days instead of by $\\operatorname{lcm}(4,6) = 12$.",
+    "1": "Computes $\\frac{95 - 11}{12} = 7$ and forgets to add back the first match.",
+    "3": "Divides $100$ by $12$ and rounds up, ignoring where the matches actually begin.",
+    "4": "Counts every orchid-watering day from $5$ through $99$, not the shared days."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "stem_md": "A foundation awards grants from its original endowment in numbered rounds. In round $n$, for each positive integer $n$, the amount awarded equals $\\frac{1}{n(n+1)}$ of the original endowment. What fraction of the original endowment has been awarded in total once round $10$ is complete?",
+   "choices": [
+    "$\\frac{1}{11}$",
+    "$\\frac{5}{6}$",
+    "$\\frac{9}{10}$",
+    "$\\frac{10}{11}$",
+    "$\\frac{11}{12}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nDecompose each round's fraction: $\\frac{1}{n(n+1)} = \\frac{1}{n} - \\frac{1}{n+1}$. Summing rounds $1$ through $10$ telescopes:\n$$\\left(1 - \\tfrac{1}{2}\\right) + \\left(\\tfrac{1}{2} - \\tfrac{1}{3}\\right) + \\cdots + \\left(\\tfrac{1}{10} - \\tfrac{1}{11}\\right) = 1 - \\tfrac{1}{11} = \\tfrac{10}{11}.$$\n\n**Trigger cue**\nSumming terms of the form $\\frac{1}{n(n+1)}$: split into partial fractions and let the middle cancel.\n\n**Takeaway**\nPartial fractions collapse consecutive-integer products into a telescoping sum.",
+   "fastest_path_md": "Running totals: $\\frac{1}{2}, \\frac{2}{3}, \\frac{3}{4}, \\ldots$ — after round $n$ the total is $\\frac{n}{n+1}$, so after round $10$ it is $\\frac{10}{11}$.",
+   "trap_map": {
+    "0": "Reports the fraction of the endowment still unawarded after round $10$.",
+    "1": "Stops the telescope at round $5$, giving $1 - \\frac{1}{6}$.",
+    "2": "Ends the telescope at $\\frac{1}{10}$, using $n$ instead of $n+1$ in the final term.",
+    "4": "Runs the telescope one round too far, to $1 - \\frac{1}{12}$."
+   },
+   "numeric_check": "10/11",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "stem_md": "In a trivia app, a player's score changes by $c_n$ points in round $n$, where a change may be negative. The changes satisfy $c_{n+1} = c_n - c_{n-1}$ for every integer $n \\ge 2$, with $c_1 = 4$ and $c_2 = 9$. By how many points does the player's score change in round $75$?",
+   "choices": [
+    "$-9$",
+    "$-4$",
+    "$4$",
+    "$5$",
+    "$9$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nGenerate terms: $4, 9, 5, -4, -9, -5$, and then $c_7 = 4$, $c_8 = 9$ — the starting pair returns, so the sequence repeats with period $6$. Since $75 = 6 \\cdot 12 + 3$, round $75$ matches the third term of the cycle: $c_{75} = c_3 = 5$.\n\n**Trigger cue**\nA recurrence subtracting the earlier term: list terms until the pair of consecutive values recurs.\n\n**Takeaway**\nThe recurrence $c_{n+1} = c_n - c_{n-1}$ always cycles with period $6$.",
+   "fastest_path_md": "Six terms, then repeat: $4, 9, 5, -4, -9, -5$. Since $75 \\equiv 3 \\pmod 6$, the answer is the third term, $5$.",
+   "trap_map": {
+    "0": "Miscomputes $75 \\bmod 6$ as $5$ and lands on the fifth term of the cycle.",
+    "1": "Starts the cycle count at $n = 0$, matching remainder $3$ to the fourth term, $-4$.",
+    "2": "Stops at round $73 = 72 + 1$, the start of a new cycle, instead of round $75$.",
+    "4": "Off-by-one in the last step: reports $c_{74} = c_2 = 9$."
+   },
+   "numeric_check": "5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "stem_md": "For every positive integer $n$, the $n$th term of a certain sequence is $3n + 2$. How many terms of the sequence are greater than $20$ and less than $100$?",
+   "choices": [
+    "$24$",
+    "$25$",
+    "$26$",
+    "$27$",
+    "$32$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nSolve $20 < 3n + 2 < 100$, i.e. $18 < 3n < 98$, so $6 < n < 32\\tfrac{2}{3}$. The integers $n$ run from $7$ to $32$, giving $32 - 7 + 1 = 26$ terms.\n\n**Trigger cue**\nCounting terms of an explicit formula inside a range: solve the inequality for $n$, then count integers.\n\n**Takeaway**\nCount integers as last minus first plus one, minding strict inequalities.",
+   "fastest_path_md": "First qualifying term is $23$ ($n = 7$, since $a_6 = 20$ is excluded); last is $98$ ($n = 32$). Count: $32 - 7 + 1 = 26$.",
+   "trap_map": {
+    "0": "Excludes both boundary terms $23$ and $98$, counting only $n = 8$ through $31$.",
+    "1": "Computes $32 - 7$ and forgets to add $1$ back.",
+    "3": "Includes $a_6 = 20$ by reading \"greater than\" as \"at least.\"",
+    "4": "Counts every term less than $100$ and ignores the lower bound."
+   },
+   "numeric_check": "26",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
