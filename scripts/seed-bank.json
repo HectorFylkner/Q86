@@ -4860,6 +4860,141 @@
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "A quantity is increased by $10\\%$, and the result is increased by $30\\%$. The final value is what percent greater than the original?",
+   "choices": [
+    "40%",
+    "41%",
+    "43%",
+    "44%",
+    "45%"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nCompose the multipliers: $1.10 \\times 1.30 = 1.43$, so the final value is $143\\%$ of the original — a $43\\%$ increase. The extra $3$ points beyond $10 + 30$ come from the second increase acting on the already-enlarged quantity.\n\n**Trigger cue**\nTwo percent changes in a row: multiply the factors; adding the percents is exactly the trap being tested.\n\n**Takeaway**\nSuccessive percent changes multiply; they never simply add.",
+   "fastest_path_md": "$1.1 \\times 1.3 = 1.43 \\Rightarrow 43\\%$.",
+   "trap_map": {
+    "0": "Adds the two percents ($10 + 30$), ignoring the compounding cross-term.",
+    "1": "Compounds only 1 point of the 3-point cross-term, splitting the difference.",
+    "3": "Overshoots the cross-term ($10\\% \\times 30\\% = 3$ points, not 4).",
+    "4": "Adds the percents and then rounds the cross-term up to 5 points."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "After a $60\\%$ increase, a quantity equals $208$. What was the quantity before the increase?",
+   "choices": [
+    "83.2",
+    "124.8",
+    "130",
+    "148",
+    "156"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nA $60\\%$ increase multiplies by $1.6$, so the original is $\\dfrac{208}{1.6} = 130$. (Check: $130 \\times 1.6 = 208$.)\n\n**Trigger cue**\nGiven the value *after* a percent change: divide by the factor — never subtract the percent of the new value.\n\n**Takeaway**\nUndo a percent change by dividing by its multiplier.",
+   "fastest_path_md": "$208 / 1.6 = 130$.",
+   "trap_map": {
+    "0": "Subtracts 60% of 208 ($208 \\times 0.4 = 83.2$), applying the percent to the wrong base.",
+    "1": "Takes 60% of 208 and stops, never forming the original.",
+    "3": "Divides by 1.4 as if the increase had been 40%.",
+    "4": "Reduces 208 by a quarter, treating the 60% increase as adding three-fifths of the original."
+   },
+   "numeric_check": "208/1.6",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "format": "problem_solving",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "A bookstore prices a boxed set at $\\$80$. In January the price is reduced by $15\\%$, and in February the January price is reduced by another $25\\%$. What is the February price, in dollars?",
+   "choices": [
+    "48",
+    "51",
+    "54",
+    "57",
+    "60"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nJanuary: $80 \\times 0.85 = 68$. February: $68 \\times 0.75 = 51$. Equivalently, one step: $80 \\times 0.85 \\times 0.75 = 80 \\times 0.6375 = 51$.\n\n**Trigger cue**\nStacked discounts on a concrete price: multiply the retention factors ($0.85$, $0.75$), not the discount percents.\n\n**Takeaway**\nChain discounts by multiplying what remains after each cut.",
+   "fastest_path_md": "$80 \\times 0.85 \\times 0.75 = 51$.",
+   "trap_map": {
+    "0": "Adds the discounts to 40% and takes it off the original: $80 \\times 0.6 = 48$.",
+    "2": "Applies both discounts to the original price separately ($80 - 12 - 20 \\cdot 0.7$-style slip).",
+    "3": "Uses 15% + 25% but only takes the second cut from half the base.",
+    "4": "Takes 25% off the original only, ignoring the January reduction."
+   },
+   "numeric_check": "80*0.85*0.75",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "format": "problem_solving",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "A gym's membership grew by $25\\%$ in its first year. In the second year membership fell, and at the end of the second year it was exactly $5\\%$ above its original size. By what percent did membership fall during the second year?",
+   "choices": [
+    "16%",
+    "18%",
+    "20%",
+    "22%",
+    "25%"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nLet the fall be $f$ (as a decimal). Then $1.25 \\times (1 - f) = 1.05$, so $1 - f = \\dfrac{1.05}{1.25} = 0.84$ and $f = 0.16$ — a $16\\%$ fall.\n\n**Trigger cue**\nA net percent change with one unknown step: divide the net multiplier by the known multiplier; never subtract percents.\n\n**Takeaway**\nSolve unknown steps in a percent chain with multipliers, not differences.",
+   "fastest_path_md": "$\\frac{1.05}{1.25} = 0.84 \\Rightarrow 16\\%$ fall.",
+   "trap_map": {
+    "1": "Averages the naive 20-point gap with the correct answer's neighborhood.",
+    "2": "Subtracts percents: $25 - 5 = 20$, ignoring that the fall acts on the enlarged base.",
+    "3": "Applies the 20-point gap to the original base and inflates it.",
+    "4": "Assumes the second year must undo the first year's percent exactly."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 5,
+   "stem_md": "A positive number is decreased by $k\\%$, and the result is increased by $2k\\%$. The final value is $12.5\\%$ greater than the original number. If $k$ is a positive integer, what is $k$?",
+   "choices": [
+    "10",
+    "12.5",
+    "25",
+    "40",
+    "50"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWith $q = \\dfrac{k}{100}$, the chain gives $(1 - q)(1 + 2q) = 1.125$. Expand: $1 + q - 2q^2 = 1.125$, so $2q^2 - q + 0.125 = 0$, i.e. $16q^2 - 8q + 1 = 0 = (4q - 1)^2$. Then $q = \\dfrac{1}{4}$ and $k = 25$. (Check: $0.75 \\times 1.5 = 1.125$.) ✓\n\n**Trigger cue**\nAn unknown percent applied twice with a net target: set up the multiplier product and solve the quadratic — or backsolve the integer choices.\n\n**Takeaway**\nUnknown percent chains become quadratics in the decimal rate.",
+   "fastest_path_md": "Backsolve C: $k=25$: $\\times 0.75$, then $\\times 1.5$ → $1.125$. ✓",
+   "trap_map": {
+    "0": "Linearizes: $-k + 2k = k = 12.5$, then rounds to the nearest choice.",
+    "1": "Sets $k$ equal to the net change itself, ignoring the interaction term.",
+    "3": "Uses $2k$ as the net change: $2k = 80 \\Rightarrow k = 40$.",
+    "4": "Solves $(1-q)(1+2q)$ with the roles of $k$ and $2k$ swapped."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
   }
  ]
 }
