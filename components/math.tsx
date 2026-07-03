@@ -74,6 +74,8 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
 
 type Block =
   | { kind: "math"; body: string }
+  | { kind: "h2"; text: string }
+  | { kind: "h3"; text: string }
   | { kind: "ul"; items: string[] }
   | { kind: "ol"; items: string[] }
   | { kind: "p"; lines: string[] };
@@ -93,6 +95,18 @@ function parseBlocks(source: string): Block[] {
         .map((l) => l.trim())
         .filter(Boolean);
       if (lines.length === 0) continue;
+      // Headings (## / ###) may share a paragraph block with body lines.
+      if (lines.some((l) => /^#{2,3}\s+/.test(l))) {
+        for (const line of lines) {
+          const h = line.match(/^(#{2,3})\s+(.*)$/);
+          if (h) {
+            blocks.push({ kind: h[1] === "##" ? "h2" : "h3", text: h[2] });
+          } else {
+            blocks.push({ kind: "p", lines: [line] });
+          }
+        }
+        continue;
+      }
       if (lines.every((l) => /^[-*]\s+/.test(l))) {
         blocks.push({
           kind: "ul",
@@ -124,6 +138,21 @@ export function Md({
       {blocks.map((block, bi) => {
         const key = `b${bi}`;
         switch (block.kind) {
+          case "h2":
+            return (
+              <h2
+                key={key}
+                className="!mt-6 font-display text-base font-semibold first:!mt-0"
+              >
+                {renderInline(block.text, key)}
+              </h2>
+            );
+          case "h3":
+            return (
+              <h3 key={key} className="!mt-4 font-display text-sm font-semibold">
+                {renderInline(block.text, key)}
+              </h3>
+            );
           case "math":
             return (
               <div

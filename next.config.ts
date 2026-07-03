@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   // The bootstrap reads these at runtime on serverless hosts: the SQL
   // migration files and the committed question bank.
   outputFileTracingIncludes: {
-    "/**": ["./drizzle/**", "./scripts/seed-bank.json"],
+    "/**": ["./drizzle/**", "./scripts/seed-bank.json", "./content/lessons/**"],
   },
 };
 

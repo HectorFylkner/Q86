@@ -130,3 +130,79 @@ body {
   border-radius: 6px;
   animation: q86-skeleton 1.4s ease-in-out infinite;
 }
+
+
+/* ---------------------------------------------------------------------------
+   Interaction polish — consistent across every control without per-file
+   churn. Keyboard focus is always visible; touch feels immediate.
+--------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--ballpoint);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ballpoint) 22%, transparent);
+}
+
+button {
+  touch-action: manipulation;
+}
+button:not(:disabled):active {
+  transform: translateY(0.5px);
+}
+
+/* Form controls: one consistent voice (height, radius, border, focus). */
+input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]),
+select,
+textarea {
+  min-height: 38px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--grid);
+  background-color: var(--surface);
+  color: var(--ink);
+  padding-inline: 10px;
+  transition: border-color 150ms ease;
+}
+input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]):hover,
+select:hover,
+textarea:hover {
+  border-color: color-mix(in srgb, var(--graphite) 50%, var(--grid));
+}
+input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ballpoint);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ballpoint) 15%, transparent);
+}
+input[type="date"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) input[type="date"] {
+    color-scheme: dark;
+  }
+}
+
+/* Thin, theme-aware scrollbars for the overflow rows (nav, tables). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--graphite) 35%, transparent) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
