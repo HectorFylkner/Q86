@@ -1,7 +1,6 @@
 import path from "node:path";
-import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { db } from "./index.ts";
+import { client, db } from "./index.ts";
 import { loadBank, readBank, verifiedSeedCount } from "./seed-bank.ts";
 
 /**
@@ -23,11 +22,10 @@ export function ensureDbReady(): Promise<void> {
 }
 
 async function provision(): Promise<void> {
-  const hasTables = await db
-    .get<{ name: string }>(
-      sql`select name from sqlite_master where type = 'table' and name = 'questions'`,
-    )
-    .then((r) => r != null);
+  const existing = await client.execute(
+    "select name from sqlite_master where type = 'table' and name = 'questions'",
+  );
+  const hasTables = existing.rows.length > 0;
 
   if (!hasTables) {
     await migrate(db, {
