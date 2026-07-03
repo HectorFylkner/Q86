@@ -2403,6 +2403,627 @@
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "stem_md": "If $\\dfrac{9^6 \\cdot 27^2}{3^8} = 3^k$, what is $k$?",
+   "choices": [
+    "$6$",
+    "$8$",
+    "$10$",
+    "$12$",
+    "$18$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Convert to base $3$: $9^6 = 3^{12}$, $27^2 = 3^6$. Then $\\tfrac{3^{12} \\cdot 3^6}{3^8} = 3^{12 + 6 - 8} = 3^{10}$.",
+   "solution_md": "**Formal path**\n\nAll factors are powers of $3$: $9 = 3^2$ and $27 = 3^3$, so the numerator is $3^{12} \\cdot 3^{6} = 3^{18}$ and division subtracts: $18 - 8 = 10$.\n\n**Trigger cue**\n\nWhen bases are $9$, $27$, or $81$, reach for rewriting everything in base $3$ first.\n\n**Takeaway**\n\nOne common base; then exponents just add and subtract.",
+   "trap_map": {
+    "0": "Multiplying exponents where they should add: $12 \\cdot 6 / 8$-style confusion trimmed to $6$.",
+    "1": "Adding $6 + 2$ from the original exponents without converting bases.",
+    "3": "Stopping at the numerator's $3^{18}$ and halving instead of subtracting $8$.",
+    "4": "Reporting the numerator exponent $18$, forgetting the division."
+   },
+   "numeric_check": "12 + 6 - 8",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "If $x$ is a nonzero number, what is the value of $x$?\n\n(1) $x^2 = 2x$\n\n(2) $x^3 > x$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "(1): $x^2 - 2x = x(x - 2) = 0$; nonzero $x$ forces $x = 2$ — sufficient. (2): both $x = 2$ and $x = -\\tfrac12$ satisfy $x^3 > x$ — not sufficient.",
+   "solution_md": "**Formal path**\n\n(1): factoring beats dividing: $x(x - 2) = 0$ gives $x = 0$ or $x = 2$; the stem excludes $0$, so $x = 2$ — sufficient. (2): $x^3 > x$ holds on $x > 1$ and on $-1 < x < 0$, which contains many values — not sufficient.\n\n**Trigger cue**\n\nWhen an equation has $x$ on both sides, reach for factoring — division by $x$ silently drops roots.\n\n**Takeaway**\n\nFactor, then apply the stem's exclusions.",
+   "trap_map": {
+    "1": "Believing $x^3 > x$ pins a single region, forgetting the two disjoint intervals.",
+    "2": "Combining unnecessarily after doubting the factored (1).",
+    "3": "Granting (2) sufficiency by testing only $x = \\tfrac12$.",
+    "4": "Dividing (1) by $x$ and worrying the excluded root ruins sufficiency."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "Is $x > 1$?\n\n(1) $\\sqrt{x} > 1$\n\n(2) $x^2 > x$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "(1): $\\sqrt{x} > 1$ requires $x \\ge 0$ and squaring preserves order on nonnegatives: $x > 1$ — sufficient. (2): $x^2 > x$ also holds for every negative $x$ — not sufficient.",
+   "solution_md": "**Formal path**\n\n(1): the square root is defined for $x \\ge 0$ and is increasing, so $\\sqrt{x} > 1 = \\sqrt{1}$ forces $x > 1$ — sufficient, answer yes. (2): $x(x-1) > 0$ means $x > 1$ or $x < 0$; the negative branch answers no — not sufficient.\n\n**Trigger cue**\n\nWhen a square root appears in an inequality, reach for its hidden domain restriction first.\n\n**Takeaway**\n\nRoots restrict the domain; squares do not.",
+   "trap_map": {
+    "1": "Reading $x^2 > x$ as guaranteeing $x > 1$ by dividing by $x$.",
+    "2": "Combining although (1) already settles it.",
+    "3": "Granting (2) after testing only positive values.",
+    "4": "Doubting (1) by imagining negative $x$ inside the root."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $2^{x} + 2^{x} + 2^{x} + 2^{x} = 4^{9}$, what is the value of $x$?",
+   "choices": [
+    "$7$",
+    "$14$",
+    "$16$",
+    "$17$",
+    "$18$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Four equal terms collapse: $4 \\cdot 2^x = 2^{x+2}$. And $4^9 = 2^{18}$. So $x + 2 = 18$, $x = 16$.",
+   "solution_md": "**Formal path**\n\nAdding four copies multiplies by $4 = 2^2$: the left side is $2^{x+2}$. The right side is $(2^2)^9 = 2^{18}$. Equal bases equate exponents: $x = 16$.\n\n**Trigger cue**\n\nWhen identical powers are added, reach for factoring them out — addition becomes multiplication.\n\n**Takeaway**\n\nFour copies of a power add two to its exponent.",
+   "trap_map": {
+    "0": "Dividing $4^9$'s exponent by... treating the four terms as $4^{x}$ and matching $x$ to half of $18$ minus 2.",
+    "1": "Adding exponents term by term: $4x = 4 \\cdot 9 \\Rightarrow x = 9$? adjusted upward to $14$ by misfactoring.",
+    "3": "Off-by-one: $x + 2 = 19$ from writing $4^9 = 2^{19}$? backing into $17$.",
+    "4": "Matching $x$ directly to $4^9$'s converted exponent $18$, forgetting the $+2$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "The integers $a$ and $b$ are both greater than $1$. What is the value of $a^b$?\n\n(1) $a^b = b^a$ and $a \\ne b$\n\n(2) $a + b = 6$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "(1): the only integer pair with $a^b = b^a$, $a \\ne b$, both $> 1$, is $\\{2, 4\\}$ — in either order $a^b = 16$ — sufficient. (2): $(2,4)$ gives $16$ but $(3,3)$ gives $27$ — not sufficient.",
+   "solution_md": "**Formal path**\n\n(1): for integers above $1$, $a^b = b^a$ with $a \\ne b$ forces $\\{a, b\\} = \\{2, 4\\}$ (the function $\\tfrac{\\ln t}{t}$ takes each value at most twice, and the only integer collision is $2, 4$). Both orders give $a^b = 2^4 = 16$ or $4^2 = 16$ — the value is pinned: sufficient. (2): $a + b = 6$ allows $(2,4) \\to 16$, $(4,2) \\to 16$, and $(3,3) \\to 27$ — not sufficient.\n\n**Trigger cue**\n\nWhen $a^b = b^a$ appears with distinct integers, reach for the unique pair $2$ and $4$.\n\n**Takeaway**\n\nTwo and four: the only distinct integer power-swap pair.",
+   "trap_map": {
+    "1": "Believing the sum $6$ forces the $\\{2,4\\}$ split.",
+    "2": "Combining although (1) alone pins the value.",
+    "3": "Granting (2) sufficiency by forgetting $(3,3)$.",
+    "4": "Doubting (1) because $a$ and $b$ individually remain unknown — the QUESTION asks for $a^b$ only."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "stem_md": "How many integers $x$ satisfy $|2x - 3| < 7$?",
+   "choices": [
+    "$5$",
+    "$6$",
+    "$7$",
+    "$8$",
+    "$9$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Unpack: $-7 < 2x - 3 < 7 \\Rightarrow -4 < 2x < 10 \\Rightarrow -2 < x < 5$. Integers: $-1, 0, 1, 2, 3, 4$ — six.",
+   "solution_md": "**Formal path**\n\n$|2x-3| < 7$ means the distance from $2x$ to $3$ is under $7$: $-4 < 2x < 10$, so $-2 < x < 5$ with strict ends. The integers inside are $-1$ through $4$: $4 - (-1) + 1 = 6$.\n\n**Trigger cue**\n\nWhen an absolute value is bounded, reach for the double inequality immediately.\n\n**Takeaway**\n\nStrict bounds exclude the endpoints — count carefully.",
+   "trap_map": {
+    "0": "Excluding $0$ or miscounting the negatives.",
+    "2": "Including one endpoint ($x = 5$ or $x = -2$).",
+    "3": "Including both endpoints.",
+    "4": "Solving $-7 < 2x + 3 < 7$ with a sign slip and counting that window."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "stem_md": "A thermostat is set to $21.4°$C and allows the room temperature $t$ to drift by at most $1.7°$C in either direction before the system activates. Which inequality describes the temperatures for which the system stays OFF?",
+   "choices": [
+    "$|t - 1.7| \\le 21.4$",
+    "$|t - 21.4| \\le 1.7$",
+    "$|t + 21.4| \\le 1.7$",
+    "$|t - 21.4| \\ge 1.7$",
+    "$|t - 1.7| \\ge 21.4$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "\"Within $1.7$ of $21.4$\" is a distance statement: $|t - \\text{center}| \\le \\text{radius}$, so $|t - 21.4| \\le 1.7$.",
+   "solution_md": "**Formal path**\n\nDistance from the setpoint: $|t - 21.4|$. Staying off means that distance is at most the tolerance: $|t - 21.4| \\le 1.7$, i.e. $19.7 \\le t \\le 23.1$.\n\n**Trigger cue**\n\nWhen a value must stay within a tolerance of a target, reach for $|x - \\text{center}| \\le \\text{radius}$.\n\n**Takeaway**\n\nAbsolute value is distance: center inside, radius outside.",
+   "trap_map": {
+    "0": "Swapping center and radius.",
+    "2": "Sign slip on the center.",
+    "3": "Flipping the inequality — that is the ON region.",
+    "4": "Swapping roles and flipping the inequality."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "If $|x - 6| = 2|x|$, what is the sum of all possible values of $x$?",
+   "choices": [
+    "$-6$",
+    "$-4$",
+    "$2$",
+    "$4$",
+    "$8$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Two cases. Same sign: $x - 6 = 2x \\Rightarrow x = -6$. Opposite sign: $x - 6 = -2x \\Rightarrow x = 2$. Both check in the original. Sum: $-6 + 2 = -4$.",
+   "solution_md": "**Formal path**\n\nCase 1: $x - 6 = 2x$ gives $x = -6$; verify $|-12| = 12 = 2 \\cdot 6$ ✓. Case 2: $x - 6 = -2x$ gives $3x = 6$, $x = 2$; verify $|-4| = 4 = 2 \\cdot 2$ ✓. Sum of roots: $-4$.\n\n**Trigger cue**\n\nWhen two absolute values are equated, reach for both sign cases and validate each root in the original.\n\n**Takeaway**\n\nTwo cases, two candidate roots — verify both.",
+   "trap_map": {
+    "0": "Keeping only the first case's root $-6$.",
+    "2": "Keeping only the second case's root $2$.",
+    "3": "Dropping the sign of the sum: $|-4| = 4$.",
+    "4": "Adding the magnitudes of the roots: $6 + 2$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "On the number line, is the point $x$ closer to $10$ than to $2$?\n\n(1) $x > 6$\n\n(2) $|x - 8| < 2$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "\"Closer to $10$ than to $2$\" means $x$ lies strictly right of their midpoint $6$. (1) says exactly $x > 6$ — sufficient. (2) gives $6 < x < 10$, entirely right of $6$ — sufficient. Each alone answers yes.",
+   "solution_md": "**Formal path**\n\nThe tie point between $2$ and $10$ is their midpoint $6$; \"closer to $10$\" is exactly $x > 6$. Statement (1) is that condition verbatim — sufficient. Statement (2) unpacks to $6 < x < 10$, a subset of $x > 6$ — sufficient. Answer: each statement alone.\n\n**Trigger cue**\n\nWhen \"closer to $a$ than to $b$\" appears, reach for the midpoint of $a$ and $b$.\n\n**Takeaway**\n\nCloser-to questions are midpoint questions.",
+   "trap_map": {
+    "0": "Solving (1) but never unpacking the interval hidden in (2).",
+    "1": "Trusting only the explicit absolute-value statement and doubting the bare inequality.",
+    "2": "Combining out of caution when each alone already lands right of the midpoint.",
+    "4": "Believing a distance comparison needs the exact position of $x$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "A lab scale displays weights rounded to the nearest tenth of a gram. A sample's display reads $3.6$ grams. If the sample's true weight is $w$ grams, which of the following contains every possible value of $w$?",
+   "choices": [
+    "$3.50 \\le w < 3.70$",
+    "$3.55 \\le w < 3.65$",
+    "$3.55 < w < 3.65$",
+    "$3.6 \\le w \\le 3.65$",
+    "$3.55 \\le w \\le 3.6$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Rounding to the nearest tenth sends $w$ to $3.6$ exactly when $w$ is within half a tenth below (inclusive) or above (exclusive): $3.55 \\le w < 3.65$.",
+   "solution_md": "**Formal path**\n\nNearest-tenth rounding maps $[3.55, 3.65)$ to $3.6$ under the round-half-up convention: $3.55$ rounds up to $3.6$ (included), while $3.65$ rounds up to $3.7$ (excluded).\n\n**Trigger cue**\n\nWhen a rounded display is given, reach for the half-step interval around it and mind the endpoint conventions.\n\n**Takeaway**\n\nRounded value means a half-step window, half-open.",
+   "trap_map": {
+    "0": "Using a whole-tenth window instead of half.",
+    "2": "Excluding the lower endpoint that rounds up into $3.6$.",
+    "3": "Treating the display as a floor, not a rounding.",
+    "4": "Treating the display as a ceiling, not a rounding."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 2,
+   "stem_md": "If $x^2 - 11x + 24 = 0$, what is the sum of the two possible values of $x$?",
+   "choices": [
+    "$-11$",
+    "$-8$",
+    "$3$",
+    "$11$",
+    "$24$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "No factoring needed: for $x^2 + bx + c = 0$, the roots sum to $-b = 11$.",
+   "solution_md": "**Formal path**\n\nFactor: $x^2 - 11x + 24 = (x - 3)(x - 8)$, roots $3$ and $8$, sum $11$ — matching Vieta's rule that the root sum is $-(-11) = 11$.\n\n**Trigger cue**\n\nWhen a question asks for the SUM or PRODUCT of roots, reach for Vieta before factoring.\n\n**Takeaway**\n\nRoot sum is minus the middle coefficient.",
+   "trap_map": {
+    "0": "Forgetting the sign flip: reading the sum as the raw coefficient $-11$.",
+    "1": "Reporting the negative of one root.",
+    "2": "Reporting a single root.",
+    "4": "Reporting the constant term — that is the roots' product."
+   },
+   "numeric_check": "3 + 8",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "stem_md": "If $x + y = 9$ and $x^2 - y^2 = 27$, what is $x - y$?",
+   "choices": [
+    "$3$",
+    "$6$",
+    "$9$",
+    "$18$",
+    "$36$"
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "Difference of squares: $x^2 - y^2 = (x+y)(x-y) = 9(x - y) = 27$, so $x - y = 3$.",
+   "solution_md": "**Formal path**\n\nFactor the difference of squares and substitute the known sum: $27 = (x+y)(x-y) = 9(x-y)$, giving $x - y = 3$. (If needed: $x = 6$, $y = 3$.)\n\n**Trigger cue**\n\nWhen $x^2 - y^2$ meets $x + y$ or $x - y$, reach for the factored form before solving for $x$ and $y$.\n\n**Takeaway**\n\nDifference of squares splits into sum times difference.",
+   "trap_map": {
+    "1": "Solving fully and reporting $x = 6$.",
+    "2": "Reporting the given sum.",
+    "3": "Dividing $27$ by $1.5$ after a factoring slip.",
+    "4": "Squaring the sum minus the given: $81 - 27$ mishandled."
+   },
+   "numeric_check": "27 / 9",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "stem_md": "A rectangular banner's length is $3$ feet longer than its width. If the banner's area is $70$ square feet, what is its width, in feet?",
+   "choices": [
+    "$5$",
+    "$7$",
+    "$8$",
+    "$10$",
+    "$13$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Backsolve: try width $7$ — length $10$, area $70$ ✓.",
+   "solution_md": "**Formal path**\n\nLet the width be $w$: $w(w + 3) = 70 \\Rightarrow w^2 + 3w - 70 = 0 \\Rightarrow (w + 10)(w - 7) = 0$. The positive root is $w = 7$.\n\n**Trigger cue**\n\nWhen a quadratic word problem has clean answer choices, reach for backsolving before factoring.\n\n**Takeaway**\n\nDiscard the negative root; dimensions are positive.",
+   "trap_map": {
+    "0": "Forcing the factor pair $5 \\cdot 14$, whose difference is $9$, not $3$.",
+    "2": "Splitting $70$ as $8 \\cdot 8.75$ after halving the $3$.",
+    "3": "Reporting the length instead of the width.",
+    "4": "Adding the $3$ to the correct answer twice."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "If $x + \\dfrac{1}{x} = 5$, what is the value of $x^2 + \\dfrac{1}{x^2}$?",
+   "choices": [
+    "$10$",
+    "$23$",
+    "$25$",
+    "$27$",
+    "$30$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Square the given: $\\left(x + \\tfrac1x\\right)^2 = x^2 + 2 + \\tfrac{1}{x^2} = 25$, so the target is $25 - 2 = 23$.",
+   "solution_md": "**Formal path**\n\nSquaring $x + \\tfrac1x = 5$ produces the cross term $2 \\cdot x \\cdot \\tfrac1x = 2$: $x^2 + 2 + \\tfrac1{x^2} = 25$. Subtract the $2$: $23$.\n\n**Trigger cue**\n\nWhen $x + \\tfrac1x$ is given and squares are asked, reach for squaring the whole expression.\n\n**Takeaway**\n\nThe cross term of a self-reciprocal square is always 2.",
+   "trap_map": {
+    "0": "Doubling the given instead of squaring.",
+    "2": "Squaring but forgetting to subtract the cross term.",
+    "3": "Adding the cross term instead of subtracting.",
+    "4": "Squaring and adding $5$ once more."
+   },
+   "numeric_check": "5^2 - 2",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "What is the value of the positive number $x$?\n\n(1) $x^2 - 6x + 9 = 0$\n\n(2) $x^2 = 9$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "(1) is a perfect square: $(x - 3)^2 = 0$ forces $x = 3$ — sufficient. (2) gives $x = \\pm 3$, and the stem's positivity keeps only $3$ — sufficient. Each alone works.",
+   "solution_md": "**Formal path**\n\n(1): $(x-3)^2 = 0$ has the single (double) root $x = 3$ — sufficient. (2): $x^2 = 9$ gives $x \\in \\{3, -3\\}$; the stem says $x > 0$, leaving $x = 3$ — sufficient. Answer: each statement alone.\n\n**Trigger cue**\n\nWhen a quadratic looks like $a^2 \\pm 2ab + b^2$, reach for the perfect-square form; and always re-read the stem's constraints before judging sufficiency.\n\n**Takeaway**\n\nStem constraints count toward sufficiency.",
+   "trap_map": {
+    "0": "Discarding (2) for its two algebraic roots, forgetting the stem's positivity.",
+    "1": "Missing that the perfect square has a unique root.",
+    "2": "Combining although each alone already pins $x = 3$.",
+    "4": "Treating double roots or sign constraints as ambiguity."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "stem_md": "The quadratic equation $x^2 + kx + 36 = 0$ has two distinct integer roots. Which of the following CANNOT be the value of $k$?",
+   "choices": [
+    "$-37$",
+    "$-20$",
+    "$-15$",
+    "$-13$",
+    "$-12$"
+   ],
+   "correct_index": 4,
+   "fastest_path_md": "Integer roots multiply to $36$ and sum to $-k$. Positive factor pairs of $36$: $(1,36), (2,18), (3,12), (4,9), (6,6)$ with sums $37, 20, 15, 13, 12$ — so $k$ can be $-37, -20, -15, -13$, or $-12$. But distinct roots exclude $(6, 6)$: $k = -12$ is impossible.",
+   "solution_md": "**Formal path**\n\nIf the roots are integers $p, q$, then $pq = 36$ and $p + q = -k$. The listed $k$ values are all negative, so the roots are positive pairs: $(1,36) \\to k = -37$, $(2,18) \\to -20$, $(3,12) \\to -15$, $(4,9) \\to -13$, $(6,6) \\to -12$. The equation demands two DISTINCT roots, eliminating $(6,6)$ — hence $k = -12$ cannot occur.\n\n**Trigger cue**\n\nWhen integer roots are promised, reach for factor pairs of the constant and Vieta sums — and honor every stem condition.\n\n**Takeaway**\n\nThe repeated-root pair dies on the word distinct.",
+   "trap_map": {
+    "0": "Rejecting the wide pair $(1, 36)$ as implausible.",
+    "1": "Rejecting $(2, 18)$ after a sum slip.",
+    "2": "Rejecting $(3, 12)$ by mispairing the factors of $36$.",
+    "3": "Rejecting $(4, 9)$ after adding to $14$ by mistake."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "stem_md": "The integers $a$ and $b$ satisfy $ab = 24$. What is the value of $a + b$?\n\n(1) $a^2 + b^2 = 73$\n\n(2) $a > b > 0$ and $a - b = 5$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "(1): $(a+b)^2 = 73 + 48 = 121$, so $a + b = \\pm 11$ — two values, not sufficient. (2): $a - b = 5$ with $ab = 24$ and positives gives $(8, 3)$: $a + b = 11$ — sufficient.",
+   "solution_md": "**Formal path**\n\n(1): $(a+b)^2 = a^2 + 2ab + b^2 = 73 + 48 = 121$, so $a + b = 11$ or $-11$ (e.g. $(8,3)$ vs $(-8,-3)$) — not sufficient. (2): positivity and $a - b = 5$ force $(a, b) = (8, 3)$, so $a + b = 11$ — sufficient.\n\n**Trigger cue**\n\nWhen $ab$ and $a^2 + b^2$ appear together, reach for completing $(a \\pm b)^2$ — and watch the $\\pm$.\n\n**Takeaway**\n\nA squared sum has two square roots.",
+   "trap_map": {
+    "0": "Forgetting the negative pair $(-8, -3)$ under (1).",
+    "2": "Combining after the $\\pm$ scare, although (2) alone settles it.",
+    "3": "Granting (1) after silently assuming positives.",
+    "4": "Missing that (2)'s difference plus the product pins the pair."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "If $-3x + 7 \\ge 19$, which of the following describes all possible values of $x$?",
+   "choices": [
+    "$x \\le -4$",
+    "$x \\ge -4$",
+    "$x \\le 4$",
+    "$x \\ge 4$",
+    "$x \\le -\\dfrac{26}{3}$"
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "Isolate: $-3x \\ge 12$. Dividing by $-3$ flips the sign: $x \\le -4$.",
+   "solution_md": "**Formal path**\n\n$-3x + 7 \\ge 19 \\Rightarrow -3x \\ge 12 \\Rightarrow x \\le -4$, the flip coming from division by a negative.\n\n**Trigger cue**\n\nWhen dividing an inequality by a negative, reach for the sign flip — every time.\n\n**Takeaway**\n\nNegative division flips the inequality.",
+   "trap_map": {
+    "1": "Dividing by $-3$ without flipping.",
+    "2": "Dropping the sign of $-4$ and flipping the relation.",
+    "3": "Dropping the sign and keeping the unflipped relation.",
+    "4": "Adding $7$ instead of subtracting: $-3x \\ge 26$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "If $2 \\le x \\le 5$ and $-4 \\le y \\le -1$, what is the greatest possible value of $x - 2y$?",
+   "choices": [
+    "$7$",
+    "$9$",
+    "$10$",
+    "$13$",
+    "$14$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "Maximize $x$ and minimize $y$ (subtracting a more negative $y$ adds more): $5 - 2(-4) = 13$.",
+   "solution_md": "**Formal path**\n\n$x - 2y$ grows with $x$ and shrinks with $y$. Take $x = 5$ (top of its range) and $y = -4$ (bottom): $5 - 2(-4) = 5 + 8 = 13$.\n\n**Trigger cue**\n\nWhen optimizing a linear combination over ranges, reach for the endpoints with the right signs.\n\n**Takeaway**\n\nExtremes of linear expressions live at endpoints.",
+   "trap_map": {
+    "0": "Using $y = -1$: $5 + 2 = 7$.",
+    "1": "Using $x = 5, y = -2$ mid-range guess.",
+    "2": "Computing $x - 2y$ at $x = 2, y = -4$.",
+    "4": "Doubling $y$'s endpoint before negating: $5 - (-9)$ style slip."
+   },
+   "numeric_check": "5 - 2*(-4)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "stem_md": "A ride-share driver earns \\$18 per trip plus a \\$35 daily bonus. What is the least number of trips she must complete in a day to earn more than \\$300 that day?",
+   "choices": [
+    "$13$",
+    "$14$",
+    "$15$",
+    "$16$",
+    "$17$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Need $18t + 35 > 300$, i.e. $t > \\tfrac{265}{18} \\approx 14.7$. The least integer above is $15$.",
+   "solution_md": "**Formal path**\n\n$18t + 35 > 300 \\Rightarrow 18t > 265 \\Rightarrow t > 14.7\\overline{2}$. Trips are whole, so $t = 15$; check: $18 \\cdot 15 + 35 = 305 > 300$ ✓ while $14$ gives $287$.\n\n**Trigger cue**\n\nWhen an integer must beat a strict bound, reach for rounding UP the fractional solution.\n\n**Takeaway**\n\nStrict \"more than\" plus integers means round up.",
+   "trap_map": {
+    "0": "Solving $18t > 235$ after a subtraction slip.",
+    "1": "Rounding $14.7$ down.",
+    "3": "Requiring $\\ge 300$ with an extra safety trip.",
+    "4": "Ignoring the bonus entirely: $300/18$ rounded up."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "stem_md": "If $\\dfrac{x - 3}{x + 2} < 0$, which of the following describes all possible values of $x$?",
+   "choices": [
+    "$-2 < x < 3$",
+    "$x < -2$ or $x > 3$",
+    "$x < 3$",
+    "$-3 < x < 2$",
+    "$x > -2$"
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "A fraction is negative when numerator and denominator disagree in sign. That happens between the critical points $-2$ and $3$: test $x = 0$: $\\tfrac{-3}{2} < 0$ ✓.",
+   "solution_md": "**Formal path**\n\nCritical points: $x = 3$ (numerator zero) and $x = -2$ (denominator zero, excluded). Sign chart: for $x < -2$ both parts negative — quotient positive; for $-2 < x < 3$ the numerator is negative, denominator positive — quotient negative ✓; for $x > 3$ both positive. Solution: $-2 < x < 3$.\n\n**Trigger cue**\n\nWhen a rational inequality appears, reach for the sign chart — never multiply by $x + 2$.\n\n**Takeaway**\n\nNever multiply by an expression of unknown sign.",
+   "trap_map": {
+    "1": "Choosing the quotient-positive region.",
+    "2": "Multiplying through by $x + 2$ as if it were positive.",
+    "3": "Swapping the critical points.",
+    "4": "Keeping only the denominator's constraint."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "stem_md": "Is $a > b$?\n\n(1) $\\dfrac{a}{b} > 1$\n\n(2) $b > 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1) with $b > 0$ means $a > b$; but with $b < 0$ it means $a < b$ (flip when multiplying by negative $b$) — alone, not sufficient. (2) alone says nothing about $a$. Together: multiply (1) by the positive $b$: $a > b$ — sufficient.",
+   "solution_md": "**Formal path**\n\n(1): $\\tfrac{a}{b} > 1$ with $(a, b) = (3, 2)$ gives yes; with $(-3, -2)$ gives $\\tfrac{-3}{-2} = 1.5 > 1$ but $-3 < -2$ — no. Not sufficient. (2) alone: no information on $a$. Together: $b > 0$ lets us multiply the inequality by $b$ without flipping: $a > b$ — sufficient.\n\n**Trigger cue**\n\nWhen an inequality involves a quotient, reach for the denominator's sign before clearing it.\n\n**Takeaway**\n\nClearing a denominator needs its sign first.",
+   "trap_map": {
+    "0": "Multiplying (1) by $b$ as if $b$ were known positive.",
+    "1": "Believing $b$'s sign alone could order the pair.",
+    "3": "Granting (1) sufficiency after testing only positive pairs.",
+    "4": "Missing that the pair combines cleanly."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "stem_md": "If $0 < a < b$ and $a b = 12$, which of the following must be true?\n\nI. $a < \\sqrt{12}$\n\nII. $b > 3$\n\nIII. $a + b > 2\\sqrt{12}$",
+   "choices": [
+    "I only",
+    "I and II only",
+    "I and III only",
+    "II and III only",
+    "I, II, and III"
+   ],
+   "correct_index": 4,
+   "fastest_path_md": "With $a < b$ and product $12$: $a$ sits below the geometric mean $\\sqrt{12}$ and $b$ above (I). Since $b > \\sqrt{12} \\approx 3.46 > 3$, II holds. AM–GM with $a \\ne b$ is strict: $a + b > 2\\sqrt{ab}$ (III).",
+   "solution_md": "**Formal path**\n\nI: if $a \\ge \\sqrt{12}$ then $b > a \\ge \\sqrt{12}$ gives $ab > 12$ — contradiction. II: $b > \\sqrt{12} > 3$ by the mirrored argument. III: $(\\sqrt a - \\sqrt b)^2 > 0$ expands to $a + b > 2\\sqrt{ab} = 2\\sqrt{12}$, strict because $a \\ne b$. All three must hold.\n\n**Trigger cue**\n\nWhen a fixed product with unequal positives appears, reach for the geometric mean as the divider.\n\n**Takeaway**\n\nUnequal positives straddle their geometric mean.",
+   "trap_map": {
+    "0": "Doubting II by comparing $b$ to the integer $3$ instead of $\\sqrt{12}$.",
+    "1": "Doubting III by forgetting strict AM–GM for unequal values.",
+    "2": "Doubting II after computing $\\sqrt{12} \\approx 3.1$ low.",
+    "3": "Doubting I by placing both factors above the mean."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
   }
  ]
 }
