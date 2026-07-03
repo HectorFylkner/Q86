@@ -6804,6 +6804,978 @@
    },
    "numeric_check": "360",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "If $x$ and $y$ are integers such that $x^2 y$ is odd, which of the following must be even?",
+   "choices": [
+    "$x + y$",
+    "$x + 2y$",
+    "$2x + y$",
+    "$xy$",
+    "$xy + 2$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nAn odd product has only odd factors, so $x^2$ is odd — hence $x$ is odd — and $y$ is odd. Then $x + y$ is odd $+$ odd $=$ even, always. The rest stay odd: $x + 2y$ and $2x + y$ are odd $+$ even; $xy$ is odd $\\cdot$ odd; $xy + 2$ adds an even to an odd.\n\n**Trigger cue**\n\nWhen a product or power is declared odd, reach for \"every factor is odd.\"\n\n**Takeaway**\n\nAn odd product forces every factor odd; two odds sum to even.",
+   "fastest_path_md": "$x^2 y$ odd pins both $x$ and $y$ odd, so every choice has a fixed parity — one test $x = y = 1$ settles it: the values are $2, 3, 3, 1, 3$. Only $x + y$ is even.",
+   "trap_map": {
+    "1": "Treats the $2y$ term as making the whole sum even, though the lone $x$ stays odd.",
+    "2": "Assumes doubling $x$ hands its evenness to the sum, but the lone $y$ remains odd.",
+    "3": "Multiplies parities like signs, reading odd $\\cdot$ odd as even.",
+    "4": "Expects adding $2$ to flip the parity of the odd product $xy$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "In a board game, a marker starts on square $50$ of a track whose squares are numbered $0$ through $100$. On each turn the marker moves either $3$ squares toward $100$ or $5$ squares toward $0$. After exactly $10$ turns the marker is on square $s$. Which of the following could be the value of $s$?",
+   "choices": [
+    "$36$",
+    "$45$",
+    "$52$",
+    "$56$",
+    "$60$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nLet $u$ be the number of forward turns, so $10 - u$ are backward: $s = 50 + 3u - 5(10 - u) = 8u$ with $0 \\le u \\le 10$. So $s$ must be a multiple of $8$ between $0$ and $80$. Only $56 = 8 \\cdot 7$ qualifies. A parity check alone kills $45$: both step sizes are odd, so each turn flips parity, and ten flips return the marker to an even square.\n\n**Trigger cue**\n\nWhen a fixed number of turns mixes two step sizes, reach for one variable counting one step type.\n\n**Takeaway**\n\nFix total moves, express the endpoint in one variable, then test choices.",
+   "fastest_path_md": "$s = 50 + 3u - 5(10 - u) = 8u$. Scan the choices for a multiple of $8$: only $56$.",
+   "trap_map": {
+    "0": "Reachable via $u = 2$, $d = 4$ — a six-turn path that ignores the requirement to use all ten turns.",
+    "1": "Forgets that two odd step sizes flip parity every turn, so ten turns must land on an even square.",
+    "2": "Solves $3u - 5d = 2$ with $u = 4$, $d = 2$, again using only six turns.",
+    "4": "Balances $+15 - 5$ over six turns ($u = 5$, $d = 1$) instead of all ten."
+   },
+   "numeric_check": "8*7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "Is $uv > 0$?\n\n(1) $\\dfrac{u}{v} > 0$\n\n(2) $u + v > 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n(1): a positive quotient requires $u$ and $v$ to be nonzero with the same sign, and same-sign nonzero numbers have a positive product — sufficient, answer yes. (2): $(u, v) = (1, 2)$ gives $uv = 2 > 0$, while $(3, -1)$ gives $uv = -3 < 0$ — not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nWhen a quotient's sign is given, reach for \"quotient and product of the same pair share a sign.\"\n\n**Takeaway**\n\nA quotient and product of the same two numbers share their sign.",
+   "fastest_path_md": "$\\tfrac{u}{v}$ and $uv$ always have the same sign (both are \"same signs vs. opposite signs\" detectors), so (1) is a yes immediately. For (2), test $(1, 2)$ and $(3, -1)$: yes then no.",
+   "trap_map": {
+    "1": "Trusts the concrete-looking sum while missing that a positive quotient pins matching signs.",
+    "2": "Combines out of caution when (1) already forces $u$ and $v$ to share a sign.",
+    "3": "Grants (2) sufficiency after testing only pairs of positive numbers.",
+    "4": "Sees two unknowns with no values and assumes no sign can be pinned down."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "stem_md": "For how many integers $n$ from $1$ to $50$, inclusive, is $3^n + n^3$ even?",
+   "choices": [
+    "$0$",
+    "$24$",
+    "$25$",
+    "$26$",
+    "$50$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$3^n$ is a product of odd factors, so it is odd for every $n \\ge 1$. $n^3$ has the parity of $n$. The sum is even exactly when both terms are odd, i.e., when $n^3$ is odd, i.e., when $n$ is odd. The odd integers from $1$ to $50$ number $25$.\n\n**Trigger cue**\n\nWhen an exponential meets a polynomial in a parity question, reach for term-by-term parity.\n\n**Takeaway**\n\nPowers keep the base's parity; cubes keep $n$'s.\n",
+   "fastest_path_md": "Test $n = 1$: $3 + 1 = 4$, even. Test $n = 2$: $9 + 8 = 17$, odd. Pattern: odd $n$ works, even $n$ fails — $25$ odds in range.",
+   "trap_map": {
+    "0": "Adds parities as odd $+$ odd $=$ odd, concluding the sum can never be even.",
+    "1": "Counts the odd integers strictly between $1$ and $50$, dropping the endpoint $n = 1$.",
+    "3": "Decides even $n$ works, then appends $n = 1$ after testing it directly.",
+    "4": "Gives $3^n$ the parity of $n$, making both terms match so every sum looks even."
+   },
+   "numeric_check": "50/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "stem_md": "If $p$ and $q$ are nonzero integers, is $p^q < 0$?\n\n(1) $p^5 q^2 < 0$\n\n(2) $q$ is odd and $pq > 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFor nonzero integers, $p^q < 0$ exactly when $p < 0$ and $q$ is odd. (1): $q^2 > 0$, so the inequality reduces to $p^5 < 0$, i.e., $p < 0$; but $(p, q) = (-2, 3)$ gives $-8$ (yes) while $(-2, 2)$ gives $4$ (no) — not sufficient. (2): $(3, 1)$ gives $3$ (no) while $(-3, -1)$ gives $-\\tfrac{1}{3}$ (yes) — not sufficient. Together: $p < 0$ and $pq > 0$ force $q < 0$, and $q$ is odd, so $p^q < 0$ — always yes. Answer: both together.\n\n**Trigger cue**\n\nWhen a power's sign is asked, reach for splitting into base sign and exponent parity.\n\n**Takeaway**\n\nOnly a negative base with an odd exponent yields a negative power.",
+   "fastest_path_md": "The yes-set is \"$p < 0$ and $q$ odd.\" (1) delivers only $p < 0$ (the $q^2$ is dead weight); (2) delivers only \"$q$ odd\" plus a sign link. Neither half decides alone; the two halves combined do.",
+   "trap_map": {
+    "0": "Reads (1)'s $p < 0$ as settling the sign, forgetting the exponent's parity decides.",
+    "1": "Assumes (2)'s odd exponent forces a negative result without pinning the sign of $p$.",
+    "3": "Grants each statement the half of the argument that only the other one supplies.",
+    "4": "Misses that combined, $q$ is a negative odd and $p$ is negative — the power's sign is fixed."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "stem_md": "Each of $a$, $b$, and $c$ is chosen from the set $\\{-2, -1, 1, 2\\}$, with repetition allowed. How many of the $64$ possible ordered triples $(a, b, c)$ have a positive product and an odd sum?",
+   "choices": [
+    "$4$",
+    "$6$",
+    "$16$",
+    "$32$",
+    "$48$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$abc > 0$ means the triple has an even number of negative entries; $a + b + c$ odd means it has an odd number of odd entries ($\\pm 1$). The set $\\{-2, -1, 1, 2\\}$ contains exactly one element for each (sign, parity) combination, so each entry's sign bit and parity bit are independent and uniform. Half the $64$ triples have an even count of negatives, and — independently — half of those have an odd count of odd entries: $64 \\cdot \\tfrac{1}{2} \\cdot \\tfrac{1}{2} = 16$.\n\n**Trigger cue**\n\nWhen sign and parity conditions hit a set covering all sign–parity combinations, reach for independence.\n\n**Takeaway**\n\nIndependent sign and parity conditions each halve the count.",
+   "fastest_path_md": "Negating one slot ($a \\leftrightarrow -a$) toggles the product condition but not the sum's parity, so exactly half of all triples pass the sign test; swapping $\\pm 1 \\leftrightarrow \\pm 2$ in one slot then toggles the sum condition, halving again: $64 / 4 = 16$.",
+   "trap_map": {
+    "0": "Misreads $abc > 0$ as requiring all three entries positive, leaving only $1$s and $2$s.",
+    "1": "Adds an unstated requirement that $a$, $b$, and $c$ be distinct.",
+    "3": "Applies only one of the two conditions; each alone passes half the triples.",
+    "4": "Counts triples meeting at least one of the conditions instead of both."
+   },
+   "numeric_check": "64/4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "stem_md": "At a school fair, a player spins two wheels. The first wheel stops on an integer $x$ from $1$ to $6$, and the second stops on an integer $y$ from $1$ to $9$. The player wins a prize when $xy + x + y$ is even. For how many of the $54$ possible pairs of results does the player win?",
+   "choices": [
+    "$12$",
+    "$15$",
+    "$27$",
+    "$39$",
+    "$42$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n$xy + x + y = (x+1)(y+1) - 1$, so the total is even exactly when $(x+1)(y+1)$ is odd — that is, when $x + 1$ and $y + 1$ are both odd, i.e., $x$ and $y$ are both even. The first wheel has $3$ even values ($2, 4, 6$) and the second has $4$ ($2, 4, 6, 8$): $3 \\cdot 4 = 12$ winning pairs.\n\n**Trigger cue**\n\nWhen $xy + x + y$ appears in a parity or divisibility question, reach for adding $1$ and factoring.\n\n**Takeaway**\n\nAdding $1$ factors $xy + x + y$; parity reads off instantly.",
+   "fastest_path_md": "Parity table on $(x, y)$: odd–odd gives odd $+$ odd $+$ odd $=$ odd; odd–even and even–odd give even $+$ odd $+$ even $=$ odd. Only even–even wins: $3 \\cdot 4 = 12$.",
+   "trap_map": {
+    "1": "Flips the factoring conclusion and requires both numbers to be odd ($3 \\cdot 5 = 15$).",
+    "2": "Assumes an even result occurs on half of all $54$ spins.",
+    "3": "Solves the wrong condition \"$xy$ even\" — at least one even number — giving $54 - 15$.",
+    "4": "Counts the losing pairs of the correct condition, $54 - 12$."
+   },
+   "numeric_check": "3*4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "stem_md": "If $x < y$ and $xy < 0$, which of the following must be positive?",
+   "choices": [
+    "$x + y$",
+    "$x^2 - y^2$",
+    "$\\dfrac{y}{x}$",
+    "$x^2 y - x y^2$",
+    "$x^3 y^3$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\n$xy < 0$ with $x < y$ forces $x < 0 < y$. Factor the target: $x^2 y - x y^2 = xy(x - y)$. Both factors are negative — $xy < 0$ by hypothesis and $x - y < 0$ from the ordering — so the product is positive, always. The others fail: $x + y$ and $x^2 - y^2 = (x+y)(x-y)$ depend on magnitudes; $\\tfrac{y}{x}$ is positive over negative — always negative; $x^3 y^3 = (xy)^3 < 0$.\n\n**Trigger cue**\n\nWhen a polynomial's sign is asked under sign constraints, reach for factoring into pieces with known signs.\n\n**Takeaway**\n\nFactor first; two guaranteed negatives multiply to a guaranteed positive.",
+   "fastest_path_md": "Test $(x, y) = (-1, 2)$ and $(-3, 1)$: the choices give $(1, -2)$, $(-3, 8)$, $(-2, -\\tfrac13)$, $(6, 12)$, $(-8, -27)$. Only $x^2 y - xy^2$ is positive both times — and $xy(x-y)$ confirms it always is.",
+   "trap_map": {
+    "0": "Assumes the positive number dominates the sum because $y$ is the larger value.",
+    "1": "Treats squaring as erasing signs and then orders the squares from $x < y$ backwards.",
+    "2": "Calls positive-over-negative positive, garbling the quotient sign rule.",
+    "4": "Treats the odd cubes like even powers that wipe out the negative sign of $xy$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "If $r$, $s$, and $t$ are nonzero numbers such that $rs < 0$ and $st > 0$, which of the following must be negative?",
+   "choices": [
+    "$r + t$",
+    "$rt$",
+    "$rst$",
+    "$r^2 t$",
+    "$s t^2$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nMultiply the two facts: $(rs)(st) = r s^2 t < 0$, and since $s^2 > 0$, this forces $rt < 0$ — always. The others vary: $rst = (rs) \\cdot t$ takes the sign opposite to $t$, which is not fixed; $r + t$ mixes opposite signs, so magnitudes decide; $r^2 t$ has the sign of $t$; $s t^2$ has the sign of $s$ — and $s$ can be either sign.\n\n**Trigger cue**\n\nWhen two sign facts share a variable, reach for multiplying them so the shared variable squares away.\n\n**Takeaway**\n\nMultiply sign facts; even powers vanish, exposing the target pair.",
+   "fastest_path_md": "Multiply the facts: negative $\\times$ positive gives $(rs)(st) = r s^2 t < 0$; dropping the positive $s^2$ leaves $rt < 0$. One line.",
+   "trap_map": {
+    "0": "Assumes opposite-signed numbers must have a negative sum, though magnitudes decide.",
+    "2": "Tacks $t$ onto the negative $rs$ and expects the product to stay negative.",
+    "3": "Assumes $t$ is negative because it is tied to $s$, whose sign is actually free.",
+    "4": "Assumes $s$ is negative because it sits inside the negative product $rs$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "A golfer's score for each round is recorded relative to par: a negative number for a round under par and a positive number for a round over par. Over three rounds, none of her recorded scores was zero, the product of the three scores was positive, and their sum was negative. Which of the following must be true?",
+   "choices": [
+    "None of the three rounds was under par.",
+    "Exactly one of the three rounds was under par.",
+    "Exactly two of the three rounds were under par.",
+    "The score with the greatest absolute value was over par.",
+    "The sum of every pair of the three scores was negative."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nA positive product of three nonzero numbers requires an even number of negative factors: zero or two. Zero negatives would make all three scores positive, giving a positive sum — contradicting the negative sum. So exactly two scores are negative: exactly two rounds under par. The last two choices fail on examples: $(-5, -1, 2)$ has its largest-magnitude score under par, and $(-1, -2, 2)$ has the pair sum $-1 + 2 = 1 > 0$.\n\n**Trigger cue**\n\nWhen a product's sign and a sum's sign are both given, reach for counting negative factors case by case.\n\n**Takeaway**\n\nPositive product means evenly many negatives; the sum eliminates cases.",
+   "fastest_path_md": "Product positive $\\Rightarrow$ $0$ or $2$ rounds under par. All-positive scores would sum positive, so the sum rules out $0$. Exactly two — done.",
+   "trap_map": {
+    "0": "Reads a positive product as meaning no negative factors at all.",
+    "1": "Pairs the negative sum with a single negative score, but then the product would be negative.",
+    "3": "Generalizes from one example such as $(-2, -2, 3)$, where the over-par round happens to dominate.",
+    "4": "Extends the negative total to every pair, but an under-par score plus the over-par score can be positive."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "A jewelry maker buys beads only in identical packs of $540$ beads each. She wants to use every bead she buys to fill a single square mosaic that has the same number of beads in each row as in each column. What is the least number of packs she must buy?",
+   "choices": [
+    "$3$",
+    "$5$",
+    "$15$",
+    "$30$",
+    "$45$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n$540 = 2^2 \\cdot 3^3 \\cdot 5$. With $k$ packs the mosaic holds $540k$ beads, which must be a perfect square, so every prime exponent of $540k$ must be even. The exponent of $2$ is already even; the exponents of $3$ and $5$ are odd, so $k$ must supply at least one more $3$ and one more $5$. The least such $k$ is $3 \\cdot 5 = 15$, giving $540 \\cdot 15 = 8100 = 90^2$.\n\n**Trigger cue**\nWhen a total built from repeated equal groups must be a perfect square, audit the prime exponents for parity.\n\n**Takeaway**\nA perfect square needs every prime exponent even.",
+   "fastest_path_md": "The odd exponents in $540 = 2^2 \\cdot 3^3 \\cdot 5$ sit on $3$ and $5$, so the least multiplier is $3 \\cdot 5 = 15$. Spot-check: $540 \\cdot 15 = 8100 = 90^2$.",
+   "trap_map": {
+    "0": "Fixes only the odd exponent of $3$, leaving the lone factor of $5$ unpaired.",
+    "1": "Fixes only the lone $5$, leaving the exponent of $3$ odd.",
+    "3": "Multiplies in one of every prime ($2 \\cdot 3 \\cdot 5$), adding an unneeded $2$ that breaks the even power of $2$.",
+    "4": "Uses $3^2 \\cdot 5$, which pairs the $5$ but pushes the exponent of $3$ to an odd $5$."
+   },
+   "numeric_check": "15",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "At a school fair, the total number of raffle tickets printed is equal to the product of all the integers from $1$ to $15$, inclusive. The organizers want to pack the tickets into envelopes that each hold exactly $6^k$ tickets, using every ticket with none left over. What is the greatest possible value of $k$?",
+   "choices": [
+    "$2$",
+    "$5$",
+    "$6$",
+    "$11$",
+    "$17$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n$6^k = 2^k \\cdot 3^k$, so $k$ is limited by the scarcer prime in $15!$. Threes: $\\lfloor 15/3 \\rfloor + \\lfloor 15/9 \\rfloor = 5 + 1 = 6$. Twos: $\\lfloor 15/2 \\rfloor + \\lfloor 15/4 \\rfloor + \\lfloor 15/8 \\rfloor = 7 + 3 + 1 = 11$. Thus $15!$ contains $2^{11} \\cdot 3^{6}$ times other primes, and the greatest $k$ with $6^k \\mid 15!$ is $\\min(11, 6) = 6$.\n\n**Trigger cue**\nA composite power dividing a factorial: split the base into primes and count each prime with floor-division sums.\n\n**Takeaway**\nThe scarcer prime caps the power of a composite divisor.",
+   "fastest_path_md": "Threes are the bottleneck: $\\lfloor 15/3 \\rfloor + \\lfloor 15/9 \\rfloor = 6$, while twos number $11$. So $k = 6$.",
+   "trap_map": {
+    "0": "Counts only the visible multiples of $6$ (namely $6$ and $12$) inside the product.",
+    "1": "Counts threes as $\\lfloor 15/3 \\rfloor = 5$, missing the second factor of $3$ inside $9$.",
+    "3": "Limits $k$ by the exponent of $2$ (eleven twos) instead of the scarcer threes.",
+    "4": "Adds the exponents of $2$ and $3$ ($11 + 6$) instead of taking the smaller one."
+   },
+   "numeric_check": "6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "For a banquet, an event planner must arrange all $196$ chairs into one rectangular grid with the same number of chairs in every row. The grid must have at least $2$ rows and at least $2$ chairs per row, and a grid of $r$ rows with $c$ chairs each is considered the same arrangement as a grid of $c$ rows with $r$ chairs each. How many different arrangements are possible?",
+   "choices": [
+    "$3$",
+    "$4$",
+    "$5$",
+    "$7$",
+    "$9$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n$196 = 2^2 \\cdot 7^2$, so it has $(2+1)(2+1) = 9$ divisors: $1, 2, 4, 7, 14, 28, 49, 98, 196$. Each arrangement is an unordered factor pair $r \\times c = 196$ with $r, c \\ge 2$: $(2, 98), (4, 49), (7, 28), (14, 14)$. The pair $(1, 196)$ is excluded by the two-row minimum, and the square $14 \\times 14$ counts once. Four arrangements.\n\n**Trigger cue**\nCounting rectangular layouts of a fixed total: list divisors, pair them, and police the boundary cases.\n\n**Takeaway**\nRectangle counts are divisor pairs; treat squares and edge pairs deliberately.",
+   "fastest_path_md": "Walk factor pairs of $196$ from the outside in: $(1,196)$ is banned, then $(2, 98), (4, 49), (7, 28), (14, 14)$ — four.",
+   "trap_map": {
+    "0": "Also drops the $14 \\times 14$ layout, treating a square grid as not rectangular.",
+    "2": "Includes the banned $1 \\times 196$ single-row layout despite the two-row minimum.",
+    "3": "Counts ordered row-column pairs with both sides at least $2$, so each non-square layout is counted twice.",
+    "4": "Counts every divisor of $196$ as its own arrangement."
+   },
+   "numeric_check": "4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "For a hallway banner, a math club prints the exact value of the product of all the integers from $1$ to $25$, inclusive. How many zeros appear at the end of the printed number?",
+   "choices": [
+    "$4$",
+    "$5$",
+    "$6$",
+    "$7$",
+    "$10$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nEach trailing zero is a factor of $10 = 2 \\cdot 5$, and the product has far more twos than fives, so the fives decide. Count them: $\\lfloor 25/5 \\rfloor + \\lfloor 25/25 \\rfloor = 5 + 1 = 6$ — one five from each of $5, 10, 15, 20, 25$, plus a second five from $25 = 5^2$. The product therefore ends in exactly $6$ zeros.\n\n**Trigger cue**\nWhen asked how many zeros end a large product, count factors of $5$, not actual digits.\n\n**Takeaway**\nTrailing zeros equal the exponent of five in the product.",
+   "fastest_path_md": "Zeros come from fives: $\\lfloor 25/5 \\rfloor + \\lfloor 25/25 \\rfloor = 5 + 1 = 6$.",
+   "trap_map": {
+    "0": "Counts only $5, 10, 15, 20$, overlooking $25$ entirely.",
+    "1": "Gives each multiple of $5$ a single five, missing the second five inside $25$.",
+    "3": "Awards $25$ three fives instead of two.",
+    "4": "Awards every multiple of $5$ two fives, doubling the correct count minus nothing."
+   },
+   "numeric_check": "6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "A community theater sold a total of $n$ tickets to its weekend festival, where $n$ is a positive integer. Is $n$ divisible by $18$?\n\n(1) $n$ is divisible by $12$.\n\n(2) $n$ is divisible by $27$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n$18 = 2 \\cdot 3^2$. (1) guarantees $2^2 \\cdot 3$ but only one $3$: $n = 12$ gives no, $n = 36$ gives yes — insufficient. (2) guarantees $3^3$ but no factor of $2$: $n = 27$ gives no, $n = 54$ gives yes — insufficient. Together $n$ is a multiple of $\\text{lcm}(12, 27) = 2^2 \\cdot 3^3 = 108$, and $18 \\mid 108$, so the answer is always yes — sufficient combined.\n\n**Trigger cue**\nDivisibility DS: convert each statement into guaranteed prime exponents, then merge with the LCM.\n\n**Takeaway**\nMerge divisibility facts by taking each prime's larger exponent.",
+   "fastest_path_md": "$18 = 2 \\cdot 3^2$. (1) supplies the $2$ but only one $3$; (2) supplies $3^3$ but no $2$. Alone each fails ($12$, $27$ are counterexamples); together $n$ is a multiple of $\\text{lcm}(12, 27) = 108$, hence of $18$.",
+   "trap_map": {
+    "0": "Assumes divisibility by $12$ already carries the $3^2$ that $18$ requires.",
+    "1": "Assumes divisibility by $27$ settles it, forgetting $18$ also needs a factor of $2$.",
+    "3": "Tests only friendly values like $36$ and $54$ and declares each statement sufficient.",
+    "4": "Never merges the prime exponents from the two statements into $2^2 \\cdot 3^3$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "A candy company molds fruit chews shaped as small identical cubes and produces them in batches of exactly $1{,}080$ chews. For a store display, the company will use every chew from $k$ full batches to build one large solid cube. What is the least value of $k$ for which this is possible?",
+   "choices": [
+    "$5$",
+    "$25$",
+    "$30$",
+    "$75$",
+    "$200$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n$1080 = 2^3 \\cdot 3^3 \\cdot 5$. A solid cube of unit cubes uses $n^3$ pieces, so $1080k$ must be a perfect cube: every prime exponent must be a multiple of $3$. The exponents of $2$ and $3$ already are; the lone $5$ must rise to $5^3$, so the least $k$ is $5^2 = 25$. Check: $1080 \\cdot 25 = 27{,}000 = 30^3$.\n\n**Trigger cue**\nA least multiplier that completes a perfect cube: raise each prime exponent to the next multiple of three.\n\n**Takeaway**\nCubes need every prime exponent divisible by three.",
+   "fastest_path_md": "$1080 = 2^3 \\cdot 3^3 \\cdot 5$ is exactly a factor of $5^2$ short of a cube, so $k = 25$ and the display holds $27{,}000 = 30^3$ chews.",
+   "trap_map": {
+    "0": "Adds only one more $5$, reaching $5^2$, which is still not a multiple of three.",
+    "2": "Completes a perfect square ($2 \\cdot 3 \\cdot 5 = 30$) instead of a perfect cube.",
+    "3": "Tacks an unneeded factor of $3$ onto the required $5^2$.",
+    "4": "Picks $200 = 2^3 \\cdot 5^2$, which does make a cube ($60^3$) but is not the least such $k$."
+   },
+   "numeric_check": "25",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "A tourism board has $6{,}480$ commemorative pins and will divide all of them into identical souvenir sets, with every pin used and none left over. The number of pins in each set must be a multiple of $12$. How many different possible values are there for the number of pins per set?",
+   "choices": [
+    "$12$",
+    "$16$",
+    "$24$",
+    "$40$",
+    "$50$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n$6480 = 2^4 \\cdot 3^4 \\cdot 5$. A valid set size is a divisor of $6480$ that is a multiple of $12 = 2^2 \\cdot 3$, i.e. $2^a 3^b 5^c$ with $2 \\le a \\le 4$, $1 \\le b \\le 4$, $0 \\le c \\le 1$: that is $3 \\cdot 4 \\cdot 2 = 24$ values. Equivalently, valid sizes are $12m$ where $m$ divides $6480/12 = 540 = 2^2 \\cdot 3^3 \\cdot 5$, which has $(2+1)(3+1)(1+1) = 24$ divisors.\n\n**Trigger cue**\nCounting divisors that must contain a given factor: divide that factor out and count divisors of the quotient.\n\n**Takeaway**\nDivisors that are multiples of $d$ match divisors of $n/d$.",
+   "fastest_path_md": "Set sizes are $12m$ with $m \\mid 6480/12 = 540$. Since $540 = 2^2 \\cdot 3^3 \\cdot 5$, there are $3 \\cdot 4 \\cdot 2 = 24$ choices of $m$.",
+   "trap_map": {
+    "0": "Forgets the exponent of $5$ can be $0$ or $1$, halving the count to $3 \\cdot 4$.",
+    "1": "Off-by-one on the exponent of $2$, allowing only $2^2$ and $2^3$ instead of three options.",
+    "3": "Counts all even divisors of $6480$ (multiples of $2$) rather than multiples of $12$.",
+    "4": "Counts every divisor of $6480$, ignoring the multiple-of-$12$ requirement."
+   },
+   "numeric_check": "24",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "A ceramicist fires a batch of $n$ mugs in her kiln, where $n$ is an integer greater than $1$. How many positive divisors does $n$ have?\n\n(1) $n$ is the product of two distinct prime numbers.\n\n(2) $n$ is even and $4 < n < 12$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe target is the divisor count, not $n$ itself. (1): if $n = pq$ with $p, q$ distinct primes, its divisors are exactly $1, p, q, pq$ — four, whatever the primes are. Sufficient. (2): the even integers strictly between $4$ and $12$ are $6, 8, 10$, with divisor counts $4$ ($1,2,3,6$), $4$ ($1,2,4,8$), and $4$ ($1,2,5,10$). One common value — sufficient. Each statement alone determines the count.\n\n**Trigger cue**\nWhen a DS question asks for a derived quantity, test whether that quantity — not the variable — is pinned down.\n\n**Takeaway**\nSufficiency needs a unique answer, not a unique $n$.",
+   "fastest_path_md": "Answer the asked question, not \"what is $n$.\" (1): $pq$ always has $4$ divisors. (2): $n \\in \\{6, 8, 10\\}$ and $d(6) = d(8) = d(10) = 4$. Each alone suffices.",
+   "trap_map": {
+    "0": "Rejects (2) because $n$ could be $6$, $8$, or $10$ — but all three share one divisor count.",
+    "1": "Rejects (1) because the primes $p$ and $q$ are unknown, though the count is $4$ regardless.",
+    "2": "Combines out of caution when each statement alone already fixes the count at four.",
+    "4": "Declares both useless because neither statement determines $n$ itself."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "In an escape room, the final lock opens when players enter the number of distinct prime numbers that divide $8{,}415$. What number opens the lock?",
+   "choices": [
+    "$3$",
+    "$4$",
+    "$5$",
+    "$6$",
+    "$24$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nStrip small primes: the digit sum of $8415$ is $18$, so $8415 = 3 \\cdot 2805 = 3 \\cdot 3 \\cdot 935$; then $935 = 5 \\cdot 187$, and $187 = 11 \\cdot 17$. Hence $8{,}415 = 3^2 \\cdot 5 \\cdot 11 \\cdot 17$, whose distinct prime divisors are $3, 5, 11, 17$ — four of them.\n\n**Trigger cue**\nA distinct-prime-factor count: run trial division and stay suspicious of a stubborn remainder like $187$.\n\n**Takeaway**\nFactor completely; a leftover like $187$ may still split.",
+   "fastest_path_md": "Peel the easy primes: $8415 = 5 \\cdot 1683 = 5 \\cdot 3 \\cdot 561 = 5 \\cdot 3 \\cdot 3 \\cdot 187$, and $187 = 11 \\cdot 17$. Distinct primes: $\\{3, 5, 11, 17\\}$ — four.",
+   "trap_map": {
+    "0": "Stops early by assuming $187$ is prime, so counts only $3$, $5$, and one leftover.",
+    "2": "Counts prime factors with multiplicity, tallying the repeated $3$ twice.",
+    "3": "Counts with multiplicity and also includes $1$ as a prime.",
+    "4": "Counts all $24$ positive divisors of $8{,}415$ instead of its distinct primes."
+   },
+   "numeric_check": "4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "If $b$ is a positive number, what is the value of $x$?\n\n(1) $b^{x} = b^{2x - 6}$\n\n(2) $b = 3$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nStatement (1): if $b \\ne 1$, equal powers of the same base force equal exponents, so $x = 2x - 6$ and $x = 6$. But $b = 1$ also satisfies $b^{x} = b^{2x-6}$ for every $x$, since both sides equal $1$. So $x$ is not determined — insufficient.\n\nStatement (2): $b = 3$ carries no information about $x$ — insufficient.\n\nTogether: $b = 3 \\ne 1$, so exponents must match: $x = 2x - 6 \\Rightarrow x = 6$, a unique value. Sufficient.\n\n**Trigger cue**\nAn equation of the form $b^{\\text{stuff}} = b^{\\text{other stuff}}$: before equating exponents, ask whether the base could be $1$.\n\n**Takeaway**\nEquating exponents requires a base other than $1$.",
+   "fastest_path_md": "Statement (2) contains no $x$, so B and D die instantly. For (1), test $b = 1$: every $x$ works, so A dies. Together $3^{x} = 3^{2x-6}$ forces $x = 6$ — C.",
+   "trap_map": {
+    "0": "Equates the exponents in statement (1) immediately, forgetting that $b = 1$ satisfies the equation for every $x$.",
+    "1": "Treats knowing the base as knowing the whole equation, though statement (2) says nothing about $x$.",
+    "3": "Combines both errors: equates exponents in (1) and credits (2) with fixing $x$ on its own.",
+    "4": "Misses that once $b = 3 \\ne 1$ is known, the exponent equation $x = 2x - 6$ has the single solution $x = 6$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 2,
+   "stem_md": "What is the value of $\\left(\\dfrac{1}{2}\\right)^{-3}$?",
+   "choices": [
+    "-8",
+    "-6",
+    "$\\dfrac{1}{8}$",
+    "6",
+    "8"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\nA negative exponent inverts the base: $\\left(\\dfrac{1}{2}\\right)^{-3} = \\left(\\dfrac{2}{1}\\right)^{3} = 2^{3} = 8$.\n\n**Trigger cue**\nA negative exponent on a fraction: flip the fraction and the exponent turns positive.\n\n**Takeaway**\nA negative exponent inverts the base, never the sign.",
+   "fastest_path_md": "Flip the fraction to clear the negative exponent: $\\left(\\tfrac12\\right)^{-3} = 2^{3} = 8$.",
+   "trap_map": {
+    "0": "Inverts the fraction correctly but also attaches the exponent's negative sign to the result, giving $-8$.",
+    "1": "Multiplies the denominator by the exponent, $2 \\times (-3) = -6$, instead of applying the power.",
+    "2": "Ignores the negative sign entirely and computes $\\left(\\tfrac12\\right)^{3} = \\tfrac18$.",
+    "3": "Multiplies $2$ by $3$ after dropping both the fraction and the negative sign."
+   },
+   "numeric_check": "(1/2)^(-3)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "If $n$ is an integer, is $(-5)^{n} > 0$?\n\n(1) $(-5)^{n+1} < 0$\n\n(2) $5^{n} < 1$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n$(-5)^{n}$ is positive exactly when $n$ is even, so the question asks: is $n$ even?\n\nStatement (1): $(-5)^{n+1} < 0$ means $n + 1$ is odd, so $n$ is even. The answer is a definite yes — sufficient.\n\nStatement (2): $5^{n} < 1$ means $n < 0$. Then $n = -1$ gives $(-5)^{-1} = -\\tfrac{1}{5} < 0$ (no), while $n = -2$ gives $(-5)^{-2} = \\tfrac{1}{25} > 0$ (yes) — insufficient.\n\n**Trigger cue**\nA negative base raised to an integer power: the sign depends only on the parity of the exponent, not its size or sign.\n\n**Takeaway**\nA negative base is positive exactly at even integer exponents.",
+   "fastest_path_md": "Parity is everything. (1) says $n+1$ is odd, so $n$ is even — definite yes. (2) only says $n < 0$: test $n = -1$ (no) and $n = -2$ (yes). Answer A.",
+   "trap_map": {
+    "1": "Reads $5^{n} < 1$ as forcing a negative power and assumes a negative exponent makes $(-5)^{n}$ negative.",
+    "2": "Believes the parity from (1) still needs the sign information from (2) before the question can be answered.",
+    "3": "Credits (2) with fixing the sign of $(-5)^{n}$, though negative even and odd exponents give opposite signs.",
+    "4": "Assumes the sign of $(-5)^{n}$ cannot be settled without knowing $n$ itself, missing the parity shortcut in (1)."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "stem_md": "If $\\sqrt{72} + \\sqrt{50} - \\sqrt{8} = k\\sqrt{2}$, what is the value of $k$?",
+   "choices": [
+    "3",
+    "9",
+    "13",
+    "57",
+    "114"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nPull the largest perfect square out of each radicand: $\\sqrt{72} = \\sqrt{36 \\cdot 2} = 6\\sqrt{2}$, $\\sqrt{50} = \\sqrt{25 \\cdot 2} = 5\\sqrt{2}$, and $\\sqrt{8} = \\sqrt{4 \\cdot 2} = 2\\sqrt{2}$. Then\n$$6\\sqrt{2} + 5\\sqrt{2} - 2\\sqrt{2} = (6 + 5 - 2)\\sqrt{2} = 9\\sqrt{2},$$\nso $k = 9$.\n\n**Trigger cue**\nA sum or difference of square roots set equal to a multiple of one surd: simplify each radical to that common surd, then combine coefficients.\n\n**Takeaway**\nSimplify each radical to a common surd, then add coefficients.",
+   "fastest_path_md": "$\\sqrt{72} = 6\\sqrt{2}$, $\\sqrt{50} = 5\\sqrt{2}$, $\\sqrt{8} = 2\\sqrt{2}$; coefficients give $6 + 5 - 2 = 9$.",
+   "trap_map": {
+    "0": "Swaps the signs on the last two terms and computes $6 - 5 + 2 = 3$.",
+    "2": "Ignores the minus sign and adds all three coefficients: $6 + 5 + 2 = 13$.",
+    "3": "Combines everything under one radical first — $\\sqrt{72 + 50 - 8} = \\sqrt{2 \\cdot 57}$ — and reads off $57$ as $k$.",
+    "4": "Adds and subtracts the radicands directly to get $\\sqrt{114}$ and reports the radicand $114$."
+   },
+   "numeric_check": "(sqrt(72)+sqrt(50)-sqrt(8))/sqrt(2)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "If $x > 0$, is $\\sqrt{x} > x$?\n\n(1) $x^{2} < 4$\n\n(2) $x^{3} < x$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nFor $x > 0$, squaring both sides of $\\sqrt{x} > x$ gives $x > x^{2}$, i.e. $x(1 - x) > 0$, i.e. $0 < x < 1$. So the question is: is $x < 1$?\n\nStatement (1): $x^{2} < 4$ with $x > 0$ gives $0 < x < 2$. Then $x = \\tfrac{1}{2}$ answers yes while $x = \\tfrac{3}{2}$ answers no — insufficient.\n\nStatement (2): $x^{3} < x$ with $x > 0$ divides by the positive number $x$ to give $x^{2} < 1$, so $0 < x < 1$. The answer is a definite yes — sufficient.\n\n**Trigger cue**\nComparing $x$ with $\\sqrt{x}$ or with powers of $x$ for positive $x$: everything reduces to where $x$ sits relative to $1$.\n\n**Takeaway**\nFor positive $x$, $\\sqrt{x}$ exceeds $x$ only when $x < 1$.",
+   "fastest_path_md": "Translate the question first: for $x > 0$, $\\sqrt{x} > x$ exactly when $x < 1$. (2) $x^{3} < x$ divides to $x^{2} < 1$, so $x < 1$ — sufficient. (1) allows both $x = \\tfrac12$ and $x = \\tfrac32$ — insufficient. B.",
+   "trap_map": {
+    "0": "Reads $x^{2} < 4$ as $x < 2$ and assumes every such $x$ has $\\sqrt{x} > x$, ignoring values between $1$ and $2$.",
+    "2": "Thinks (2) still needs (1)'s upper bound, not seeing that $x^{3} < x$ with $x > 0$ already forces $x < 1$.",
+    "3": "Credits (1) as well, overlooking that $x = \\tfrac32$ satisfies $x^{2} < 4$ yet gives $\\sqrt{x} < x$.",
+    "4": "Fails to decode $x^{3} < x$ into $0 < x < 1$ and concludes neither statement settles the comparison."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "What is the value of $x$?\n\n(1) $7^{x^{2}} = 7^{4x - 3}$\n\n(2) $x^{x - 3} = 1$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\nStatement (1): the base $7$ exceeds $1$, so the exponents are equal: $x^{2} = 4x - 3$, i.e. $(x - 1)(x - 3) = 0$, so $x = 1$ or $x = 3$ — two values, insufficient.\n\nStatement (2): a power equals $1$ in three ways — exponent $0$ with nonzero base ($x = 3$), base $1$ ($x = 1$), or base $-1$ with an even integer exponent ($x = -1$, since $(-1)^{-4} = 1$). So $x \\in \\{-1, 1, 3\\}$ — insufficient.\n\nTogether: the intersection is $\\{1, 3\\}$, still two candidate values — insufficient.\n\n**Trigger cue**\nAny equation of the form $(\\text{expression})^{(\\text{expression})} = 1$: enumerate all three cases before judging sufficiency.\n\n**Takeaway**\n$a^{b} = 1$ has three cases; intersecting them can stay ambiguous.",
+   "fastest_path_md": "Test $x = 1$ and $x = 3$: both satisfy statement (1) ($7^{1} = 7^{1}$ and $7^{9} = 7^{9}$) and both satisfy statement (2) ($1^{-2} = 1$ and $3^{0} = 1$). Two survivors of both statements — E, no further work needed.",
+   "trap_map": {
+    "0": "Solves $x^{2} = 4x - 3$ but keeps only the root $x = 3$, missing $x = 1$ from the factoring.",
+    "1": "Reads $x^{x-3} = 1$ as forcing the exponent to be $0$, so $x = 3$ uniquely — missing the base-$1$ and base-$(-1)$ cases.",
+    "2": "Drops $x = 1$ from one of the two solution sets, so the intersection appears to collapse to the single value $3$.",
+    "3": "Believes each statement independently pins $x = 3$, overlooking the second root in (1) and the extra cases in (2)."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $2^{2x} - 6 \\cdot 2^{x} + 8 = 0$, what is the sum of all possible values of $x$?",
+   "choices": [
+    "1",
+    "2",
+    "3",
+    "6",
+    "8"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $u = 2^{x}$, so $u > 0$ and $2^{2x} = u^{2}$. The equation becomes\n$$u^{2} - 6u + 8 = 0 \\Rightarrow (u - 2)(u - 4) = 0 \\Rightarrow u = 2 \\text{ or } u = 4.$$\nConverting back: $2^{x} = 2$ gives $x = 1$, and $2^{x} = 4$ gives $x = 2$. The sum of all possible values is $1 + 2 = 3$.\n\n**Trigger cue**\n$2^{2x}$ appearing alongside $2^{x}$ is a quadratic in disguise: substitute $u = 2^{x}$.\n\n**Takeaway**\nSubstitute $u = 2^{x}$; solve the quadratic; convert roots back.",
+   "fastest_path_md": "See $(2^{x})^{2} - 6(2^{x}) + 8 = 0$, factor as $(2^{x} - 2)(2^{x} - 4) = 0$, so $x = 1$ or $2$; sum $= 3$.",
+   "trap_map": {
+    "0": "Keeps only the root $2^{x} = 2$, reporting $x = 1$ alone.",
+    "1": "Keeps only the root $2^{x} = 4$, reporting $x = 2$ alone.",
+    "3": "Sums the roots of the quadratic in $u$ ($2 + 4 = 6$) without converting back to $x$.",
+    "4": "Multiplies the $u$-roots ($2 \\cdot 4 = 8$) — the quadratic's constant term — instead of converting to $x$."
+   },
+   "numeric_check": "1 + 2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $x$ and $y$ are integers greater than $1$ and $x^{y} = 4{,}096$, what is the value of $x$?\n\n(1) $x > y$\n\n(2) $y$ is the square of an integer.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n$4{,}096 = 2^{12}$, so $x$ must be a power of $2$, say $x = 2^{d}$, with $dy = 12$. The pairs $(x, y)$ with both integers greater than $1$ are $(2, 12)$, $(4, 6)$, $(8, 4)$, $(16, 3)$, and $(64, 2)$.\n\nStatement (1): $x > y$ keeps $(8, 4)$, $(16, 3)$, and $(64, 2)$, so $x$ could be $8$, $16$, or $64$ — insufficient.\n\nStatement (2): among the possible exponents $\\{12, 6, 4, 3, 2\\}$, only $y = 4$ is a perfect square, forcing $(x, y) = (8, 4)$ and $x = 8$ — sufficient.\n\n**Trigger cue**\nA fixed number equated to $x^{y}$ with integer unknowns: prime-factorize it and list every base–exponent split before touching the statements.\n\n**Takeaway**\nList every base–exponent split of the prime power first.",
+   "fastest_path_md": "$4{,}096 = 2^{12}$: the splits are $2^{12}, 4^{6}, 8^{4}, 16^{3}, 64^{2}$. Scan the exponents $\\{12, 6, 4, 3, 2\\}$ for perfect squares — only $4$ qualifies, so (2) alone nails $x = 8$. (1) still allows $8$, $16$, $64$. B.",
+   "trap_map": {
+    "0": "Assumes $x > y$ leaves a single split, overlooking that $(8,4)$, $(16,3)$, and $(64,2)$ all satisfy it.",
+    "2": "Misses that $4$ is the only perfect square among the possible exponents, so combines the statements unnecessarily.",
+    "3": "Believes $x > y$ forces the extreme split $64^{2}$ uniquely while also crediting (2).",
+    "4": "Never enumerates the finitely many power representations of $4{,}096$ and assumes the ambiguity survives both statements."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "A geological survey office reports ground tremors on a scale for which each increase of $1$ in the reading corresponds to the released energy being multiplied by $9$. During one survey, station P records a tremor with a reading of $4.5$, and station Q records a tremor with a reading of $3$. The energy released by the tremor at P is how many times the energy released by the tremor at Q?",
+   "choices": [
+    "3",
+    "12",
+    "13.5",
+    "27",
+    "81"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nIf a reading of $r$ corresponds to energy $E_{0} \\cdot 9^{r}$, the ratio of the two energies is\n$$\\frac{E_{0} \\cdot 9^{4.5}}{E_{0} \\cdot 9^{3}} = 9^{4.5 - 3} = 9^{1.5} = 9^{1} \\cdot 9^{1/2} = 9 \\cdot 3 = 27.$$\n\n**Trigger cue**\nAn \"each unit multiplies the quantity by $k$\" scale: the ratio between two readings is $k^{\\text{difference}}$, and a fractional difference calls for roots.\n\n**Takeaway**\nHalf-unit steps contribute the square root of the scale factor.",
+   "fastest_path_md": "The reading difference is $1.5$, so the ratio is $9^{1.5} = 9 \\cdot \\sqrt{9} = 27$: the full unit contributes $9$ and the half unit contributes $3$.",
+   "trap_map": {
+    "0": "Uses only the half-unit step, computing $9^{0.5} = 3$.",
+    "1": "Adds the unit factor $9$ and the half-unit factor $3$ instead of multiplying them.",
+    "2": "Multiplies $9$ by the reading difference $1.5$ instead of raising $9$ to that power.",
+    "4": "Rounds the $1.5$-unit difference up to $2$ full units and computes $9^{2} = 81$."
+   },
+   "numeric_check": "9^1.5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "stem_md": "On the number line, the distance between $x$ and $-2.5$ is exactly $4.1$. What is the sum of the two possible values of $x$?",
+   "choices": [
+    "$-8.2$",
+    "$-6.6$",
+    "$-5$",
+    "$1.6$",
+    "$5$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe condition is $|x - (-2.5)| = 4.1$, so $x = -2.5 + 4.1 = 1.6$ or $x = -2.5 - 4.1 = -6.6$. The sum is $1.6 + (-6.6) = -5$.\n\n**Trigger cue**\n\nWhen a distance equation has two solutions and the question asks for their sum, use symmetry about the center.\n\n**Takeaway**\n\nSolutions of $|x - c| = r$ sum to $2c$.",
+   "fastest_path_md": "The two solutions sit symmetrically about the center $-2.5$, so they sum to $2(-2.5) = -5$ — no need to find either one.",
+   "trap_map": {
+    "0": "Adds the two signed deviations $-4.1 - 4.1$ instead of the two solutions.",
+    "1": "Keeps only the left solution $-2.5 - 4.1 = -6.6$.",
+    "3": "Keeps only the right solution $-2.5 + 4.1 = 1.6$.",
+    "4": "Misreads the center as $+2.5$ and sums that pair of solutions."
+   },
+   "numeric_check": "(-2.5)*2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "stem_md": "Throughout one trading day, the price $p$ of a stock, in dollars, satisfied $|p - 42.60| \\le 1.85$. In dollars, what is the greatest possible difference between two prices at which the stock traded that day?",
+   "choices": [
+    "$\\$1.85$",
+    "$\\$3.70$",
+    "$\\$40.75$",
+    "$\\$44.45$",
+    "$\\$46.30$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe condition confines $p$ to the interval from $42.60 - 1.85 = 40.75$ to $42.60 + 1.85 = 44.45$. The greatest possible difference between two prices is the full width of that interval: $44.45 - 40.75 = 3.70$.\n\n**Trigger cue**\n\nWhen $|x - c| \\le r$ bounds a quantity and the question asks for a maximum spread, compare the interval's endpoints.\n\n**Takeaway**\n\nA tolerance of radius $r$ spans a width of $2r$.",
+   "fastest_path_md": "An interval $|p - c| \\le r$ has width $2r$: the answer is $2(1.85) = \\$3.70$, with no need to compute either endpoint.",
+   "trap_map": {
+    "0": "Uses the radius alone, forgetting the price can deviate in both directions.",
+    "2": "Reports the least possible price $40.75$ instead of the difference.",
+    "3": "Reports the greatest possible price $44.45$ instead of the difference.",
+    "4": "Adds the full width $3.70$ to the center $42.60$."
+   },
+   "numeric_check": "2*1.85",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "For real numbers $x$, what is the least possible value of $|x - 3.5| + |x + 1.5| + |x - 7|$?",
+   "choices": [
+    "$5$",
+    "$8.5$",
+    "$9$",
+    "$12$",
+    "$13.5$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe expression is the total distance from $x$ to the three anchors $-1.5$, $3.5$, and $7$. A sum of distances to an odd number of points is minimized at the median anchor, $x = 3.5$. There the value is $0 + 5 + 3.5 = 8.5$ — the two outer anchors contribute exactly their spread $7 - (-1.5)$.\n\n**Trigger cue**\n\nWhen a sum of absolute values of $x$ minus constants must be minimized, place $x$ at the median constant.\n\n**Takeaway**\n\nSums of distances are minimized at the median anchor.",
+   "fastest_path_md": "Set $x$ at the median anchor $3.5$: the outer pair contributes its spread $7 - (-1.5) = 8.5$ and the middle term contributes $0$.",
+   "trap_map": {
+    "0": "Uses only the spread between $-1.5$ and $3.5$, ignoring the anchor at $7$.",
+    "2": "Minimizes at the mean of the anchors, $x = 3$, which gives $9$.",
+    "3": "Evaluates at the anchor $x = 7$ (equivalently, adds the three anchors' magnitudes).",
+    "4": "Evaluates at the anchor $x = -1.5$."
+   },
+   "numeric_check": "7-(-1.5)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "On the number line, is the point $x$ farther from $0$ than the point $y$ is?\n\n(1) $x^2 > y^2$\n\n(2) $x > y$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nThe question asks: is $|x| > |y|$? For any reals, $x^2 > y^2$ holds exactly when $|x| > |y|$, since squaring erases sign and preserves the order of magnitudes. Statement (1) is therefore a restatement of the question — sufficient, answer yes. Statement (2) orders positions, not magnitudes: $x = 5, y = 1$ gives yes, while $x = 1, y = -5$ gives no — insufficient.\n\n**Trigger cue**\n\nWhen a question compares distances from zero, translate every statement into magnitudes before judging it.\n\n**Takeaway**\n\nComparing squares compares magnitudes; comparing positions does not.",
+   "fastest_path_md": "$x^2 > y^2 \\iff |x| > |y|$, so (1) answers the question outright. (2) dies on the pair $x = 1$, $y = -5$.",
+   "trap_map": {
+    "1": "Trusts $x > y$ to order magnitudes — it fails when $y$ is a large negative like $-5$.",
+    "2": "Combines out of caution, believing (1) still needs sign information from (2).",
+    "3": "Accepts (2) after testing only pairs on the positive side of zero.",
+    "4": "Rejects (1) for not fixing the signs of $x$ and $y$, which magnitudes never need."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "A machine shop turns steel pins of diameter $d$ centimeters. Vendor P accepts a pin only if $|d - 2.50| \\le 0.06$, and vendor Q accepts a pin only if $|d - 2.42| \\le 0.05$. The diameters acceptable to both vendors form an interval of what total length, in centimeters?",
+   "choices": [
+    "$0.03$",
+    "$0.05$",
+    "$0.08$",
+    "$0.11$",
+    "$0.19$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nVendor P accepts the interval $[2.44,\\ 2.56]$ and vendor Q accepts $[2.37,\\ 2.47]$. Their intersection runs from the larger left endpoint $2.44$ to the smaller right endpoint $2.47$, an interval of length $2.47 - 2.44 = 0.03$.\n\n**Trigger cue**\n\nWhen two tolerance conditions must hold at once, unpack each into an interval and intersect the endpoints.\n\n**Takeaway**\n\nIntersect intervals: larger left endpoint to smaller right endpoint.",
+   "fastest_path_md": "Unpack both: $[2.44, 2.56]$ and $[2.37, 2.47]$. Overlap is $[2.44, 2.47]$ — length $0.03$.",
+   "trap_map": {
+    "1": "Uses vendor Q's radius $0.05$ as the overlap length.",
+    "2": "Uses the distance between the two centers, $2.50 - 2.42$.",
+    "3": "Adds the two radii $0.06 + 0.05$ instead of intersecting the intervals.",
+    "4": "Measures the union $[2.37,\\ 2.56]$ instead of the intersection."
+   },
+   "numeric_check": "2.47-2.44",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "stem_md": "If $|x| \\le 3.5$ and $|y - 2| \\le 1.5$, what is the greatest possible value of $|2x - y|$?",
+   "choices": [
+    "$6.5$",
+    "$7$",
+    "$9$",
+    "$10.5$",
+    "$12$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nHere $2x$ ranges over $[-7,\\ 7]$ and $y$ over $[0.5,\\ 3.5]$, so $2x - y$ ranges over $[-7 - 3.5,\\ 7 - 0.5] = [-10.5,\\ 6.5]$. The absolute value is maximized at whichever endpoint lies farther from $0$: $|-10.5| = 10.5 > 6.5$. The maximum is $10.5$, at $x = -3.5$, $y = 3.5$.\n\n**Trigger cue**\n\nWhen an absolute value of a linear combination must be maximized over intervals, test both extreme ends — the negative end can win.\n\n**Takeaway**\n\nMaximize $|E|$ by checking both the largest and smallest values of $E$.",
+   "fastest_path_md": "Push $2x - y$ to both extremes: high end $7 - 0.5 = 6.5$, low end $-7 - 3.5 = -10.5$. The magnitude winner is $10.5$.",
+   "trap_map": {
+    "0": "Maximizes $2x - y$ itself ($7 - 0.5$) and never checks the negative extreme.",
+    "1": "Maximizes $|2x|$ alone and ignores $y$ entirely.",
+    "2": "Pins $y$ at its center $2$ instead of its extreme $3.5$.",
+    "4": "Adds every bound in sight: $7 + 3.5 + 1.5$."
+   },
+   "numeric_check": "2*3.5+3.5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "stem_md": "On the number line, point $A$ has coordinate $-1.4$ and point $B$ has coordinate $3.2$. Point $P$ lies between $A$ and $B$, and the distance from $P$ to $A$ is $3$ times the distance from $P$ to $B$. What is the coordinate of $P$?",
+   "choices": [
+    "$-0.25$",
+    "$0.9$",
+    "$1.15$",
+    "$2.05$",
+    "$5.5$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nWith $P$ between $A$ and $B$, the distances are $P - (-1.4)$ and $3.2 - P$, so $P + 1.4 = 3(3.2 - P)$. Then $4P = 9.6 - 1.4 = 8.2$, giving $P = 2.05$. Check: $|P - A| = 3.45 = 3(1.15) = 3|P - B|$.\n\n**Trigger cue**\n\nWhen a point splits a segment in a given distance ratio, drop the absolute values using the between condition and solve linearly.\n\n**Takeaway**\n\nA $3{:}1$ split sits three-quarters of the way across.",
+   "fastest_path_md": "$P$ is $\\tfrac{3}{4}$ of the way from $A$ to $B$: $-1.4 + \\tfrac{3}{4}(4.6) = -1.4 + 3.45 = 2.05$.",
+   "trap_map": {
+    "0": "Flips the ratio and solves $3|P - A| = |P - B|$.",
+    "1": "Takes the midpoint of $A$ and $B$, ignoring the ratio.",
+    "2": "Reports the distance from $P$ to $B$ instead of the coordinate of $P$.",
+    "4": "Drops the between condition and lands on the external division point."
+   },
+   "numeric_check": "(-1.4+3*3.2)/4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 2,
+   "stem_md": "At dawn, the temperature at a weather station was $-4.6°$C. By mid-afternoon, the temperature had risen steadily to $7.8°$C. By how many degrees Celsius did the temperature rise?",
+   "choices": [
+    "$-12.4$",
+    "$3.2$",
+    "$11.4$",
+    "$12.4$",
+    "$13.4$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe rise is the distance on the number line from $-4.6$ to $7.8$: $7.8 - (-4.6) = 7.8 + 4.6 = 12.4$ degrees.\n\n**Trigger cue**\n\nWhen a change crosses zero, subtract the signed values — the two magnitudes add.\n\n**Takeaway**\n\nDistance across zero is the sum of the two magnitudes.",
+   "fastest_path_md": "Both readings' distances to $0$ add: $4.6 + 7.8 = 12.4$.",
+   "trap_map": {
+    "0": "Subtracts in the wrong order, $-4.6 - 7.8$, and reports the signed result.",
+    "1": "Subtracts the magnitudes, $7.8 - 4.6$, ignoring that $-4.6$ is below zero.",
+    "2": "Misreads $-4.6$ as $-3.6$ before adding.",
+    "4": "Makes a carry slip when adding $7.8 + 4.6$."
+   },
+   "numeric_check": "7.8+4.6",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
