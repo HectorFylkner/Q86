@@ -35,13 +35,7 @@ import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
 import { questions, settings } from "../lib/db/schema.ts";
 import { createVerifiedQuestion } from "../lib/ai/pipeline.ts";
-import {
-  SKILL_BY_SUBTOPIC,
-  SUBTOPICS_BY_SKILL,
-  type Context,
-  type QuestionFormat,
-  type Subtopic,
-} from "../lib/taxonomy.ts";
+import { SKILL_BY_SUBTOPIC, type Subtopic } from "../lib/taxonomy.ts";
 import { mulberry32, pick, shuffle } from "../lib/generators/rng.ts";
 import { buildPlan, TARGET_TOTAL, type PlanItem } from "./seed-plan.ts";
 
@@ -162,6 +156,7 @@ function loadBank(): void {
   );
   let inserted = 0;
   let updated = 0;
+  let retired = 0;
   db.transaction((tx) => {
     for (const q of bank.questions) {
       const existingId = existing.get(q.stem_md);
@@ -205,9 +200,26 @@ function loadBank(): void {
         .run();
       inserted++;
     }
+    // Retire seed rows whose stems left the bank (e.g. questions replaced
+    // after failing a deeper audit). Rows are never deleted — verified=false
+    // removes them from every serving query while preserving attempt history.
+    const bankStems = new Set(bank.questions.map((q) => q.stem_md));
+    const seedRows = tx
+      .select({ id: questions.id, stem: questions.stemMd })
+      .from(questions)
+      .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
+      .all();
+    for (const row of seedRows) {
+      if (bankStems.has(row.stem)) continue;
+      tx.update(questions)
+        .set({ verified: false })
+        .where(eq(questions.id, row.id))
+        .run();
+      retired++;
+    }
   });
   console.log(
-    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${verifiedSeedCount()} verified seed questions total.`,
+    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${retired} retired, ${verifiedSeedCount()} verified seed questions total.`,
   );
 }
 
