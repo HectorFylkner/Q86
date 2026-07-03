@@ -1,74 +1,71 @@
-# Deploying Q86 as a private website
+# Putting Q86 on the web (no terminal needed)
 
-Q86 runs on libSQL: locally that's a plain SQLite file under `./data`
-(no accounts, no cloud), and in production the same code talks to a
-hosted [Turso](https://turso.tech) database. Scratch-work photos live
-inside the database, so nothing depends on server disk — which is what
-makes serverless hosting work.
+The app sets itself up on its first visit: it creates its database
+tables and loads all 180 verified questions automatically. That means
+deployment is entirely point-and-click in the browser — two free
+accounts, roughly ten minutes.
 
-When `SITE_PASSWORD` is set, every page and API route is gated behind a
-login screen (90-day cookie). Without it the app assumes it is local and
-stays open — **never expose an instance publicly without setting it.**
+You will create:
 
-## Vercel + Turso (recommended — free)
+1. a **Turso** account — holds your database (question bank, attempt
+   history, everything) in the cloud, free tier;
+2. a **Vercel** account — serves the website itself, free tier.
 
-Both free tiers comfortably fit a single-user training app, and every
-`git push` deploys automatically.
+## Step 1 — Turso (the database)
 
-1. **Create the database** (Turso CLI: <https://docs.turso.tech/cli>):
+1. Go to <https://app.turso.tech> and sign up (easiest with your
+   GitHub account).
+2. Create a database: name it `q86`, pick the region closest to you
+   (e.g. Stockholm).
+3. On the database's page, copy two things into a note:
+   - the **URL** — starts with `libsql://…`
+   - a **token** — look for "Create token" / "Generate token" and copy
+     the long string it gives you.
 
-   ```sh
-   turso auth signup
-   turso db create q86 --location arn
-   turso db show q86 --url
-   turso db tokens create q86
-   ```
+## Step 2 — Vercel (the website)
 
-   Keep the URL (`libsql://…`) and the token.
+1. Go to <https://vercel.com/new> and sign up with your **GitHub**
+   account, so Vercel can see your repositories.
+2. Import the **Q86** repository. Vercel recognizes it as a Next.js
+   app — change nothing.
+3. Before pressing Deploy, open **Environment Variables** and add:
 
-2. **Provision it from your machine** — applies the schema and loads
-   the 180-question bank into Turso:
-
-   ```sh
-   TURSO_DATABASE_URL=libsql://… TURSO_AUTH_TOKEN=… pnpm db:push
-   TURSO_DATABASE_URL=libsql://… TURSO_AUTH_TOKEN=… pnpm seed
-   ```
-
-   Expect `180 inserted … 180 verified seed questions total`.
-
-3. **Create the Vercel project**: <https://vercel.com/new>, import the
-   GitHub repo (framework auto-detects as Next.js — no settings to
-   change). Before the first deploy, add the environment variables:
-
-   | Variable | Value |
+   | Name | Value |
    | --- | --- |
-   | `TURSO_DATABASE_URL` | the `libsql://…` URL |
-   | `TURSO_AUTH_TOKEN` | the token |
-   | `SITE_PASSWORD` | a long password — required |
-   | `ANTHROPIC_API_KEY` | optional, AI features only |
-   | `ANTHROPIC_MODEL` | optional, e.g. `claude-sonnet-5` |
+   | `TURSO_DATABASE_URL` | the `libsql://…` URL from step 1 |
+   | `TURSO_AUTH_TOKEN` | the token from step 1 |
+   | `SITE_PASSWORD` | invent a long password — this locks your site |
 
-4. **Deploy.** Your site is at `https://<project>.vercel.app` — log in
-   with the site password. Future updates ship on `git push` (or by
-   pressing Redeploy in the dashboard).
+   Optional, only for the AI features (coach, twins, report import):
+   `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (e.g. `claude-sonnet-5`).
 
-Tips:
+4. Press **Deploy** and wait a minute or two.
 
-- In the Vercel project settings, set the function region near your
-  Turso location (e.g. `arn1`/`fra1` for a Stockholm database) so
-  queries stay low-latency.
-- Turso keeps point-in-time backups on its side; `turso db shell q86`
-  gives you raw SQL access. Local `pnpm backup` is for file mode only.
-- Your laptop's local `./data/q86.db` and the Turso database are
-  separate worlds by design — train against one. If you want your local
-  history in the cloud, upload the file once:
-  `turso db shell q86 < <(sqlite3 data/q86.db .dump)` before step 2, or
-  just start fresh in the cloud.
+## Step 3 — use it
 
-## Any Docker host with a disk (alternative)
+Open `https://<your-project>.vercel.app`, enter your site password
+once, and train. The very first page load takes a few extra seconds
+while the app installs its question bank into your Turso database —
+that happens only once. Bookmark it on your phone; the login lasts 90
+days per device.
+
+From now on, any update pushed to the repository's main branch deploys
+itself automatically.
+
+## Good to know
+
+- **Backups**: Turso keeps its own point-in-time backups of your
+  database.
+- **Your laptop's copy is separate.** Running the app locally uses a
+  local file database; the website uses Turso. Train on the website so
+  all your statistics live in one place.
+- **Region tip** (optional): in Vercel's project settings you can set
+  the function region to match your Turso region (e.g. Stockholm =
+  `arn1`) for snappier pages.
+
+## Alternative: any Docker host with a disk
 
 The repo also ships a `Dockerfile`, self-provisioning entrypoint, and
 `fly.toml`. On Fly.io/Railway/a VPS the app runs in file mode against a
 volume mounted at `/app/data` — no Turso involved. Set `SITE_PASSWORD`
-(plus the optional Anthropic vars) and deploy; the entrypoint applies
-the schema and seed bank on every boot.
+and deploy.
