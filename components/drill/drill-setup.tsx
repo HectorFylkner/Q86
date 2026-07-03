@@ -12,6 +12,7 @@ import {
   SUBTOPIC_LABELS,
   type FundamentalSkill,
   type QuestionFormat,
+  type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ export type DrillConfigValue = {
   filter: QuestionFilter;
   count: number;
   timing: DrillTiming;
+  focus: SessionFocus;
 };
 
 const COUNT_OPTIONS = [5, 10, 15, 20];
@@ -50,6 +52,7 @@ export function DrillSetup({
   const [count, setCount] = useState(10);
   const [timing, setTiming] = useState<DrillTiming>("soft");
   const [format, setFormat] = useState<QuestionFormat | "all">("all");
+  const [focus, setFocus] = useState<SessionFocus>("focused");
   const [genState, setGenState] = useState<
     | { kind: "idle" }
     | { kind: "working"; stage: string }
@@ -304,6 +307,37 @@ export function DrillSetup({
           </div>
         </div>
 
+        <div className="mt-4 border-t border-grid pt-4">
+          <h3 className="text-sm font-medium">Session focus</h3>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {(
+              [
+                ["focused", "Focused — counts in statistics"],
+                ["casual", "Casual — excluded from statistics"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setFocus(value)}
+                className={cn(
+                  "rounded-[6px] border px-2.5 py-1 text-sm",
+                  focus === value
+                    ? "border-ink bg-highlight font-medium"
+                    : "border-grid text-graphite hover:border-graphite/50",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {focus === "casual" && (
+            <p className="mt-1.5 text-[11px] text-amber">
+              Casual attempts stay out of analytics, calibration, and the daily
+              plan. Misses still join the redo queue.
+            </p>
+          )}
+        </div>
+
         <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-grid pt-4">
           <button
             onClick={() =>
@@ -311,6 +345,7 @@ export function DrillSetup({
                 filter: buildFilter(),
                 count: Math.min(count, matching),
                 timing,
+                focus,
               })
             }
             disabled={matching === 0}

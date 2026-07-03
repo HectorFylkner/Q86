@@ -38,7 +38,12 @@ function skillAccuracy(): Record<FundamentalSkill, SkillRecord> {
       .select({ correct: attempts.correct })
       .from(attempts)
       .innerJoin(questions, eq(attempts.questionId, questions.id))
-      .where(eq(questions.fundamentalSkill, skill))
+      .where(
+        and(
+          eq(questions.fundamentalSkill, skill),
+          eq(attempts.focus, "focused"),
+        ),
+      )
       .orderBy(desc(attempts.id))
       .limit(30)
       .all();

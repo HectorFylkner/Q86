@@ -7,6 +7,7 @@ import {
   type DrillTiming,
 } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import type { SessionFocus } from "@/lib/taxonomy";
 import { DrillSetup, type CountRow, type DrillConfigValue } from "./drill-setup";
 import { QuestionRunner } from "./question-runner";
 
@@ -18,6 +19,7 @@ type Stage =
       sessionId: number;
       questions: Question[];
       timing: DrillTiming;
+      focus: SessionFocus;
     };
 
 export function DrillClient({
@@ -45,6 +47,7 @@ export function DrillClient({
             sessionId: res.sessionId,
             questions: res.questions,
             timing: "soft",
+            focus: "focused",
           });
         }
       })
@@ -69,6 +72,7 @@ export function DrillClient({
         sessionId: res.sessionId,
         questions: res.questions,
         timing: config.timing,
+        focus: config.focus,
       });
     } catch {
       setStage({
@@ -95,6 +99,7 @@ export function DrillClient({
         mode="drill"
         questions={stage.questions}
         timing={stage.timing}
+        focus={stage.focus}
         onRestart={() => setStage({ kind: "setup", error: null })}
       />
     );

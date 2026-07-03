@@ -31,6 +31,7 @@ import type {
   EditReason,
   ErrorType,
   FundamentalSkill,
+  SessionFocus,
   SessionMode,
   Subtopic,
 } from "./taxonomy.ts";
@@ -47,6 +48,7 @@ export async function startDrill(config: {
   filter: QuestionFilter;
   count: number;
   timing: DrillTiming;
+  focus?: SessionFocus;
 }): Promise<StartDrillResult> {
   const picked = selectQuestions(config.filter, config.count);
   if (picked.length === 0) {
@@ -134,6 +136,7 @@ export async function logAttempt(input: {
   selectedIndex: number;
   timeSeconds: number;
   confidence: Confidence;
+  focus?: SessionFocus;
 }): Promise<{ attemptId: number; correct: boolean }> {
   const q = db
     .select()
@@ -149,6 +152,7 @@ export async function logAttempt(input: {
       questionId: input.questionId,
       sessionId: input.sessionId,
       mode: input.mode,
+      focus: input.focus ?? "focused",
       selectedIndex: input.selectedIndex,
       correct,
       timeSeconds: input.timeSeconds,
@@ -201,6 +205,7 @@ export async function startTimedSet(config: {
   kind: TimedKind;
   skill?: FundamentalSkill;
   showTimer: boolean;
+  focus?: SessionFocus;
 }): Promise<StartTimedResult> {
   const total = config.kind === "full" ? 21 : 7;
   const picked = selectTimedSet(total, config.skill);
@@ -252,6 +257,7 @@ export async function saveTimedSession(input: {
   edits: TimedEditInput[];
   durationSeconds: number;
   notReachedCount: number;
+  focus?: SessionFocus;
 }): Promise<SaveTimedResponse> {
   if (input.edits.length > 3) {
     throw new Error("A section allows at most 3 edits.");
@@ -291,6 +297,7 @@ export async function saveTimedSession(input: {
           questionId: q.id,
           sessionId: input.sessionId,
           mode: input.mode,
+          focus: input.focus ?? "focused",
           selectedIndex: result.selectedIndex,
           correct,
           timeSeconds: result.timeSeconds,

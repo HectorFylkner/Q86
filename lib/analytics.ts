@@ -56,6 +56,8 @@ export type EditLedgerRow = {
 
 export type AnalyticsData = {
   attemptCount: number;
+  /** Attempts tagged casual at session start, excluded from every number here. */
+  casualExcluded: number;
   mirror: {
     domains: MirrorBar[];
     contexts: MirrorBar[];
@@ -120,9 +122,21 @@ export function gatherAnalytics(): AnalyticsData {
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.focus, "focused"))
     .orderBy(desc(attempts.id))
     .limit(5000)
     .all();
+
+  // Casual attempts and their sessions stay out of every statistic below.
+  const casualRows = db
+    .select({ sessionId: attempts.sessionId })
+    .from(attempts)
+    .where(eq(attempts.focus, "casual"))
+    .all();
+  const casualExcluded = casualRows.length;
+  const casualSessionIds = new Set(
+    casualRows.map((r) => r.sessionId).filter((s): s is number => s != null),
+  );
 
   // --- score-report mirror -------------------------------------------------
   function bars<K extends string>(
@@ -185,7 +199,8 @@ export function gatherAnalytics(): AnalyticsData {
     .from(edits)
     .innerJoin(questions, eq(edits.questionId, questions.id))
     .orderBy(desc(edits.id))
-    .all();
+    .all()
+    .filter((e) => !casualSessionIds.has(e.sessionId));
 
   const improved = editRows.filter((e) => !e.fromCorrect && e.toCorrect).length;
   const destroyed = editRows.filter((e) => e.fromCorrect && !e.toCorrect).length;
@@ -292,6 +307,7 @@ export function gatherAnalytics(): AnalyticsData {
 
   return {
     attemptCount: rows.length,
+    casualExcluded,
     mirror: {
       domains: bars(CONTENT_DOMAINS, DOMAIN_LABELS, (r) => r.domain),
       contexts: bars(CONTEXTS, CONTEXT_LABELS, (r) => r.context),

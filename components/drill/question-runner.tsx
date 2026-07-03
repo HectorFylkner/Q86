@@ -20,6 +20,7 @@ import {
   type Confidence,
   type Difficulty,
   type ErrorType,
+  type SessionFocus,
 } from "@/lib/taxonomy";
 import { cn, formatSeconds, percent } from "@/lib/utils";
 
@@ -41,12 +42,14 @@ export function QuestionRunner({
   mode,
   questions,
   timing,
+  focus = "focused",
   onRestart,
 }: {
   sessionId: number;
   mode: "drill" | "redo";
   questions: Question[];
   timing: "untimed" | "soft";
+  focus?: SessionFocus;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -106,6 +109,7 @@ export function QuestionRunner({
       selectedIndex: selected,
       timeSeconds,
       confidence,
+      focus,
     })
       .then(({ attemptId }) => {
         setResults((r) =>
@@ -117,7 +121,7 @@ export function QuestionRunner({
           r.map((res, i) => (i === index ? { ...res, saveFailed: true } : res)),
         );
       });
-  }, [phase, selected, confidence, question, sessionId, mode, index]);
+  }, [phase, selected, confidence, question, sessionId, mode, focus, index]);
 
   const next = useCallback(() => {
     if (phase !== "revealed") return;

@@ -92,6 +92,12 @@ export const SESSION_MODES = [
 ] as const;
 export type SessionMode = (typeof SESSION_MODES)[number];
 
+// Declared at session start. Casual attempts still count for question
+// rotation and the redo queue, but are excluded from every performance
+// statistic (analytics, calibration, daily-plan skill weights).
+export const SESSION_FOCUS = ["focused", "casual"] as const;
+export type SessionFocus = (typeof SESSION_FOCUS)[number];
+
 export const QUESTION_SOURCES = ["seed", "generated", "twin"] as const;
 export type QuestionSource = (typeof QUESTION_SOURCES)[number];
 

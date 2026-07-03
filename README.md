@@ -13,6 +13,9 @@ Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 - Deterministic rapid-fire pattern trainer with per-category ELO
 - Analytics mirroring the official score-report format, plus a
   deterministic daily plan
+- Session focus tags: mark a drill or timed set "casual" and it stays
+  out of analytics, calibration, and the daily plan — misses still
+  join the redo queue
 
 ## Run it
 

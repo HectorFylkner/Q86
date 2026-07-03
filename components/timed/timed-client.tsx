@@ -22,6 +22,7 @@ import {
   SKILL_LABELS,
   type Confidence,
   type FundamentalSkill,
+  type SessionFocus,
 } from "@/lib/taxonomy";
 import { cn, formatSeconds } from "@/lib/utils";
 
@@ -56,6 +57,7 @@ export function TimedClient({
   const [kind, setKind] = useState<TimedKind>("full");
   const [miniSkill, setMiniSkill] = useState<FundamentalSkill | "mix">("mix");
   const [showTimer, setShowTimer] = useState(false);
+  const [focus, setFocus] = useState<SessionFocus>("focused");
 
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [mode, setMode] = useState<"timed_set" | "section_sim">("section_sim");
@@ -109,6 +111,7 @@ export function TimedClient({
         skill:
           selectedKind === "mini" && miniSkill !== "mix" ? miniSkill : undefined,
         showTimer,
+        focus,
       });
       if (res.error != null || res.sessionId == null || res.mode == null) {
         setStage({ kind: "config", error: res.error ?? "Could not start." });
@@ -215,6 +218,7 @@ export function TimedClient({
           totalSeconds -
           Math.max(0, ((endsAtRef.current ?? 0) - Date.now()) / 1000),
         notReachedCount,
+        focus,
       })
         .then((saved) => setStage({ kind: "summary", saved }))
         .catch((e) => {
@@ -422,6 +426,21 @@ export function TimedClient({
           />
           Show the per-question timer (hidden by default, like the real exam)
         </label>
+        <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
+          <input
+            type="checkbox"
+            checked={focus === "casual"}
+            onChange={(e) => setFocus(e.target.checked ? "casual" : "focused")}
+            className="h-4 w-4 accent-[var(--ballpoint)]"
+          />
+          Casual session — exclude this set from analytics and the daily plan
+        </label>
+        {focus === "casual" && (
+          <p className="text-[11px] text-amber">
+            Misses still join the redo queue; only the statistics skip this
+            session.
+          </p>
+        )}
       </div>
     );
   }

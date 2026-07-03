@@ -15,6 +15,7 @@ import type {
   FundamentalSkill,
   QuestionFormat,
   QuestionSource,
+  SessionFocus,
   SessionMode,
   Subtopic,
 } from "../taxonomy.ts";
@@ -81,6 +82,9 @@ export const attempts = sqliteTable(
       .references(() => questions.id),
     sessionId: integer("session_id").references(() => sessions.id),
     mode: text("mode").$type<SessionMode>().notNull(),
+    // "casual" attempts are excluded from analytics and plan inputs but
+    // still drive rotation and the redo queue.
+    focus: text("focus").$type<SessionFocus>().notNull().default("focused"),
     selectedIndex: integer("selected_index").notNull(),
     correct: integer("correct", { mode: "boolean" }).notNull(),
     timeSeconds: real("time_seconds").notNull(),
