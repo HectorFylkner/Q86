@@ -4995,6 +4995,843 @@
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "stem_md": "How many four-letter sequences of distinct letters can be formed from the six letters $P, Q, R, S, T, U$ if each sequence must contain the letter $P$?",
+   "choices": [
+    "$120$",
+    "$240$",
+    "$300$",
+    "$360$",
+    "$480$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nCount all four-letter sequences of distinct letters, then remove those with no $P$. Total: $6 \\cdot 5 \\cdot 4 \\cdot 3 = 360$. Sequences avoiding $P$ draw all four letters from the remaining five: $5 \\cdot 4 \\cdot 3 \\cdot 2 = 120$. Sequences containing $P$: $360 - 120 = 240$.\n\n**Trigger cue**\nA \"must contain $X$\" condition on arrangements: count everything, subtract the arrangements that avoid $X$.\n\n**Takeaway**\n\"Must contain\" equals total minus the arrangements that omit it.",
+   "fastest_path_md": "Direct build: place $P$ in one of $4$ positions, then fill the other three slots from the remaining five letters in order: $4 \\cdot (5 \\cdot 4 \\cdot 3) = 240$.",
+   "trap_map": {
+    "0": "Computes only the complement $5 \\cdot 4 \\cdot 3 \\cdot 2 = 120$ (sequences with no $P$) and stops.",
+    "2": "Subtracts three-letter arrangements $5 \\cdot 4 \\cdot 3 = 60$ from $360$ instead of the four-letter complement.",
+    "3": "Ignores the restriction and reports all $6 \\cdot 5 \\cdot 4 \\cdot 3 = 360$ sequences.",
+    "4": "Adds the complement to the total, $360 + 120$, instead of subtracting it."
+   },
+   "numeric_check": "6*5*4*3 - 5*4*3*2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 3,
+   "stem_md": "A bookstore clerk is setting up a window display of $3$ different novels chosen from $8$ available novels. The chosen novels are placed side by side in a row, and displays that use the same novels in a different left-to-right order count as different displays. How many displays are possible?",
+   "choices": [
+    "$24$",
+    "$56$",
+    "$112$",
+    "$336$",
+    "$512$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe display is an ordered selection of $3$ novels from $8$ distinct novels: $8$ choices for the left slot, $7$ for the middle, $6$ for the right, so $8 \\cdot 7 \\cdot 6 = 336$.\n\n**Trigger cue**\nSelecting a few items from many when the arrangement (left-to-right, ranked, labeled slots) matters: multiply falling factors, do not divide.\n\n**Takeaway**\nWhen order counts, multiply slot by slot without dividing.",
+   "fastest_path_md": "Fill the three slots left to right: $8 \\cdot 7 \\cdot 6 = 336$.",
+   "trap_map": {
+    "0": "Multiplies $8$ novels by $3$ slots instead of filling the slots one at a time.",
+    "1": "Uses the combination $\\binom{8}{3} = 56$, ignoring that left-to-right order matters.",
+    "2": "Multiplies $\\binom{8}{3}$ by $2$ instead of by the $3! = 6$ orderings of the chosen novels.",
+    "4": "Computes $8^3 = 512$, allowing the same novel to fill more than one slot."
+   },
+   "numeric_check": "8*7*6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 3,
+   "stem_md": "Ms. Rivera must assign her four classes — algebra, biology, chemistry, and drama — to four consecutive periods, one class per period. If chemistry cannot be assigned to the first period, how many different schedules are possible?",
+   "choices": [
+    "$6$",
+    "$12$",
+    "$18$",
+    "$21$",
+    "$24$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWithout restriction there are $4! = 24$ schedules. Schedules that put chemistry first leave $3! = 6$ orders for the other classes. Valid schedules: $24 - 6 = 18$.\n\n**Trigger cue**\nOne item barred from one slot in a full arrangement: subtract the bad arrangements from the total, or seat the restricted slot first.\n\n**Takeaway**\nHandle the restricted position first, or subtract the violating arrangements.",
+   "fastest_path_md": "Fill the restricted slot first: $3$ classes may go first, then the remaining three classes fill the rest in $3! = 6$ ways: $3 \\cdot 6 = 18$.",
+   "trap_map": {
+    "0": "Counts the forbidden schedules ($3! = 6$ with chemistry first) instead of the allowed ones.",
+    "1": "Multiplies chemistry's $3$ allowed periods by the $4$ classes rather than arranging the remaining classes.",
+    "3": "Subtracts $3$ instead of $3! = 6$ from the $24$ total.",
+    "4": "Ignores the restriction and reports all $4! = 24$ schedules."
+   },
+   "numeric_check": "24 - 6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "stem_md": "A hospital is forming a rapid-response team of $4$ members chosen from $6$ doctors and $3$ nurses. If the team must include at least one nurse, how many different teams are possible?",
+   "choices": [
+    "$15$",
+    "$60$",
+    "$111$",
+    "$126$",
+    "$168$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nAll teams of $4$ from the $9$ staff: $\\binom{9}{4} = 126$. Teams with no nurse use only doctors: $\\binom{6}{4} = 15$. Teams with at least one nurse: $126 - 15 = 111$.\n\n**Trigger cue**\nAn \"at least one\" membership condition on a committee: count all committees and subtract the ones with none.\n\n**Takeaway**\nAt least one equals total minus none.",
+   "fastest_path_md": "Complement in one line: $\\binom{9}{4} - \\binom{6}{4} = 126 - 15 = 111$. Casework by nurse count ($1$, $2$, or $3$ nurses) takes three computations instead of two.",
+   "trap_map": {
+    "0": "Reports the all-doctor teams $\\binom{6}{4} = 15$ — the complement — instead of subtracting them.",
+    "1": "Counts only teams with exactly one nurse, $3 \\cdot \\binom{6}{3} = 60$, missing the two- and three-nurse teams.",
+    "3": "Ignores the restriction and reports all $\\binom{9}{4} = 126$ teams.",
+    "4": "Reserves one nurse ($3$ ways) and then picks any $3$ of the remaining $8$, double-counting teams with multiple nurses: $3 \\cdot \\binom{8}{3} = 168$."
+   },
+   "numeric_check": "126 - 15",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "stem_md": "A courier's office sits $4$ blocks west and $3$ blocks south of a client's building, and the streets form a rectangular grid. Walking only east or north along the streets, how many different routes can the courier take from the office to the client's building?",
+   "choices": [
+    "$12$",
+    "$35$",
+    "$56$",
+    "$210$",
+    "$5040$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nEvery route is a string of $7$ moves: $4$ east ($E$) and $3$ north ($N$) in some order. Choosing which $3$ of the $7$ positions hold the $N$ moves determines the route: $\\binom{7}{3} = \\frac{7!}{3!\\,4!} = 35$.\n\n**Trigger cue**\nShortest routes on a grid moving in only two directions: count arrangements of the move letters, $\\binom{m+n}{n}$.\n\n**Takeaway**\nGrid routes are arrangements of repeated move letters.",
+   "fastest_path_md": "Total moves $4 + 3 = 7$; choose the slots for the smaller direction: $\\binom{7}{3} = 35$.",
+   "trap_map": {
+    "0": "Multiplies the two dimensions, $4 \\cdot 3 = 12$, instead of arranging the moves.",
+    "2": "Miscounts the trip as $8$ moves and computes $\\binom{8}{3} = 56$.",
+    "3": "Orders the three north moves as distinct picks, $7 \\cdot 6 \\cdot 5 = 210$, without dividing by $3!$.",
+    "4": "Treats all seven moves as distinguishable and computes $7! = 5040$."
+   },
+   "numeric_check": "5040/(6*24)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "stem_md": "How many ordered triples of positive integers $(x, y, z)$ satisfy $x + y + z = 12$?",
+   "choices": [
+    "$55$",
+    "$66$",
+    "$91$",
+    "$165$",
+    "$220$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nWrite $12$ as a row of $12$ units; the $11$ gaps between adjacent units can each hold a divider. Choosing $2$ of the $11$ gaps splits the row into three positive parts $x$, $y$, $z$ in order, so the count is $\\binom{11}{2} = 55$.\n\n**Trigger cue**\nCounting ordered ways to split a whole number into a fixed number of positive parts: place dividers in the gaps, $\\binom{n-1}{k-1}$.\n\n**Takeaway**\nPositive ordered parts: choose dividers among the $n-1$ gaps.",
+   "fastest_path_md": "Fix $x = 1, 2, \\ldots, 10$; for each $x$ the pair $(y, z)$ has $12 - x - 1 = 11 - x$ options. Sum: $10 + 9 + \\cdots + 1 = 55$.",
+   "trap_map": {
+    "1": "Uses $\\binom{12}{2} = 66$, placing dividers among $12$ gaps instead of the $11$ gaps between units.",
+    "2": "Counts nonnegative solutions, $\\binom{14}{2} = 91$, allowing a variable to be $0$.",
+    "3": "Places $3$ dividers instead of $2$: $\\binom{11}{3} = 165$.",
+    "4": "Computes $\\binom{12}{3} = 220$, choosing $3$ of the $12$ units rather than $2$ of the $11$ gaps."
+   },
+   "numeric_check": "(11*10)/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "stem_md": "The positive integer $n$ leaves a remainder of $5$ when divided by $9$. What is the remainder when $4n^2 + 7n + 6$ is divided by $9$?",
+   "choices": [
+    "$0$",
+    "$2$",
+    "$6$",
+    "$7$",
+    "$8$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nSince $n \\equiv 5 \\pmod 9$, we have $n^2 \\equiv 25 \\equiv 7 \\pmod 9$. Then $4n^2 + 7n + 6 \\equiv 4 \\cdot 7 + 7 \\cdot 5 + 6 = 28 + 35 + 6 = 69 \\pmod 9$, and $69 = 9 \\cdot 7 + 6$, so the remainder is $6$.\n\n**Trigger cue**\n\nA polynomial in $n$ with $n$'s remainder given: substitute the residue and reduce term by term.\n\n**Takeaway**\n\nSubstitute the remainder for $n$; reduce modulo $9$ at every step.",
+   "fastest_path_md": "Use the smallest qualifying value $n = 5$: $4(25) + 35 + 6 = 141 = 9 \\cdot 15 + 6$, so the remainder is $6$.",
+   "trap_map": {
+    "0": "Drops the constant term $6$, computing $141 - 6 = 135 \\equiv 0 \\pmod 9$.",
+    "1": "Mis-reduces $25$ to $6$ modulo $9$, giving $24 + 35 + 6 = 65 \\equiv 2$.",
+    "3": "Replaces $n^2$ by $n$'s residue $5$ instead of squaring: $20 + 35 + 6 = 61 \\equiv 7$.",
+    "4": "Sets $n \\equiv 1$ and sums the coefficients: $4 + 7 + 6 = 17 \\equiv 8$."
+   },
+   "numeric_check": "mod(4*25 + 7*5 + 6, 9)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 2,
+   "stem_md": "A community kitchen has $530$ bread rolls and packs them into bags that hold exactly $12$ rolls each. After filling as many complete bags as possible, how many additional rolls would the kitchen need in order to fill one more complete bag?",
+   "choices": [
+    "$2$",
+    "$10$",
+    "$12$",
+    "$44$",
+    "$45$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nDivide: $530 = 12 \\cdot 44 + 2$, so $44$ complete bags are filled and $2$ rolls remain. One more complete bag needs $12$ rolls, so the kitchen needs $12 - 2 = 10$ additional rolls.\n\n**Trigger cue**\n\nWhen a question asks how many more items reach the next full group, find the remainder first, then subtract it from the group size.\n\n**Takeaway**\n\nShortfall to the next multiple equals divisor minus remainder.",
+   "fastest_path_md": "$12 \\cdot 44 = 528$, so $2$ rolls are left over; the gap to a full bag is $12 - 2 = 10$.",
+   "trap_map": {
+    "0": "Reports the leftover rolls ($530 - 528 = 2$) instead of the shortfall to the next full bag.",
+    "2": "Ignores the $2$ leftover rolls and assumes an entire new bag of $12$ must be supplied from scratch.",
+    "3": "Reports the number of complete bags filled, $44$, answering the wrong question.",
+    "4": "Reports the number of bags needed to hold every roll, $45$, instead of the missing rolls."
+   },
+   "numeric_check": "12 - mod(530, 12)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "stem_md": "What is the units digit of $57^{34}$?",
+   "choices": [
+    "$1$",
+    "$3$",
+    "$5$",
+    "$7$",
+    "$9$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nOnly the units digit $7$ of the base matters. Powers of $7$ end in $7, 9, 3, 1$ with period $4$. Since $34 = 4 \\cdot 8 + 2$, the units digit of $57^{34}$ matches the second entry of the cycle, which is $9$.\n\n**Trigger cue**\n\nA huge power of a multi-digit base: strip the base to its units digit, then reduce the exponent by the cycle length.\n\n**Takeaway**\n\nOnly the base's units digit and the exponent's position in the cycle matter.",
+   "fastest_path_md": "$7^2 = 49$ ends in $9$; because $34 \\equiv 2 \\pmod 4$, the answer is the same as for $7^2$: $9$.",
+   "trap_map": {
+    "0": "Miscomputes $34 \\bmod 4$ as $0$ and reads the last cycle entry, $1$.",
+    "1": "Reads the third entry of the cycle $7, 9, 3, 1$ after an off-by-one in the exponent reduction.",
+    "2": "Works with the tens digit $5$ of the base, whose powers all end in $5$.",
+    "3": "Assumes every power of a number ending in $7$ still ends in $7$."
+   },
+   "numeric_check": "mod(49, 10)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "stem_md": "What is the units digit of the positive integer $n$?\n\n(1) The units digit of $7n$ is $1$.\n\n(2) The units digit of $4n$ is $2$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nOnly the units digit $d$ of $n$ matters. From (1): scan $7d$ for $d = 0$ through $9$; the units digits are $0, 7, 4, 1, 8, 5, 2, 9, 6, 3$, and only $d = 3$ gives $1$. Statement (1) pins $d = 3$ — sufficient. From (2): the units digits of $4d$ are $0, 4, 8, 2, 6, 0, 4, 8, 2, 6$; both $d = 3$ and $d = 8$ give $2$, so statement (2) leaves two possibilities — not sufficient.\n\n**Trigger cue**\n\nA units digit described through a multiple: test all ten digits and count the preimages.\n\n**Takeaway**\n\nMultiplying by $7$ permutes units digits; multiplying by $4$ collapses them.",
+   "fastest_path_md": "For (1), $7 \\cdot 3 = 21$ is the only way to end in $1$ — sufficient. For (2), $4 \\cdot 3 = 12$ and $4 \\cdot 8 = 32$ both end in $2$ — not sufficient. Answer: statement (1) alone.",
+   "trap_map": {
+    "1": "Believes a units digit of $2$ for $4n$ pins $n$'s digit, missing that both $3$ and $8$ work.",
+    "2": "Assumes a single fact about a product can never determine a digit, so both statements seem necessary.",
+    "3": "Checks only $n$ ending in $3$ against statement (2) and never tests $n$ ending in $8$.",
+    "4": "Doubts that any digit can be recovered from a product's units digit at all."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "stem_md": "When the positive integer $n$ is divided by $5$, the remainder is $3$, and when $n$ is divided by $7$, the remainder is $2$. What is the remainder when $n$ is divided by $35$?",
+   "choices": [
+    "$5$",
+    "$6$",
+    "$8$",
+    "$17$",
+    "$23$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nWrite $n = 7k + 2$. The mod-$5$ condition gives $7k + 2 \\equiv 3 \\pmod 5$, so $2k \\equiv 1 \\pmod 5$, which forces $k \\equiv 3 \\pmod 5$. Then $k = 5m + 3$ and $n = 7(5m + 3) + 2 = 35m + 23$, so the remainder upon division by $35$ is $23$.\n\n**Trigger cue**\n\nTwo remainder conditions with coprime divisors and a question about their product: merge into a single residue mod the product.\n\n**Takeaway**\n\nList one congruence's values; keep the first that satisfies the other.",
+   "fastest_path_md": "List numbers that leave remainder $2$ upon division by $7$: $2, 9, 16, 23$. The first that leaves remainder $3$ upon division by $5$ is $23$; all solutions repeat every $35$.",
+   "trap_map": {
+    "0": "Adds the two remainders: $3 + 2 = 5$.",
+    "1": "Multiplies the two remainders: $3 \\cdot 2 = 6$.",
+    "2": "Takes the smallest number with remainder $3$ upon division by $5$ that is not $3$ itself, $8$, ignoring the mod-$7$ condition.",
+    "3": "Swaps the conditions, solving $n \\equiv 2 \\pmod 5$ and $n \\equiv 3 \\pmod 7$, whose solution is $17$."
+   },
+   "numeric_check": "mod(58, 35)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "stem_md": "For how many integers $n$ from $1$ to $100$ inclusive does $7^n$ have units digit $3$?",
+   "choices": [
+    "$24$",
+    "$25$",
+    "$26$",
+    "$33$",
+    "$50$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nUnits digits of $7^n$ cycle as $7, 9, 3, 1$ with period $4$, so $7^n$ ends in $3$ exactly when $n \\equiv 3 \\pmod 4$. The qualifying $n$ in $[1, 100]$ are $3, 7, 11, \\ldots, 99$, an arithmetic sequence with $\\frac{99 - 3}{4} + 1 = 25$ terms.\n\n**Trigger cue**\n\nCounting exponents that produce a target units digit: find the cycle, locate the target's position, count that residue class in the range.\n\n**Takeaway**\n\nOne hit per full cycle: divide the range length by the period.",
+   "fastest_path_md": "The cycle $7, 9, 3, 1$ has length $4$ and contains $3$ once, and $1$ to $100$ holds exactly $25$ complete cycles, so the count is $\\frac{100}{4} = 25$.",
+   "trap_map": {
+    "0": "Divides the last qualifying exponent $99$ by the cycle length $4$ and truncates, instead of counting the arithmetic sequence.",
+    "2": "Adds an extra term by also counting $n = 100$, even though $7^{100}$ ends in $1$.",
+    "3": "Uses a cycle of length $3$ for powers of $7$, estimating $\\frac{100}{3} \\approx 33$.",
+    "4": "Assumes the units digit alternates between two values, so half of all exponents qualify."
+   },
+   "numeric_check": "(99 - 3)/4 + 1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "stem_md": "A fountain show runs a repeating $9$-minute program: water jets for the first $4$ minutes, colored lights for the next $3$ minutes, and mist for the final $2$ minutes, after which the program immediately restarts. The show begins at time zero and runs without interruption. During the first $200$ minutes of the show, for how many complete minutes is the mist active?",
+   "choices": [
+    "$22$",
+    "$40$",
+    "$44$",
+    "$45$",
+    "$50$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nDivide the elapsed time by the cycle length: $200 = 9 \\cdot 22 + 2$, so $22$ complete programs run, contributing $22 \\cdot 2 = 44$ mist minutes. The leftover $2$ minutes are the start of a new program, which is the jets phase, so they add no mist time. Total: $44$ minutes.\n\n**Trigger cue**\n\nA repeating schedule cut off mid-cycle: count full cycles with division, then walk the remainder through the phases in order.\n\n**Takeaway**\n\nCount full cycles, then trace the leftover minutes phase by phase.",
+   "fastest_path_md": "$200 \\div 9 = 22$ remainder $2$: each full cycle gives $2$ mist minutes ($44$ total), and the extra $2$ minutes are jets, adding nothing.",
+   "trap_map": {
+    "0": "Reports the number of complete cycles, $22$, instead of the mist minutes they contain.",
+    "1": "Treats the program as $10$ minutes long, getting $20$ cycles and $20 \\cdot 2 = 40$ mist minutes.",
+    "3": "Credits a mist minute inside the leftover $2$ minutes, which actually fall in the jets phase.",
+    "4": "Adds the phases to an $8$-minute cycle, getting $25$ cycles and $25 \\cdot 2 = 50$ mist minutes."
+   },
+   "numeric_check": "22*2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "stem_md": "If $n$ is a positive integer, what is the units digit of $n^4$?\n\n(1) $n$ is even.\n\n(2) $n$ is not a multiple of $5$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe units digit of $n^4$ depends only on the units digit of $n$: digits $1, 3, 7, 9$ give $1$; digits $2, 4, 6, 8$ give $6$; digit $5$ gives $5$; digit $0$ gives $0$. From (1), $n$ can end in $0, 2, 4, 6, 8$, so $n^4$ ends in $0$ or $6$ — not sufficient. From (2), $n$ can end in any digit except $0$ and $5$, so $n^4$ ends in $1$ or $6$ — not sufficient. Together, $n$ ends in $2, 4, 6,$ or $8$, and every such digit gives $n^4$ ending in $6$ — sufficient.\n\n**Trigger cue**\n\nA question about the units digit of a fixed power under digit restrictions: tabulate the ten possible outcomes first.\n\n**Takeaway**\n\nFourth powers end only in $0$, $1$, $5$, or $6$.\n",
+   "fastest_path_md": "Tabulate fourth-power endings: $\\{0 \\to 0,\\ 5 \\to 5,\\ \\text{odd} \\to 1,\\ \\text{even} \\to 6\\}$. (1) leaves $\\{0, 6\\}$; (2) leaves $\\{1, 6\\}$; the overlap of the digit restrictions leaves only $6$.",
+   "trap_map": {
+    "0": "Assumes every even $n$ gives $n^4$ ending in $6$, forgetting $n$ ending in $0$.",
+    "1": "Assumes every non-multiple of $5$ gives $n^4$ ending in $6$, forgetting odd digits give $1$.",
+    "3": "Knows fourth powers end only in $0, 1, 5, 6$ and concludes each statement alone narrows to one digit.",
+    "4": "Misses that combining even with not-a-multiple-of-$5$ leaves only $2, 4, 6, 8$, all with fourth powers ending in $6$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "stem_md": "What is the remainder when $1! + 2! + 3! + \\cdots + 40!$ is divided by $8$?",
+   "choices": [
+    "$0$",
+    "$1$",
+    "$2$",
+    "$3$",
+    "$6$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nFor every $k \\geq 4$, the product $k!$ contains the factors $2$ and $4$, so $8 \\mid k!$ and those terms contribute $0$ modulo $8$. The sum therefore reduces to its first three terms: $1! + 2! + 3! = 1 + 2 + 6 = 9 \\equiv 1 \\pmod 8$.\n\n**Trigger cue**\n\nA long sum of factorials against a small modulus: find where the factorials become multiples of the modulus and discard everything after.\n\n**Takeaway**\n\nFactorials eventually absorb any modulus; only the early terms matter.",
+   "fastest_path_md": "$4! = 24$ is already a multiple of $8$, and every later factorial contains $4!$, so only $1 + 2 + 6 = 9$ survives: remainder $1$.",
+   "trap_map": {
+    "0": "Notes that $4!$ and beyond are multiples of $8$ and forgets the three surviving terms entirely.",
+    "2": "Reduces the surviving sum $9$ by $7$ instead of $8$, using the wrong modulus.",
+    "3": "Assumes divisibility by $8$ starts at $3!$, keeping only $1! + 2! = 3$.",
+    "4": "Reports the last surviving term $3! = 6$ as the remainder."
+   },
+   "numeric_check": "mod(1 + 2 + 6, 8)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "stem_md": "A community theater sells adult tickets for $\\$12$ each and child tickets for $\\$7$ each. A group buys exactly $9$ tickets, including at least $2$ adult tickets and at least $3$ child tickets. What is the least possible total amount, in dollars, that the group pays for the tickets?",
+   "choices": [
+    "$45$",
+    "$63$",
+    "$73$",
+    "$78$",
+    "$93$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLet $a$ be the number of adult tickets, so the child count is $9 - a$ with $2 \\le a \\le 6$. The cost is $12a + 7(9 - a) = 63 + 5a$, which increases with $a$, so take $a = 2$: the cost is $63 + 10 = 73$.\n\n**Trigger cue**\n\nA fixed group size, two prices, and per-type minimums: push the count toward the cheaper type.\n\n**Takeaway**\n\nTo minimize cost, load the count onto the cheapest allowed option.",
+   "fastest_path_md": "Child tickets are cheaper, so buy only the forced $2$ adult tickets and make the other $7$ child tickets: $2 \\cdot 12 + 7 \\cdot 7 = 24 + 49 = 73$.",
+   "trap_map": {
+    "0": "Prices only the required $2$ adult and $3$ child tickets, ignoring the other $4$ tickets.",
+    "1": "Buys all $9$ tickets as child tickets, violating the adult minimum.",
+    "3": "Swaps the minimums, buying $3$ adult and $6$ child tickets.",
+    "4": "Maximizes instead of minimizes, filling the remaining tickets with adult tickets."
+   },
+   "numeric_check": "2*12 + 7*7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "stem_md": "An online tutoring platform charges each new tutor a one-time registration fee of $\\$35$ and pays $\\$18$ per completed session. What is the least number of sessions a new tutor must complete so that her total pay, after the registration fee is deducted, is at least $\\$400$?",
+   "choices": [
+    "$22$",
+    "$23$",
+    "$24$",
+    "$25$",
+    "$26$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nLet $n$ be the number of sessions. Require $18n - 35 \\ge 400$, so $18n \\ge 435$ and $n \\ge 24.1\\overline{6}$. The least integer satisfying this is $n = 25$.\n\n**Trigger cue**\n\nA \"least number needed to reach a target\" with a fixed deduction: set up a linear inequality and round up.\n\n**Takeaway**\n\nSolve the inequality, then round up to the next whole unit.",
+   "fastest_path_md": "Test the boundary: $18 \\cdot 24 - 35 = 397$, just short of $400$; one more session gives $415$. Answer $25$.",
+   "trap_map": {
+    "0": "Divides $400$ by $18$ and rounds down, ignoring the fee entirely.",
+    "1": "Divides $400$ by $18$ and rounds up, forgetting the $\\$35$ fee.",
+    "2": "Rounds $435/18 \\approx 24.2$ down, leaving the tutor $\\$3$ short of the goal.",
+    "4": "Adds an unnecessary extra session after correctly rounding up to $25$."
+   },
+   "numeric_check": "ceil((400 + 35)/18)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "stem_md": "If $2 \\le a \\le 7$ and $-4 \\le b \\le 3$, what is the least possible value of $ab$?",
+   "choices": [
+    "$-28$",
+    "$-12$",
+    "$-8$",
+    "$6$",
+    "$21$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nFor a fixed $b$, the product $ab$ is linear in $a$, so its extremes occur at $a \\in \\{2, 7\\}$; likewise $b \\in \\{-4, 3\\}$. The four corner products are $2(-4) = -8$, $7(-4) = -28$, $2(3) = 6$, and $7(3) = 21$. The least is $-28$.\n\n**Trigger cue**\n\nMin or max of a product of variables confined to intervals: evaluate every endpoint pair.\n\n**Takeaway**\n\nProducts over intervals take extreme values at endpoint pairs.",
+   "fastest_path_md": "The most negative product pairs the largest positive value with the most negative one: $7 \\cdot (-4) = -28$.",
+   "trap_map": {
+    "1": "Multiplies the two bounds of $b$'s own interval, $-4 \\cdot 3$.",
+    "2": "Pairs the least $a$ with the least $b$: $2 \\cdot (-4) = -8$.",
+    "3": "Assumes the least product comes from the least positive values, $2 \\cdot 3 = 6$.",
+    "4": "Computes the greatest possible value, $7 \\cdot 3 = 21$, instead of the least."
+   },
+   "numeric_check": "7*(-4)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "A list consists of five integers whose sum is $60$. Is the greatest integer in the list at least $15$?\n\n(1) The least integer in the list is $4$.\n\n(2) Every integer in the list is less than $15$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nStatement (2): every integer is less than $15$, so the greatest is at most $14$ — a definite No. Sufficient. Statement (1): the other four integers sum to $56$. The list $4, 14, 14, 14, 14$ answers No, while $4, 4, 4, 4, 44$ answers Yes. Not sufficient. Answer: statement (2) alone.\n\n**Trigger cue**\n\nA yes/no question about a list's greatest value under a sum constraint: test extreme allocations for each statement.\n\n**Takeaway**\n\nA guaranteed no settles a yes/no question.",
+   "fastest_path_md": "(2) caps every entry below $15$, so the answer is a definite No — sufficient. For (1), compare $4, 14, 14, 14, 14$ with $4, 4, 4, 4, 44$: both legal, different answers.",
+   "trap_map": {
+    "0": "Assumes the least value $4$ forces one of the remaining four (summing to $56$) up to $15$, overrating the pigeonhole bound of $14$.",
+    "2": "Combines the statements without noticing that (2) alone already forces a definite No.",
+    "3": "Credits (1) with sufficiency by rounding the average $56/4 = 14$ up to $15$.",
+    "4": "Treats the definite No from (2) as a failure to answer rather than as sufficiency."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "A carpenter has $60$ board-feet of lumber. Each chair requires $4$ board-feet and each table requires $9$ board-feet. If the carpenter must build at least $3$ chairs and at least $2$ tables, what is the greatest total number of chairs and tables he can build?",
+   "choices": [
+    "$10$",
+    "$11$",
+    "$12$",
+    "$13$",
+    "$15$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nMaximize $c + t$ subject to $4c + 9t \\le 60$, $c \\ge 3$, $t \\ge 2$. Chairs use fewer board-feet per piece, so hold tables at the minimum $t = 2$: then $4c \\le 60 - 18 = 42$, giving $c \\le 10$. The total is $10 + 2 = 12$. Every additional table consumes lumber worth more than two chairs, so the count only drops.\n\n**Trigger cue**\n\nMaximizing a count under one resource cap: satisfy the costly minimums, then spend everything on the cheapest item.\n\n**Takeaway**\n\nMeet expensive requirements minimally, then maximize the cheap item.\n",
+   "fastest_path_md": "Hold tables at $2$: $60 - 18 = 42$ board-feet buys $\\lfloor 42/4 \\rfloor = 10$ chairs, so $10 + 2 = 12$ pieces.",
+   "trap_map": {
+    "0": "Insists all $60$ board-feet be used exactly, building $6$ chairs and $4$ tables.",
+    "1": "Builds $3$ tables instead of the minimum $2$, leaving lumber for only $8$ chairs.",
+    "3": "Rounds $42/4 = 10.5$ up to $11$ chairs, exceeding the available lumber.",
+    "4": "Ignores the required tables and converts all $60$ board-feet into chairs."
+   },
+   "numeric_check": "floor((60 - 2*9)/4) + 2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "stem_md": "If $x$ and $y$ are numbers, is $xy \\le 49$?\n\n(1) $x + y = 14$\n\n(2) $x - y = 4$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nStatement (1): with $x + y = 14$, we get $xy = x(14 - x) = 49 - (x - 7)^2 \\le 49$, so the answer is always Yes. Sufficient. Statement (2): $x = 9, y = 5$ gives $xy = 45$ (Yes), while $x = 12, y = 8$ gives $xy = 96$ (No). Not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA product bound when the sum is fixed: complete the square or recall the equal-split maximum.\n\n**Takeaway**\n\nA fixed sum caps the product at the equal split.",
+   "fastest_path_md": "A fixed sum of $14$ caps the product at $7 \\cdot 7 = 49$, so (1) forces Yes. For (2), test $(9, 5)$ and $(12, 8)$ — different answers.",
+   "trap_map": {
+    "1": "Tests only modest pairs for (2), such as $(9, 5)$, and never a large pair like $(12, 8)$.",
+    "2": "Insists the individual values of $x$ and $y$ are needed, missing that (1) bounds the product by itself.",
+    "3": "Assumes each linear relation pins down $xy$ well enough to compare with $49$.",
+    "4": "Believes a yes/no product question requires the exact value of $xy$, which neither statement gives."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "stem_md": "A manager must assign exactly $40$ shifts among $7$ employees. Each employee must be assigned at least $4$ shifts, and no employee may be assigned more than twice as many shifts as any other employee. What is the greatest number of shifts that can be assigned to any one employee?",
+   "choices": [
+    "$8$",
+    "$10$",
+    "$11$",
+    "$12$",
+    "$16$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nLet $L$ be the fewest shifts any employee receives, so everyone has between $L$ and $2L$ shifts. If the top employee gets $M$, the other six get at least $L$ each, so $M \\le 40 - 6L$; the ratio rule adds $M \\le 2L$. The first bound falls as $L$ grows while the second rises, so the best $L$ balances them: $2L = 40 - 6L$ gives $L = 5$ and $M = 10$. The assignment $5, 5, 5, 5, 5, 5, 10$ uses all $40$ shifts and obeys every rule; $M = 11$ would need $L \\ge 6$, but $6 \\cdot 6 + 11 = 47 > 40$.\n\n**Trigger cue**\n\nA fixed total with a cap tying the largest share to the smallest: give everyone else the same low amount and balance the two bounds.\n\n**Takeaway**\n\nA max-to-min ratio cap ties the top to the bottom value.",
+   "fastest_path_md": "Give the other six employees $L$ shifts each: $M = 40 - 6L$ must satisfy $M \\le 2L$, so $40 - 6L \\le 2L$ and $L \\ge 5$. Then $M = 40 - 30 = 10$.",
+   "trap_map": {
+    "0": "Anchors the minimum at the required $4$ and caps the top at $2 \\cdot 4 = 8$.",
+    "2": "Caps the top at twice the average $40/7 \\approx 5.7$ and rounds to $11$.",
+    "3": "Doubles the rounded-up average of $6$ without checking that the shifts still total $40$.",
+    "4": "Drops the ratio rule and gives the other six employees the bare minimum of $4$ shifts each."
+   },
+   "numeric_check": "40 - 6*5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "stem_md": "Set $S$ consists of consecutive integers. How many integers are in $S$?\n\n(1) The sum of the integers in $S$ is $120$.\n\n(2) The largest integer in $S$ is $14$ more than the smallest integer in $S$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nStatement (1): a sum of $120$ arises from runs of different lengths — $39+40+41$ uses $3$ integers, $22+23+24+25+26$ uses $5$, and $1+2+\\dots+15$ uses $15$. The count is not determined. Not sufficient.\n\nStatement (2): consecutive integers step by $1$, so largest $-$ smallest $= 14$ forces exactly $14 + 1 = 15$ integers, no matter where the run is located. Sufficient.\n\nStatement (2) alone is sufficient; statement (1) alone is not.\n\n**Trigger cue**\nFor consecutive integers, the range alone fixes the count: count $=$ range $+ 1$.\n\n**Takeaway**\nConsecutive integers: count equals range plus one.",
+   "fastest_path_md": "Statement (2) is instant: range $14$ means $14 + 1 = 15$ integers. To kill statement (1), produce two decompositions of $120$ with different lengths — $39+40+41$ and $1+2+\\dots+15$ — and you are done.",
+   "trap_map": {
+    "0": "Assumes $120$ decomposes into consecutive integers in only one way, overlooking runs like $39+40+41$.",
+    "2": "Thinks the range only bounds the spread and that the sum is still needed to fix the count.",
+    "3": "Credits statement (1) with fixing the count, though $3$, $5$, and $15$ integers all reach a sum of $120$.",
+    "4": "Misses that a range of $14$ forces exactly $15$ consecutive integers wherever the run sits."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 2,
+   "stem_md": "What is the largest of $5$ consecutive even integers?\n\n(1) The smallest of the five integers is $18$.\n\n(2) The sum of the five integers is $110$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nWrite the five integers as $a, a+2, a+4, a+6, a+8$; the largest is $a + 8$.\n\nStatement (1): $a = 18$, so the largest is $18 + 8 = 26$. Sufficient.\n\nStatement (2): $5a + 20 = 110$ gives $a = 18$, so the largest is again $26$. Sufficient.\n\nEach statement alone is sufficient.\n\n**Trigger cue**\nWhen the count and spacing of an evenly spaced set are fixed, any single anchor — an endpoint, the sum, or the mean — locks in every term.\n\n**Takeaway**\nFixed count and spacing: one anchor determines the whole set.",
+   "fastest_path_md": "With $5$ terms spaced by $2$, the set has one degree of freedom. Statement (1) anchors it directly. Statement (2) anchors it through the mean: $110/5 = 22$ is the middle term, so the largest is $22 + 4 = 26$. Each alone works.",
+   "trap_map": {
+    "0": "Misses that the sum in statement (2) yields the mean $22$, which is the middle term and fixes the set.",
+    "1": "Misses that the smallest term plus four steps of $2$ pins the largest at $26$.",
+    "2": "Thinks an anchor and the sum are both needed, though either one alone fixes the single unknown.",
+    "4": "Treats the set as undetermined even though the count is fixed at $5$ and the spacing at $2$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "stem_md": "The sum of $6$ consecutive odd integers is $96$. What is the least of the six integers?",
+   "choices": [
+    "$9$",
+    "$11$",
+    "$13$",
+    "$16$",
+    "$21$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe mean is $96/6 = 16$. With an even number of terms, $16$ is not itself a term — it sits midway between the $3$rd and $4$th. The six odd integers are therefore $16 \\pm 1$, $16 \\pm 3$, $16 \\pm 5$, that is, $11, 13, 15, 17, 19, 21$. The least is $11$.\n\n**Trigger cue**\nA sum of an evenly spaced set: divide by the count to find the center, then step out to the ends — with an even count the center falls between two terms.\n\n**Takeaway**\nDivide by the count; the mean centers the set.",
+   "fastest_path_md": "Backsolve from the middle choice sizes: try $11$ as the least — $11+13+15+17+19+21 = 96$. Done. Or compute the mean $16$ and step down $5$ (half-spacings $1, 3, 5$) to the least term.",
+   "trap_map": {
+    "0": "Steps down $7$ from the mean, extending the set one spacing too far below the center.",
+    "2": "Stops at the second-least term, $16 - 3$, miscounting the offsets from the mean.",
+    "3": "Reports the mean itself, assuming it must be a member of the set.",
+    "4": "Solves for the greatest of the six instead of the least."
+   },
+   "numeric_check": "96/6 - 5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "stem_md": "A city crew installs streetlights along one side of a straight road that is $1{,}710$ feet long. The lights are equally spaced $45$ feet apart, and there is a light at each end of the road. How many streetlights does the crew install?",
+   "choices": [
+    "$37$",
+    "$38$",
+    "$39$",
+    "$40$",
+    "$41$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe distance between the first and last lights is $1{,}710$ feet, so the number of $45$-foot gaps is $1{,}710/45 = 38$. A row with a light at each end has one more light than gaps: $38 + 1 = 39$.\n\n**Trigger cue**\nEqually spaced objects occupying both endpoints of an interval: the object count is the gap count plus one.\n\n**Takeaway**\nCount posts, not gaps: intervals plus one.",
+   "fastest_path_md": "$1{,}710/45 = 38$ gaps, then add $1$ for the light that starts the row: $39$. Sanity-check with a tiny case — a $90$-foot road at $45$-foot spacing has lights at $0$, $45$, $90$: three lights, two gaps.",
+   "trap_map": {
+    "0": "Subtracts one from the gap count instead of adding one.",
+    "1": "Reports the number of $45$-foot gaps, forgetting the light at the start of the road.",
+    "3": "Adds one to the correct light count, placing an extra light beyond the far end.",
+    "4": "Adds a light for each end on top of a count that already includes both ends."
+   },
+   "numeric_check": "1710/45 + 1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "$S$ is the sum of the integers from $41$ to $90$, inclusive, and $T$ is the sum of the integers from $1$ to $50$, inclusive. What is the value of $S - T$?",
+   "choices": [
+    "$40$",
+    "$1{,}000$",
+    "$2{,}000$",
+    "$2{,}050$",
+    "$2{,}500$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nBoth sums contain exactly $50$ terms. Pair them in order: $41$ with $1$, $42$ with $2$, $\\dots$, $90$ with $50$. Every pair differs by $40$, so\n$$S - T = 50 \\times 40 = 2{,}000.$$\n\n**Trigger cue**\nA difference of two equal-length evenly spaced sums: subtract term by term instead of computing either sum.\n\n**Takeaway**\nEqual-length sums: pair terms and multiply the shift by the count.",
+   "fastest_path_md": "Do not evaluate either sum. Each of the $50$ terms of $S$ is exactly $40$ more than the matching term of $T$, so $S - T = 50 \\times 40 = 2{,}000$.",
+   "trap_map": {
+    "0": "Finds the per-term shift of $40$ but never multiplies by the $50$ pairs.",
+    "1": "Multiplies the shift by $25$, pairing up only half of the terms.",
+    "3": "Uses a shift of $41$ by comparing $41$ to $0$ instead of to $1$.",
+    "4": "Multiplies the count $50$ by itself, using the count as the shift."
+   },
+   "numeric_check": "50 * 40",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "How many multiples of $6$ lie between $-29$ and $82$?",
+   "choices": [
+    "$13$",
+    "$14$",
+    "$17$",
+    "$18$",
+    "$19$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe least multiple of $6$ greater than $-29$ is $-24$; the greatest multiple of $6$ less than $82$ is $78$. These multiples form an evenly spaced list with spacing $6$, so the count is\n$$\\frac{78 - (-24)}{6} + 1 = \\frac{102}{6} + 1 = 17 + 1 = 18.$$\n\n**Trigger cue**\nCounting multiples over an interval that spans zero: anchor both ends at actual multiples, and remember that $0$ and the negative multiples count.\n\n**Takeaway**\nZero and negative multiples count too.",
+   "fastest_path_md": "Split at zero: positive multiples $6$ through $78$ give $13$; then $0$ is a multiple of $6$; then $-6, -12, -18, -24$ give $4$ more. Total $13 + 1 + 4 = 18$.",
+   "trap_map": {
+    "0": "Counts only the positive multiples $6$ through $78$, ignoring $0$ and the negative multiples.",
+    "1": "Includes $0$ but still misses the four negative multiples down to $-24$.",
+    "2": "Computes $(78 - (-24))/6 = 17$ without adding $1$ for the first term.",
+    "4": "Adds $1$ twice after dividing the span by $6$."
+   },
+   "numeric_check": "(78 + 24)/6 + 1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "The $21$ runners in a road race wear bibs numbered with consecutive integers, and the sum of all $21$ bib numbers is $651$. If the runner wearing the lowest-numbered bib withdraws before the start, what is the average (arithmetic mean) of the bib numbers of the runners who start the race?",
+   "choices": [
+    "$30.5$",
+    "$31$",
+    "$31.5$",
+    "$32$",
+    "$32.55$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nFor $21$ consecutive integers, the mean is the median: $651/21 = 31$, so the bibs run from $21$ to $41$. Removing bib $21$ leaves the $20$ consecutive integers $22$ through $41$, whose average is the midpoint of the endpoints:\n$$\\frac{22 + 41}{2} = 31.5.$$\n\n**Trigger cue**\nA sum of a consecutive run: divide by the count to locate the median, and after removing terms the remaining run's mean is still the average of its endpoints.\n\n**Takeaway**\nA consecutive run's average is the midpoint of its endpoints.",
+   "fastest_path_md": "Structure only: dropping the lowest of a consecutive run slides the center up by half a step, so the mean moves from $651/21 = 31$ to $31.5$. No need to rebuild the list or re-add the sum.",
+   "trap_map": {
+    "0": "Removes the highest bib instead of the lowest, computing $610/20$.",
+    "1": "Assumes the average is unchanged when the lowest runner leaves.",
+    "3": "Shifts the mean by a full unit instead of half a spacing.",
+    "4": "Divides the original sum $651$ by $20$ without removing the withdrawn bib."
+   },
+   "numeric_check": "630/20",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "$T$ is a set of consecutive even integers. What is the median of $T$?\n\n(1) The sum of the integers in $T$ is $0$.\n\n(2) $T$ contains fewer than $8$ integers.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nFor any evenly spaced set, the median equals the mean.\n\nStatement (1): the mean is $\\text{sum}/\\text{count} = 0/\\text{count} = 0$, whatever the count, so the median is $0$. (For instance $\\{-2, 0, 2\\}$ and $\\{-6, -4, -2, 0, 2, 4, 6\\}$ both qualify, and both have median $0$.) Sufficient.\n\nStatement (2): $\\{2, 4\\}$ has median $3$ while $\\{6, 8\\}$ has median $7$; both contain fewer than $8$ integers. Not sufficient.\n\nStatement (1) alone is sufficient.\n\n**Trigger cue**\nA median question about an evenly spaced set: convert it to a mean question, because mean and median coincide — a zero sum then forces both to be $0$.\n\n**Takeaway**\nEvenly spaced: zero sum forces zero mean and median.",
+   "fastest_path_md": "Median $=$ mean for evenly spaced sets, and statement (1) makes the mean $0/\\text{count} = 0$ with no case analysis. Statement (2) dies to two quick examples, $\\{2,4\\}$ versus $\\{6,8\\}$.",
+   "trap_map": {
+    "1": "Believes the size bound in statement (2) locates the set while the zero-sum condition does not.",
+    "2": "Thinks the count is needed alongside the zero sum, missing that median $=$ mean $= 0$ for any qualifying size.",
+    "3": "Credits statement (2) alone, though $\\{2,4\\}$ and $\\{6,8\\}$ give different medians.",
+    "4": "Assumes the median cannot be found without knowing how many integers the set contains."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "$Q$ is a set of consecutive odd integers. The sum of the three least integers in $Q$ is $75$, and the sum of the three greatest integers in $Q$ is $159$. What is the sum of all the integers in $Q$?",
+   "choices": [
+    "$234$",
+    "$585$",
+    "$624$",
+    "$663$",
+    "$702$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThree consecutive odd integers sum to three times their middle term. So the three least average $75/3 = 25$, making the least integer $25 - 2 = 23$; the three greatest average $159/3 = 53$, making the greatest $53 + 2 = 55$.\n\nThe set runs from $23$ to $55$ in steps of $2$: count $= (55 - 23)/2 + 1 = 17$ and median $= (23 + 55)/2 = 39$. Therefore the sum is $17 \\times 39 = 663$.\n\n**Trigger cue**\nA sum of the extreme few terms of an evenly spaced set: divide by how many were added to get their middle term, then recover the endpoints.\n\n**Takeaway**\nTriple sums reveal endpoints; sum equals count times median.",
+   "fastest_path_md": "$75/3 = 25$ and $159/3 = 53$ are the middles of the end triples, so the set spans $23$ to $55$. Then sum $=$ count $\\times$ midpoint $= 17 \\times 39 = 663$.",
+   "trap_map": {
+    "0": "Adds only the two given sums, $75 + 159$, ignoring every middle term.",
+    "1": "Builds the count from the inner anchors $25$ and $53$, getting $15$ terms.",
+    "2": "Drops the $+1$ when counting from $23$ to $55$, using $16$ terms.",
+    "4": "Adds $1$ twice when counting from $23$ to $55$, using $18$ terms."
+   },
+   "numeric_check": "17 * 39",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
