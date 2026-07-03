@@ -21,10 +21,21 @@ type stripping) and pnpm.
 
 ```sh
 pnpm install
-cp .env.example .env.local     # add your ANTHROPIC_API_KEY
 pnpm db:push                   # creates ./data/q86.db
-pnpm seed                      # generates 180 verified questions (resumable)
+pnpm seed                      # loads the committed 180-question bank (offline, no API key)
 pnpm dev
+```
+
+Open http://localhost:3000. The full training loop — drill, timed sets,
+redo queue, pattern trainer, analytics, daily plan — works with no API
+key: the 180-question bank ships in `scripts/seed-bank.json`, every
+question verified by a programmatic brute-force check before admission.
+
+The AI features (question twins, `/api/generate`, the post-mortem coach,
+score-report import) need a key:
+
+```sh
+cp .env.example .env.local     # then add your ANTHROPIC_API_KEY
 ```
 
 `ANTHROPIC_MODEL` is optional and defaults to `claude-sonnet-4-6`.
@@ -36,7 +47,8 @@ pnpm dev
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Generate + verify the 180-question seed bank (`--plan` prints the distribution without API calls) |
+| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution, `--api` regenerates via the AI pipeline) |
+| `pnpm start` | Serve the production build (after `pnpm build`) |
 
 Everything lives in `./data` (SQLite database, scratch-work images) —
 gitignored, no accounts, no cloud.
