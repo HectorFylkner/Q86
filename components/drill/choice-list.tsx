@@ -32,7 +32,7 @@ export function ChoiceList({
             disabled={revealed}
             onClick={() => onSelect(i)}
             className={cn(
-              "relative block w-full overflow-hidden rounded-[6px] border px-3 py-2.5 text-left text-[15px] transition-colors duration-150",
+              "relative block min-h-[44px] w-full overflow-hidden rounded-[6px] border px-3 py-2.5 text-left text-[15px] transition-colors duration-150",
               !revealed && "cursor-pointer hover:border-graphite/50",
               isCorrect
                 ? "border-ballpoint/70"

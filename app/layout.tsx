@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "katex/dist/katex.min.css";
 import "./globals.css";
-import { Nav } from "@/components/nav";
+import { BottomTabs, Nav } from "@/components/nav";
 import { Providers } from "@/components/providers";
 
 const inter = localFont({
@@ -29,19 +29,29 @@ const jetbrainsMono = localFont({
 export const metadata: Metadata = {
   title: "Q86",
   description: "Personal GMAT Focus quant training platform",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Q86" },
+  icons: { apple: "/apple-touch-icon.png" },
 };
+
+// Applied before hydration so a saved theme never flashes the wrong ground.
+const themeInit = `try{var t=localStorage.getItem("q86-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <Providers>
           <Nav />
-          <main className="mx-auto w-full max-w-[1120px] px-4 pb-16 pt-6 sm:px-6">
+          <BottomTabs />
+          <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-6 sm:px-6 sm:pb-16">
             {children}
           </main>
         </Providers>

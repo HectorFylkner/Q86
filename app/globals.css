@@ -3,7 +3,8 @@
 /* ---------------------------------------------------------------------------
    Q86 design tokens — "the marked exam".
    Exam paper, graphite, ballpoint ink, and the reviewer's red pen.
-   Light theme only, deliberately: training happens under match conditions.
+   Default is exam-paper light (match conditions); "night desk" dark is
+   available via the nav toggle or the OS preference.
 --------------------------------------------------------------------------- */
 
 :root {
@@ -17,6 +18,35 @@
   --amber: #b7791f;
   --highlight: #f5efd9;
 }
+
+/* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141519;
+    --surface: #1c1e24;
+    --grid: #2b2e36;
+    --ink: #eceae4;
+    --graphite: #9ca1a8;
+    --ballpoint: #8fa0f2;
+    --redpen: #e0705f;
+    --amber: #d9a050;
+    --highlight: #2b2820;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141519;
+  --surface: #1c1e24;
+  --grid: #2b2e36;
+  --ink: #eceae4;
+  --graphite: #9ca1a8;
+  --ballpoint: #8fa0f2;
+  --redpen: #e0705f;
+  --amber: #d9a050;
+  --highlight: #2b2820;
+}
+
+/* KaTeX inherits currentColor, but its rules/fraction bars use borders that
+   already track color — nothing to override. */
 
 @theme inline {
   --color-paper: var(--paper);

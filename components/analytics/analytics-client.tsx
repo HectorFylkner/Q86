@@ -27,17 +27,26 @@ import {
   type EditReason,
 } from "@/lib/taxonomy";
 import { cn, percent } from "@/lib/utils";
-
-const INK = "#17181A";
-const GRAPHITE = "#5E6268";
-const BALLPOINT = "#2239C4";
-const REDPEN = "#C63B2F";
-const AMBER = "#B7791F";
-const GRID = "#E9E6DD";
-
-const AXIS_TICK = { fill: GRAPHITE, fontSize: 11 } as const;
+import { useChartTokens } from "@/components/use-chart-tokens";
 
 export function AnalyticsClient({ data }: { data: AnalyticsData }) {
+  // Charts follow the active theme (SVG attrs cannot use CSS variables).
+  const {
+    ink: INK,
+    graphite: GRAPHITE,
+    grid: GRID,
+    ballpoint: BALLPOINT,
+    redpen: REDPEN,
+    amber: AMBER,
+  } = useChartTokens();
+  const AXIS_TICK = { fill: GRAPHITE, fontSize: 11 } as const;
+  const tooltipStyle = {
+    backgroundColor: "var(--surface)",
+    border: `1px solid ${GRID}`,
+    borderRadius: 6,
+    fontSize: 12,
+    color: INK,
+  } as const;
   if (data.attemptCount === 0) {
     return (
       <div className="space-y-4">
@@ -611,13 +620,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   );
 }
 
-const tooltipStyle = {
-  backgroundColor: "#FFFFFF",
-  border: `1px solid ${GRID}`,
-  borderRadius: 6,
-  fontSize: 12,
-  color: INK,
-} as const;
+
 
 function Section({
   title,

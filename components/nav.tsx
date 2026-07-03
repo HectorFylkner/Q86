@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -15,6 +16,15 @@ const LINKS = [
   { href: "/patterns", label: "Patterns" },
   { href: "/analytics", label: "Analytics" },
   { href: "/import", label: "Import" },
+];
+
+/** The daily loop, thumb-reachable on phones. */
+const TAB_LINKS = [
+  { href: "/", label: "Today" },
+  { href: "/drill", label: "Drill" },
+  { href: "/timed", label: "Timed" },
+  { href: "/deck", label: "Deck" },
+  { href: "/analytics", label: "Stats" },
 ];
 
 export function Nav() {
@@ -54,7 +64,37 @@ export function Nav() {
             );
           })}
         </nav>
+        <ThemeToggle />
       </div>
     </header>
+  );
+}
+
+/** Phone-only fixed bottom tab bar. Rendered outside the sticky header:
+ *  backdrop-filter on an ancestor would turn position:fixed into
+ *  header-relative positioning. */
+export function BottomTabs() {
+  const pathname = usePathname();
+  return (
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden">
+        {TAB_LINKS.map((link) => {
+          const active =
+            link.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "flex min-h-[52px] flex-1 items-center justify-center text-[13px]",
+                active ? "font-semibold text-ballpoint" : "text-graphite",
+              )}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </nav>
   );
 }
