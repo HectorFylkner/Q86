@@ -62,6 +62,9 @@ cp .env.example .env.local
 Everything lives in `./data` (SQLite database, scratch-work images) —
 gitignored, no accounts, no cloud. `pnpm backup` snapshots it.
 
+Want it as a website instead of localhost? See [DEPLOY.md](DEPLOY.md) —
+a Dockerfile, password gate, and Fly.io config ship with the repo.
+
 ## Extending the question bank
 
 New questions enter `scripts/seed-bank.json` only through the authoring
