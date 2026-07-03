@@ -8721,6 +8721,1005 @@
    },
    "numeric_check": "26",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "stem_md": "An integer is selected at random from the integers $1$ through $60$, inclusive. What is the probability that the selected integer is a multiple of $4$ or a multiple of $6$?",
+   "choices": [
+    "$\\dfrac{1}{6}$",
+    "$\\dfrac{1}{4}$",
+    "$\\dfrac{1}{3}$",
+    "$\\dfrac{5}{12}$",
+    "$\\dfrac{1}{2}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFrom $1$ to $60$ there are $15$ multiples of $4$, $10$ multiples of $6$, and $5$ multiples of $\\mathrm{lcm}(4,6) = 12$. By inclusion–exclusion the favorable count is $15 + 10 - 5 = 20$, so the probability is $\\tfrac{20}{60} = \\tfrac{1}{3}$.\n\n**Trigger cue**\n\n\"Multiple of $a$ or $b$\" over a consecutive range: count each set, then subtract the multiples of the lcm.\n\n**Takeaway**\n\nFor \"or\" over multiples, subtract the lcm's multiples once.",
+   "fastest_path_md": "Counts up to $60$: multiples of $4$: $15$; of $6$: $10$; of $12$: $5$. Favorable $= 15 + 10 - 5 = 20$, so $\\tfrac{20}{60} = \\tfrac{1}{3}$.",
+   "trap_map": {
+    "0": "Counts only the $10$ multiples of $6$, ignoring multiples of $4$.",
+    "1": "Counts only the $15$ multiples of $4$, ignoring multiples of $6$.",
+    "3": "Adds $15 + 10$ without subtracting the $5$ multiples of $12$ that were counted twice.",
+    "4": "Adds the overlap instead of subtracting it: $(15 + 10 + 5)/60$."
+   },
+   "numeric_check": "20/60",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "stem_md": "On any given workday, Lena's morning bus is late with probability $0.3$ and, independently, her evening bus is late with probability $0.4$. What is the probability that, on a given workday, exactly one of the two buses is late?",
+   "choices": [
+    "$0.12$",
+    "$0.42$",
+    "$0.46$",
+    "$0.58$",
+    "$0.70$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nExactly one late splits into two disjoint cases: morning late and evening on time, or morning on time and evening late. By independence, $0.3 \\cdot 0.6 + 0.7 \\cdot 0.4 = 0.18 + 0.28 = 0.46$.\n\n**Trigger cue**\n\nTwo independent events with \"exactly one\": add the two only-this-one products.\n\n**Takeaway**\n\n\"Exactly one\" happens two disjoint ways; add both products.",
+   "fastest_path_md": "Late–on time both ways: $0.3 \\cdot 0.6 + 0.7 \\cdot 0.4 = 0.18 + 0.28 = 0.46$.",
+   "trap_map": {
+    "0": "Computes both buses late: $0.3 \\cdot 0.4$.",
+    "1": "Computes neither bus late: $0.7 \\cdot 0.6$.",
+    "3": "Computes at least one bus late, $1 - 0.42$, instead of exactly one.",
+    "4": "Adds $0.3 + 0.4$, double-counting the day when both buses are late."
+   },
+   "numeric_check": "0.3*0.6 + 0.7*0.4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 4,
+   "stem_md": "A design firm has $80$ employees: $50$ engineers and $30$ analysts. Exactly $30$ of the engineers and $10$ of the analysts work remotely. If one of the firm's remote employees is selected at random, what is the probability that the selected employee is an analyst?",
+   "choices": [
+    "$\\dfrac{1}{8}$",
+    "$\\dfrac{1}{4}$",
+    "$\\dfrac{1}{3}$",
+    "$\\dfrac{1}{2}$",
+    "$\\dfrac{3}{4}$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe selection is made from the remote employees only: $30 + 10 = 40$ people. Of these, $10$ are analysts, so the probability is $\\tfrac{10}{40} = \\tfrac{1}{4}$.\n\n**Trigger cue**\n\n\"If a [subgroup] member is selected at random\": shrink the sample space to that subgroup before counting.\n\n**Takeaway**\n\nCondition first — the denominator is the remote group, not everyone.",
+   "fastest_path_md": "Restrict to the $40$ remote workers; $10$ of them are analysts: $\\tfrac{10}{40} = \\tfrac{1}{4}$.",
+   "trap_map": {
+    "0": "Divides the $10$ remote analysts by all $80$ employees, ignoring the remote condition.",
+    "2": "Reverses the condition, computing remote given analyst: $10/30$.",
+    "3": "Reports the fraction of all employees who work remotely: $40/80$.",
+    "4": "Computes the probability the remote employee is an engineer, the complement."
+   },
+   "numeric_check": "10/40",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 4,
+   "stem_md": "A two-digit positive integer is selected at random. What is the probability that its tens digit is greater than its units digit?",
+   "choices": [
+    "$\\dfrac{1}{10}$",
+    "$\\dfrac{2}{5}$",
+    "$\\dfrac{9}{20}$",
+    "$\\dfrac{1}{2}$",
+    "$\\dfrac{3}{5}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThere are $90$ two-digit integers. For tens digit $t$ (from $1$ to $9$), the units digit can be any of $0, 1, \\ldots, t-1$: exactly $t$ options. The favorable count is $1 + 2 + \\cdots + 9 = 45$, so the probability is $\\tfrac{45}{90} = \\tfrac{1}{2}$.\n\n**Trigger cue**\n\nDigit-comparison probability: fix one digit, count the other digit's options, and sum the series.\n\n**Takeaway**\n\nSum per-digit counts; the units digit $0$ breaks naive symmetry.",
+   "fastest_path_md": "For tens digit $t$ there are $t$ smaller units digits, so $1 + 2 + \\cdots + 9 = 45$ of the $90$ numbers qualify: $\\tfrac{1}{2}$.",
+   "trap_map": {
+    "0": "Counts the $9$ numbers with equal digits instead of tens greater than units.",
+    "1": "Counts the $36$ numbers whose tens digit is less than the units digit.",
+    "2": "Divides the $45$ favorable numbers by $100$ instead of the $90$ two-digit integers.",
+    "4": "Includes the $9$ equal-digit numbers with the $45$ favorable ones: $54/90$."
+   },
+   "numeric_check": "45/90",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "Six panelists, including Ito and Weber, are randomly assigned to six chairs spaced evenly around a circular table, one panelist per chair. What is the probability that Ito and Weber occupy adjacent chairs?",
+   "choices": [
+    "$\\dfrac{1}{6}$",
+    "$\\dfrac{1}{5}$",
+    "$\\dfrac{1}{3}$",
+    "$\\dfrac{2}{5}$",
+    "$\\dfrac{1}{2}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSeat Ito first; by symmetry his chair does not matter. Weber is then equally likely to occupy any of the remaining $5$ chairs, and exactly $2$ of those are adjacent to Ito. The probability is $\\tfrac{2}{5}$.\n\n**Trigger cue**\n\nAdjacency in a random circular seating: fix one person and count the neighboring seats among what remains.\n\n**Takeaway**\n\nFix one seat; circular adjacency becomes $2$ out of $n-1$.",
+   "fastest_path_md": "Place Ito anywhere. Of the $5$ chairs left for Weber, $2$ neighbor Ito: $\\tfrac{2}{5}$.",
+   "trap_map": {
+    "0": "Blocks the pair without its two internal orders and uses a straight-line count: $5!/6!$.",
+    "1": "Counts the pair as one circular unit but forgets its two internal orders: $4!/5!$.",
+    "2": "Treats the chairs as a straight row of six: $2 \\cdot 5!/6!$.",
+    "4": "Assumes adjacent and non-adjacent seatings are equally likely."
+   },
+   "numeric_check": "48/120",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "A pack of $12$ batteries contains exactly $3$ dead batteries. A technician tests the batteries one at a time, in random order and without replacement. What is the probability that the first dead battery the technician finds is the third battery tested?",
+   "choices": [
+    "$\\dfrac{9}{64}$",
+    "$\\dfrac{9}{55}$",
+    "$\\dfrac{1}{4}$",
+    "$\\dfrac{21}{55}$",
+    "$\\dfrac{34}{55}$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe first dead battery appears third exactly when the tests run good, good, dead in that order: $\\tfrac{9}{12} \\cdot \\tfrac{8}{11} \\cdot \\tfrac{3}{10} = \\tfrac{216}{1320} = \\tfrac{9}{55}$.\n\n**Trigger cue**\n\n\"First [type] on trial $k$\" without replacement: chain the one exact ordered sequence with shrinking counts.\n\n**Takeaway**\n\nMultiply the ordered draws with shrinking denominators.",
+   "fastest_path_md": "Good, good, dead in order: $\\tfrac{9}{12} \\cdot \\tfrac{8}{11} \\cdot \\tfrac{3}{10} = \\tfrac{9}{55}$.",
+   "trap_map": {
+    "0": "Treats the tests as with-replacement: $\\left(\\tfrac{3}{4}\\right)^2 \\cdot \\tfrac{1}{4}$.",
+    "2": "Uses the overall dead rate $3/12$, ignoring that the first two tests must be good.",
+    "3": "Computes the probability that the first three batteries tested are all good.",
+    "4": "Computes the probability of at least one dead battery among the first three tests."
+   },
+   "numeric_check": "(9/12)*(8/11)*(3/10)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 2,
+   "stem_md": "A jewelry maker strings beads onto a cord in a repeating pattern: $1$ red bead, then $2$ blue beads, then $1$ green bead, after which the pattern starts over. If she strings exactly $30$ beads, how many of them are blue?",
+   "choices": [
+    "$7$",
+    "$10$",
+    "$14$",
+    "$15$",
+    "$16$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe pattern red, blue, blue, green repeats every $4$ beads and contains $2$ blue beads per cycle. Since $30 = 7 \\cdot 4 + 2$, there are $7$ complete cycles contributing $7 \\cdot 2 = 14$ blue beads, and the $2$ leftover beads are red then blue — one more blue. Total: $14 + 1 = 15$.\n\n**Trigger cue**\n\nA repeating pattern with a \"how many of X among the first $N$\" ask: divide $N$ by the cycle length and walk the remainder by hand.\n\n**Takeaway**\n\nCount full cycles, then check the leftover beads.",
+   "fastest_path_md": "Cycle length $4$ with $2$ blue each. $30 \\div 4 = 7$ remainder $2$, and the leftover pair is red, blue. So $7 \\cdot 2 + 1 = 15$.",
+   "trap_map": {
+    "0": "Counts the $7$ complete cycles (equivalently, the green beads) instead of the blue beads.",
+    "1": "Divides $30$ by the $3$ colors rather than by the $4$-bead cycle length.",
+    "2": "Takes $7$ full cycles times $2$ blue but ignores the $2$ leftover beads.",
+    "4": "Assumes the partial cycle contributes both of its blue beads, rounding up to $8$ full cycles."
+   },
+   "numeric_check": "7*2+1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 3,
+   "stem_md": "In a sequence, $a_1 = 3$ and $a_{n+1} = 2a_n - 1$ for all $n \\ge 1$. What is the value of $a_5$?",
+   "choices": [
+    "$17$",
+    "$18$",
+    "$33$",
+    "$63$",
+    "$65$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nIterate the rule four times: $a_2 = 2(3) - 1 = 5$, $a_3 = 2(5) - 1 = 9$, $a_4 = 2(9) - 1 = 17$, $a_5 = 2(17) - 1 = 33$.\n\n**Trigger cue**\n\nA recursion asked for a nearby term: iterate directly and label each index — no closed form needed.\n\n**Takeaway**\n\nFor nearby terms, four labeled iterations beat any formula.",
+   "fastest_path_md": "Double and subtract $1$ each step: $3 \\to 5 \\to 9 \\to 17 \\to 33$. (Each term is one more than a power of $2$, confirming the march.)",
+   "trap_map": {
+    "0": "Stops one step early at $a_4 = 17$.",
+    "1": "Applies $2(a_n - 1)$ each step — subtracting before doubling gives $3 \\to 4 \\to 6 \\to 10 \\to 18$.",
+    "3": "Uses $a_{n+1} = 2a_n + 1$, flipping the sign: $3 \\to 7 \\to 15 \\to 31 \\to 63$.",
+    "4": "Iterates one step too far, landing on $a_6 = 65$."
+   },
+   "numeric_check": "2*17-1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 4,
+   "stem_md": "Priya starts a savings jar with a \\$12 deposit in January. In each month after January, she deposits \\$5 more than she deposited the month before. What is the total amount she deposits during the 12 months from January through December?",
+   "choices": [
+    "\\$67",
+    "\\$330",
+    "\\$474",
+    "\\$534",
+    "\\$804"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe deposits form an arithmetic sequence with first term $12$, common difference $5$, and $12$ terms, so December's deposit is $12 + 11 \\cdot 5 = 67$. The total is the average of the first and last deposits times the number of months: $\\frac{(12 + 67) \\cdot 12}{2} = 79 \\cdot 6 = 474$.\n\n**Trigger cue**\n\n\"Same increase every period, total over all periods\": find the last term, then average the ends and multiply by the count.\n\n**Takeaway**\n\nArithmetic total equals average of endpoints times term count.",
+   "fastest_path_md": "December's deposit is $12 + 11 \\cdot 5 = 67$. Pair first with last: $\\frac{12 + 67}{2} \\cdot 12 = 79 \\cdot 6 = 474$.",
+   "trap_map": {
+    "0": "Finds December's single deposit of $\\$67$ instead of the year's total.",
+    "1": "Adds only the $\\$5$ increases ($5 \\cdot 66 = 330$), dropping the twelve $\\$12$ base deposits.",
+    "3": "Runs the increases from $1$ through $12$ instead of $0$ through $11$: $144 + 5 \\cdot 78 = 534$.",
+    "4": "Multiplies December's $\\$67$ by $12$, as if every month matched the largest deposit."
+   },
+   "numeric_check": "(12+67)*12/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 4,
+   "stem_md": "For every positive integer $n$, the $n$th term of a sequence is defined by $t_n = \\frac{1}{n} - \\frac{1}{n+1}$. What is the sum of the first $20$ terms of this sequence?",
+   "choices": [
+    "$\\frac{1}{21}$",
+    "$\\frac{1}{20}$",
+    "$\\frac{19}{20}$",
+    "$\\frac{20}{21}$",
+    "$\\frac{21}{22}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nWrite the sum out: $\\left(\\frac{1}{1} - \\frac{1}{2}\\right) + \\left(\\frac{1}{2} - \\frac{1}{3}\\right) + \\cdots + \\left(\\frac{1}{20} - \\frac{1}{21}\\right)$. Every intermediate fraction cancels with its neighbor, leaving only $1 - \\frac{1}{21} = \\frac{20}{21}$.\n\n**Trigger cue**\n\nTerms shaped like $\\frac{1}{n} - \\frac{1}{n+1}$ signal a telescoping sum: expand the first two and last terms to see what survives.\n\n**Takeaway**\n\nTelescoping sums collapse to first piece minus last piece.",
+   "fastest_path_md": "Test small cases: $1$ term gives $\\frac{1}{2}$, $2$ terms give $\\frac{2}{3}$, $3$ terms give $\\frac{3}{4}$ — the running sum is $\\frac{n}{n+1}$, so $20$ terms give $\\frac{20}{21}$.",
+   "trap_map": {
+    "0": "Keeps only the surviving tail $\\frac{1}{21}$ and forgets the leading $1$.",
+    "1": "Reports the positive part of the $20$th term, $\\frac{1}{20}$, instead of summing.",
+    "2": "Telescopes to $1 - \\frac{1}{20}$, subtracting the wrong tail fraction (off by one).",
+    "4": "Runs the telescope one term too far, computing $1 - \\frac{1}{22}$."
+   },
+   "numeric_check": "1 - 1/21",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "In a sequence, $a_1 = 4$, $a_2 = 7$, and $a_n = a_{n-1} - a_{n-2}$ for all $n \\ge 3$. What is the sum of the first $100$ terms of the sequence?",
+   "choices": [
+    "$-4$",
+    "$0$",
+    "$3$",
+    "$10$",
+    "$18$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nGenerate terms: $4, 7, 3, -4, -7, -3$, then $a_7 = 4$ and $a_8 = 7$, so the sequence repeats with period $6$, and each six-term block sums to $0$. Since $100 = 16 \\cdot 6 + 4$, the $96$ terms in full blocks contribute $0$, and the sum equals $a_{97} + a_{98} + a_{99} + a_{100} = 4 + 7 + 3 + (-4) = 10$.\n\n**Trigger cue**\n\nA recursion like $a_n = a_{n-1} - a_{n-2}$ asked about a distant index: generate terms until the pair $(a_1, a_2)$ reappears, then use the cycle.\n\n**Takeaway**\n\nFind the cycle, cancel full blocks, add the remainder.",
+   "fastest_path_md": "Six terms in, the block $4, 7, 3, -4, -7, -3$ cancels to $0$ (each value appears with both signs). Only terms $97$–$100$ matter: $4 + 7 + 3 - 4 = 10$.",
+   "trap_map": {
+    "0": "Computes the single term $a_{100} = -4$ instead of the sum.",
+    "1": "Assumes $100$ terms split into complete cycles that all cancel to $0$.",
+    "2": "Miscounts the remainder as $5$ leftover terms: $4 + 7 + 3 - 4 - 7 = 3$.",
+    "4": "Drops the sign on the fourth leftover term, adding $4 + 7 + 3 + 4 = 18$."
+   },
+   "numeric_check": "4+7+3-4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "A stamping machine is programmed to produce $5$ parts during its 1st minute of operation and to increase its output by $3$ parts in each minute thereafter. However, during every 5th minute (the 5th, 10th, 15th, and so on) the machine pauses to cool and produces nothing, even though its programmed output level keeps rising on schedule. How many parts does the machine actually produce during its first $20$ minutes of operation?",
+   "choices": [
+    "$440$",
+    "$500$",
+    "$512$",
+    "$574$",
+    "$670$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe scheduled output in minute $n$ is $5 + 3(n-1) = 3n + 2$, so the twenty scheduled outputs run from $5$ to $62$ and total $\\frac{(5 + 62) \\cdot 20}{2} = 670$. Cooling wipes out minutes $5, 10, 15, 20$, whose scheduled outputs are $17, 32, 47, 62$, totaling $158$. Actual production is $670 - 158 = 512$.\n\n**Trigger cue**\n\nA regular series with periodic exceptions: total the clean series first, then subtract exactly the excluded terms — never rebuild the series around the gaps.\n\n**Takeaway**\n\nSum the full pattern, then subtract the skipped terms.",
+   "fastest_path_md": "Full arithmetic sum: $\\frac{(5 + 62) \\cdot 20}{2} = 670$. The four cooling minutes cost $17 + 32 + 47 + 62 = 158$. So $670 - 158 = 512$.",
+   "trap_map": {
+    "0": "Lets the schedule stall during pauses, summing $16$ consecutive terms $5$ through $50$ for $440$.",
+    "1": "Subtracts the outputs of minutes $6, 11, 16, 21$ ($20 + 35 + 50 + 65 = 170$) — off by one on which levels are skipped.",
+    "3": "Forgets that minute $20$ is itself a cooling minute, removing only three pauses: $670 - 96 = 574$.",
+    "4": "Sums all twenty scheduled outputs and ignores the cooling pauses entirely."
+   },
+   "numeric_check": "670-158",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 2,
+   "stem_md": "The average (arithmetic mean) of five numbers is $14$. Four of the numbers are $9$, $12$, $15$, and $18$. What is the fifth number?",
+   "choices": [
+    "$2$",
+    "$13.5$",
+    "$14$",
+    "$16$",
+    "$34$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nFive numbers with mean $14$ must total $5 \\times 14 = 70$. The four given numbers total $9 + 12 + 15 + 18 = 54$, so the fifth number is $70 - 54 = 16$.\n\n**Trigger cue**\nA mean with one missing value: convert the mean to a total, then subtract what is known.\n\n**Takeaway**\nA mean is just a total divided by the count.",
+   "fastest_path_md": "Target total $5 \\times 14 = 70$; the given four sum to $54$; $70 - 54 = 16$.",
+   "trap_map": {
+    "0": "Uses a target total of $4 \\times 14 = 56$ (multiplying by the number of known values) before subtracting the four given numbers.",
+    "1": "Averages the four given numbers ($54 / 4 = 13.5$) instead of solving for the fifth.",
+    "2": "Assumes the fifth number must equal the mean itself.",
+    "4": "Drops the $18$ from the known values and computes $70 - 36$."
+   },
+   "numeric_check": "5*14-(9+12+15+18)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 4,
+   "stem_md": "Five positive integers have a median of $10$ and an average (arithmetic mean) of $12$. What is the greatest possible value of the largest of the five integers?",
+   "choices": [
+    "$30$",
+    "$36$",
+    "$38$",
+    "$40$",
+    "$48$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe five integers total $5 \\times 12 = 60$, and in sorted order the third integer is the median, $10$. To maximize the largest integer, minimize the other four subject to the order: the two smallest can each be $1$, the third must be $10$, and the fourth can be as small as the median, $10$. That leaves $60 - 1 - 1 - 10 - 10 = 38$ for the largest.\n\n**Trigger cue**\nMaximizing one member of a set with a fixed mean and median: pin the median, then push every other value to its floor.\n\n**Takeaway**\nTo maximize one value, minimize all the others legally.",
+   "fastest_path_md": "Floor everything else: $1, 1, 10, 10$ uses $22$ of the total $60$, so the maximum is $60 - 22 = 38$.",
+   "trap_map": {
+    "0": "Sets the three smallest integers all equal to the median $10$ and computes $60 - 30$.",
+    "1": "Assumes the five integers must be distinct, using $1, 2, 10, 11$ for the others.",
+    "3": "Lets the two smallest values be $0$, forgetting the integers are positive.",
+    "4": "Forgets the fourth integer must be at least the median, subtracting only $1 + 1 + 10$ from $60$."
+   },
+   "numeric_check": "60-1-1-10-10",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 4,
+   "stem_md": "A data set consists of measurements that are not all equal. Which of the following operations must leave the standard deviation of the data set unchanged?",
+   "choices": [
+    "Increasing each measurement by $8$",
+    "Increasing each measurement by $8\\%$",
+    "Doubling each measurement and then decreasing each result by $8$",
+    "Increasing the largest measurement by $8$ and decreasing the smallest measurement by $8$",
+    "Increasing each measurement greater than the mean by $8$ and decreasing each measurement less than the mean by $8$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nStandard deviation measures the gaps between values and their mean. Adding the same constant to every measurement slides the whole set — every gap, and hence the standard deviation, is unchanged. A percent increase scales every gap by $1.08$; doubling scales every gap by $2$, and the later $-8$ shift cannot undo that; moving the extremes outward, or moving every value away from the mean, widens the gaps. Only the uniform shift preserves the standard deviation.\n\n**Trigger cue**\nOperations on a whole data set: ask what happens to the gaps, not to the values.\n\n**Takeaway**\nShifts preserve standard deviation; scalings and spreadings change it.",
+   "fastest_path_md": "Standard deviation ignores location. A uniform $+8$ shift moves the set without stretching it — done, no computation.",
+   "trap_map": {
+    "1": "Treats a uniform percent increase like a uniform shift; scaling stretches every gap and multiplies the standard deviation by $1.08$.",
+    "2": "Assumes the $-8$ undoes the doubling; a constant shift cannot shrink the doubled spread.",
+    "3": "Sees that the mean is unchanged and concludes the standard deviation is too; pushing the extremes outward increases spread.",
+    "4": "Believes symmetric moves cancel; moving values away from the mean on both sides increases every deviation."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "Each of the $20$ students in a class took a placement test on which every score is an integer from $0$ to $100$, inclusive. The class mean was $73$, and no student scored below $60$. What is the greatest possible number of students who scored exactly $100$?",
+   "choices": [
+    "$2$",
+    "$6$",
+    "$7$",
+    "$9$",
+    "$14$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe $20$ scores total $20 \\times 73 = 1460$. If every student scored the minimum $60$, the total would be $1200$, so there are $1460 - 1200 = 260$ surplus points to distribute. Each student raised from $60$ to $100$ consumes $40$ of the surplus, so at most $\\lfloor 260/40 \\rfloor = 6$ students can score $100$. Feasibility check: six $100$s leave $860$ points for $14$ students — thirteen at $60$ and one at $80$ works. Seven $100$s would leave $760$ for $13$ students, below the required minimum $13 \\times 60 = 780$.\n\n**Trigger cue**\nMaximizing a count under a fixed mean: set everyone else to the extreme allowed value and budget the surplus.\n\n**Takeaway**\nFix the total, floor the rest, divide the surplus.",
+   "fastest_path_md": "Surplus over an all-$60$ class: $1460 - 1200 = 260$. Each $100$-scorer costs $40$ of it: $\\lfloor 260/40 \\rfloor = 6$.",
+   "trap_map": {
+    "0": "Divides the $260$-point surplus by $100$ instead of by the $40$-point gap between the floor and the maximum.",
+    "2": "Rounds $260/40 = 6.5$ up to $7$, which would force the remaining students below the $60$ minimum.",
+    "3": "Measures each top scorer's cost from the mean ($100 - 73 = 27$ points) rather than from the $60$ floor.",
+    "4": "Ignores the $60$-point minimum entirely and computes $\\lfloor 1460/100 \\rfloor$."
+   },
+   "numeric_check": "floor((20*73-20*60)/(100-60))",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 3,
+   "stem_md": "A hiking club has $8$ members whose average (arithmetic mean) age is $32$ years. When one member leaves the club and a new member aged $20$ joins, the club again has $8$ members, and their average age is $30$ years. How old, in years, is the member who left?",
+   "choices": [
+    "$16$",
+    "$30$",
+    "$32$",
+    "$36$",
+    "$52$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe original total of the ages is $8 \\times 32 = 256$. After the swap the total is $8 \\times 30 = 240$. If the departing member's age is $L$, then $256 - L + 20 = 240$, so $L = 256 + 20 - 240 = 36$.\n\n**Trigger cue**\nOne member swapped and the mean given before and after: work with the two totals, not the means.\n\n**Takeaway**\nMembership changes are bookkeeping on totals.",
+   "fastest_path_md": "Totals: before $256$, after $240$. The swap removed $L$ and added $20$, so $L = 256 + 20 - 240 = 36$.",
+   "trap_map": {
+    "0": "Computes the drop in the total, $256 - 240 = 16$, but forgets to add back the newcomer's age.",
+    "1": "Reports the new average age instead of the departing member's age.",
+    "2": "Assumes the departing member was exactly the average age of the original club.",
+    "4": "Adds the newcomer's age to the old mean ($32 + 20$) instead of balancing the totals."
+   },
+   "numeric_check": "8*32+20-8*30",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "A survey asked each of $50$ households how many cars it owns. Exactly $12$ households own no car, exactly $6$ own three cars, and each of the remaining households owns either one or two cars. If the median number of cars owned is $1$, what is the greatest possible number of households that own exactly two cars?",
+   "choices": [
+    "$14$",
+    "$18$",
+    "$19$",
+    "$25$",
+    "$32$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nWith $50$ values, the median is the average of the $25$th and $26$th values in order. The $12$ zeros fill positions $1$ through $12$. For the median to equal $1$, both the $25$th and the $26$th values must be $1$ (no other pair averages to $1$ here, since only $12$ values are $0$). The one-car households occupy positions $13$ onward, so position $26$ is a $1$ only when there are at least $26 - 12 = 14$ one-car households. That leaves at most $50 - 12 - 6 - 14 = 18$ two-car households.\n\n**Trigger cue**\nA median over an even count with frequency groups: pin down BOTH middle positions before counting.\n\n**Takeaway**\nEven-count medians constrain two positions, not one.",
+   "fastest_path_md": "Median of $50$ values sits at positions $25$ and $26$; both must be $1$, so ones run through position $26$: at least $14$ ones, leaving $32 - 14 = 18$ twos.",
+   "trap_map": {
+    "0": "Solves for the minimum number of one-car households and reports it instead of the maximum two-car count.",
+    "2": "Covers only the $25$th position with a $1$ (using $13$ ones), forgetting the $26$th value must also be $1$; the median would be $1.5$.",
+    "3": "Treats every household past the $25$th position as a two-car owner, forgetting the six three-car households.",
+    "4": "Maximizes without the median condition, computing $50 - 12 - 6$."
+   },
+   "numeric_check": "50-12-6-14",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A data set is formed by combining group $G_1$, which has $m$ values with mean $20$, and group $G_2$, which has $n$ values with mean $50$; the mean of the combined set is $30$. After $12$ more values with mean $50$ are added to the combined set, the mean of the full set becomes $35$. What is the value of $m$?",
+   "choices": [
+    "12",
+    "24",
+    "36",
+    "48",
+    "80"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe group sums are $20m$ and $50n$. The first combination gives $\\dfrac{20m+50n}{m+n}=30$, so $20m+50n=30m+30n$, which simplifies to $20n=10m$, i.e. $m=2n$. The $12$ added values have sum $600$, so $\\dfrac{20m+50n+600}{m+n+12}=35$. Since $20m+50n=30(m+n)$, this becomes $30(m+n)+600=35(m+n)+420$, so $5(m+n)=180$ and $m+n=36$. With $m=2n$: $n=12$ and $m=24$.\n\n**Trigger cue**\nTwo group means plus their combined mean fix only the ratio of group sizes; a second combining event with a known new mean pins the absolute sizes.\n\n**Takeaway**\nCombined averages fix size ratios; a second average fixes actual sizes.",
+   "fastest_path_md": "Deviations from the final mean $35$: the $12$ new values sit $15$ above, a surplus of $180$; the original $m+n$ values sit $5$ below, so $5(m+n)=180$ and $m+n=36$. The mean $30$ lies at distances $10$ and $20$ from $20$ and $50$, so $m:n=20:10=2:1$, giving $m=24$.",
+   "trap_map": {
+    "0": "Solves the system correctly but reports $n=12$, the size of $G_2$, instead of $m$.",
+    "2": "Reports the combined size $m+n=36$ rather than $m$ alone.",
+    "3": "Reports the final count $m+n+12=48$ after the new values are added.",
+    "4": "Leaves the $12$ added values out of the count, solving $\\frac{90n+600}{3n}=35$ to get $m=80$."
+   },
+   "numeric_check": "2*(180/15)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "When $x$ liters of a solution that is $20\\%$ alcohol are combined with $y$ liters of a solution that is $50\\%$ alcohol, the result is a solution that is $42\\%$ alcohol. What is the value of $\\dfrac{x}{y}$?",
+   "choices": [
+    "$\\dfrac{4}{11}$",
+    "$\\dfrac{2}{5}$",
+    "$\\dfrac{11}{15}$",
+    "$\\dfrac{5}{2}$",
+    "$\\dfrac{11}{4}$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nTotal alcohol is conserved: $0.20x + 0.50y = 0.42(x+y)$. Multiplying by $100$: $20x + 50y = 42x + 42y$, so $8y = 22x$ and $\\dfrac{x}{y} = \\dfrac{8}{22} = \\dfrac{4}{11}$.\n\n**Trigger cue**\nA mixture concentration strictly between two component concentrations, with the mixing ratio asked: write the weighted average once, or jump straight to alligation.\n\n**Takeaway**\nMixing amounts are inversely proportional to distances from the mixture concentration.",
+   "fastest_path_md": "Alligation: distances from $42$ are $42-20=22$ and $50-42=8$. Amounts are in the inverse ratio, so $x:y = 8:22 = 4:11$.",
+   "trap_map": {
+    "1": "Forms the ratio of the two concentrations, $20:50 = 2:5$, instead of the ratio of the volumes.",
+    "2": "Computes $\\frac{y}{x+y}=\\frac{11}{15}$, the stronger solution's share of the mixture, not $\\frac{x}{y}$.",
+    "3": "Uses the inverted concentration ratio $50:20 = 5:2$.",
+    "4": "Sets the volumes directly proportional to the alligation distances $22:8$ instead of inversely proportional."
+   },
+   "numeric_check": "4/11",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "stem_md": "A juice stand makes a punch by mixing $6$ liters of a juice that is $10\\%$ sugar by volume with $4$ liters of a juice that is $25\\%$ sugar by volume. The punch is what percent sugar by volume?",
+   "choices": [
+    "1.6",
+    "16",
+    "17.5",
+    "19",
+    "20"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nSugar from the first juice: $0.10 \\times 6 = 0.6$ liters. Sugar from the second: $0.25 \\times 4 = 1$ liter. The punch holds $0.6 + 1 = 1.6$ liters of sugar in $6 + 4 = 10$ liters, so its concentration is $\\dfrac{1.6}{10} = 16\\%$.\n\n**Trigger cue**\nTwo ingredients with known concentrations and volumes: total the pure component, then divide by the total volume.\n\n**Takeaway**\nWeight each concentration by its volume; never average concentrations directly.",
+   "fastest_path_md": "Sugar: $0.6 + 1 = 1.6$ liters out of $10$ liters, so $16\\%$. (Sanity check: closer to $10\\%$ than to $25\\%$ because more of the weaker juice is used.)",
+   "trap_map": {
+    "0": "Reports the $1.6$ liters of sugar instead of converting to a percent of the $10$-liter punch.",
+    "2": "Takes the simple average of $10$ and $25$, ignoring the unequal volumes.",
+    "3": "Swaps the weights, applying $10\\%$ to $4$ liters and $25\\%$ to $6$ liters.",
+    "4": "Uses the part-to-part ratio $4:6$ instead of the part-to-whole ratio $4:10$, computing $10 + \\frac{4}{6}(15) = 20$."
+   },
+   "numeric_check": "(0.10*6 + 0.25*4)/(6+4)*100",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "stem_md": "A car radiator contains $6$ liters of coolant that is $25\\%$ antifreeze. A mechanic drains some of the coolant and replaces it with an equal volume of pure antifreeze, after which the radiator again contains $6$ liters of coolant, now $75\\%$ antifreeze. How many liters of coolant did the mechanic drain?",
+   "choices": [
+    "2",
+    "3",
+    "4",
+    "4.5",
+    "12"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $x$ be the liters drained and replaced. The kept $6-x$ liters remain $25\\%$ antifreeze, and the $x$ liters added are $100\\%$ antifreeze: $0.25(6-x) + x = 0.75 \\times 6$. So $1.5 + 0.75x = 4.5$, giving $0.75x = 3$ and $x = 4$.\n\n**Trigger cue**\nDrain-and-replace with a pure component: the final mix is the kept portion blended with the pure addition, so one weighted-average equation finishes it.\n\n**Takeaway**\nDrained liquid carries the component out; account for it before adding.",
+   "fastest_path_md": "Replacing a fraction $f$ of a $25\\%$ mix with $100\\%$ antifreeze lands at $75\\%$ when $f = \\dfrac{75-25}{100-25} = \\dfrac{2}{3}$. So $\\dfrac{2}{3} \\times 6 = 4$ liters.",
+   "trap_map": {
+    "0": "Inverts the kept-to-replaced ratio, replacing $\\frac{1}{3}$ of the coolant instead of $\\frac{2}{3}$.",
+    "1": "Ignores the antifreeze that leaves with the drained coolant, solving $1.5 + x = 4.5$.",
+    "3": "Reports the final amount of antifreeze in the radiator, $4.5$ liters, not the amount drained.",
+    "4": "Adds pure antifreeze without draining anything, solving $1.5 + x = 0.75(6+x)$."
+   },
+   "numeric_check": "6*(75-25)/(100-25)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A container holds $V$ liters of an acid solution of unknown concentration. If $8$ liters of pure acid were added, the concentration would rise by exactly $15$ percentage points; if instead $8$ liters of pure water were added, the concentration would fall by exactly $10$ percentage points. What is the value of $V$?",
+   "choices": [
+    "16",
+    "24",
+    "32",
+    "40",
+    "56"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet the concentration be $p\\%$, so the container holds $\\dfrac{pV}{100}$ liters of acid. Adding $8$ liters of water keeps the acid fixed: $\\dfrac{pV}{100} = \\dfrac{(p-10)(V+8)}{100}$, which expands to $pV = pV + 8p - 10V - 80$, so $8p = 10(V+8)$. Adding $8$ liters of acid: $\\dfrac{pV}{100} + 8 = \\dfrac{(p+15)(V+8)}{100}$, which expands to $800 = 8p + 15(V+8)$. Substituting $8p = 10(V+8)$ gives $800 = 25(V+8)$, so $V + 8 = 32$ and $V = 24$.\n\n**Trigger cue**\nTwo hypothetical additions to the same unknown solution: write one conservation equation per scenario, then eliminate the unknown concentration.\n\n**Takeaway**\nEqual additions give equal final volumes; subtract scenarios to eliminate unknowns.",
+   "fastest_path_md": "Both scenarios end at $V+8$ liters and differ only in swapping $8$ liters of water for $8$ liters of acid — a difference of $8$ liters of pure acid, i.e. $800$ percent-liters. That gap equals the $15 + 10 = 25$-point spread: $\\dfrac{800}{V+8} = 25$, so $V + 8 = 32$ and $V = 24$.",
+   "trap_map": {
+    "0": "Finds the final volume $32$ but subtracts the $8$ added liters twice, once for each scenario.",
+    "2": "Solves $25(V+8) = 800$ correctly but reports the final volume $V+8 = 32$.",
+    "3": "Reports the original concentration, $40$ percent, instead of the volume.",
+    "4": "Averages the $15$- and $10$-point shifts instead of adding them, computing $\\frac{800}{12.5} - 8 = 56$."
+   },
+   "numeric_check": "100*8/(15+10) - 8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 2,
+   "stem_md": "Working alone at its constant rate, machine $X$ can complete a task in $8$ hours. Working together at their constant rates, machines $X$ and $Y$ can complete the same task in $3$ hours. How many hours would machine $Y$, working alone at its constant rate, need to complete the task?",
+   "choices": [
+    "$\\frac{24}{11}$",
+    "$4.8$",
+    "$5$",
+    "$5.5$",
+    "$11$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe combined rate is $\\dfrac{1}{3}$ task per hour and machine $X$'s rate is $\\dfrac{1}{8}$. So machine $Y$'s rate is $\\dfrac{1}{3} - \\dfrac{1}{8} = \\dfrac{8 - 3}{24} = \\dfrac{5}{24}$ task per hour, and $Y$ alone needs $\\dfrac{24}{5} = 4.8$ hours.\n\n**Trigger cue**\nGiven one solo time and a together time, subtract the rates — never the times.\n\n**Takeaway**\nRates add and subtract; times do not.",
+   "fastest_path_md": "In the $3$ shared hours, $X$ does $\\frac{3}{8}$ of the task, so $Y$ does the other $\\frac{5}{8}$ in $3$ hours. Alone: $3 \\div \\frac{5}{8} = \\frac{24}{5} = 4.8$ hours.",
+   "trap_map": {
+    "0": "Adds the rates $\\frac{1}{8} + \\frac{1}{3}$ as if $3$ hours were $Y$'s solo time, producing a together time of $\\frac{24}{11}$.",
+    "2": "Subtracts the given times, $8 - 3 = 5$, instead of subtracting the rates.",
+    "3": "Averages the two given times: $(8 + 3)/2 = 5.5$.",
+    "4": "Adds the two given times: $8 + 3 = 11$."
+   },
+   "numeric_check": "1/(1/3 - 1/8)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "stem_md": "A delivery scooter leaves a warehouse and travels along a straight road at a constant speed of $24$ kilometers per hour. Twenty minutes later, a motorcycle leaves the same warehouse and travels along the same road at a constant speed of $40$ kilometers per hour. How many minutes after its own departure does the motorcycle catch up with the scooter?",
+   "choices": [
+    "$7.5$",
+    "$12$",
+    "$20$",
+    "$30$",
+    "$50$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nIn its $20$-minute head start ($\\frac{1}{3}$ hour), the scooter travels $24 \\cdot \\frac{1}{3} = 8$ kilometers. The motorcycle closes that gap at $40 - 24 = 16$ kilometers per hour, so it needs $\\dfrac{8}{16} = \\dfrac{1}{2}$ hour, that is, $30$ minutes.\n\n**Trigger cue**\nA chase along the same route: head-start distance divided by the difference of the speeds.\n\n**Takeaway**\nCatch-up time is head start divided by the speed difference.",
+   "fastest_path_md": "Head start $= 24 \\cdot \\frac{1}{3} = 8$ km. The gap shrinks $16$ km every hour, so $8$ km takes half an hour: $30$ minutes.",
+   "trap_map": {
+    "0": "Divides the $8$-kilometer head start by the sum of the speeds, $64$ km/h, giving $\\frac{1}{8}$ hour $= 7.5$ minutes.",
+    "1": "Divides the head start by the motorcycle's speed alone, $\\frac{8}{40}$ hour $= 12$ minutes, ignoring that the scooter keeps moving.",
+    "2": "Repeats the $20$-minute head start as the answer.",
+    "4": "Measures the time from the scooter's departure instead of the motorcycle's: $30 + 20 = 50$ minutes."
+   },
+   "numeric_check": "(24*(20/60)/(40 - 24))*60",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "stem_md": "Working alone at their constant rates, Ana can edit a manuscript in $6$ hours, Ben in $8$ hours, and Carla in $12$ hours. Ana and Ben begin editing the manuscript together. After $2$ hours, Ana leaves and Carla immediately takes her place, and Ben and Carla work together until the manuscript is finished. How many hours after Ana and Ben began is the manuscript finished?",
+   "choices": [
+    "$2$",
+    "$\\frac{24}{7}$",
+    "$4$",
+    "$\\frac{22}{5}$",
+    "$\\frac{16}{3}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe rates are $\\frac{1}{6}$, $\\frac{1}{8}$, and $\\frac{1}{12}$ manuscript per hour. In the first $2$ hours, Ana and Ben complete $2\\left(\\frac{1}{6} + \\frac{1}{8}\\right) = 2 \\cdot \\frac{7}{24} = \\frac{7}{12}$. The remaining $\\frac{5}{12}$ is done by Ben and Carla at $\\frac{1}{8} + \\frac{1}{12} = \\frac{5}{24}$ per hour, taking $\\frac{5}{12} \\div \\frac{5}{24} = 2$ hours. Total: $2 + 2 = 4$ hours.\n\n**Trigger cue**\nWorkers swap partway through a job: split the timeline into phases and track the fraction finished in each.\n\n**Takeaway**\nPhase the timeline; the job fractions must sum to one.",
+   "fastest_path_md": "Let the job be $24$ units: Ana $4$, Ben $3$, Carla $2$ units per hour. Phase 1: $(4+3)\\cdot 2 = 14$ units. The last $10$ units at $3 + 2 = 5$ per hour take $2$ hours. Total $4$.",
+   "trap_map": {
+    "0": "Counts only the second phase, forgetting the $2$ hours Ana and Ben already worked.",
+    "1": "Applies Ana and Ben's combined rate to the whole job: $1 \\div \\frac{7}{24} = \\frac{24}{7}$.",
+    "3": "Assumes exactly half the job was done in the first $2$ hours: $2 + \\frac{1}{2} \\div \\frac{5}{24} = \\frac{22}{5}$.",
+    "4": "Has Ben finish the remaining $\\frac{5}{12}$ alone: $2 + \\frac{5}{12} \\div \\frac{1}{8} = \\frac{16}{3}$."
+   },
+   "numeric_check": "2 + (1 - 2*(1/6 + 1/8))/(1/8 + 1/12)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "stem_md": "Towns $P$ and $Q$ are $24$ miles apart along a straight road. At 1:00 p.m., Raj leaves town $P$ and walks toward town $Q$ at a constant speed of $4$ miles per hour. At 2:30 p.m., Lena leaves town $Q$ and walks toward town $P$ along the same road at a constant speed of $5$ miles per hour. How many miles from town $P$ are they when they meet?",
+   "choices": [
+    "$8$",
+    "$10$",
+    "$12$",
+    "$14$",
+    "$16$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nBy 2:30 p.m., Raj has walked $4 \\cdot 1.5 = 6$ miles, so $24 - 6 = 18$ miles separate the two walkers. They close that gap at $4 + 5 = 9$ miles per hour, meeting $\\dfrac{18}{9} = 2$ hours later. Raj walks $1.5 + 2 = 3.5$ hours in all, so the meeting point is $4 \\cdot 3.5 = 14$ miles from town $P$.\n\n**Trigger cue**\nOpposite-direction travelers with staggered starts: remove the head start first, then divide by the combined speed.\n\n**Takeaway**\nShrink the gap by the head start; then use combined speed.",
+   "fastest_path_md": "Head start eats $6$ of the $24$ miles; the remaining $18$ close at $9$ mph in $2$ hours. Raj: $6 + 4\\cdot 2 = 14$ miles from $P$.",
+   "trap_map": {
+    "0": "Counts only the $4 \\cdot 2 = 8$ miles Raj walks after Lena starts, dropping his head start.",
+    "1": "Finds Lena's distance, $5 \\cdot 2 = 10$ — the distance from town $Q$, not town $P$.",
+    "2": "Assumes they meet at the midpoint of the $24$ miles.",
+    "4": "Subtracts Raj's post-2:30 distance from $24$: $24 - 8 = 16$, mixing up the reference town."
+   },
+   "numeric_check": "4*3.5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "stem_md": "Working at its constant rate, copier $A$ produces $240$ copies in $4$ minutes, and working at its constant rate, copier $B$ produces $240$ copies in $6$ minutes. Working together at their respective rates, how many minutes will the two copiers need to produce a total of $1{,}500$ copies?",
+   "choices": [
+    "$15$",
+    "$25$",
+    "$30$",
+    "$37.5$",
+    "$62.5$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nCopier $A$'s rate is $\\dfrac{240}{4} = 60$ copies per minute and copier $B$'s rate is $\\dfrac{240}{6} = 40$ copies per minute. Together they produce $60 + 40 = 100$ copies per minute, so $1{,}500$ copies take $\\dfrac{1500}{100} = 15$ minutes.\n\n**Trigger cue**\nRates stated as an amount per batch time: convert each to a per-minute rate, then add the rates.\n\n**Takeaway**\nConvert to a common unit rate before adding rates.",
+   "fastest_path_md": "$60 + 40 = 100$ copies every minute, so $1{,}500$ copies take $15$ minutes.",
+   "trap_map": {
+    "1": "Uses copier $A$'s rate alone: $1500 \\div 60 = 25$.",
+    "2": "Averages the two rates to $50$ per minute and treats that average as the combined rate: $1500 \\div 50 = 30$.",
+    "3": "Uses copier $B$'s rate alone: $1500 \\div 40 = 37.5$.",
+    "4": "Treats the pair as producing $240$ copies every $4 + 6 = 10$ minutes: $\\frac{1500}{240} \\cdot 10 = 62.5$."
+   },
+   "numeric_check": "1500/(240/4 + 240/6)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "A caterer makes fruit punch by combining two ready-made blends. In Blend A, the ratio of juice to sparkling water is $5:3$; in Blend B, the ratio of juice to sparkling water is $1:3$. The caterer combines the blends to produce $96$ liters of punch in which the ratio of juice to sparkling water is $1:1$. How many liters of Blend A does the caterer use?",
+   "choices": [
+    "32",
+    "48",
+    "60",
+    "64",
+    "80"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nBlend A is $\\dfrac{5}{8}$ juice and Blend B is $\\dfrac{1}{4}$ juice. Let $A$ be the liters of Blend A, so Blend B contributes $96 - A$ liters. A $1:1$ punch is half juice, i.e. $48$ liters of juice: $\\dfrac{5A}{8} + \\dfrac{96 - A}{4} = 48$. Multiplying by $8$ gives $5A + 2(96 - A) = 384$, so $3A = 192$ and $A = 64$.\n\n**Trigger cue**\nTwo mixtures with known part ratios blended to hit a target ratio: convert each ratio to a fraction of its whole, then balance a single component.\n\n**Takeaway**\nConvert part ratios to fractions of the whole before mixing.",
+   "fastest_path_md": "Alligation on the juice fraction: Blend A is $\\dfrac{5}{8}$ juice, Blend B is $\\dfrac{2}{8}$, target $\\dfrac{4}{8}$. Distances are $1$ and $2$ eighths; invert them to get $A:B = 2:1$, so $A = \\dfrac{2}{3}(96) = 64$.",
+   "trap_map": {
+    "0": "Inverts the alligation weights, mixing $A:B = 1:2$ — this is Blend B's volume, not Blend A's.",
+    "1": "Assumes the two blends are used in equal amounts because the target ratio is $1:1$.",
+    "2": "Computes $\\dfrac{5}{8}$ of the total $96$ liters — Blend A's juice fraction applied to the whole punch.",
+    "4": "Mixes the blends in the ratio of their juice parts, $5:1$, giving $\\dfrac{5}{6}$ of $96$."
+   },
+   "numeric_check": "96*2/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "stem_md": "Positive numbers $a$, $b$, $c$, and $d$ satisfy $\\dfrac{a}{b} = \\dfrac{c}{d} = \\dfrac{4}{9}$. If $a + c = 36$, what is the value of $b + d$?",
+   "choices": [
+    "16",
+    "45",
+    "72",
+    "81",
+    "117"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nFrom $\\dfrac{a}{b} = \\dfrac{4}{9}$ we get $b = \\dfrac{9a}{4}$, and likewise $d = \\dfrac{9c}{4}$. Therefore $b + d = \\dfrac{9}{4}(a + c) = \\dfrac{9}{4}(36) = 81$.\n\n**Trigger cue**\nSeveral fractions all equal to one ratio, with a sum of numerators given: the sum of numerators over the sum of denominators preserves that same ratio.\n\n**Takeaway**\nEqual ratios: numerator sums and denominator sums keep the same ratio.",
+   "fastest_path_md": "Mediant of equal fractions: $\\dfrac{a+c}{b+d} = \\dfrac{4}{9}$ directly, so $b + d = \\dfrac{9}{4} \\cdot 36 = 81$.",
+   "trap_map": {
+    "0": "Scales in the wrong direction, computing $\\dfrac{4}{9}$ of $36$.",
+    "1": "Computes the difference $(b+d) - (a+c)$ — the $5$ extra ratio parts — instead of $b+d$ itself.",
+    "2": "Doubles $a + c$ instead of scaling it by $\\dfrac{9}{4}$.",
+    "4": "Reports the grand total $a + b + c + d$ rather than $b + d$."
+   },
+   "numeric_check": "36*9/4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "stem_md": "Two positive numbers are in the ratio $3:5$. If the sum of the two numbers is $96$, what is the smaller number?",
+   "choices": [
+    "12",
+    "32",
+    "36",
+    "48",
+    "60"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWrite the numbers as $3k$ and $5k$ for some $k > 0$. Then $3k + 5k = 8k = 96$, so $k = 12$ and the smaller number is $3k = 36$.\n\n**Trigger cue**\nA ratio together with a total: the total spans $3 + 5 = 8$ equal parts, so find one part first.\n\n**Takeaway**\nDivide the total by the sum of the ratio parts first.",
+   "fastest_path_md": "$96 \\div 8 = 12$ per part; the smaller number is $3 \\times 12 = 36$.",
+   "trap_map": {
+    "0": "Reports the size of one part, $k = 12$, instead of the smaller number.",
+    "1": "Divides $96$ by $3$ rather than by the $8$ total parts.",
+    "3": "Halves the total, ignoring the $3:5$ split.",
+    "4": "Reports the larger number ($5$ parts) instead of the smaller."
+   },
+   "numeric_check": "96*3/8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "stem_md": "The ratio of $x$ to $y$ is $9:5$, where $x$ and $y$ are positive. If $x$ is decreased by $20$ percent and $y$ is increased by $20$ percent, what is the value of $\\dfrac{x}{y}$ after these changes?",
+   "choices": [
+    "$\\dfrac{5}{6}$",
+    "$\\dfrac{6}{5}$",
+    "$\\dfrac{36}{25}$",
+    "$\\dfrac{9}{5}$",
+    "$\\dfrac{27}{10}$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $x = 9t$ and $y = 5t$. After the changes, $x$ becomes $0.8(9t) = 7.2t$ and $y$ becomes $1.2(5t) = 6t$. So $\\dfrac{x}{y} = \\dfrac{7.2t}{6t} = \\dfrac{6}{5}$.\n\n**Trigger cue**\nPercent changes applied to the two terms of a ratio: multiply the ratio by the single factor $\\dfrac{0.8}{1.2}$ instead of recomputing values.\n\n**Takeaway**\nEqual percent changes on both terms do not cancel.",
+   "fastest_path_md": "Scale the ratio once: $\\dfrac{9}{5} \\cdot \\dfrac{0.8}{1.2} = \\dfrac{9}{5} \\cdot \\dfrac{2}{3} = \\dfrac{6}{5}$.",
+   "trap_map": {
+    "0": "Computes the new value of $\\dfrac{y}{x}$, inverting the requested ratio.",
+    "2": "Applies only the $20\\%$ decrease to $x$ and leaves $y$ unchanged.",
+    "3": "Assumes the equal-size percent changes cancel, leaving the ratio unchanged at $\\dfrac{9}{5}$.",
+    "4": "Swaps the changes, increasing $x$ by $20\\%$ and decreasing $y$ by $20\\%$."
+   },
+   "numeric_check": "6/5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "stem_md": "If $x$, $y$, and $z$ are positive numbers such that $2x = 3y = 8z$, what is the value of $\\dfrac{x}{z}$?",
+   "choices": [
+    "$\\dfrac{1}{4}$",
+    "$\\dfrac{2}{3}$",
+    "$\\dfrac{3}{2}$",
+    "$\\dfrac{8}{3}$",
+    "4"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\nSet the common value equal to a convenient number: $2x = 3y = 8z = 24$, the least common multiple of the coefficients. Then $x = 12$, $y = 8$, and $z = 3$, so $\\dfrac{x}{z} = \\dfrac{12}{3} = 4$. Any other common value scales all three numbers equally, leaving the ratio unchanged.\n\n**Trigger cue**\nA chain of equal products such as $2x = 3y = 8z$: assign the chain the LCM of the coefficients to get clean integer values.\n\n**Takeaway**\nIn equal-product chains, each variable is inversely proportional to its coefficient.",
+   "fastest_path_md": "From $2x = 8z$ alone: $\\dfrac{x}{z} = \\dfrac{8}{2} = 4$ — the coefficients swap places.",
+   "trap_map": {
+    "0": "Reads $2x = 8z$ as $x:z = 2:8$, using the coefficients directly as the ratio parts.",
+    "1": "Takes $x:y$ straight from the coefficients as $2:3$ instead of inverting them.",
+    "2": "Correctly finds $x:y = 3:2$ but reports that pair instead of $x:z$.",
+    "3": "Computes $y:z = 8:3$ instead of $x:z$."
+   },
+   "numeric_check": "8/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "An antiques dealer prices a rug so that her profit is $25\\%$ of the selling price. During a weekend sale she reduces the selling price by $10\\%$ and sells the rug, earning a profit of $\\$66$. How many dollars did the dealer pay for the rug?",
+   "choices": [
+    "198",
+    "330",
+    "396",
+    "440",
+    "528"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $S$ be the original selling price. The profit is $25\\%$ of the selling price, so the cost is $C = S - 0.25S = 0.75S$. The sale price is $0.9S$, so the realized profit is $0.9S - 0.75S = 0.15S$. Setting $0.15S = 66$ gives $S = 440$, and $C = 0.75 \\times 440 = 330$.\n\n**Trigger cue**\nProfit quoted as a percent of the *selling price*, not of cost — make the selling price the variable and write every quantity as a fraction of it.\n\n**Takeaway**\nWhen profit is a percent of price, cost is the derived fraction.",
+   "fastest_path_md": "Anchor everything to the original price $S$: cost $= 0.75S$, sale price $= 0.9S$, so profit $= 0.15S = \\$66$. Then $S = 440$ and cost $= 0.75 \\times 440 = 330$.",
+   "trap_map": {
+    "0": "Ignores the $10\\%$ markdown and sets $0.25S = 66$, giving $S = 264$ and cost $0.75 \\times 264 = 198$.",
+    "2": "Reports the discounted selling price $0.9 \\times 440 = 396$ instead of the cost.",
+    "3": "Reports the original selling price $S = 440$ instead of the cost.",
+    "4": "Treats the $25\\%$ as profit on cost, solving $1.25C \\times 0.9 - C = 0.125C = 66$ for $C = 528$."
+   },
+   "numeric_check": "0.75*(66/0.15)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "stem_md": "Marisol lent $\\$5{,}000$ to a colleague at simple annual interest. Exactly $8$ months later, the colleague settled the loan with a single payment of $\\$5{,}240$. What was the annual interest rate on the loan?",
+   "choices": [
+    "$3.2\\%$",
+    "$4.8\\%$",
+    "$6\\%$",
+    "$7.2\\%$",
+    "$9.6\\%$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe interest paid is $5240 - 5000 = 240$ dollars. Simple interest satisfies $I = P \\cdot r \\cdot t$ with $t$ in years, and $8$ months is $\\tfrac{8}{12} = \\tfrac{2}{3}$ year. So $240 = 5000 \\cdot r \\cdot \\tfrac{2}{3}$, which gives $r = \\dfrac{240 \\cdot 3}{5000 \\cdot 2} = 0.072 = 7.2\\%$.\n\n**Trigger cue**\nA simple-interest term stated in months with an annual rate requested — convert the time to years before solving.\n\n**Takeaway**\nSimple interest measures time in years; annualize a partial-year rate upward.",
+   "fastest_path_md": "The $\\$240$ interest is $4.8\\%$ of $\\$5{,}000$, but it was earned in only $\\tfrac{2}{3}$ of a year, so the annual rate is $4.8\\% \\times \\tfrac{3}{2} = 7.2\\%$.",
+   "trap_map": {
+    "0": "Multiplies by the time fraction instead of dividing: $4.8\\% \\times \\tfrac{2}{3} = 3.2\\%$.",
+    "1": "Computes $240/5000 = 4.8\\%$ and stops, ignoring that the term is only $8$ months.",
+    "2": "Converts $8$ months to $0.8$ year (dividing by $10$ instead of $12$): $240/(5000 \\times 0.8) = 6\\%$.",
+    "4": "Treats the $8$-month term as half a year: $240/(5000 \\times 0.5) = 9.6\\%$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "stem_md": "A collector bought a vintage movie poster and later sold it at a $12\\%$ loss. If she had sold the poster for $\\$90$ more, she would instead have earned an $8\\%$ profit. How many dollars did the collector pay for the poster?",
+   "choices": [
+    "396",
+    "450",
+    "750",
+    "1125",
+    "2250"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $C$ be the cost. The actual selling price was $0.88C$, and the hypothetical price was $1.08C$. The gap between them is $1.08C - 0.88C = 0.20C$, and this gap is the extra $\\$90$. So $0.20C = 90$, giving $C = 450$.\n\n**Trigger cue**\nOne sale described at two outcomes — a loss percent and a profit percent — with the dollar difference given: the difference spans the *sum* of the two percents of cost.\n\n**Takeaway**\nA loss-to-profit swing covers the sum of both percents of cost.",
+   "fastest_path_md": "The $\\$90$ carries the price from $12\\%$ below cost to $8\\%$ above cost, a span of $20\\%$ of cost: $90/0.20 = 450$.",
+   "trap_map": {
+    "0": "Reports the actual selling price $0.88 \\times 450 = 396$ instead of the cost.",
+    "2": "Divides the $\\$90$ by the loss percent alone: $90/0.12 = 750$.",
+    "3": "Divides the $\\$90$ by the profit percent alone: $90/0.08 = 1125$.",
+    "4": "Uses the difference of the percents, $12\\% - 8\\% = 4\\%$, instead of their sum: $90/0.04 = 2250$."
+   },
+   "numeric_check": "90/0.20",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "stem_md": "Priya deposits $\\$12{,}500$ into a savings account that pays $4\\%$ annual interest, compounded semiannually. If she makes no other deposits or withdrawals, how many dollars of interest does the account earn during the first year?",
+   "choices": [
+    "250",
+    "500",
+    "505",
+    "510",
+    "1020"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nCompounded semiannually, the account credits $\\tfrac{4\\%}{2} = 2\\%$ per six-month period, twice. After one year the balance is $12500 \\times 1.02^2 = 12500 \\times 1.0404 = 13005$, so the interest earned is $13005 - 12500 = 505$.\n\n**Trigger cue**\nA rate \"compounded semiannually\" (or quarterly): halve (or quarter) the annual rate, then apply it once per period.\n\n**Takeaway**\nHalve the rate, double the periods; the excess over simple is interest-on-interest.",
+   "fastest_path_md": "Two periods of $2\\%$ on $\\$12{,}500$ give $250 + 250 = 500$ of base interest, plus $2\\%$ of the first period's $\\$250$, which is $\\$5$: total $\\$505$.",
+   "trap_map": {
+    "0": "Applies only one six-month period of $2\\%$: $12500 \\times 0.02 = 250$.",
+    "1": "Uses $4\\%$ for the year with no compounding, missing the interest-on-interest: $12500 \\times 0.04 = 500$.",
+    "3": "Computes the second period's interest, $2\\%$ of $12750 = 255$, and doubles it to $510$.",
+    "4": "Treats $4\\%$ as the rate per six-month period: $12500 \\times (1.04^2 - 1) = 1020$."
+   },
+   "numeric_check": "12500*(1.02^2 - 1)",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
