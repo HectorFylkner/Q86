@@ -16,13 +16,17 @@ Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
 ## Run it
 
-Requires Node 22.18+ (the seed script runs TypeScript via Node's native
-type stripping) and pnpm.
+Requires Node 22.6+ (the seed script runs TypeScript via Node's native
+type stripping; the scripts pass `--experimental-strip-types`, which is
+default from Node 22.18) and pnpm.
+
+`pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
+180-question bank into it — offline, no API key:
 
 ```sh
 pnpm install
-pnpm db:push                   # creates ./data/q86.db
-pnpm seed                      # loads the committed 180-question bank (offline, no API key)
+pnpm db:push
+pnpm seed
 pnpm dev
 ```
 
@@ -32,10 +36,11 @@ key: the 180-question bank ships in `scripts/seed-bank.json`, every
 question verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
-score-report import) need a key:
+score-report import) need a key — copy the template and fill in
+`ANTHROPIC_API_KEY`:
 
 ```sh
-cp .env.example .env.local     # then add your ANTHROPIC_API_KEY
+cp .env.example .env.local
 ```
 
 `ANTHROPIC_MODEL` is optional and defaults to `claude-sonnet-4-6`.
@@ -61,8 +66,10 @@ gate in `scripts/author/harness.mjs`: each item carries a `check()` that
 recomputes the answer from the stem's raw data by brute force, and the
 item is rejected unless the check agrees with the keyed choice. Start
 from `scripts/author/example-batch.mjs`. After appending, run
-`node scripts/verify-bank.ts` (structural re-verification of the whole
-bank) and `pnpm seed` (loads new items, retires removed ones).
+`node --experimental-strip-types scripts/verify-bank.ts` (structural
+re-verification of the whole bank) and `pnpm seed` (loads new items,
+retires removed ones). The flag is needed below Node 22.18 because these
+tools import the app's TypeScript modules directly.
 
 Avoid `pnpm seed --api` (LLM generation): its verification is an LLM
 cross-solve plus numeric spot-check, and a brute-force audit found that

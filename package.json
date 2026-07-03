@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Q86 — personal GMAT Focus quant training platform",
   "engines": {
-    "node": ">=22.18"
+    "node": ">=22.6"
   },
   "scripts": {
     "dev": "next dev",
@@ -13,8 +13,8 @@
     "start": "next start",
     "lint": "eslint .",
     "db:push": "node -e \"require('fs').mkdirSync('data/scratch',{recursive:true})\" && drizzle-kit push",
-    "seed": "node scripts/seed.ts",
-    "backup": "node scripts/backup.ts"
+    "seed": "node --experimental-strip-types scripts/seed.ts",
+    "backup": "node --experimental-strip-types scripts/backup.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

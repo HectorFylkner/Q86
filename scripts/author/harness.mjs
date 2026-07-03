@@ -16,8 +16,10 @@
  *     the check itself must derive the correct index programmatically.
  *
  * Usage: write a batch file next to this one (see example-batch.mjs),
- * then run it with `node scripts/author/your-batch.mjs`. After appending,
- * run `node scripts/verify-bank.ts` and `pnpm seed` to load the DB.
+ * then run it with `node --experimental-strip-types scripts/author/your-batch.mjs`
+ * (the flag is needed below Node 22.18 — this file imports the app's .ts
+ * modules). After appending, run the same way: scripts/verify-bank.ts,
+ * then `pnpm seed` to load the DB.
  */
 import fs from "node:fs";
 import path from "node:path";
