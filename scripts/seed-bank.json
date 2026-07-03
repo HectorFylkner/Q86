@@ -1863,6 +1863,546 @@
    },
    "numeric_check": "combinations(5,1) * combinations(4,2)",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "stem_md": "What is the greatest common factor of $84$ and $126$?",
+   "choices": [
+    "$6$",
+    "$14$",
+    "$21$",
+    "$42$",
+    "$63$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "Backsolve from the largest: does $63$ divide $84$? No. Does $42$? $84 = 2 \\cdot 42$ ✓ and $126 = 3 \\cdot 42$ ✓ — done.",
+   "solution_md": "**Formal path**\n\nPrime factorize: $84 = 2^2 \\cdot 3 \\cdot 7$ and $126 = 2 \\cdot 3^2 \\cdot 7$. Take the lower power of each shared prime: $2 \\cdot 3 \\cdot 7 = 42$.\n\n**Trigger cue**\n\nWhen a GCF is asked, reach for prime factorization and take minimum exponents.\n\n**Takeaway**\n\nGCF: shared primes at their lowest powers.",
+   "trap_map": {
+    "0": "Taking $2 \\cdot 3$ and dropping the shared $7$.",
+    "1": "Taking $2 \\cdot 7$ and dropping the shared $3$.",
+    "2": "Taking $3 \\cdot 7$ and dropping the shared $2$.",
+    "4": "Reporting half of $126$ — a divisor of one number only."
+   },
+   "numeric_check": "gcd(84, 126)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 3,
+   "stem_md": "How many positive integers less than $200$ are divisible by both $6$ and $8$?",
+   "choices": [
+    "$4$",
+    "$8$",
+    "$12$",
+    "$16$",
+    "$33$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Divisible by both means divisible by $\\text{lcm}(6,8) = 24$. Count multiples of $24$ below $200$: $24, 48, \\ldots, 192$ — that is $\\lfloor 199/24 \\rfloor = 8$.",
+   "solution_md": "**Formal path**\n\n$\\text{lcm}(6, 8) = 24$ (primes: $2^3 \\cdot 3$). The multiples of $24$ in $[1, 199]$ are $24k$ for $k = 1..8$ since $24 \\cdot 8 = 192 < 200 \\le 24 \\cdot 9$.\n\n**Trigger cue**\n\nWhen \"divisible by both\" appears, reach for the LCM before counting.\n\n**Takeaway**\n\nCount multiples of the LCM, not of each divisor.",
+   "trap_map": {
+    "0": "Using $\\text{lcm} = 48$ ($6 \\cdot 8$) and counting its multiples.",
+    "2": "Counting multiples of $6 \\cdot 8 / 4 = 12$? — using the GCF's cofactor by confusion.",
+    "3": "Counting multiples of $12$ minus overlap incorrectly.",
+    "4": "Counting multiples of $6$ alone."
+   },
+   "numeric_check": "floor(199 / 24)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "Positive integers $a$ and $b$ satisfy $\\gcd(a, b) = 15$ and $\\text{lcm}(a, b) = 180$. If $a < b$ and $b$ is not a multiple of $a$, what is $b - a$?",
+   "choices": [
+    "$15$",
+    "$45$",
+    "$60$",
+    "$105$",
+    "$165$"
+   ],
+   "correct_index": 0,
+   "fastest_path_md": "Write $a = 15m$, $b = 15n$ with $\\gcd(m, n) = 1$ and $mn = \\tfrac{180}{15} = 12$. Coprime pairs with $m < n$: $(1, 12)$ and $(3, 4)$. The first makes $b$ a multiple of $a$ — excluded. So $(a, b) = (45, 60)$ and $b - a = 15$.",
+   "solution_md": "**Formal path**\n\nFactor out the GCF: $a = 15m$, $b = 15n$ with coprime cofactors. Then $\\text{lcm}(a,b) = 15mn = 180$, so $mn = 12$. Coprime factorizations of $12$: $1 \\cdot 12$ and $3 \\cdot 4$. The pair $(15, 180)$ violates the not-a-multiple condition, leaving $(45, 60)$: difference $15$.\n\n**Trigger cue**\n\nWhen GCF and LCM are both given, reach for coprime cofactors of $\\text{lcm}/\\gcd$.\n\n**Takeaway**\n\nFactor out the GCF; the cofactors are coprime.",
+   "trap_map": {
+    "1": "Reporting $a = 45$ itself instead of the difference.",
+    "2": "Reporting $b = 60$ itself instead of the difference.",
+    "3": "Mixing the two pairs: $120 - 15$ from a half-LCM slip.",
+    "4": "Using the excluded pair $(15, 180)$: $180 - 15 = 165$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "Is the positive integer $n$ divisible by $12$?\n\n(1) $n$ is divisible by $6$.\n\n(2) $n^2$ is divisible by $48$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "(1): $n = 6$ says no, $n = 12$ says yes — not sufficient. (2): $48 = 2^4 \\cdot 3$. Exponents in $n^2$ are doubled exponents of $n$, so $2 e_2(n) \\ge 4$ and $2 e_3(n) \\ge 1$ force $e_2(n) \\ge 2$, $e_3(n) \\ge 1$: $n$ carries $2^2 \\cdot 3 = 12$. Sufficient — yes.",
+   "solution_md": "**Formal path**\n\n(1) alone fails on $n = 6$ vs $n = 12$. For (2): write prime exponents. $48 \\mid n^2$ demands $e_2(n^2) \\ge 4$ and $e_3(n^2) \\ge 1$. Since $e_p(n^2) = 2e_p(n)$, this gives $e_2(n) \\ge 2$ and $e_3(n) \\ge 1$ (exponents are integers, so $2e_3(n) \\ge 1$ rounds up to $e_3(n) \\ge 1$). Hence $12 = 2^2 \\cdot 3$ divides $n$ — statement (2) alone is sufficient.\n\n**Trigger cue**\n\nWhen a square's divisibility is given, reach for doubling/halving prime exponents with ceilings.\n\n**Takeaway**\n\nSquares double exponents; invert with a ceiling.",
+   "trap_map": {
+    "0": "Trusting (1) because $6$ shares factors with $12$.",
+    "2": "Combining out of caution when (2) already forces $2^2 \\cdot 3$.",
+    "3": "Granting (1) sufficiency by pattern-matching it to (2).",
+    "4": "Doubting (2) because $48$ is not a perfect square."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "Two ferries leave a dock together at 6:00 a.m. One returns to the dock every $36$ minutes, the other every $48$ minutes. How many minutes after 6:00 a.m. will they next be at the dock together?",
+   "choices": [
+    "$84$",
+    "$96$",
+    "$120$",
+    "$144$",
+    "$288$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "The joint return happens at the LCM. $36 = 2^2 \\cdot 3^2$, $48 = 2^4 \\cdot 3$; LCM $= 2^4 \\cdot 3^2 = 144$.",
+   "solution_md": "**Formal path**\n\nFerry A is at the dock at multiples of $36$; ferry B at multiples of $48$. The first common positive multiple is $\\text{lcm}(36, 48) = 2^{4} \\cdot 3^{2} = 144$ minutes.\n\n**Trigger cue**\n\nWhen cycles must coincide, reach for the LCM of the periods.\n\n**Takeaway**\n\nCoincidence of cycles is an LCM question.",
+   "trap_map": {
+    "0": "Adding the two periods: $36 + 48 = 84$.",
+    "1": "Doubling the average of the periods.",
+    "2": "Using $\\gcd \\cdot 10$-style guesswork: $12 \\cdot 10 = 120$.",
+    "4": "Multiplying the periods and dividing by $6$ instead of the GCF $12$."
+   },
+   "numeric_check": "lcm(36, 48)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "What is the value of the positive integer $n$?\n\n(1) $\\gcd(n, 45) = 9$\n\n(2) $\\text{lcm}(n, 45) = 90$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "(1) allows $n = 9, 18, 36, \\ldots$ — not sufficient. (2) allows $n = 18$ and $n = 90$ — not sufficient. Together, $\\gcd \\cdot \\text{lcm} = 45n$ gives $9 \\cdot 90 = 810 = 45n$, so $n = 18$.",
+   "solution_md": "**Formal path**\n\n(1): $n$ must carry $3^2$, no factor $5$, and no third $3$: $n \\in \\{9, 18, 36, 72, \\ldots\\}$ — many values. (2): $\\text{lcm}(n, 45) = 90 = 2 \\cdot 3^2 \\cdot 5$ allows $n = 2 \\cdot 3^2 = 18$ or $n = 90$ among others — not unique. Together, the identity $\\gcd(n, 45)\\cdot\\text{lcm}(n, 45) = 45n$ gives $n = \\tfrac{9 \\cdot 90}{45} = 18$, and $18$ satisfies both statements — sufficient.\n\n**Trigger cue**\n\nWhen a pair's GCF and LCM both appear, reach for $\\gcd \\cdot \\text{lcm} = $ product.\n\n**Takeaway**\n\nGCF times LCM equals the product of the pair.",
+   "trap_map": {
+    "0": "Believing the GCF alone pins $n$ against the fixed $45$.",
+    "1": "Believing the LCM alone pins $n$; $18$ and $90$ both work.",
+    "3": "Granting each alone after finding a single example for each.",
+    "4": "Missing the product identity and declaring the pair inconclusive."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "stem_md": "How many positive integers $n \\le 300$ are divisible by $4$ or by $6$, but not by both?",
+   "choices": [
+    "$50$",
+    "$75$",
+    "$100$",
+    "$125$",
+    "$150$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Multiples of $4$: $75$. Multiples of $6$: $50$. Both means multiples of $\\text{lcm} = 12$: $25$. Exactly one: $75 + 50 - 2 \\cdot 25 = 75$.",
+   "solution_md": "**Formal path**\n\n$\\lfloor 300/4 \\rfloor = 75$, $\\lfloor 300/6 \\rfloor = 50$, $\\lfloor 300/12 \\rfloor = 25$. \"Or but not both\" counts the symmetric difference: $(75 - 25) + (50 - 25) = 75$.\n\n**Trigger cue**\n\nWhen \"but not both\" appears, reach for subtracting the overlap twice.\n\n**Takeaway**\n\nExactly-one counts subtract the overlap twice.",
+   "trap_map": {
+    "0": "Computing only the $6$-side: $50 - 25 = 25$? doubled to $50$.",
+    "2": "Union instead of symmetric difference: $75 + 50 - 25 = 100$.",
+    "3": "Adding the counts without any overlap correction and trimming.",
+    "4": "Plain sum $75 + 50$ then rounding down."
+   },
+   "numeric_check": "floor(300/4) + floor(300/6) - 2 * floor(300/12)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "stem_md": "The sum of $7$ consecutive integers is $161$. What is the largest of the seven?",
+   "choices": [
+    "$20$",
+    "$23$",
+    "$26$",
+    "$29$",
+    "$32$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "For consecutive integers, sum $=$ count $\\times$ middle. Middle $= 161 / 7 = 23$; the largest is $23 + 3 = 26$.",
+   "solution_md": "**Formal path**\n\nLet the middle integer be $m$. The seven integers are $m - 3, \\ldots, m + 3$, summing to $7m = 161$, so $m = 23$. Largest: $m + 3 = 26$.\n\n**Trigger cue**\n\nWhen consecutive integers are summed, reach for the middle value: sum equals count times median.\n\n**Takeaway**\n\nAnchor on the median, then step to the edge.",
+   "trap_map": {
+    "0": "Reporting the smallest ($23 - 3 = 20$).",
+    "1": "Stopping at the middle value $23$.",
+    "3": "Adding the full half-width twice: $23 + 6$.",
+    "4": "Dividing by $5$ instead of $7$ and adjusting."
+   },
+   "numeric_check": "161/7 + 3",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "stem_md": "An auditorium's rows hold consecutive even numbers of seats: the first row has $12$ seats and each row after it has $2$ more seats than the row before. If there are $15$ rows, how many seats are there in total?",
+   "choices": [
+    "$300$",
+    "$360$",
+    "$390$",
+    "$420$",
+    "$450$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Evenly spaced: total $=$ rows $\\times$ average of first and last. Last row: $12 + 14 \\cdot 2 = 40$. Average $= \\tfrac{12 + 40}{2} = 26$; total $= 15 \\cdot 26 = 390$.",
+   "solution_md": "**Formal path**\n\nThe seat counts form an arithmetic sequence with $a_1 = 12$, $d = 2$, $n = 15$: $a_{15} = 12 + 14 \\cdot 2 = 40$. Sum $= \\tfrac{n(a_1 + a_{15})}{2} = \\tfrac{15 \\cdot 52}{2} = 390$.\n\n**Trigger cue**\n\nWhen evenly spaced values are totaled, reach for count times the average of the endpoints.\n\n**Takeaway**\n\nArithmetic sums: count times endpoint average.",
+   "trap_map": {
+    "0": "Using the last row as $32$ via $12 + 10 \\cdot 2$.",
+    "1": "Averaging first and last as $24$ by an arithmetic slip.",
+    "3": "Using $16$ rows: $16 \\cdot 26.25$-style overcount rounded to $420$.",
+    "4": "Multiplying rows by the last row's count: $15 \\cdot 30$."
+   },
+   "numeric_check": "15 * (12 + 40) / 2",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "The average of $5$ consecutive odd integers is $k$. In terms of $k$, what is the sum of the smallest and largest of the five?",
+   "choices": [
+    "$k$",
+    "$2k - 4$",
+    "$2k$",
+    "$2k + 4$",
+    "$5k$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Test $1, 3, 5, 7, 9$: average $k = 5$; smallest $+$ largest $= 10 = 2k$. Symmetry makes this general.",
+   "solution_md": "**Formal path**\n\nFive consecutive odd integers are symmetric about their average $k$ (which is the middle one): $k - 4, k - 2, k, k + 2, k + 4$. Smallest plus largest: $(k - 4) + (k + 4) = 2k$.\n\n**Trigger cue**\n\nWhen a symmetric set's endpoints are combined, reach for the mirror property around the mean.\n\n**Takeaway**\n\nSymmetric endpoints always sum to twice the mean.",
+   "trap_map": {
+    "0": "Halving the endpoint sum back to the average.",
+    "1": "Subtracting the spacing once: $(k-4) + k$.",
+    "3": "Adding the spacing once: $k + (k+4)$.",
+    "4": "Reporting the total of all five instead of two."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "How many integers between $100$ and $500$ inclusive leave a remainder of $3$ when divided by $7$?",
+   "choices": [
+    "$56$",
+    "$57$",
+    "$58$",
+    "$59$",
+    "$60$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "The qualifying integers are evenly spaced by $7$: the first in range is $101 = 7 \\cdot 14 + 3$, and the last is $500 = 7 \\cdot 71 + 3$ itself. Count $= \\tfrac{500 - 101}{7} + 1 = 57 + 1 = 58$.",
+   "solution_md": "**Formal path**\n\nNumbers $\\equiv 3 \\pmod 7$ in $[100, 500]$ run $101, 108, \\ldots, 500$ — note $500 = 7 \\cdot 71 + 3$ qualifies. Arithmetic-list count: $\\tfrac{\\text{last} - \\text{first}}{\\text{step}} + 1 = \\tfrac{399}{7} + 1 = 58$.\n\n**Trigger cue**\n\nWhen counting a remainder class in a range, reach for finding the true first AND last members before dividing.\n\n**Takeaway**\n\nCheck both endpoints; then divide and add one.",
+   "trap_map": {
+    "0": "Dropping the $+1$ fencepost after also missing that $500$ qualifies.",
+    "1": "Assuming a round endpoint like $500$ cannot belong to the class, ending at $493$.",
+    "3": "Adding the fencepost twice.",
+    "4": "Estimating $\\tfrac{400}{7} + 3$ and rounding."
+   },
+   "numeric_check": "(500 - 101)/7 + 1",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "A courier makes deliveries along a street whose house numbers are the consecutive multiples of $4$ from $4$ to $200$ inclusive. If the courier skips every house whose number is a multiple of $12$, how many houses receive a delivery?",
+   "choices": [
+    "$30$",
+    "$32$",
+    "$33$",
+    "$34$",
+    "$36$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "Houses: $200/4 = 50$. Skipped houses are multiples of $12$ (every third multiple of $4$): $\\lfloor 200/12 \\rfloor = 16$. Delivered: $50 - 16 = 34$.",
+   "solution_md": "**Formal path**\n\nThe street has the multiples of $4$ up to $200$: fifty houses. A skipped house must be a multiple of both $4$ and $12$, i.e. of $\\text{lcm}(4, 12) = 12$; in range these are $12, 24, \\ldots, 192$ — sixteen houses. Delivered: $50 - 16 = 34$.\n\n**Trigger cue**\n\nWhen one spaced list is removed from another, reach for the LCM to count the overlap.\n\n**Takeaway**\n\nCount the whole list, subtract the LCM-spaced overlap.",
+   "trap_map": {
+    "0": "Subtracting $\\lfloor 200/10 \\rfloor = 20$ with the wrong skip divisor.",
+    "1": "A fencepost slip on the house count: $49 - 17$.",
+    "2": "Treating every third house as skipped starting from house $4$: $50 - 17$.",
+    "4": "Subtracting only $14$ skips after miscounting $\\lfloor 200/12 \\rfloor$."
+   },
+   "numeric_check": "floor(200/4) - floor(200/12)",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "$S$ is a set of consecutive integers. What is the sum of the integers in $S$?\n\n(1) $S$ contains exactly $9$ integers.\n\n(2) The median of $S$ is $14$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Sum $=$ count $\\times$ median for consecutive integers. (1) gives the count only; (2) gives the median only; together: $9 \\cdot 14 = 126$.",
+   "solution_md": "**Formal path**\n\nFor consecutive integers, the sum is (number of terms) $\\times$ (median). (1) alone: median unknown — any 9-term run works. (2) alone: the run's length is unknown ($\\{14\\}$, $\\{13,14,15\\}$, …). Together the sum is pinned at $9 \\cdot 14 = 126$ — sufficient.\n\n**Trigger cue**\n\nWhen a consecutive set's sum is asked, reach for count × median and check which piece each statement supplies.\n\n**Takeaway**\n\nSum needs both the count and the center.",
+   "trap_map": {
+    "0": "Assuming a 9-integer run has a default starting point.",
+    "1": "Assuming the median fixes the set's size.",
+    "3": "Granting each alone because each supplies one clean number.",
+    "4": "Missing that the two numbers multiply to the sum."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "stem_md": "The sum of $4$ consecutive even integers is $S$. Which of the following must be true of $S$?\n\nI. $S$ is divisible by $4$\n\nII. $S$ is divisible by $8$\n\nIII. $S$ is not divisible by $16$",
+   "choices": [
+    "I only",
+    "II only",
+    "I and II only",
+    "I and III only",
+    "I, II, and III"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "Write them as $2k, 2k+2, 2k+4, 2k+6$: sum $= 8k + 12 = 4(2k + 3)$ with $2k + 3$ odd. So $S$ always carries exactly two factors of $2$: divisible by $4$ (I), never by $8$ (kills II), and therefore never by $16$ (III holds).",
+   "solution_md": "**Formal path**\n\nFour consecutive evens: $2k, 2k+2, 2k+4, 2k+6$ sum to $8k + 12 = 4(2k+3)$ with $2k+3$ odd. So $S$ is always a multiple of $4$ (I true), never a multiple of $8$ (II false), and therefore never a multiple of $16$ (III true).\n\n**Trigger cue**\n\nWhen consecutive evens are summed, reach for factoring the sum and checking the odd part.\n\n**Takeaway**\n\nFactor the sum; the odd cofactor caps the powers of two.",
+   "trap_map": {
+    "0": "Missing that never-divisible-by-8 also settles III.",
+    "1": "Testing one case where the sum looks divisible by 8 after an addition slip.",
+    "2": "Assuming four even numbers force three factors of $2$, accepting II.",
+    "4": "Marking all three without checking II against $2 + 4 + 6 + 8 = 20$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "A florist wants to split $360$ roses into identical bouquets with no roses left over, using more than one bouquet. If the number of bouquets must be a perfect square, what is the greatest number of bouquets she can make?",
+   "choices": [
+    "$4$",
+    "$9$",
+    "$16$",
+    "$36$",
+    "$81$"
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "$360 = 2^3 \\cdot 3^2 \\cdot 5$. A square divisor uses even exponents: the largest is $2^2 \\cdot 3^2 = 36$.",
+   "solution_md": "**Formal path**\n\nThe number of bouquets must divide $360 = 2^3 \\cdot 3^2 \\cdot 5$ and be a perfect square. Square divisors take even exponents: $2^0$ or $2^2$; $3^0$ or $3^2$; $5^0$. The largest is $2^2 \\cdot 3^2 = 36$.\n\n**Trigger cue**\n\nWhen a divisor must be a perfect square, reach for even exponents inside the factorization.\n\n**Takeaway**\n\nSquare divisors take even exponents only.",
+   "trap_map": {
+    "0": "Stopping at $2^2$ and ignoring the $3^2$ factor.",
+    "1": "Stopping at $3^2$ and ignoring the $2^2$ factor.",
+    "2": "Choosing $16 = 2^4$, which exceeds the available $2^3$.",
+    "4": "Choosing $81 = 3^4$, which exceeds the available $3^2$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "A warehouse ships gift sets in identical cartons. A full shipment of $875$ gift sets fills every carton exactly, with none left over. If each carton holds more than $20$ but fewer than $30$ gift sets, how many gift sets does each carton hold?",
+   "choices": [
+    "$21$",
+    "$24$",
+    "$25$",
+    "$27$",
+    "$28$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "$875 = 5^3 \\cdot 7$. Its divisors are built from $5$s and one optional $7$: $1, 5, 7, 25, 35, 125, 175, 875$. The only one strictly between $20$ and $30$ is $25$.",
+   "solution_md": "**Formal path**\n\nThe carton size must divide $875 = 5^3 \\cdot 7$. Listing divisors: $1, 5, 7, 25, 35, 125, 175, 875$. Exactly one falls in the window $(20, 30)$: $25$, giving $875 / 25 = 35$ cartons.\n\n**Trigger cue**\n\nWhen a total must split evenly, reach for the prime factorization and scan the divisor window.\n\n**Takeaway**\n\nDivisor hunting is exponent bookkeeping.",
+   "trap_map": {
+    "0": "Testing $21 = 3 \\cdot 7$ and miscomputing $875/21$ as an integer.",
+    "1": "Choosing $24$ because it divides the nearby round number $840$.",
+    "3": "Choosing $27 = 3^3$ by pattern-matching the cube in $5^3$.",
+    "4": "Choosing $28 = 2^2 \\cdot 7$ after seeing the factor $7$ and inventing the $4$."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "A print shop packs $n$ identical flyers into boxes for delivery. What is the value of $n$?\n\n(1) $n$ has exactly three positive divisors.\n\n(2) $n$ is between $110$ and $130$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "Exactly three divisors means $n = p^2$ for a prime $p$ ($1, p, p^2$). (1) alone: infinitely many. (2) alone: twenty candidates. Together: the only prime square in $(110, 130)$ is $121 = 11^2$.",
+   "solution_md": "**Formal path**\n\nA divisor count of $3$ forces $n = p^2$ with $p$ prime, since $3$ is odd and prime: exponent pattern $(2)$. Squares of primes near the window: $49, 121, 169$ — only $121$ lies between $110$ and $130$. Each statement alone leaves multiple values; together they pin $n = 121$.\n\n**Trigger cue**\n\nWhen a divisor count is tiny, reach for the exponent-pattern characterization.\n\n**Takeaway**\n\nThree divisors means a prime squared.",
+   "trap_map": {
+    "0": "Believing three divisors pins one number by itself.",
+    "1": "Treating the range alone as narrow enough.",
+    "3": "Granting each alone after finding $121$ mentally in both.",
+    "4": "Missing that prime squares are sparse enough for the window to isolate one."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "A game show awards points as powers: a contestant's score is $12^{10}$. If the score board displays the score as $2^a \\cdot 3^b$, what is $a + b$?",
+   "choices": [
+    "$20$",
+    "$25$",
+    "$30$",
+    "$35$",
+    "$40$"
+   ],
+   "correct_index": 2,
+   "fastest_path_md": "$12 = 2^2 \\cdot 3$, so $12^{10} = 2^{20} \\cdot 3^{10}$: $a + b = 30$.",
+   "solution_md": "**Formal path**\n\nPower of a product: $12^{10} = (2^2 \\cdot 3)^{10} = 2^{20} \\cdot 3^{10}$. Thus $a = 20$, $b = 10$, and $a + b = 30$.\n\n**Trigger cue**\n\nWhen a composite base carries a big exponent, reach for factoring the base first.\n\n**Takeaway**\n\nExponents distribute over the base's prime factors.",
+   "trap_map": {
+    "0": "Reporting $a$ alone.",
+    "1": "Computing $2^{15} \\cdot 3^{10}$ from $12 = 2 \\cdot 6$ half-factoring.",
+    "3": "Adding an extra 5 by treating $12 = 2^2 \\cdot 3^1$ as $2^2 \\cdot 3^{1.5}$-style slip.",
+    "4": "Doubling both exponents: $(2 \\cdot 10) + (2 \\cdot 10)$."
+   },
+   "numeric_check": "20 + 10",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "A factory labels its products with serial numbers $1$ through $1{,}000$. A quality tag is attached to every product whose serial number has an odd number of positive divisors. How many quality tags are used?",
+   "choices": [
+    "$25$",
+    "$31$",
+    "$50$",
+    "$100$",
+    "$500$"
+   ],
+   "correct_index": 1,
+   "fastest_path_md": "Divisors pair up $d \\leftrightarrow \\tfrac{n}{d}$ except when $n$ is a perfect square. So odd divisor counts happen exactly at squares: $1^2$ through $31^2 = 961$ — that is $31$ tags.",
+   "solution_md": "**Formal path**\n\nFor non-squares, divisors pair into distinct couples, giving an even count. A perfect square pairs $\\sqrt{n}$ with itself, making the count odd. Squares up to $1000$: $1, 4, 9, \\ldots, 961 = 31^2$, and $32^2 = 1024 > 1000$. Count: $31$.\n\n**Trigger cue**\n\nWhen \"odd number of divisors\" appears, reach for perfect squares immediately.\n\n**Takeaway**\n\nOnly perfect squares have oddly many divisors.",
+   "trap_map": {
+    "0": "Counting squares only up to $625 = 25^2$.",
+    "2": "Halving $1000$'s square count estimate: $\\sqrt{1000} \\approx 31.6$ misrounded up then doubled.",
+    "3": "Counting numbers with an odd number of PRIME divisors instead.",
+    "4": "Counting odd serial numbers."
+   },
+   "numeric_check": "floor(sqrt(1000))",
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "A charity splits a donation of $n$ dollars, where $n$ is a positive integer, evenly among its programs. Is $n$ divisible by $36$?\n\n(1) $n$ is divisible by $12$ and by $18$.\n\n(2) $n^2$ is divisible by $216$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 3,
+   "fastest_path_md": "(1): divisible by both $12$ and $18$ means divisible by $\\text{lcm}(12, 18) = 36$ — sufficient. (2): $216 = 2^3 \\cdot 3^3$, and exponents in $n^2$ are doubled, so $2e_2(n) \\ge 3$ and $2e_3(n) \\ge 3$ force $e_2(n) \\ge 2$ and $e_3(n) \\ge 2$: $n$ carries $2^2 \\cdot 3^2 = 36$ — also sufficient.",
+   "solution_md": "**Formal path**\n\n(1): joint divisibility is LCM divisibility, and $\\text{lcm}(12, 18) = 2^2 \\cdot 3^2 = 36$ — sufficient, answer yes. (2): $216 \\mid n^2$ means $n^2$ carries $2^3 3^3$; prime exponents of a square are even and doubled from $n$, so $e_2(n) \\ge \\lceil 3/2 \\rceil = 2$ and likewise $e_3(n) \\ge 2$. Hence $36 \\mid n$ — sufficient. Each statement alone answers the question.\n\n**Trigger cue**\n\nWhen divisibility facts stack, reach for LCMs; when squares appear, halve exponents with ceilings.\n\n**Takeaway**\n\nLCM for joint facts; ceilings for square roots of exponents.",
+   "trap_map": {
+    "0": "Doubting (2) because $216$ is not a perfect square.",
+    "1": "Doubting (1) by multiplying $12 \\cdot 18 = 216$ and confusing product with LCM.",
+    "2": "Combining out of caution when each alone already forces $2^2 3^2$.",
+    "4": "Testing only $n = 6$ against (2) — it fails the premise, not the question."
+   },
+   "numeric_check": null,
+   "provenance": "authored (fable-5) + brute-force programmatic verification"
   }
  ]
 }
