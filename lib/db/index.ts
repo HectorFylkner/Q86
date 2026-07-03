@@ -23,11 +23,18 @@ const globalForDb = globalThis as unknown as {
 };
 
 function createDbClient(): Client {
-  const remoteUrl = process.env.TURSO_DATABASE_URL;
+  // Some hosting integrations inject DATABASE_URL instead; accept it when
+  // it is a libsql URL so marketplace-provisioned databases work unedited.
+  const remoteUrl =
+    process.env.TURSO_DATABASE_URL ??
+    (process.env.DATABASE_URL?.startsWith("libsql")
+      ? process.env.DATABASE_URL
+      : undefined);
   if (remoteUrl) {
     return createClient({
       url: remoteUrl,
-      authToken: process.env.TURSO_AUTH_TOKEN,
+      authToken:
+        process.env.TURSO_AUTH_TOKEN ?? process.env.DATABASE_AUTH_TOKEN,
     });
   }
   fs.mkdirSync(DATA_DIR, { recursive: true });

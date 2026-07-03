@@ -33,6 +33,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
+import { ensureDbReady } from "../lib/db/bootstrap.ts";
+import { loadBank, verifiedSeedCount } from "../lib/db/seed-bank.ts";
 import { questions, settings } from "../lib/db/schema.ts";
 import { createVerifiedQuestion } from "../lib/ai/pipeline.ts";
 import { SKILL_BY_SUBTOPIC, type Subtopic } from "../lib/taxonomy.ts";
@@ -41,15 +43,6 @@ import { buildPlan, TARGET_TOTAL, type PlanItem } from "./seed-plan.ts";
 
 const MAX_CONSECUTIVE_FAILURES = 15;
 const CONCURRENCY = 3;
-
-async function verifiedSeedCount(): Promise<number> {
-  const row = await db
-    .select({ n: count() })
-    .from(questions)
-    .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
-    .get();
-  return row?.n ?? 0;
-}
 
 async function getProgress(): Promise<number> {
   const row = await db
@@ -121,123 +114,10 @@ async function buildTopUp(
 }
 
 
-type BankQuestion = {
-  format: string;
-  content_domain: string;
-  context: string;
-  fundamental_skill: string;
-  subtopic: string;
-  difficulty: number;
-  stem_md: string;
-  choices: string[];
-  correct_index: number;
-  solution_md: string;
-  fastest_path_md: string;
-  trap_map: Record<string, string>;
-  numeric_check: string | null;
-};
-
-const BANK_PATH = path.join(import.meta.dirname, "seed-bank.json");
-
-/** Offline mode: load the committed, already-verified bank. Idempotent —
- *  items whose stem already exists are skipped, so reruns are safe. */
-async function loadBank(): Promise<void> {
-  if (!fs.existsSync(BANK_PATH)) {
-    console.error(
-      `No seed bank at ${BANK_PATH}. Run pnpm seed --api to generate one.`,
-    );
-    process.exit(1);
-  }
-  const bank = JSON.parse(fs.readFileSync(BANK_PATH, "utf8")) as {
-    questions: BankQuestion[];
-  };
-  const existing = new Map(
-    (
-      await db
-        .select({ id: questions.id, stem: questions.stemMd })
-        .from(questions)
-        .all()
-    ).map((r) => [r.stem, r.id]),
-  );
-  let inserted = 0;
-  let updated = 0;
-  let retired = 0;
-  await db.transaction(async (tx) => {
-    for (const q of bank.questions) {
-      const existingId = existing.get(q.stem_md);
-      if (existingId != null) {
-        // Upsert: editorial fixes in the bank propagate to installed rows.
-        await tx
-          .update(questions)
-          .set({
-            choices: q.choices,
-            correctIndex: q.correct_index,
-            solutionMd: q.solution_md,
-            fastestPathMd: q.fastest_path_md,
-            trapMap: q.trap_map,
-            numericCheck: q.numeric_check,
-            verified: true,
-          })
-          .where(eq(questions.id, existingId))
-          .run();
-        updated++;
-        continue;
-      }
-      await tx
-        .insert(questions)
-        .values({
-          source: "seed",
-          format: q.format as (typeof questions.$inferInsert)["format"],
-          contentDomain:
-            q.content_domain as (typeof questions.$inferInsert)["contentDomain"],
-          context: q.context as (typeof questions.$inferInsert)["context"],
-          fundamentalSkill:
-            q.fundamental_skill as (typeof questions.$inferInsert)["fundamentalSkill"],
-          subtopic: q.subtopic as (typeof questions.$inferInsert)["subtopic"],
-          difficulty: q.difficulty,
-          stemMd: q.stem_md,
-          choices: q.choices,
-          correctIndex: q.correct_index,
-          solutionMd: q.solution_md,
-          fastestPathMd: q.fastest_path_md,
-          trapMap: q.trap_map,
-          numericCheck: q.numeric_check,
-          verified: true,
-        })
-        .run();
-      inserted++;
-    }
-    // Retire seed rows whose stems left the bank (e.g. questions replaced
-    // after failing a deeper audit). Rows are never deleted — verified=false
-    // removes them from every serving query while preserving attempt history.
-    const bankStems = new Set(bank.questions.map((q) => q.stem_md));
-    const seedRows = await tx
-      .select({ id: questions.id, stem: questions.stemMd })
-      .from(questions)
-      .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
-      .all();
-    for (const row of seedRows) {
-      if (bankStems.has(row.stem)) continue;
-      await tx
-        .update(questions)
-        .set({ verified: false })
-        .where(eq(questions.id, row.id))
-        .run();
-      retired++;
-    }
-  });
-  console.log(
-    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${retired} retired, ${await verifiedSeedCount()} verified seed questions total.`,
-  );
-}
-
 async function main() {
-  try {
-    await verifiedSeedCount();
-  } catch {
-    console.error("The database has no tables. Run pnpm db:push first.");
-    process.exit(1);
-  }
+  // Applies the schema to an empty database and no-ops otherwise, so a
+  // fresh clone can run `pnpm seed` (or nothing at all) directly.
+  await ensureDbReady();
 
   const plan = buildPlan();
 
@@ -247,7 +127,10 @@ async function main() {
   }
 
   if (!process.argv.includes("--api")) {
-    await loadBank();
+    const { inserted, updated, retired } = await loadBank();
+    console.log(
+      `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${retired} retired, ${await verifiedSeedCount()} verified seed questions total.`,
+    );
     return;
   }
 
