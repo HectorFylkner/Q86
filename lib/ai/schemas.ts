@@ -9,13 +9,17 @@ import {
 } from "../taxonomy.ts";
 
 /** What the generator model returns (§8.1). Taxonomy fields we dictate in
- *  the request are not echoed back; content_domain is the model's call. */
+ *  the request are not echoed back; content_domain is the model's call.
+ *  stem_md is deliberately first: some models otherwise skip straight to
+ *  the choices and omit the stem entirely. */
 export const generatedQuestionSchema = z.object({
-  content_domain: z.enum(CONTENT_DOMAINS),
   stem_md: z
     .string()
     .min(20)
-    .describe("The question stem. For DS, includes statements (1) and (2)."),
+    .describe(
+      "REQUIRED, write this field first: the complete question text shown to the test taker. For DS, includes statements (1) and (2).",
+    ),
+  content_domain: z.enum(CONTENT_DOMAINS),
   choices: z
     .array(z.string().min(1))
     .length(5)

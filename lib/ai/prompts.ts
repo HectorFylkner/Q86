@@ -84,7 +84,7 @@ export function generatorUser(spec: GenerationSpec): string {
 
 Set content_domain to "algebra" if the core work is manipulating variables, equations, inequalities, or functions; otherwise "arithmetic".
 
-Return the complete question object.`;
+Return the complete question object. Write stem_md first — the full question text the test taker reads. An object without stem_md is invalid and discarded.`;
 }
 
 export function twinGeneratorUser(
