@@ -5832,6 +5832,978 @@
    },
    "numeric_check": "17 * 39",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "Four more than half of a number $n$ is equal to two less than $n$. What is the value of $n$?",
+   "choices": [
+    "-4",
+    "4",
+    "6",
+    "8",
+    "12"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nTranslate literally: $\\frac{n}{2} + 4 = n - 2$. Subtract $\\frac{n}{2}$ from both sides: $4 = \\frac{n}{2} - 2$, so $\\frac{n}{2} = 6$ and $n = 12$.\n\n**Trigger cue**\n\nA single unknown wrapped in \"more than / less than\" phrases: translate each side in place, then solve the one-variable equation.\n\n**Takeaway**\n\nTranslate phrase by phrase; \"less than\" reverses the subtraction order.",
+   "fastest_path_md": "Backsolve: at $n = 12$, half of it plus four is $10$, and $12 - 2 = 10$. Match on the first clean candidate.",
+   "trap_map": {
+    "0": "Translates \"four more than half\" as $\\frac{n}{2} - 4$, flipping the sign of the $4$.",
+    "1": "Writes the right side as $n + 2$ instead of $n - 2$.",
+    "2": "Reaches $\\frac{n}{2} = 6$ and reports $6$ without doubling.",
+    "3": "Takes half of $n + 4$ instead, solving $\\frac{n+4}{2} = n - 2$."
+   },
+   "numeric_check": "2*(4+2)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "The sum of two numbers is $43$, and the larger number is $7$ more than twice the smaller number. What is the larger number?",
+   "choices": [
+    "12",
+    "18",
+    "24",
+    "25",
+    "31"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nLet the smaller number be $s$; the larger is $2s + 7$. The sum gives $s + (2s + 7) = 43$, so $3s = 36$ and $s = 12$. The larger number is $2(12) + 7 = 31$.\n\n**Trigger cue**\n\nA sum plus one comparative relation between two unknowns: substitute the relation into the sum so only one variable remains.\n\n**Takeaway**\n\nUse one variable for both numbers, then answer the number asked for.",
+   "fastest_path_md": "Peel off the extra $7$: $43 - 7 = 36$ splits $1:2$ into $12$ and $24$, so the larger is $24 + 7 = 31$. Or backsolve: $31$ leaves $12$, and $2(12) + 7 = 31$. ✓",
+   "trap_map": {
+    "0": "Solves correctly but reports the smaller number.",
+    "1": "Treats $7$ as a plain difference and reports the smaller half of $(43-7)$.",
+    "2": "Doubles the smaller number but forgets to add the $7$.",
+    "3": "Misapplies the sum-and-difference shortcut $(43+7)/2$ although the relation is not a plain difference."
+   },
+   "numeric_check": "2*12+7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "Seven times a number, decreased by $4$, equals five times the result of decreasing the number by $4$. What is the number?",
+   "choices": [
+    "-12",
+    "-8",
+    "0",
+    "8",
+    "12"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nLet the number be $n$. The first phrase is $7n - 4$; the second is $5(n - 4)$. Set them equal: $7n - 4 = 5n - 20$, so $2n = -16$ and $n = -8$.\n\n**Trigger cue**\n\n\"Decreased by\" attached to a multiplied quantity: the whole decreased quantity goes in parentheses before the multiplier acts.\n\n**Takeaway**\n\nParenthesize the quantity being multiplied before subtracting.",
+   "fastest_path_md": "Backsolve with the negatives first: $n = -8$ gives $7(-8) - 4 = -60$ and $5(-8 - 4) = -60$. Match.",
+   "trap_map": {
+    "0": "Translates the left side as $7n + 4$, flipping \"decreased by.\"",
+    "2": "Fails to distribute the $5$, solving $7n - 4 = 5n - 4$.",
+    "3": "Drops the sign in the final step, solving $2n = 16$.",
+    "4": "Distributes to $5n + 20$ instead of $5n - 20$."
+   },
+   "numeric_check": "(-20+4)/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "In a trivia contest, Mika and Jonas scored $96$ points combined, and Mika scored $14$ points more than Jonas. How many points did Jonas score?",
+   "choices": [
+    "34",
+    "41",
+    "48",
+    "55",
+    "62"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nLet Jonas's score be $j$; Mika's is $j + 14$. Then $j + (j + 14) = 96$, so $2j = 82$ and $j = 41$.\n\n**Trigger cue**\n\nA total together with a fixed gap between two people: one variable and one equation settle it.\n\n**Takeaway**\n\nSubtract the gap from the total, halve, then check who was asked.",
+   "fastest_path_md": "$(96 - 14) / 2 = 41$ is the smaller share — and Jonas is the lower scorer, so no further step is needed.",
+   "trap_map": {
+    "0": "Subtracts the $14$-point gap twice before halving.",
+    "2": "Halves the total and ignores the gap entirely.",
+    "3": "Reports Mika's score instead of Jonas's.",
+    "4": "Adds the gap to half the total, overshooting even Mika's score."
+   },
+   "numeric_check": "(96-14)/2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "What is the greatest integer $n$ such that four times $n$ decreased by $9$ is smaller than twice $n$ increased by $8$?",
+   "choices": [
+    "-1",
+    "2",
+    "7",
+    "8",
+    "9"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nTranslate: $4n - 9 < 2n + 8$. Subtract $2n$ and add $9$: $2n < 17$, so $n < 8.5$. The greatest integer below $8.5$ is $8$.\n\n**Trigger cue**\n\n\"Greatest integer such that\" plus an inequality: solve the inequality exactly, then step to the nearest allowed integer.\n\n**Takeaway**\n\nSolve to the exact boundary, then round toward the allowed side.",
+   "fastest_path_md": "$2n < 17$ in one move, so $n < 8.5$ — take $8$. A quick plug confirms: $4(8) - 9 = 23 < 24 = 2(8) + 8$.",
+   "trap_map": {
+    "0": "Adds $9$ instead of subtracting, reaching $2n < -1$.",
+    "1": "Adds $2n$ to the left instead of subtracting, reaching $6n < 17$.",
+    "2": "Backs off one extra integer below the true maximum of $8$.",
+    "4": "Rounds $8.5$ up instead of taking the greatest integer below it."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "At a fair, every ride ticket costs the same amount. If Priya buys $5$ tickets, she will have $\\$7$ left over; to buy $8$ tickets, she would need $\\$5$ more than she has. How much money does Priya have?",
+   "choices": [
+    "$\\$12$",
+    "$\\$20$",
+    "$\\$27$",
+    "$\\$32$",
+    "$\\$39$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLet $m$ be her money and $p$ the ticket price. Then $m = 5p + 7$ and $m = 8p - 5$. Setting the expressions equal: $5p + 7 = 8p - 5$, so $3p = 12$ and $p = 4$. Hence $m = 5(4) + 7 = 27$.\n\n**Trigger cue**\n\nA surplus under one purchase and a shortfall under another: both describe the same amount of money, so equate them.\n\n**Takeaway**\n\nSurplus plus shortfall equals the cost of the extra units.",
+   "fastest_path_md": "The jump from $5$ to $8$ tickets swings her from $\\$7$ over to $\\$5$ short — a $\\$12$ swing across $3$ tickets, so each costs $\\$4$. Money: $5(4) + 7 = \\$27$.",
+   "trap_map": {
+    "0": "Adds the leftover $\\$7$ to the shortfall $\\$5$ and stops at the cash swing.",
+    "1": "Reports the cost of $5$ tickets, dropping the $\\$7$ she keeps.",
+    "3": "Reports the cost of $8$ tickets, which is more money than she has.",
+    "4": "Adds the $\\$7$ leftover to the $8$-ticket cost."
+   },
+   "numeric_check": "5*4+7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "For numbers $a$, $b$, and $c$, the sum of $a$ and $b$ is $9$, the sum of $a$ and $c$ is $13$, and the sum of $b$ and $c$ is $16$. What is the value of $c$?",
+   "choices": [
+    "3",
+    "6",
+    "10",
+    "13",
+    "19"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nAdd all three equations: $(a+b) + (a+c) + (b+c) = 9 + 13 + 16 = 38$, so $2(a + b + c) = 38$ and $a + b + c = 19$. Subtract $a + b = 9$: $c = 19 - 9 = 10$.\n\n**Trigger cue**\n\nAll three pairwise sums given: add them — every variable appears exactly twice — instead of solving by substitution.\n\n**Takeaway**\n\nSumming pairwise sums counts each variable twice.",
+   "fastest_path_md": "$9 + 13 + 16 = 38$, halve to get the total $19$, subtract the pair that omits $c$: $19 - 9 = 10$.",
+   "trap_map": {
+    "0": "Reports $a$ instead of $c$.",
+    "1": "Reports $b$ instead of $c$.",
+    "3": "Repeats the given sum $a + c$ instead of isolating $c$.",
+    "4": "Stops at the total $a + b + c$."
+   },
+   "numeric_check": "(9+13+16)/2 - 9",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "A fitness studio charges a one-time enrollment fee plus the same rate for each month of membership. A membership costs $\\$205$ in total for the first $5$ months and $\\$355$ in total for the first $11$ months. What is the enrollment fee, in dollars?",
+   "choices": [
+    "25",
+    "41",
+    "55",
+    "80",
+    "150"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nLet $f$ be the fee and $m$ the monthly rate: $f + 5m = 205$ and $f + 11m = 355$. Subtracting, $6m = 150$, so $m = 25$. Then $f = 205 - 5(25) = 80$.\n\n**Trigger cue**\n\nA fixed charge plus a constant rate with two different totals: subtract the totals to isolate the rate first.\n\n**Takeaway**\n\nSubtracting two totals cancels the fee and exposes the rate.",
+   "fastest_path_md": "The extra $6$ months cost $355 - 205 = \\$150$, so the rate is $\\$25$ per month; the fee is $205 - 125 = \\$80$.",
+   "trap_map": {
+    "0": "Reports the monthly rate instead of the enrollment fee.",
+    "1": "Divides $\\$205$ by $5$, assuming there is no fee at all.",
+    "2": "Divides the $\\$150$ difference by $5$ months instead of $6$.",
+    "4": "Stops at the raw difference between the two totals."
+   },
+   "numeric_check": "205 - 5*(355-205)/6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "data_sufficiency",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "If $x$ and $y$ are positive integers, what is the value of $x$?\n\n(1) $x + 3y = 26$\n\n(2) $x > 3y$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\n(1): $x = 26 - 3y$ gives $x \\in \\{23, 20, 17, \\dots, 2\\}$ for $y = 1, \\dots, 8$ — insufficient. (2): an inequality alone fixes nothing — insufficient. Together: $26 - 3y > 3y$ forces $y \\le 4$, leaving $x \\in \\{14, 17, 20, 23\\}$ — still four values. Insufficient even combined.\n\n**Trigger cue**\n\nAn equation plus an inequality over positive integers: list the surviving solutions explicitly before judging sufficiency.\n\n**Takeaway**\n\nAn inequality narrows a solution list; it rarely collapses it to one.",
+   "fastest_path_md": "(1) leaves $8$ pairs. Adding (2): $26 - 3y > 3y$ means $y \\le 4$, so $x$ can still be $14$, $17$, $20$, or $23$ — pick E.",
+   "trap_map": {
+    "0": "Believes positivity makes $x + 3y = 26$ have a unique solution.",
+    "1": "Treats the inequality $x > 3y$ as if it pinned $x$ by itself.",
+    "2": "Assumes adding the inequality must narrow the list to a single pair; four pairs survive.",
+    "3": "Judges each statement sufficient after testing only one convenient pair."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "data_sufficiency",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "For numbers $a$ and $b$, is $a$ greater than $b$?\n\n(1) The sum of $a$ and twice $b$ is $30$.\n\n(2) The sum of $b$ and twice $a$ is $36$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n(1): $a + 2b = 30$ allows $(a, b) = (30, 0)$, a yes, and $(0, 15)$, a no — insufficient. (2): $2a + b = 36$ allows $(18, 0)$, a yes, and $(0, 36)$, a no — insufficient. Together: subtracting (1) from (2) gives $(2a + b) - (a + 2b) = 36 - 30$, so $a - b = 6 > 0$ — a definite yes. Sufficient combined.\n\n**Trigger cue**\n\nTwo mirrored linear equations and a comparison question: subtract them to read off $a - b$ directly.\n\n**Takeaway**\n\nSubtracting mirrored equations produces the difference immediately.",
+   "fastest_path_md": "Each equation alone bends both ways. Subtract the two: $a - b = 6$, so together they answer yes without ever solving for $a$ or $b$.",
+   "trap_map": {
+    "0": "Assumes $a + 2b = 30$ alone forces $a$ above $b$.",
+    "1": "Assumes $2a + b = 36$ alone forces $a$ above $b$.",
+    "3": "Grants each statement alone after testing only positive sample values.",
+    "4": "Solves for the pair, gets one point $(14, 8)$, and mistrusts a unique answer from combining."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "data_sufficiency",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "At a school store, pencils cost $40$ cents each and erasers cost $70$ cents each. Kavi bought at least one pencil, at least one eraser, and nothing else. Did Kavi buy more pencils than erasers?\n\n(1) Kavi spent $\\$4.10$ in total.\n\n(2) Kavi bought $8$ items in total.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n(1): in cents, $40p + 70e = 410$, i.e. $4p + 7e = 41$. Since $4p$ is even and $41$ is odd, $e$ must be odd, so $e \\in \\{1, 3, 5\\}$; only $e = 3$ leaves $41 - 21 = 20$ divisible by $4$, giving $p = 5$. The purchase is unique and $5 > 3$ — a definite yes. Sufficient. (2): $p + e = 8$ allows $(7, 1)$, a yes, and $(1, 7)$, a no — insufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA money total over integer item counts: run the parity-and-divisibility sieve before dismissing one equation in two unknowns.\n\n**Takeaway**\n\nInteger constraints can make a single equation sufficient.",
+   "fastest_path_md": "For (1), $4p + 7e = 41$ needs $e$ odd; test $e = 1, 3, 5$ — only $e = 3$, $p = 5$ works, so (1) answers yes by itself. (2) obviously splits both ways.",
+   "trap_map": {
+    "1": "Trusts the item count alone, though it says nothing about the split.",
+    "2": "Assumes one equation with two unknowns always needs the second statement; the cent equation has a single positive-integer solution.",
+    "3": "Grants statement (2) as well, though $(7,1)$ and $(1,7)$ answer differently.",
+    "4": "Dismisses statement (1) as one equation, two unknowns without testing integer solutions."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "data_sufficiency",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "What is the value of the integer $n$?\n\n(1) Three more than twice $n$ is greater than $15$ and less than $21$.\n\n(2) Four less than three times $n$ is greater than $19$ and less than $23$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n(1): $15 < 2n + 3 < 21$ gives $12 < 2n < 18$, so $6 < n < 9$ and $n \\in \\{7, 8\\}$ — insufficient. (2): $19 < 3n - 4 < 23$ gives $23 < 3n < 27$, so $\\frac{23}{3} < n < 9$; the only integer in that band is $n = 8$ — sufficient. Answer: statement (2) alone.\n\n**Trigger cue**\n\nA range statement about an integer: convert to explicit bounds and count the integers inside before judging.\n\n**Takeaway**\n\nA range is sufficient when exactly one integer fits inside.",
+   "fastest_path_md": "(1): $6 < n < 9$ holds two integers — out. (2): $23 < 3n < 27$ traps $n$ strictly between $7.67$ and $9$, so $n = 8$ — done, B.",
+   "trap_map": {
+    "0": "Overlooks that statement (1) leaves both $n = 7$ and $n = 8$.",
+    "2": "Assumes both ranges are needed when statement (2) already pins a single integer.",
+    "3": "Grants statement (1) as well, though it allows two values.",
+    "4": "Declares that ranges never determine a value; between $19$ and $23$, $3n - 4$ forces $n = 8$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 5,
+   "stem_md": "The positive integers $x$ and $y$ satisfy $5x + 3y = 71$ and $x > y$. What is the greatest possible value of $x - y$?",
+   "choices": [
+    "2",
+    "3",
+    "11",
+    "13",
+    "21"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFrom $3y = 71 - 5x$, the right side must be a positive multiple of $3$: $71 - 5x \\equiv 0 \\pmod 3$ reduces to $x \\equiv 1 \\pmod 3$. The positive solutions are $(x, y) = (1, 22), (4, 17), (7, 12), (10, 7), (13, 2)$. Only $(10, 7)$ and $(13, 2)$ satisfy $x > y$, and the differences are $3$ and $11$. The greatest is $11$.\n\n**Trigger cue**\n\nA linear equation over positive integers with an extremal question: the solution list is finite — write it out.\n\n**Takeaway**\n\nEnumerate every integer solution before optimizing anything.",
+   "fastest_path_md": "Maximize $x$: $5x < 71$ caps $x$ at $13$, and $x = 13$ gives $y = 2$ — a valid pair with $x > y$ — so the answer is $13 - 2 = 11$.",
+   "trap_map": {
+    "0": "Reports $y$ from the maximizing pair instead of $x - y$.",
+    "1": "Stops at the first pair with $x > y$, namely $(10, 7)$.",
+    "3": "Reports $x$ itself rather than the difference.",
+    "4": "Ignores $x > y$ and computes $y - x$ from $(1, 22)$."
+   },
+   "numeric_check": "13-2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "format": "problem_solving",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "How many integers $n$ satisfy all three of the following conditions: seven less than three times $n$ is positive, twice $n$ increased by $5$ is less than $39$, and $n$ differs from $10$ by more than $2$?",
+   "choices": [
+    "8",
+    "9",
+    "10",
+    "11",
+    "14"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nTranslate each clause: $3n - 7 > 0$ gives $n > \\frac{7}{3}$, so $n \\ge 3$; $2n + 5 < 39$ gives $n < 17$, so $n \\le 16$; $|n - 10| > 2$ gives $n < 8$ or $n > 12$. Intersect: $n \\in \\{3, 4, 5, 6, 7\\} \\cup \\{13, 14, 15, 16\\}$, which is $5 + 4 = 9$ integers.\n\n**Trigger cue**\n\n\"How many integers satisfy\" a list of verbal conditions: convert every clause to explicit bounds, then intersect and count.\n\n**Takeaway**\n\nTranslate every clause to bounds; count endpoints with care.",
+   "fastest_path_md": "The band $3$ through $16$ holds $14$ integers; \"differs from $10$ by more than $2$\" strikes out $8$ through $12$ — five of them — leaving $14 - 5 = 9$.",
+   "trap_map": {
+    "0": "Solves $2n + 5 < 39$ as $n < 16$, wrongly excluding $n = 16$.",
+    "2": "Allows $2n + 5 = 39$, wrongly including $n = 17$.",
+    "3": "Reads \"differs by more than $2$\" as \"by $2$ or more,\" keeping $n = 8$ and $n = 12$.",
+    "4": "Ignores the distance-from-$10$ condition altogether."
+   },
+   "numeric_check": "5+4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "If $a$ and $b$ are numbers such that $\\dfrac{a}{b} > 1$, which of the following must be true?",
+   "choices": [
+    "$a > b$",
+    "$a > 0$",
+    "$b > 0$",
+    "$a + b > 0$",
+    "$|a| > |b|$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nIf $b > 0$, multiplying $\\frac{a}{b} > 1$ by $b$ gives $a > b > 0$, so $|a| > |b|$. If $b < 0$, multiplying flips the inequality: $a < b < 0$, so again $|a| > |b|$. The pair $a = -3$, $b = -2$ satisfies $\\frac{a}{b} = \\frac{3}{2} > 1$ and defeats every other choice.\n\n**Trigger cue**\n\nA ratio compared with $1$: split on the sign of the denominator, or read $\\left|\\frac{a}{b}\\right| > 1$ directly as a magnitude fact.\n\n**Takeaway**\n\nA ratio exceeding $1$ compares magnitudes, not signed values.",
+   "fastest_path_md": "Test one negative pair: $a = -3$, $b = -2$ satisfies $\\frac{a}{b} > 1$ and kills every choice except $|a| > |b|$.",
+   "trap_map": {
+    "0": "Multiplies both sides by $b$ without checking that $b$ could be negative.",
+    "1": "Assumes a ratio greater than $1$ requires a positive numerator.",
+    "2": "Assumes a ratio greater than $1$ requires a positive denominator.",
+    "3": "Upgrades the same-sign fact to a positive sum, forgetting the both-negative case."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 2,
+   "stem_md": "If $ab = 0$ and $a \\ne 0$, which of the following must be true?",
+   "choices": [
+    "$a = 0$",
+    "$b = 0$",
+    "$a + b = 0$",
+    "$a > 0$",
+    "$a + b < 0$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nA product equals zero only when at least one factor equals zero. The stem rules out $a = 0$, so $b = 0$ is forced. With $b = 0$ the sum $a + b = a$ is nonzero, and $a$ itself may be positive or negative, so every other choice can fail.\n\n**Trigger cue**\n\n$ab = 0$ together with a nonzero fact: apply the zero-product property to the factor that is not excluded.\n\n**Takeaway**\n\nZero product means some factor is zero — the one not excluded.",
+   "fastest_path_md": "Zero product with $a \\ne 0$: the zero must be $b$. Testing $a = 1$ and $a = -1$ eliminates the sign choices instantly.",
+   "trap_map": {
+    "0": "Applies the zero-product property to $a$, the factor the stem already rules out.",
+    "2": "Believes the two factors must be opposites for the product to vanish.",
+    "3": "Assumes the nonzero factor $a$ must be positive.",
+    "4": "Assumes the nonzero factor $a$ must be negative, making the sum negative."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "If $0 < x < 1$, which of the following must be true?\n\nI. $x^2 < x$\n\nII. $2x > 1$\n\nIII. $\\dfrac{1}{x} > 1$",
+   "choices": [
+    "I only",
+    "II only",
+    "I and III only",
+    "II and III only",
+    "I, II, and III"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nMultiplying $x < 1$ by the positive number $x$ gives $x^2 < x$, so I holds. Dividing $1 > x$ by the positive number $x$ gives $\\frac{1}{x} > 1$, so III holds. II fails at $x = 0.3$, where $2x = 0.6 < 1$. The answer is I and III only.\n\n**Trigger cue**\n\nA variable confined to $(0,1)$: test one small fraction and one large fraction before trusting any statement.\n\n**Takeaway**\n\nProper fractions shrink when squared and exceed one when reciprocated.",
+   "fastest_path_md": "Try $x = 0.3$: I and III hold, II fails ($0.6 < 1$). Try $x = 0.9$: I and III still hold. Answer: I and III only.",
+   "trap_map": {
+    "0": "Rejects III by confusing $\\frac{1}{x} > 1$ with $x > 1$.",
+    "1": "Tests only a value above $\\frac{1}{2}$, where II happens to hold, and distrusts I and III.",
+    "3": "Believes squaring always increases a number, discarding I.",
+    "4": "Accepts II after testing a single value greater than $\\frac{1}{2}$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "If $x < y < 0$, which of the following must be true?",
+   "choices": [
+    "$x^2 < y^2$",
+    "$\\dfrac{1}{x} < \\dfrac{1}{y}$",
+    "$\\dfrac{1}{x} > \\dfrac{1}{y}$",
+    "$xy > 1$",
+    "$\\dfrac{x}{y} < 1$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nBoth numbers are negative, so $xy > 0$. Dividing $x < y$ by the positive quantity $xy$ preserves the order: $\\frac{x}{xy} < \\frac{y}{xy}$, that is, $\\frac{1}{y} < \\frac{1}{x}$. So $\\frac{1}{x} > \\frac{1}{y}$ always. The pair $(-2, -1)$ defeats choices A, B, and E, and the pair $\\left(-\\frac{1}{2}, -\\frac{1}{4}\\right)$ defeats $xy > 1$.\n\n**Trigger cue**\n\nAn ordered pair of same-sign numbers and reciprocal choices: reciprocation reverses order within a sign class.\n\n**Takeaway**\n\nFor same-sign numbers, taking reciprocals reverses the inequality.",
+   "fastest_path_md": "Plug $x = -2$, $y = -1$: only $\\frac{1}{x} > \\frac{1}{y}$ (that is, $-\\frac{1}{2} > -1$) survives among A, B, E; then $x = -\\frac{1}{2}$, $y = -\\frac{1}{4}$ kills $xy > 1$.",
+   "trap_map": {
+    "0": "Squares the inequality as though squaring preserves order for negatives.",
+    "1": "Takes reciprocals of both sides without reversing the inequality.",
+    "3": "Upgrades “negative times negative is positive” to “greater than $1$.”",
+    "4": "Divides $x < y$ by the negative number $y$ without flipping the sign."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "In a trivia match, Jae scored $j$ points and Kim scored $k$ points, where $j$ and $k$ are integers whose sum is odd. Which of the following must be true?",
+   "choices": [
+    "$jk$ is odd",
+    "$jk$ is even",
+    "$j - k$ is even",
+    "$j$ is odd",
+    "$j^2 + k^2$ is even"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nAn odd sum forces one of $j, k$ to be even and the other odd. An even factor makes the product $jk$ even. Which player holds the odd score is not fixed, so a choice naming $j$ can fail. The difference $j - k$ shares the parity of $j + k$, so it is odd, and $j^2 + k^2$ keeps exactly one odd square, so it is odd as well.\n\n**Trigger cue**\n\nA parity fact about a sum: translate it to “one even, one odd” and push that through products and squares.\n\n**Takeaway**\n\nAn odd sum means mixed parity, so the product is even.",
+   "fastest_path_md": "Odd sum = one even score, one odd score. Any even factor makes the product even — pick $jk$ even and move on.",
+   "trap_map": {
+    "0": "Matches an odd sum with an odd product.",
+    "2": "Expects the odd parts to cancel, though sum and difference always share parity.",
+    "3": "Pins the odd score on Jae when it could be Kim's.",
+    "4": "Believes squaring evens numbers out, though squares preserve parity."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "Is $x + y > 0$?\n\n(1) $x > |y|$\n\n(2) $x > 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n(1) gives $x > |y| \\ge -y$, so $x + y > 0$ for every allowed pair — sufficient. (2) allows $(x, y) = (1, 1)$ with a positive sum and $(1, -5)$ with a negative sum — not sufficient. Statement (1) alone answers the question.\n\n**Trigger cue**\n\nA variable dominating an absolute value: $x > |y|$ means $x$ outweighs $y$ whichever sign $y$ takes.\n\n**Takeaway**\n\n$x > |y|$ makes $x$ outweigh $y$ in any sum.",
+   "fastest_path_md": "(1): $x$ beats $|y|$, so the sum must be positive — sufficient. (2): compare $(1, 1)$ with $(1, -5)$ — insufficient. Answer: (1) alone.",
+   "trap_map": {
+    "1": "Credits $x > 0$ alone, forgetting a large negative $y$ can sink the sum.",
+    "2": "Combines out of caution, missing that $x > |y| \\ge -y$ already settles the question.",
+    "3": "Grants (2) sufficiency after testing only nonnegative values of $y$.",
+    "4": "Doubts (1) because $y$'s sign is unknown, though $|y|$ absorbs both signs."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "stem_md": "Is $a > 0$?\n\n(1) $a^2 = 4a$\n\n(2) $a \\ne 0$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n(1) rearranges to $a^2 - 4a = 0$, so $a(a - 4) = 0$ and $a = 0$ or $a = 4$. The question “is $a > 0$?” gets a no at $a = 0$ and a yes at $a = 4$ — not sufficient. (2) allows $a = 1$ and $a = -1$ — not sufficient. Together, $a \\ne 0$ removes the root $a = 0$, leaving $a = 4 > 0$ — sufficient.\n\n**Trigger cue**\n\nAn equation with the variable on both sides: factor it; never divide by the variable.\n\n**Takeaway**\n\nDividing by a variable silently discards its zero root.",
+   "fastest_path_md": "(1): $a \\in \\{0, 4\\}$ — one no, one yes. (2): clearly not alone. Together only $a = 4$ survives — both statements needed.",
+   "trap_map": {
+    "0": "Divides $a^2 = 4a$ by $a$, silently discarding the root $a = 0$.",
+    "1": "Reads $a \\ne 0$ as $a > 0$.",
+    "3": "Cancels $a$ in (1) and equates nonzero with positive in (2).",
+    "4": "Keeps both roots of (1) even after (2) eliminates $a = 0$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "stem_md": "If $x$, $y$, and $z$ are nonzero numbers such that $x y^2 z^3 > 0$, which of the following must be true?\n\nI. $xz > 0$\n\nII. $x z^2 > 0$\n\nIII. $\\dfrac{x}{z} > 0$",
+   "choices": [
+    "I only",
+    "II only",
+    "I and II only",
+    "I and III only",
+    "I, II, and III"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSince $y^2 > 0$, the condition reduces to $x z^3 > 0$, and because $z^3$ carries the sign of $z$, this says exactly that $x$ and $z$ share a sign. Hence $xz > 0$ (I) and $\\frac{x}{z} > 0$ (III) both hold. II asserts $x z^2 > 0$, which is just $x > 0$; the model $x = -1$, $y = 1$, $z = -1$ satisfies the condition and breaks II.\n\n**Trigger cue**\n\nThe sign of a monomial: even powers are invisible, odd powers carry the sign of their base.\n\n**Takeaway**\n\nStrip even powers; odd powers keep the base's sign.",
+   "fastest_path_md": "Drop the even powers $y^2$ and $z^2$: the condition is just $xz > 0$. I and III restate it; II claims $x > 0$, broken by $x = z = -1$, $y = 1$.",
+   "trap_map": {
+    "0": "Distrusts III though a quotient obeys the same sign rule as a product.",
+    "1": "Reads the positive product as forcing $x > 0$, ignoring that $z^3$ can be negative.",
+    "2": "Tests only positive $z$, which makes II look forced, while doubting the quotient in III.",
+    "4": "Accepts II after testing only positive values of $z$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "stem_md": "Is $z < 0$?\n\n(1) $z^3 < z$\n\n(2) $z^5 < z^3$",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\n(1) $z^3 < z \\iff z(z - 1)(z + 1) < 0 \\iff z < -1$ or $0 < z < 1$. (2) $z^5 < z^3 \\iff z^3(z^2 - 1) < 0$, which yields the identical set $z < -1$ or $0 < z < 1$. Each statement, and therefore the combination, still contains $z = -2$ (answer yes) and $z = \\frac{1}{2}$ (answer no) — not sufficient even together.\n\n**Trigger cue**\n\nPower inequalities: move everything to one side and sign-chart; different exponents can hide identical statements.\n\n**Takeaway**\n\nTwo statements with the same solution set add nothing together.",
+   "fastest_path_md": "Sign-chart both: each says exactly $z < -1$ or $0 < z < 1$ — identical information. Test $z = -2$ and $z = \\frac{1}{2}$: still both answers, so together insufficient.",
+   "trap_map": {
+    "0": "Solves (1) as only $z < -1$, dropping the $0 < z < 1$ branch.",
+    "1": "Solves (2) as only $z < -1$, dropping the $0 < z < 1$ branch.",
+    "2": "Assumes two different-looking inequalities must intersect to a set with a single sign.",
+    "3": "Cancels powers of $z$ in each statement, reducing both to $z < -1$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "stem_md": "Over three consecutive days, a food truck recorded daily profits of $p$, $q$, and $r$ dollars, where a negative value represents a loss. If $pqr < 0$ and $p + q + r > 0$, which of the following must be true?",
+   "choices": [
+    "$p < 0$",
+    "Exactly one of $p$, $q$, and $r$ is negative",
+    "Exactly two of $p$, $q$, and $r$ are negative",
+    "$p + q > 0$",
+    "$r > 0$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n$pqr < 0$ requires an odd number of negative factors: one or three (and no zeros). Three negatives would force $p + q + r < 0$, contradicting the positive total, so exactly one of the three values is negative. Which day it is stays free: $(-10, 2, 9)$ defeats $p + q > 0$, $(2, 9, -10)$ defeats $r > 0$, and $(2, -10, 9)$ shows the loss need not fall on day one, defeating $p < 0$.\n\n**Trigger cue**\n\nA sign condition on a product plus a sum condition: count negative factors by parity, then let the sum prune the count.\n\n**Takeaway**\n\nA negative product means an odd count of negative factors.",
+   "fastest_path_md": "Odd number of negatives (product $< 0$), but three negatives cannot sum to a positive — so exactly one negative. Shuffle $(-10, 2, 9)$ to kill every position-specific choice.",
+   "trap_map": {
+    "0": "Pins the loss on day one when the negative value could be any of the three.",
+    "2": "Pairs a negative product with two negative factors — an even count, which gives a positive product.",
+    "3": "Assumes any two days must net positive because the three-day total is positive.",
+    "4": "Pins the profit on day three; $(2, 9, -10)$ satisfies everything with $r < 0$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "stem_md": "If $|a| - a = |b| - b$ and $a \\ne b$, which of the following must be true?",
+   "choices": [
+    "$a > 0$",
+    "$ab > 0$",
+    "$|a| = |b|$",
+    "$a + b > 0$",
+    "$a - b > 0$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nLet $f(t) = |t| - t$. For $t \\ge 0$, $f(t) = 0$; for $t < 0$, $f(t) = -2t > 0$, and there $f$ is one-to-one. Two different inputs $a \\ne b$ can share an output only where $f$ is flat, so $f(a) = f(b) = 0$, forcing $a \\ge 0$ and $b \\ge 0$. Since $a \\ne b$, they are not both zero, hence $a + b > 0$. The pair $(a, b) = (0, 3)$ satisfies the condition and defeats each of the other four choices.\n\n**Trigger cue**\n\nExpressions of the form $|t| \\pm t$: they collapse to $0$ or $\\pm 2t$ depending on sign — split there.\n\n**Takeaway**\n\n$|t| - t$ vanishes on all nonnegatives; equal outputs need not mean equal inputs.",
+   "fastest_path_md": "$|t| - t$ is $0$ for $t \\ge 0$ and strictly positive (and one-to-one) for $t < 0$. Distinct inputs with equal outputs must sit on the flat part: $a, b \\ge 0$ and not both zero, so $a + b > 0$.",
+   "trap_map": {
+    "0": "Forgets that $a = 0$ satisfies $|a| - a = 0$ and is allowed.",
+    "1": "Misses the $a = 0$ case, which makes the product zero rather than positive.",
+    "2": "Treats $|t| - t$ as one-to-one, though it is $0$ for every nonnegative input.",
+    "4": "Reads $a \\ne b$ as $a > b$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "stem_md": "If $x^2 < x + 6$, which of the following must be true?",
+   "choices": [
+    "$x > 0$",
+    "$x < 2$",
+    "$0 < x < 3$",
+    "$x^2 < 4$",
+    "$|x| < 3$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\n$x^2 - x - 6 < 0$ factors as $(x - 3)(x + 2) < 0$, so $-2 < x < 3$. A must-be-true choice has to contain this entire interval. $|x| < 3$ describes $(-3, 3)$, which contains $(-2, 3)$. Each other choice omits part of the interval: $x = -1$ breaks $x > 0$ and $0 < x < 3$, while $x = 2.5$ breaks $x < 2$ and $x^2 < 4$.\n\n**Trigger cue**\n\n“Must be true” after a solvable inequality: solve it first, then pick the choice that is a superset of the solution set, never a subset.\n\n**Takeaway**\n\nMust-be-true answers contain the solution set; they never trim it.",
+   "fastest_path_md": "Solve: $(x - 3)(x + 2) < 0$ gives $-2 < x < 3$. The only choice containing that whole interval is $|x| < 3$.",
+   "trap_map": {
+    "0": "Drops the negative part $-2 < x < 0$ of the solution set.",
+    "1": "Mis-factors $x^2 - x - 6$ as $(x - 2)(x + 3)$, moving the boundary to $2$.",
+    "2": "Keeps only the positive portion of the interval $-2 < x < 3$.",
+    "3": "Builds a symmetric bound from the nearer endpoint $-2$, trimming the set."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "stem_md": "A coffee shop receives a delivery of beans every $6$ days and a delivery of pastry boxes every $15$ days. Both deliveries arrived this morning. In how many days will the shop next receive both deliveries on the same day?",
+   "choices": [
+    "$21$",
+    "$30$",
+    "$45$",
+    "$60$",
+    "$90$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe deliveries coincide again after a number of days that both cycle lengths divide — the least common multiple. $6 = 2 \\cdot 3$ and $15 = 3 \\cdot 5$, so $\\mathrm{lcm}(6, 15) = 2 \\cdot 3 \\cdot 5 = 30$.\n\n**Trigger cue**\n\nTwo repeating cycles start together and must coincide again — reach for the lcm of the periods.\n\n**Takeaway**\n\nCycles that start together realign at the lcm.",
+   "fastest_path_md": "Walk multiples of the longer cycle: $15$, $30$. The first one divisible by $6$ is $30$.",
+   "trap_map": {
+    "0": "Adds the two cycle lengths ($6 + 15$) instead of finding a common multiple.",
+    "2": "Picks a multiple of $15$ without checking that it is also a multiple of $6$.",
+    "3": "Finds a common multiple of the two cycles but not the least one.",
+    "4": "Multiplies the cycle lengths, ignoring their shared factor of $3$."
+   },
+   "numeric_check": "30",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "stem_md": "What is the least common multiple of $24$ and $90$?",
+   "choices": [
+    "$6$",
+    "$114$",
+    "$180$",
+    "$360$",
+    "$720$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFactor: $24 = 2^3 \\cdot 3$ and $90 = 2 \\cdot 3^2 \\cdot 5$. The lcm takes the larger power of each prime: $2^3 \\cdot 3^2 \\cdot 5 = 8 \\cdot 9 \\cdot 5 = 360$.\n\n**Trigger cue**\n\nAn lcm of two concrete numbers: factor both, take maximum exponents.\n\n**Takeaway**\n\nThe lcm takes each prime at its larger exponent.",
+   "fastest_path_md": "Scan multiples of $90$: $90$, $180$, $270$, $360$. Only $360 = 24 \\cdot 15$ is divisible by $24$.",
+   "trap_map": {
+    "0": "Computes the greatest common factor instead of the least common multiple.",
+    "1": "Adds the two numbers instead of taking the lcm.",
+    "2": "Drops one factor of $2$, treating $24$ as $2^2 \\cdot 3$.",
+    "4": "Divides the product $24 \\cdot 90$ by $3$ instead of by the gcd $6$."
+   },
+   "numeric_check": "360",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 3,
+   "stem_md": "How many positive integers $n$ satisfy $\\mathrm{lcm}(12, n) = 60$?",
+   "choices": [
+    "$3$",
+    "$4$",
+    "$5$",
+    "$6$",
+    "$12$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSince the lcm is $60$, $n$ must divide $60 = 2^2 \\cdot 3 \\cdot 5$. Also $12 = 2^2 \\cdot 3$ already supplies $2^2$ and $3$ but no $5$, so $n$ must supply the factor $5$. Thus $n = 2^a \\cdot 3^b \\cdot 5$ with $a \\in \\{0,1,2\\}$ and $b \\in \\{0,1\\}$: the values $5, 10, 15, 20, 30, 60$ — six in all.\n\n**Trigger cue**\n\nCounting $n$ with a fixed lcm: $n$ divides the lcm and must cover the primes the partner lacks.\n\n**Takeaway**\n\n$n$ divides the lcm and supplies the missing primes.",
+   "fastest_path_md": "$n$ must divide $60$ and carry the $5$ that $12$ lacks: the multiples of $5$ among divisors of $60$ are $5, 10, 15, 20, 30, 60$ — count $6$.",
+   "trap_map": {
+    "0": "Counts only the multiples of $15$ that divide $60$, namely $15$, $30$, $60$.",
+    "1": "Assumes $n$ must be even, dropping $n = 5$ and $n = 15$.",
+    "2": "Excludes $n = 60$ on the false belief that $n$ must be smaller than the lcm.",
+    "4": "Counts every divisor of $60$ without enforcing $\\mathrm{lcm}(12, n) = 60$."
+   },
+   "numeric_check": "6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "If $n$ is a positive integer such that $\\gcd(n, 40) = 8$ and $\\gcd(n, 36) = 12$, what is the smallest possible value of $n$?",
+   "choices": [
+    "$8$",
+    "$12$",
+    "$24$",
+    "$48$",
+    "$120$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$40 = 2^3 \\cdot 5$, so $\\gcd(n, 40) = 8$ forces $2^3 \\mid n$ and $5 \\nmid n$. $36 = 2^2 \\cdot 3^2$, so $\\gcd(n, 36) = 12 = 2^2 \\cdot 3$ forces $3 \\mid n$ but $9 \\nmid n$ (the $2^2$ demand is already met). The smallest positive integer with $2^3$, exactly one $3$, and no $5$ is $2^3 \\cdot 3 = 24$. Verify: $\\gcd(24, 40) = 8$ and $\\gcd(24, 36) = 12$.\n\n**Trigger cue**\n\nSeveral gcd conditions on one unknown: translate each into forced prime powers and forbidden primes.\n\n**Takeaway**\n\nEach exact gcd forces some primes and forbids others.",
+   "fastest_path_md": "Both gcds must divide $n$, so $\\mathrm{lcm}(8, 12) = 24$ divides $n$. Test $24$: $\\gcd(24, 40) = 8$ and $\\gcd(24, 36) = 12$ — it already works.",
+   "trap_map": {
+    "0": "Reports the first gcd itself instead of building $n$ from both conditions.",
+    "1": "Reports the second gcd, ignoring the requirement $2^3 \\mid n$.",
+    "3": "Uses $2^4 \\cdot 3$, wrongly requiring $n$'s power of $2$ to exceed that of $40$.",
+    "4": "Includes a factor of $5$ (giving $24 \\cdot 5$), though $\\gcd(n, 40) = 8$ forbids it."
+   },
+   "numeric_check": "24",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "If $n$ is a positive integer, is $n$ divisible by $15$?\n\n(1) The least common multiple of $n$ and $10$ is $30$.\n\n(2) The greatest common divisor of $n$ and $9$ is $3$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\n(1) $\\mathrm{lcm}(n, 10) = 30$ forces $n \\mid 30$ and $n$ to supply the factor $3$ that $10$ lacks: $n \\in \\{3, 6, 15, 30\\}$. Here $n = 3$ answers no while $n = 15$ answers yes — insufficient. (2) $\\gcd(n, 9) = 3$ says $n$ is a multiple of $3$ but not of $9$: $n = 3$ gives no, $n = 15$ gives yes — insufficient. Combined: every candidate in $\\{3, 6, 15, 30\\}$ is already a multiple of $3$ and none is a multiple of $9$, so statement (2) eliminates nothing; $n = 3$ (no) and $n = 15$ (yes) both survive. Together the statements are still insufficient.\n\n**Trigger cue**\n\nBefore combining, test whether one statement's candidate list already satisfies the other statement.\n\n**Takeaway**\n\nCombining adds nothing when one statement implies the other.",
+   "fastest_path_md": "(1) gives $n \\in \\{3, 6, 15, 30\\}$ — mixed yes/no. Each of these already has $\\gcd(n, 9) = 3$, so (2) removes no candidates. Still mixed: choose (E).",
+   "trap_map": {
+    "0": "Trusts (1) after testing only $n = 15$ and $n = 30$, missing $n = 3$ and $n = 6$.",
+    "1": "Reads $\\gcd(n, 9) = 3$ as forcing $n = 3$, which would give a definite no.",
+    "2": "When combining, discards $n = 3$ and $n = 6$ on the false idea that $\\gcd(n, 9) = 3$ requires $n > 9$.",
+    "3": "Treats each statement as pinning $n$ to a single value."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "Two gears are meshed so that their teeth interlock: the smaller gear has $42$ teeth and the larger gear has $54$ teeth. A technician paints the two teeth that are currently touching, one on each gear. How many complete revolutions will the smaller gear make before the two painted teeth first touch each other again?",
+   "choices": [
+    "$6$",
+    "$7$",
+    "$9$",
+    "$54$",
+    "$378$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nEach meshing step advances both gears by one tooth, so after $T$ tooth engagements the painted teeth meet again exactly when $42 \\mid T$ and $54 \\mid T$. The first such $T$ is $\\mathrm{lcm}(42, 54)$: $42 = 2 \\cdot 3 \\cdot 7$ and $54 = 2 \\cdot 3^3$, so $T = 2 \\cdot 3^3 \\cdot 7 = 378$. The smaller gear turns $378 / 42 = 9$ complete revolutions.\n\n**Trigger cue**\n\nMeshed gears or rotating cycles returning to a starting alignment: lcm of the counts, then convert to revolutions.\n\n**Takeaway**\n\nAlign at the lcm, then divide by teeth per revolution.",
+   "fastest_path_md": "$\\mathrm{lcm}(42, 54) = 378$ engagements; the smaller gear makes $378 / 42 = 9$ turns.",
+   "trap_map": {
+    "0": "Computes the gcd of the tooth counts instead of working from the lcm.",
+    "1": "Counts revolutions of the $54$-tooth gear ($378/54$) rather than the smaller gear.",
+    "3": "Reports the larger gear's tooth count, confusing teeth with turns.",
+    "4": "Stops at the lcm — total tooth engagements, not revolutions."
+   },
+   "numeric_check": "378/42",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "data_sufficiency",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "If $m$ and $n$ are positive integers, what is the value of $\\gcd(m, n)$?\n\n(1) $m = n + 6$\n\n(2) Both $m$ and $n$ are multiples of $6$.",
+   "choices": [
+    "Statement (1) alone is sufficient, but statement (2) alone is not.",
+    "Statement (2) alone is sufficient, but statement (1) alone is not.",
+    "Both statements together are sufficient, but neither alone is.",
+    "Each statement alone is sufficient.",
+    "Statements (1) and (2) together are not sufficient."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n(1) $\\gcd(m, n) = \\gcd(n + 6, n) = \\gcd(6, n)$, which can be $1$, $2$, $3$, or $6$ depending on $n$ — insufficient. (2) A common divisor of two multiples of $6$ is at least $6$, but $m = 6, n = 12$ gives $\\gcd = 6$ while $m = 12, n = 24$ gives $\\gcd = 12$ — insufficient. Combined: by (1) the gcd divides $m - n = 6$, and by (2) it is a multiple of $6$; the only positive integer that both divides $6$ and is a multiple of $6$ is $6$ itself — sufficient.\n\n**Trigger cue**\n\nA fixed difference between two integers caps their gcd: any common divisor must divide the difference.\n\n**Takeaway**\n\nThe gcd of two integers divides their difference.",
+   "fastest_path_md": "From (1) the gcd divides $6$; from (2) it is a multiple of $6$; together it must equal $6$. Alone, (1) allows $1, 2, 3, 6$ and (2) allows $6, 12, \\dots$",
+   "trap_map": {
+    "0": "Jumps from $m - n = 6$ straight to $\\gcd = 6$, though $\\gcd(6, n)$ can be $1$, $2$, or $3$.",
+    "1": "Assumes two multiples of $6$ must have gcd exactly $6$, missing $m = 12$, $n = 24$.",
+    "3": "Makes both errors above and grants each statement alone.",
+    "4": "Never intersects \"the gcd divides $6$\" with \"$6$ divides the gcd\"."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "stem_md": "How many positive integers $n \\le 1000$ satisfy $\\gcd(n, 60) = 12$?",
+   "choices": [
+    "$16$",
+    "$63$",
+    "$66$",
+    "$67$",
+    "$83$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\n$\\gcd(n, 60) = 12$ requires $12 \\mid n$, so write $n = 12k$ with $1 \\le k \\le 83$ (since $12 \\cdot 83 = 996$). Because $60 = 12 \\cdot 5$, $\\gcd(12k, 60) = 12 \\cdot \\gcd(k, 5)$, so the condition is exactly $5 \\nmid k$. Among $k = 1, \\dots, 83$ there are $\\lfloor 83/5 \\rfloor = 16$ multiples of $5$, leaving $83 - 16 = 67$.\n\n**Trigger cue**\n\n\"$\\gcd(n, m)$ equals exactly $d$\": substitute $n = dk$ and demand $k$ coprime to $m/d$.\n\n**Takeaway**\n\nFactor out the gcd; the cofactor must be coprime.",
+   "fastest_path_md": "Multiples of $12$ up to $1000$: $83$. The gcd jumps to $60$ exactly for multiples of $60$: $16$ of them. $83 - 16 = 67$.",
+   "trap_map": {
+    "0": "Counts the $n$ with $\\gcd(n, 60) = 60$ — the multiples of $60$ — instead.",
+    "1": "Removes the $20$ multiples of $5$ up to $100$ instead of the multiples of $60$ up to $1000$.",
+    "2": "Rounds $1000/60$ up to $17$ when subtracting.",
+    "4": "Counts every multiple of $12$, forgetting the gcd must equal exactly $12$."
+   },
+   "numeric_check": "floor(1000/12) - floor(1000/60)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "How many positive integers are divisors of both $540$ and $360$?",
+   "choices": [
+    "$6$",
+    "$9$",
+    "$12$",
+    "$18$",
+    "$24$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe common divisors of two integers are exactly the divisors of their gcd. $540 = 2^2 \\cdot 3^3 \\cdot 5$ and $360 = 2^3 \\cdot 3^2 \\cdot 5$, so $\\gcd = 2^2 \\cdot 3^2 \\cdot 5 = 180$. The number of divisors of $180$ is $(2+1)(2+1)(1+1) = 18$.\n\n**Trigger cue**\n\n\"Divisors of both\" — never list; count the divisors of the gcd.\n\n**Takeaway**\n\nCommon divisors are precisely the divisors of the gcd.",
+   "fastest_path_md": "$\\gcd(540, 360) = 180 = 2^2 \\cdot 3^2 \\cdot 5$, so the count is $3 \\cdot 3 \\cdot 2 = 18$.",
+   "trap_map": {
+    "0": "Miscomputes the gcd as $12$ and counts its $6$ divisors.",
+    "1": "Drops the shared prime $5$ and counts only the $9$ divisors of $36$.",
+    "2": "Carries only one factor of $3$ into the gcd, counting the $12$ divisors of $60$.",
+    "4": "Counts the divisors of $540$ (or of $360$) itself rather than of the gcd."
+   },
+   "numeric_check": "(2+1)*(2+1)*(1+1)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "What is the smallest positive integer that is divisible by every integer from $2$ through $10$ except $7$?",
+   "choices": [
+    "$120$",
+    "$180$",
+    "$360$",
+    "$720$",
+    "$2520$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe answer is $\\mathrm{lcm}(2, 3, 4, 5, 6, 8, 9, 10)$. Collect the highest prime power in the list: $2^3$ (from $8$), $3^2$ (from $9$), and $5$ (from $5$ or $10$). So the lcm is $8 \\cdot 9 \\cdot 5 = 360$; divisibility by $2, 3, 4, 6, 10$ then follows automatically.\n\n**Trigger cue**\n\n\"Divisible by each number in a list\": build the lcm from the highest power of each prime present.\n\n**Takeaway**\n\nOnly the highest power of each prime matters.",
+   "fastest_path_md": "Only $8$, $9$, and $5$ constrain anything: $8 \\cdot 9 \\cdot 5 = 360$, and every other listed number divides it.",
+   "trap_map": {
+    "0": "Omits $9$, capping the power of $3$ at $3^1$.",
+    "1": "Omits $8$, capping the power of $2$ at $2^2$.",
+    "3": "Multiplies $8 \\cdot 9 \\cdot 10$, producing a common multiple that is not least.",
+    "4": "Includes $7$, computing the lcm of all integers from $2$ through $10$."
+   },
+   "numeric_check": "360",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
