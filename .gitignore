@@ -6,8 +6,9 @@ node_modules/
 out/
 next-env.d.ts
 
-# local data (SQLite db, scratch-work images)
+# local data (SQLite db, scratch-work images) and backups of it
 data/
+backups/
 
 # env
 .env

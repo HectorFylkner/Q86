@@ -243,6 +243,16 @@ async function main() {
     return;
   }
 
+  console.warn(
+    [
+      "⚠ --api generates questions gated only by an LLM cross-solve plus a",
+      "  numeric spot-check. A brute-force audit of a previous API run found",
+      "  22 of 43 generated questions mathematically defective despite that",
+      "  gate. Prefer the committed bank; if you generate, re-verify every",
+      "  new question with a programmatic check (see scripts/author/).",
+    ].join("\n"),
+  );
+
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error(
       "ANTHROPIC_API_KEY is not set. Add it to .env.local, then rerun pnpm seed.",

@@ -47,8 +47,24 @@ cp .env.example .env.local     # then add your ANTHROPIC_API_KEY
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution, `--api` regenerates via the AI pipeline) |
+| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
+| `pnpm backup` | Snapshot `./data` (history, ELO, scratch photos) into `./backups`, safe while the app runs |
 
 Everything lives in `./data` (SQLite database, scratch-work images) —
-gitignored, no accounts, no cloud.
+gitignored, no accounts, no cloud. `pnpm backup` snapshots it.
+
+## Extending the question bank
+
+New questions enter `scripts/seed-bank.json` only through the authoring
+gate in `scripts/author/harness.mjs`: each item carries a `check()` that
+recomputes the answer from the stem's raw data by brute force, and the
+item is rejected unless the check agrees with the keyed choice. Start
+from `scripts/author/example-batch.mjs`. After appending, run
+`node scripts/verify-bank.ts` (structural re-verification of the whole
+bank) and `pnpm seed` (loads new items, retires removed ones).
+
+Avoid `pnpm seed --api` (LLM generation): its verification is an LLM
+cross-solve plus numeric spot-check, and a brute-force audit found that
+gate had passed 22 defective questions out of 43. If you do generate,
+re-verify every new question through the authoring gate.

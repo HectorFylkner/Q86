@@ -13,7 +13,8 @@
     "start": "next start",
     "lint": "eslint .",
     "db:push": "node -e \"require('fs').mkdirSync('data/scratch',{recursive:true})\" && drizzle-kit push",
-    "seed": "node scripts/seed.ts"
+    "seed": "node scripts/seed.ts",
+    "backup": "node scripts/backup.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",
