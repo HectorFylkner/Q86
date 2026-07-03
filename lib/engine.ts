@@ -39,8 +39,8 @@ function whereFromFilter(filter: QuestionFilter): SQL | undefined {
   return and(...conds);
 }
 
-export function countQuestions(filter: QuestionFilter): number {
-  const row = db
+export async function countQuestions(filter: QuestionFilter): Promise<number> {
+  const row = await db
     .select({ n: count() })
     .from(questions)
     .where(whereFromFilter(filter))
@@ -53,20 +53,17 @@ export function countQuestions(filter: QuestionFilter): number {
  * gate. Questions already answered correctly twice or more are
  * deprioritized (weight 0.15 vs 1).
  */
-export function selectQuestions(
+export async function selectQuestions(
   filter: QuestionFilter,
   count: number,
-): Question[] {
+): Promise<Question[]> {
   const excluded = new Set(filter.excludeIds ?? []);
-  const candidates = db
-    .select()
-    .from(questions)
-    .where(whereFromFilter(filter))
-    .all()
-    .filter((q) => !excluded.has(q.id));
+  const candidates = (
+    await db.select().from(questions).where(whereFromFilter(filter)).all()
+  ).filter((q) => !excluded.has(q.id));
   if (candidates.length === 0) return [];
 
-  const correctRows = db
+  const correctRows = await db
     .select({ questionId: attempts.questionId })
     .from(attempts)
     .where(
@@ -112,10 +109,10 @@ export function selectQuestions(
  * blend across all four skills; mini (7) proportionally. Shortfalls in one
  * skill are backfilled from the whole pool.
  */
-export function selectTimedSet(
+export async function selectTimedSet(
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
-): Question[] {
+): Promise<Question[]> {
   if (singleSkill) {
     return selectQuestions({ skills: [singleSkill] }, total);
   }
@@ -137,15 +134,18 @@ export function selectTimedSet(
   const picked: Question[] = [];
   for (const [skill, n] of blend) {
     picked.push(
-      ...selectQuestions(
+      ...(await selectQuestions(
         { skills: [skill], excludeIds: picked.map((q) => q.id) },
         n,
-      ),
+      )),
     );
   }
   if (picked.length < total) {
     picked.push(
-      ...selectQuestions({ excludeIds: picked.map((q) => q.id) }, total - picked.length),
+      ...(await selectQuestions(
+        { excludeIds: picked.map((q) => q.id) },
+        total - picked.length,
+      )),
     );
   }
   // Shuffle so skills are interleaved.

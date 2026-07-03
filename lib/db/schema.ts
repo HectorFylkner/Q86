@@ -91,7 +91,9 @@ export const attempts = sqliteTable(
     confidence: text("confidence").$type<Confidence>().notNull(),
     errorType: text("error_type").$type<ErrorType>(),
     errorSubtag: text("error_subtag").$type<Subtopic>(),
-    // JSON array of up to 3 relative paths under ./data/scratch/.
+    // JSON array of up to 3 scratch-work images stored as data URLs
+    // (kept in the DB so serverless hosts work; legacy rows may hold
+    // relative file paths from the era of on-disk storage).
     scratchImagePath: text("scratch_image_path"),
     aiFeedbackMd: text("ai_feedback_md"),
     userNotes: text("user_notes"),

@@ -17,9 +17,9 @@ function resolveBaseURL(): string | undefined {
 const anthropic = createAnthropic({ baseURL: resolveBaseURL() });
 
 /** settings.model override → ANTHROPIC_MODEL env → default. */
-export function getModelId(): string {
+export async function getModelId(): Promise<string> {
   try {
-    const row = db
+    const row = await db
       .select()
       .from(settings)
       .where(eq(settings.key, "model"))
@@ -31,8 +31,8 @@ export function getModelId(): string {
   return process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
 }
 
-export function getModel() {
-  return anthropic(getModelId());
+export async function getModel() {
+  return anthropic(await getModelId());
 }
 
 /** Deterministic failures that a retry cannot fix (bad key, bad request). */

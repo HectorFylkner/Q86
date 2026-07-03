@@ -87,9 +87,9 @@ export async function verifyCandidate(
   },
   model?: LanguageModel,
 ): Promise<VerificationOutcome> {
-  const { object } = await withRetry(() =>
+  const { object } = await withRetry(async () =>
     generateObject({
-      model: model ?? getModel(),
+      model: model ?? (await getModel()),
       temperature: 0,
       schema: verifierResultSchema,
       system: verifierSystem(),

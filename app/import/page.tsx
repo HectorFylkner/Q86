@@ -8,8 +8,8 @@ import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default function ImportPage() {
-  const reports = db
+export default async function ImportPage() {
+  const reports = await db
     .select()
     .from(baselineReports)
     .orderBy(desc(baselineReports.createdAt))

@@ -4,8 +4,8 @@ import { gatherAnalytics } from "@/lib/analytics";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default function AnalyticsPage() {
-  const data = gatherAnalytics();
+export default async function AnalyticsPage() {
+  const data = await gatherAnalytics();
 
   return (
     <div className="space-y-4">

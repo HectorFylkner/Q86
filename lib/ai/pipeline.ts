@@ -85,8 +85,11 @@ export async function createVerifiedQuestion(
   let twinSource: Question | null = null;
   if (opts.twinOf != null) {
     twinSource =
-      db.select().from(questions).where(eq(questions.id, opts.twinOf)).get() ??
-      null;
+      (await db
+        .select()
+        .from(questions)
+        .where(eq(questions.id, opts.twinOf))
+        .get()) ?? null;
     if (!twinSource) {
       return {
         ok: false,
@@ -105,9 +108,9 @@ export async function createVerifiedQuestion(
         })
       : generatorUser(spec);
 
-    const { object: raw } = await withRetry(() =>
+    const { object: raw } = await withRetry(async () =>
       generateObject({
-        model: model ?? getModel(),
+        model: model ?? (await getModel()),
         temperature: GENERATOR_TEMPERATURE,
         schema: generatedQuestionSchema,
         messages: [
@@ -147,7 +150,7 @@ export async function createVerifiedQuestion(
       continue;
     }
 
-    const question = db
+    const question = await db
       .insert(questions)
       .values({
         source: opts.source,

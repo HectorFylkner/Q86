@@ -13,33 +13,41 @@ export const SETTING_KEYS = [
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
-export function getSetting(key: SettingKey): string | null {
-  const row = db.select().from(settings).where(eq(settings.key, key)).get();
+export async function getSetting(key: SettingKey): Promise<string | null> {
+  const row = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, key))
+    .get();
   return row?.value ?? null;
 }
 
-export function putSetting(key: SettingKey, value: string): void {
-  db.insert(settings)
+export async function putSetting(key: SettingKey, value: string): Promise<void> {
+  await db
+    .insert(settings)
     .values({ key, value })
     .onConflictDoUpdate({ target: settings.key, set: { value } })
     .run();
 }
 
-export function getLatestBaseline(): BaselineReport | null {
+export async function getLatestBaseline(): Promise<BaselineReport | null> {
   return (
-    db
+    (await db
       .select()
       .from(baselineReports)
       .orderBy(desc(baselineReports.createdAt))
       .limit(1)
-      .get() ?? null
+      .get()) ?? null
   );
 }
 
 /** Weakness 0..1 per skill from the latest imported report's fundamental
  *  skill percentiles; null when nothing imported. */
-export function baselineWeakness(): Record<FundamentalSkill, number> | null {
-  const report = getLatestBaseline();
+export async function baselineWeakness(): Promise<Record<
+  FundamentalSkill,
+  number
+> | null> {
+  const report = await getLatestBaseline();
   if (!report) return null;
   const parsed = report.parsed as {
     fundamental_skills?: Array<{ skill: string; percentile: number }>;
@@ -55,10 +63,10 @@ export function baselineWeakness(): Record<FundamentalSkill, number> | null {
   return out;
 }
 
-export function weightOverrides(): Partial<
+export async function weightOverrides(): Promise<Partial<
   Record<FundamentalSkill, number>
-> | null {
-  const raw = getSetting("weight_overrides");
+> | null> {
+  const raw = await getSetting("weight_overrides");
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as Record<string, number>;

@@ -14,7 +14,7 @@ export default async function QueuePage({
   const { start } = await searchParams;
   const now = new Date();
 
-  const due = db
+  const due = (await db
     .select({
       id: redoQueue.id,
       questionId: redoQueue.questionId,
@@ -28,9 +28,9 @@ export default async function QueuePage({
     .innerJoin(questions, eq(redoQueue.questionId, questions.id))
     .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, now)))
     .orderBy(redoQueue.dueAt)
-    .all() as DueRow[];
+    .all()) as DueRow[];
 
-  const upcoming = db
+  const upcoming = (await db
     .select({
       id: redoQueue.id,
       questionId: redoQueue.questionId,
@@ -45,9 +45,9 @@ export default async function QueuePage({
     .where(and(eq(redoQueue.cleared, false), gt(redoQueue.dueAt, now)))
     .orderBy(redoQueue.dueAt)
     .limit(30)
-    .all() as DueRow[];
+    .all()) as DueRow[];
 
-  const log = db
+  const log = (await db
     .select({
       id: attempts.id,
       createdAt: attempts.createdAt,
@@ -68,7 +68,7 @@ export default async function QueuePage({
     .innerJoin(questions, eq(attempts.questionId, questions.id))
     .orderBy(desc(attempts.id))
     .limit(500)
-    .all() as LogRow[];
+    .all()) as LogRow[];
 
   return (
     <div className="space-y-4">

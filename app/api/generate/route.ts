@@ -21,7 +21,8 @@ import {
 } from "@/lib/taxonomy";
 
 export const runtime = "nodejs";
-export const maxDuration = 600;
+// Vercel Hobby (fluid compute) caps at 300s; a 10-question batch fits.
+export const maxDuration = 300;
 
 const requestSchema = z.object({
   count: z.number().int().min(1).max(15).optional(),
@@ -137,7 +138,7 @@ export async function POST(request: Request) {
   let twinOf: number | undefined;
 
   if (body.twinOf != null) {
-    const sourceQuestion = db
+    const sourceQuestion = await db
       .select()
       .from(questions)
       .where(eq(questions.id, body.twinOf))

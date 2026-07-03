@@ -50,7 +50,7 @@ export async function startDrill(config: {
   timing: DrillTiming;
   focus?: SessionFocus;
 }): Promise<StartDrillResult> {
-  const picked = selectQuestions(config.filter, config.count);
+  const picked = await selectQuestions(config.filter, config.count);
   if (picked.length === 0) {
     return {
       error:
@@ -59,7 +59,7 @@ export async function startDrill(config: {
       questions: [],
     };
   }
-  const session = db
+  const session = await db
     .insert(sessions)
     .values({
       mode: "drill",
@@ -76,7 +76,7 @@ export async function startRedoSession(
   if (questionIds.length === 0) {
     return { error: "Nothing due to redo.", sessionId: null, questions: [] };
   }
-  const rows = db
+  const rows = await db
     .select()
     .from(questions)
     .where(
@@ -87,7 +87,7 @@ export async function startRedoSession(
   const ordered = questionIds
     .map((id) => byId.get(id))
     .filter((q): q is Question => Boolean(q));
-  const session = db
+  const session = await db
     .insert(sessions)
     .values({ mode: "redo", config: { questionIds } })
     .returning()
@@ -103,7 +103,7 @@ export async function startDrillWithQuestions(
   if (questionIds.length === 0) {
     return { error: "No questions to drill.", sessionId: null, questions: [] };
   }
-  const rows = db
+  const rows = await db
     .select()
     .from(questions)
     .where(
@@ -121,7 +121,7 @@ export async function startDrillWithQuestions(
       questions: [],
     };
   }
-  const session = db
+  const session = await db
     .insert(sessions)
     .values({ mode: "drill", config: { questionIds } })
     .returning()
@@ -138,7 +138,7 @@ export async function logAttempt(input: {
   confidence: Confidence;
   focus?: SessionFocus;
 }): Promise<{ attemptId: number; correct: boolean }> {
-  const q = db
+  const q = await db
     .select()
     .from(questions)
     .where(eq(questions.id, input.questionId))
@@ -146,7 +146,7 @@ export async function logAttempt(input: {
   if (!q) throw new Error(`Question ${input.questionId} not found`);
   const correct = input.selectedIndex === q.correctIndex;
 
-  const attempt = db
+  const attempt = await db
     .insert(attempts)
     .values({
       questionId: input.questionId,
@@ -162,9 +162,9 @@ export async function logAttempt(input: {
     .get();
 
   if (input.mode === "redo") {
-    applyRedoResult(q.id, correct, input.timeSeconds);
+    await applyRedoResult(q.id, correct, input.timeSeconds);
   } else if (!correct) {
-    enqueueMiss(q.id, attempt.id);
+    await enqueueMiss(q.id, attempt.id);
   }
 
   return { attemptId: attempt.id, correct };
@@ -178,14 +178,15 @@ export async function tagAttempt(
     userNotes?: string | null;
   },
 ): Promise<void> {
-  db.update(attempts).set(patch).where(eq(attempts.id, attemptId)).run();
+  await db.update(attempts).set(patch).where(eq(attempts.id, attemptId)).run();
 }
 
 export async function finishSession(
   sessionId: number,
   summary: Record<string, unknown>,
 ): Promise<void> {
-  db.update(sessions)
+  await db
+    .update(sessions)
     .set({ endedAt: new Date(), summary })
     .where(eq(sessions.id, sessionId))
     .run();
@@ -208,7 +209,7 @@ export async function startTimedSet(config: {
   focus?: SessionFocus;
 }): Promise<StartTimedResult> {
   const total = config.kind === "full" ? 21 : 7;
-  const picked = selectTimedSet(total, config.skill);
+  const picked = await selectTimedSet(total, config.skill);
   if (picked.length < total) {
     return {
       error: `Not enough verified questions for a ${total}-question set (${picked.length} available). Run pnpm seed or generate more from the drill screen.`,
@@ -218,7 +219,7 @@ export async function startTimedSet(config: {
     };
   }
   const mode = config.kind === "full" ? "section_sim" : "timed_set";
-  const session = db
+  const session = await db
     .insert(sessions)
     .values({ mode, config: config as unknown as Record<string, unknown> })
     .returning()
@@ -270,7 +271,7 @@ export async function saveTimedSession(input: {
     }
   }
 
-  const questionRows = db
+  const questionRows = await db
     .select()
     .from(questions)
     .where(
@@ -285,13 +286,13 @@ export async function saveTimedSession(input: {
   const attemptIdByQuestionId: Record<number, number> = {};
   const correctByQuestionId: Record<number, boolean> = {};
 
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     for (const result of input.results) {
       const q = byId.get(result.questionId);
       if (!q) throw new Error(`Question ${result.questionId} not found`);
       const correct = result.selectedIndex === q.correctIndex;
       correctByQuestionId[q.id] = correct;
-      const attempt = tx
+      const attempt = await tx
         .insert(attempts)
         .values({
           questionId: q.id,
@@ -311,7 +312,8 @@ export async function saveTimedSession(input: {
     for (const edit of input.edits) {
       const q = byId.get(edit.questionId);
       if (!q) continue;
-      tx.insert(edits)
+      await tx
+        .insert(edits)
         .values({
           sessionId: input.sessionId,
           questionId: edit.questionId,
@@ -329,7 +331,10 @@ export async function saveTimedSession(input: {
   // Redo enqueue outside the transaction: it has its own dedupe logic.
   for (const result of input.results) {
     if (!correctByQuestionId[result.questionId]) {
-      enqueueMiss(result.questionId, attemptIdByQuestionId[result.questionId]);
+      await enqueueMiss(
+        result.questionId,
+        attemptIdByQuestionId[result.questionId],
+      );
     }
   }
 
@@ -343,7 +348,7 @@ export async function saveTimedSession(input: {
     );
   }, 0);
 
-  const allEdits = db.select().from(edits).all();
+  const allEdits = await db.select().from(edits).all();
   const lifetimeEditNet = allEdits.reduce(
     (net, e) => net + (e.toCorrect ? 1 : 0) - (e.fromCorrect ? 1 : 0),
     0,
@@ -363,7 +368,8 @@ export async function saveTimedSession(input: {
     notReached: input.notReachedCount,
     durationSeconds: input.durationSeconds,
   };
-  db.update(sessions)
+  await db
+    .update(sessions)
     .set({ endedAt: new Date(), summary })
     .where(eq(sessions.id, input.sessionId))
     .run();
@@ -405,12 +411,12 @@ export async function savePatternRound(input: {
   const score = input.items.filter((i) => i.correct).length;
 
   // Previous best round score for this selection, from session summaries.
-  const previousBest = bestRoundScore(input.category);
+  const previousBest = await bestRoundScore(input.category);
 
   const touched = [...new Set(input.items.map((i) => i.category))];
   const oldRatings: Record<string, number> = {};
   for (const category of touched) {
-    const row = db
+    const row = await db
       .select()
       .from(eloRatings)
       .where(eq(eloRatings.category, category))
@@ -419,8 +425,9 @@ export async function savePatternRound(input: {
   }
 
   const newRatings = { ...oldRatings };
-  db.transaction((tx) => {
-    tx.insert(sessions)
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(sessions)
       .values({
         mode: "pattern",
         config: { category: input.category },
@@ -429,7 +436,8 @@ export async function savePatternRound(input: {
       })
       .run();
     for (const item of input.items) {
-      tx.insert(patternAttempts)
+      await tx
+        .insert(patternAttempts)
         .values({
           category: item.category,
           promptText: item.promptText,
@@ -446,7 +454,8 @@ export async function savePatternRound(input: {
       );
     }
     for (const category of touched) {
-      tx.insert(eloRatings)
+      await tx
+        .insert(eloRatings)
         .values({
           category,
           rating: newRatings[category],
@@ -460,10 +469,10 @@ export async function savePatternRound(input: {
     }
   });
 
-  const dayStreak = computeDayStreak();
+  const dayStreak = await computeDayStreak();
   const categoryStreaks: Record<string, number> = {};
   for (const category of touched) {
-    categoryStreaks[category] = computeCategoryStreak(category);
+    categoryStreaks[category] = await computeCategoryStreak(category);
   }
 
   return {
@@ -487,14 +496,14 @@ export async function saveSetting(
   key: "test_date" | "timed_set_cadence" | "weight_overrides" | "model",
   value: string,
 ): Promise<void> {
-  putSetting(key, value);
+  await putSetting(key, value);
 }
 
 export async function saveBaselineReport(input: {
   rawText: string;
   parsed: ParsedReport;
 }): Promise<{ id: number }> {
-  const row = db
+  const row = await db
     .insert(baselineReports)
     .values({
       rawText: input.rawText,

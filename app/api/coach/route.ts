@@ -1,10 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { db, SCRATCH_DIR } from "@/lib/db";
+import { db } from "@/lib/db";
 import { attempts, questions } from "@/lib/db/schema";
 import { getModel, withRetry } from "@/lib/ai/model";
 import { coachSystem, coachUser } from "@/lib/ai/prompts";
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const attempt = db
+  const attempt = await db
     .select()
     .from(attempts)
     .where(eq(attempts.id, body.attemptId))
@@ -50,7 +48,7 @@ export async function POST(request: Request) {
       { status: 404 },
     );
   }
-  const question = db
+  const question = await db
     .select()
     .from(questions)
     .where(eq(questions.id, attempt.questionId))
@@ -62,19 +60,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Persist the scratch images under ./data/scratch/.
-  const imagePaths: string[] = [];
-  for (let i = 0; i < body.images.length; i++) {
-    const match = body.images[i].match(/^data:image\/(\w+);base64,(.+)$/);
-    if (!match) continue;
-    const ext = match[1] === "jpeg" ? "jpg" : match[1];
-    const filename = `attempt-${attempt.id}-${i + 1}.${ext}`;
-    fs.writeFileSync(
-      path.join(SCRATCH_DIR, filename),
-      Buffer.from(match[2], "base64"),
-    );
-    imagePaths.push(path.join("scratch", filename));
-  }
+  // The scratch images are kept in the database (as data URLs) so the
+  // record survives on hosts without a persistent filesystem.
 
   const trapForSelected =
     attempt.selectedIndex !== question.correctIndex
@@ -83,9 +70,9 @@ export async function POST(request: Request) {
 
   let coach;
   try {
-    const { object } = await withRetry(() =>
+    const { object } = await withRetry(async () =>
       generateObject({
-        model: getModel(),
+        model: await getModel(),
         temperature: 0.2,
         schema: coachResponseSchema,
         system: coachSystem(),
@@ -133,9 +120,10 @@ export async function POST(request: Request) {
     `**Takeaway**\n\n${coach.takeaway_15_words}`,
   ].join("\n\n");
 
-  db.update(attempts)
+  await db
+    .update(attempts)
     .set({
-      scratchImagePath: JSON.stringify(imagePaths),
+      scratchImagePath: JSON.stringify(body.images),
       aiFeedbackMd: feedbackMd,
     })
     .where(eq(attempts.id, attempt.id))

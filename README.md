@@ -57,13 +57,15 @@ cp .env.example .env.local
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
 | `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
-| `pnpm backup` | Snapshot `./data` (history, ELO, scratch photos) into `./backups`, safe while the app runs |
+| `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
-Everything lives in `./data` (SQLite database, scratch-work images) —
-gitignored, no accounts, no cloud. `pnpm backup` snapshots it.
+Everything — attempt history, ELO, scratch-work photos — lives in one
+SQLite database at `./data/q86.db`, gitignored, no accounts, no cloud.
+`pnpm backup` snapshots it.
 
 Want it as a website instead of localhost? See [DEPLOY.md](DEPLOY.md) —
-a Dockerfile, password gate, and Fly.io config ship with the repo.
+free Vercel + Turso hosting (push-to-deploy, password gate) is the
+recommended path; a Dockerfile + Fly.io config ship as the alternative.
 
 ## Extending the question bank
 

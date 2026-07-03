@@ -21,8 +21,8 @@ import {
 import { baselineWeakness, getSetting, weightOverrides } from "./settings.ts";
 import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
 
-export function daysToTest(): number | null {
-  const raw = getSetting("test_date");
+export async function daysToTest(): Promise<number | null> {
+  const raw = await getSetting("test_date");
   if (!raw) return null;
   const target = new Date(`${raw}T00:00:00`);
   if (Number.isNaN(target.getTime())) return null;
@@ -31,10 +31,10 @@ export function daysToTest(): number | null {
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
 
-function skillAccuracy(): Record<FundamentalSkill, SkillRecord> {
+async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
   const out = {} as Record<FundamentalSkill, SkillRecord>;
   for (const skill of FUNDAMENTAL_SKILLS) {
-    const rows = db
+    const rows = await db
       .select({ correct: attempts.correct })
       .from(attempts)
       .innerJoin(questions, eq(attempts.questionId, questions.id))
@@ -55,38 +55,38 @@ function skillAccuracy(): Record<FundamentalSkill, SkillRecord> {
   return out;
 }
 
-export function dueRedoCount(): number {
-  return db
+export async function dueRedoCount(): Promise<number> {
+  const rows = await db
     .select({ id: redoQueue.id })
     .from(redoQueue)
     .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, new Date())))
-    .all().length;
+    .all();
+  return rows.length;
 }
 
-export function gatherPlanInputs(): PlanInputs {
+export async function gatherPlanInputs(): Promise<PlanInputs> {
   const eloRows = new Map(
-    db
-      .select()
-      .from(eloRatings)
-      .all()
-      .map((r) => [r.category, r.rating]),
+    (await db.select().from(eloRatings).all()).map((r) => [
+      r.category,
+      r.rating,
+    ]),
   );
   const eloByCategory = Object.fromEntries(
     PATTERN_CATEGORY_KEYS.map((k) => [k, eloRows.get(k) ?? ELO_START]),
   ) as Record<PatternCategoryKey, number>;
 
-  const cadenceRaw = Number(getSetting("timed_set_cadence") ?? "3");
+  const cadenceRaw = Number((await getSetting("timed_set_cadence")) ?? "3");
   // Local-calendar day index so the cadence flips at local midnight.
   const now = new Date();
   const localDayIndex = Math.floor(
     (now.getTime() - now.getTimezoneOffset() * 60_000) / 86_400_000,
   );
   return {
-    daysToTest: daysToTest(),
-    skillAccuracy: skillAccuracy(),
-    baselineWeakness: baselineWeakness(),
-    weightOverrides: weightOverrides(),
-    dueRedoCount: dueRedoCount(),
+    daysToTest: await daysToTest(),
+    skillAccuracy: await skillAccuracy(),
+    baselineWeakness: await baselineWeakness(),
+    weightOverrides: await weightOverrides(),
+    dueRedoCount: await dueRedoCount(),
     cadenceDays:
       Number.isInteger(cadenceRaw) && cadenceRaw > 0 ? cadenceRaw : 3,
     dayIndex: localDayIndex,
@@ -94,16 +94,16 @@ export function gatherPlanInputs(): PlanInputs {
   };
 }
 
-export function todaysPlan(): DailyPlan {
-  return computeDailyPlan(gatherPlanInputs());
+export async function todaysPlan(): Promise<DailyPlan> {
+  return computeDailyPlan(await gatherPlanInputs());
 }
 
 /** Pick the concrete questions for today's weighted drill block. */
-export function selectPlanDrillIds(plan: DailyPlan): number[] {
+export async function selectPlanDrillIds(plan: DailyPlan): Promise<number[]> {
   const ids: number[] = [];
   for (const { skill, count } of plan.drill.bySkill) {
     if (count <= 0) continue;
-    const picked = selectQuestions(
+    const picked = await selectQuestions(
       { skills: [skill], excludeIds: ids },
       count,
     );

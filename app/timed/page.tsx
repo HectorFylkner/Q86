@@ -13,11 +13,13 @@ export default async function TimedPage({
 }) {
   const { start } = await searchParams;
   const verifiedTotal =
-    db
-      .select({ n: count() })
-      .from(questions)
-      .where(eq(questions.verified, true))
-      .get()?.n ?? 0;
+    (
+      await db
+        .select({ n: count() })
+        .from(questions)
+        .where(eq(questions.verified, true))
+        .get()
+    )?.n ?? 0;
 
   return (
     <div className="space-y-4">

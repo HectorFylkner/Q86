@@ -232,7 +232,7 @@ export function TimedClient({
           });
         });
     },
-    [sessionId, mode, questions, totalSeconds],
+    [sessionId, mode, questions, totalSeconds, focus],
   );
 
   // Keep a live reference for the clock-expiry path.

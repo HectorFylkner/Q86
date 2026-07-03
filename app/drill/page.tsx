@@ -22,10 +22,10 @@ export default async function DrillPage({
   // One-click launch of today's weighted drill block (F8).
   if (!autoStartIds?.length && plan === "1") {
     const { todaysPlan, selectPlanDrillIds } = await import("@/lib/plan-server");
-    autoStartIds = selectPlanDrillIds(todaysPlan());
+    autoStartIds = await selectPlanDrillIds(await todaysPlan());
   }
 
-  const rows = db
+  const rows = (await db
     .select({
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
@@ -35,7 +35,7 @@ export default async function DrillPage({
     .from(questions)
     .where(eq(questions.verified, true))
     .groupBy(questions.subtopic, questions.difficulty, questions.format)
-    .all() as CountRow[];
+    .all()) as CountRow[];
 
   return (
     <div className="space-y-4">

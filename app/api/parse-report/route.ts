@@ -32,9 +32,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { object } = await withRetry(() =>
+    const { object } = await withRetry(async () =>
       generateObject({
-        model: getModel(),
+        model: await getModel(),
         temperature: 0,
         schema: parsedReportSchema,
         system: reportParserSystem(),

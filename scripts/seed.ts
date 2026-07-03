@@ -42,8 +42,8 @@ import { buildPlan, TARGET_TOTAL, type PlanItem } from "./seed-plan.ts";
 const MAX_CONSECUTIVE_FAILURES = 15;
 const CONCURRENCY = 3;
 
-function verifiedSeedCount(): number {
-  const row = db
+async function verifiedSeedCount(): Promise<number> {
+  const row = await db
     .select({ n: count() })
     .from(questions)
     .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
@@ -51,8 +51,8 @@ function verifiedSeedCount(): number {
   return row?.n ?? 0;
 }
 
-function getProgress(): number {
-  const row = db
+async function getProgress(): Promise<number> {
+  const row = await db
     .select()
     .from(settings)
     .where(eq(settings.key, "seed_progress"))
@@ -60,8 +60,9 @@ function getProgress(): number {
   return row ? Number(row.value) : 0;
 }
 
-function setProgress(n: number): void {
-  db.insert(settings)
+async function setProgress(n: number): Promise<void> {
+  await db
+    .insert(settings)
     .values({ key: "seed_progress", value: String(n) })
     .onConflictDoUpdate({ target: settings.key, set: { value: String(n) } })
     .run();
@@ -84,12 +85,15 @@ function printPlanSummary(plan: PlanItem[]): void {
 }
 
 /** Top-up items for shortfall: aim generation at underfilled subtopics. */
-function buildTopUp(plan: PlanItem[], deficit: number): PlanItem[] {
+async function buildTopUp(
+  plan: PlanItem[],
+  deficit: number,
+): Promise<PlanItem[]> {
   const rng = mulberry32(Date.now() % 2 ** 31);
   const target = new Map<Subtopic, number>();
   for (const item of plan)
     target.set(item.subtopic, (target.get(item.subtopic) ?? 0) + 1);
-  const actualRows = db
+  const actualRows = await db
     .select({ subtopic: questions.subtopic, n: count() })
     .from(questions)
     .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
@@ -137,7 +141,7 @@ const BANK_PATH = path.join(import.meta.dirname, "seed-bank.json");
 
 /** Offline mode: load the committed, already-verified bank. Idempotent —
  *  items whose stem already exists are skipped, so reruns are safe. */
-function loadBank(): void {
+async function loadBank(): Promise<void> {
   if (!fs.existsSync(BANK_PATH)) {
     console.error(
       `No seed bank at ${BANK_PATH}. Run pnpm seed --api to generate one.`,
@@ -148,21 +152,23 @@ function loadBank(): void {
     questions: BankQuestion[];
   };
   const existing = new Map(
-    db
-      .select({ id: questions.id, stem: questions.stemMd })
-      .from(questions)
-      .all()
-      .map((r) => [r.stem, r.id]),
+    (
+      await db
+        .select({ id: questions.id, stem: questions.stemMd })
+        .from(questions)
+        .all()
+    ).map((r) => [r.stem, r.id]),
   );
   let inserted = 0;
   let updated = 0;
   let retired = 0;
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     for (const q of bank.questions) {
       const existingId = existing.get(q.stem_md);
       if (existingId != null) {
         // Upsert: editorial fixes in the bank propagate to installed rows.
-        tx.update(questions)
+        await tx
+          .update(questions)
           .set({
             choices: q.choices,
             correctIndex: q.correct_index,
@@ -177,7 +183,8 @@ function loadBank(): void {
         updated++;
         continue;
       }
-      tx.insert(questions)
+      await tx
+        .insert(questions)
         .values({
           source: "seed",
           format: q.format as (typeof questions.$inferInsert)["format"],
@@ -204,14 +211,15 @@ function loadBank(): void {
     // after failing a deeper audit). Rows are never deleted — verified=false
     // removes them from every serving query while preserving attempt history.
     const bankStems = new Set(bank.questions.map((q) => q.stem_md));
-    const seedRows = tx
+    const seedRows = await tx
       .select({ id: questions.id, stem: questions.stemMd })
       .from(questions)
       .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
       .all();
     for (const row of seedRows) {
       if (bankStems.has(row.stem)) continue;
-      tx.update(questions)
+      await tx
+        .update(questions)
         .set({ verified: false })
         .where(eq(questions.id, row.id))
         .run();
@@ -219,13 +227,13 @@ function loadBank(): void {
     }
   });
   console.log(
-    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${retired} retired, ${verifiedSeedCount()} verified seed questions total.`,
+    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${retired} retired, ${await verifiedSeedCount()} verified seed questions total.`,
   );
 }
 
 async function main() {
   try {
-    verifiedSeedCount();
+    await verifiedSeedCount();
   } catch {
     console.error("The database has no tables. Run pnpm db:push first.");
     process.exit(1);
@@ -239,7 +247,7 @@ async function main() {
   }
 
   if (!process.argv.includes("--api")) {
-    loadBank();
+    await loadBank();
     return;
   }
 
@@ -260,12 +268,12 @@ async function main() {
     process.exit(1);
   }
 
-  let verified = verifiedSeedCount();
-  let consumed = getProgress();
+  let verified = await verifiedSeedCount();
+  let consumed = await getProgress();
   if (verified === 0 && consumed > 0) {
     console.log("Database has no seed questions but progress > 0 — resetting.");
     consumed = 0;
-    setProgress(0);
+    await setProgress(0);
   }
 
   if (verified >= TARGET_TOTAL) {
@@ -338,7 +346,7 @@ async function main() {
           // never replays items other workers already picked up; any
           // in-flight losses are restored by the top-up phase.
           consumed++;
-          setProgress(consumed);
+          await setProgress(consumed);
         }
         await runItem(item);
         if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) aborted = true;
@@ -353,7 +361,7 @@ async function main() {
 
   // Top up any shortfall from discarded questions (also covers reruns).
   while (!aborted && verified < TARGET_TOTAL) {
-    const topUp = buildTopUp(plan, TARGET_TOTAL - verified);
+    const topUp = await buildTopUp(plan, TARGET_TOTAL - verified);
     if (topUp.length === 0) break;
     console.log(`Topping up shortfall: ${topUp.length} more questions.`);
     queue = topUp;
@@ -378,7 +386,7 @@ async function main() {
   console.log(
     `\nDone. ${verified} verified seed questions (${failed} candidates discarded).`,
   );
-  const bySkillRows = db
+  const bySkillRows = await db
     .select({ skill: questions.fundamentalSkill, n: count() })
     .from(questions)
     .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))

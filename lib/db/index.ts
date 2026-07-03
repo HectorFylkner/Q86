@@ -1,27 +1,44 @@
 import fs from "node:fs";
 import path from "node:path";
-import Database from "better-sqlite3";
-import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { createClient, type Client } from "@libsql/client";
+import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import * as schema from "./schema.ts";
 
+/**
+ * One driver, two homes. Locally (and on any host with a disk) the
+ * database is a plain SQLite file under ./data — local-first, no
+ * accounts, no cloud. Set TURSO_DATABASE_URL (+ TURSO_AUTH_TOKEN) and
+ * the same code talks to a hosted libSQL database instead, which is
+ * what serverless deployments (Vercel) use.
+ */
 const DATA_DIR = path.join(process.cwd(), "data");
-const SCRATCH_DIR = path.join(DATA_DIR, "scratch");
 const DB_PATH = path.join(DATA_DIR, "q86.db");
 
-type DB = BetterSQLite3Database<typeof schema>;
+type DB = LibSQLDatabase<typeof schema>;
 
 // Keep a single connection across Next.js hot reloads.
-const globalForDb = globalThis as unknown as { __q86db?: DB };
+const globalForDb = globalThis as unknown as {
+  __q86db?: DB;
+  __q86client?: Client;
+};
 
-function createDb(): DB {
-  fs.mkdirSync(SCRATCH_DIR, { recursive: true });
-  const sqlite = new Database(DB_PATH);
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("foreign_keys = ON");
-  return drizzle(sqlite, { schema });
+function createDbClient(): Client {
+  const remoteUrl = process.env.TURSO_DATABASE_URL;
+  if (remoteUrl) {
+    return createClient({
+      url: remoteUrl,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+  }
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  return createClient({ url: `file:${DB_PATH}` });
 }
 
-export const db: DB = globalForDb.__q86db ?? createDb();
-if (process.env.NODE_ENV !== "production") globalForDb.__q86db = db;
+const client: Client = globalForDb.__q86client ?? createDbClient();
+export const db: DB = globalForDb.__q86db ?? drizzle(client, { schema });
+if (process.env.NODE_ENV !== "production") {
+  globalForDb.__q86client = client;
+  globalForDb.__q86db = db;
+}
 
-export { schema, SCRATCH_DIR, DATA_DIR };
+export { schema, client, DATA_DIR, DB_PATH };

@@ -105,8 +105,8 @@ const EXPECTED_BY_CONFIDENCE: Record<Confidence, number> = {
   lock: 95,
 };
 
-export function gatherAnalytics(): AnalyticsData {
-  const rows = db
+export async function gatherAnalytics(): Promise<AnalyticsData> {
+  const rows = await db
     .select({
       id: attempts.id,
       correct: attempts.correct,
@@ -128,7 +128,7 @@ export function gatherAnalytics(): AnalyticsData {
     .all();
 
   // Casual attempts and their sessions stay out of every statistic below.
-  const casualRows = db
+  const casualRows = await db
     .select({ sessionId: attempts.sessionId })
     .from(attempts)
     .where(eq(attempts.focus, "casual"))
@@ -184,29 +184,30 @@ export function gatherAnalytics(): AnalyticsData {
   };
 
   // --- edit ledger ----------------------------------------------------------
-  const editRows = db
-    .select({
-      id: edits.id,
-      createdAt: edits.createdAt,
-      fromCorrect: edits.fromCorrect,
-      toCorrect: edits.toCorrect,
-      reason: edits.reason,
-      justification: edits.justification,
-      sessionId: edits.sessionId,
-      questionId: edits.questionId,
-      subtopic: questions.subtopic,
-    })
-    .from(edits)
-    .innerJoin(questions, eq(edits.questionId, questions.id))
-    .orderBy(desc(edits.id))
-    .all()
-    .filter((e) => !casualSessionIds.has(e.sessionId));
+  const editRows = (
+    await db
+      .select({
+        id: edits.id,
+        createdAt: edits.createdAt,
+        fromCorrect: edits.fromCorrect,
+        toCorrect: edits.toCorrect,
+        reason: edits.reason,
+        justification: edits.justification,
+        sessionId: edits.sessionId,
+        questionId: edits.questionId,
+        subtopic: questions.subtopic,
+      })
+      .from(edits)
+      .innerJoin(questions, eq(edits.questionId, questions.id))
+      .orderBy(desc(edits.id))
+      .all()
+  ).filter((e) => !casualSessionIds.has(e.sessionId));
 
   const improved = editRows.filter((e) => !e.fromCorrect && e.toCorrect).length;
   const destroyed = editRows.filter((e) => e.fromCorrect && !e.toCorrect).length;
 
   // Lock-confidence answers that were correct and then changed.
-  const attemptConfidence = db
+  const attemptConfidence = await db
     .select({
       sessionId: attempts.sessionId,
       questionId: attempts.questionId,
@@ -278,7 +279,7 @@ export function gatherAnalytics(): AnalyticsData {
   }
 
   // --- redo compliance ---------------------------------------------------------
-  const redoRows = db.select().from(redoQueue).all();
+  const redoRows = await db.select().from(redoQueue).all();
   const nowMs = Date.now();
   const redoCompliance = {
     open: redoRows.filter((r) => !r.cleared).length,
@@ -293,11 +294,10 @@ export function gatherAnalytics(): AnalyticsData {
 
   // --- pattern ELO ---------------------------------------------------------------
   const eloMap = new Map(
-    db
-      .select()
-      .from(eloRatings)
-      .all()
-      .map((r) => [r.category, r.rating]),
+    (await db.select().from(eloRatings).all()).map((r) => [
+      r.category,
+      r.rating,
+    ]),
   );
   const eloBars = PATTERN_CATEGORY_KEYS.map((category) => ({
     category,

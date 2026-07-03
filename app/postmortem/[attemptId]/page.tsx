@@ -16,9 +16,13 @@ export default async function PostmortemPage({
   const id = Number(attemptId);
   if (!Number.isInteger(id)) notFound();
 
-  const attempt = db.select().from(attempts).where(eq(attempts.id, id)).get();
+  const attempt = await db
+    .select()
+    .from(attempts)
+    .where(eq(attempts.id, id))
+    .get();
   if (!attempt) notFound();
-  const question = db
+  const question = await db
     .select()
     .from(questions)
     .where(eq(questions.id, attempt.questionId))

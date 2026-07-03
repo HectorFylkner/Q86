@@ -14,16 +14,18 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default function TodayPage() {
-  const inputs = gatherPlanInputs();
+export default async function TodayPage() {
+  const inputs = await gatherPlanInputs();
   const plan = computeDailyPlan(inputs);
-  const days = daysToTest();
+  const days = await daysToTest();
   const verifiedCount =
-    db
-      .select({ n: count() })
-      .from(questions)
-      .where(eq(questions.verified, true))
-      .get()?.n ?? 0;
+    (
+      await db
+        .select({ n: count() })
+        .from(questions)
+        .where(eq(questions.verified, true))
+        .get()
+    )?.n ?? 0;
   const cadence = inputs.cadenceDays;
   const daysUntilTimed = plan.timedSetToday
     ? 0
@@ -50,7 +52,7 @@ export default function TodayPage() {
             </p>
           )}
         </div>
-        <SettingsForm testDate={getSetting("test_date")} cadence={cadence} />
+        <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

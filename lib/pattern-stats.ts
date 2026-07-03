@@ -3,8 +3,8 @@ import { db } from "./db/index.ts";
 import { patternAttempts, sessions } from "./db/schema.ts";
 
 /** Consecutive local days with pattern work, ending today. */
-export function computeDayStreak(): number {
-  const dayRows = db.all<{ d: string }>(
+export async function computeDayStreak(): Promise<number> {
+  const dayRows = await db.all<{ d: string }>(
     sql`select distinct date(created_at / 1000.0, 'unixepoch', 'localtime') as d
         from pattern_attempts order by d desc`,
   );
@@ -25,8 +25,10 @@ export function computeDayStreak(): number {
 }
 
 /** Current consecutive-correct run for one category. */
-export function computeCategoryStreak(category: string): number {
-  const recent = db
+export async function computeCategoryStreak(
+  category: string,
+): Promise<number> {
+  const recent = await db
     .select({ correct: patternAttempts.correct })
     .from(patternAttempts)
     .where(eq(patternAttempts.category, category))
@@ -43,8 +45,10 @@ export function computeCategoryStreak(category: string): number {
 
 /** Best round score for a category selection ("mixed" or a category key),
  *  from pattern session summaries. */
-export function bestRoundScore(categorySelection: string): number {
-  const pastSessions = db
+export async function bestRoundScore(
+  categorySelection: string,
+): Promise<number> {
+  const pastSessions = await db
     .select()
     .from(sessions)
     .where(eq(sessions.mode, "pattern"))

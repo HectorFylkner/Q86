@@ -25,37 +25,39 @@ export default async function PatternsPage({
       ? ("mixed" as const)
       : null;
   const ratings = new Map(
-    db
-      .select()
-      .from(eloRatings)
-      .all()
-      .map((r) => [r.category, r.rating]),
+    (await db.select().from(eloRatings).all()).map((r) => [
+      r.category,
+      r.rating,
+    ]),
   );
   const attemptCounts = new Map(
-    db
-      .select({ category: patternAttempts.category, n: count() })
-      .from(patternAttempts)
-      .groupBy(patternAttempts.category)
-      .all()
-      .map((r) => [r.category, r.n]),
+    (
+      await db
+        .select({ category: patternAttempts.category, n: count() })
+        .from(patternAttempts)
+        .groupBy(patternAttempts.category)
+        .all()
+    ).map((r) => [r.category, r.n]),
   );
 
-  const stats: CategoryStats[] = PATTERN_CATEGORIES.map((c) => ({
-    key: c.key,
-    label: c.label,
-    rating: Math.round(ratings.get(c.key) ?? ELO_START),
-    attempts: attemptCounts.get(c.key) ?? 0,
-    bestRound: bestRoundScore(c.key),
-    streak: computeCategoryStreak(c.key),
-  }));
+  const stats: CategoryStats[] = await Promise.all(
+    PATTERN_CATEGORIES.map(async (c) => ({
+      key: c.key,
+      label: c.label,
+      rating: Math.round(ratings.get(c.key) ?? ELO_START),
+      attempts: attemptCounts.get(c.key) ?? 0,
+      bestRound: await bestRoundScore(c.key),
+      streak: await computeCategoryStreak(c.key),
+    })),
+  );
 
   return (
     <div className="space-y-4">
       <h1 className="font-display text-xl font-semibold">Pattern trainer</h1>
       <PatternsClient
         stats={stats}
-        dayStreak={computeDayStreak()}
-        mixedBest={bestRoundScore("mixed")}
+        dayStreak={await computeDayStreak()}
+        mixedBest={await bestRoundScore("mixed")}
         autoStart={autoStart}
       />
     </div>
