@@ -24,7 +24,7 @@ try {
   // .env.local may not exist; the key may come from the environment
 }
 
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
 import { questions, settings } from "../lib/db/schema.ts";
 import { createVerifiedQuestion } from "../lib/ai/pipeline.ts";
@@ -124,7 +124,7 @@ function verifiedSeedCount(): number {
   const row = db
     .select({ n: count() })
     .from(questions)
-    .where(eq(questions.source, "seed"))
+    .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
     .get();
   return row?.n ?? 0;
 }
@@ -170,7 +170,7 @@ function buildTopUp(plan: PlanItem[], deficit: number): PlanItem[] {
   const actualRows = db
     .select({ subtopic: questions.subtopic, n: count() })
     .from(questions)
-    .where(eq(questions.source, "seed"))
+    .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
     .groupBy(questions.subtopic)
     .all();
   const actual = new Map(actualRows.map((r) => [r.subtopic, r.n]));
@@ -337,7 +337,7 @@ async function main() {
   const bySkillRows = db
     .select({ skill: questions.fundamentalSkill, n: count() })
     .from(questions)
-    .where(eq(questions.source, "seed"))
+    .where(and(eq(questions.source, "seed"), eq(questions.verified, true)))
     .groupBy(questions.fundamentalSkill)
     .all();
   for (const row of bySkillRows) console.log(`  ${row.skill}: ${row.n}`);
