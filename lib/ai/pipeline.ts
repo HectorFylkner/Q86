@@ -110,8 +110,18 @@ export async function createVerifiedQuestion(
         model: model ?? getModel(),
         temperature: GENERATOR_TEMPERATURE,
         schema: generatedQuestionSchema,
-        system: generatorSystem(),
-        prompt,
+        messages: [
+          {
+            role: "system",
+            content: generatorSystem(),
+            // The same ~1.6k-token system prompt repeats across every
+            // generation call in a seed run — cache it (reads bill ~10%).
+            providerOptions: {
+              anthropic: { cacheControl: { type: "ephemeral" } },
+            },
+          },
+          { role: "user", content: prompt },
+        ],
       }),
     );
 
