@@ -27,6 +27,7 @@ export const METHODOLOGY = `Named techniques you may reference (use exactly thes
 - Timing checkpoints and the invest-or-bail decision: at 2:45 on one question, either commit to a known finishing path or pick the best remaining choice and move on.`;
 
 const SOLUTION_CONTRACT = `Solution contract (follow exactly):
+- Present only final, polished reasoning. Never narrate self-correction, re-checking, or exploration ("wait", "let me verify", "actually") — if you catch an error while writing, rewrite the section cleanly.
 - fastest_path_md: the quickest test-taker route only (often testing numbers, backsolving, estimation, or a pattern shortcut). 2-6 sentences or a short list. No headers.
 - solution_md: three sections in this order, using these exact bold headers:
   **Formal path**
