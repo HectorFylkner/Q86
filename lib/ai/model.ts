@@ -1,9 +1,20 @@
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { settings } from "../db/schema.ts";
 
 export const DEFAULT_MODEL = "claude-sonnet-4-6";
+
+/** ANTHROPIC_BASE_URL is honored whether or not it includes the /v1
+ *  path segment the SDK expects (some environments export just the host). */
+function resolveBaseURL(): string | undefined {
+  const raw = process.env.ANTHROPIC_BASE_URL;
+  if (!raw) return undefined;
+  const trimmed = raw.replace(/\/+$/, "");
+  return /\/v\d+$/.test(trimmed) ? trimmed : `${trimmed}/v1`;
+}
+
+const anthropic = createAnthropic({ baseURL: resolveBaseURL() });
 
 /** settings.model override → ANTHROPIC_MODEL env → default. */
 export function getModelId(): string {
