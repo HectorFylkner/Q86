@@ -1,7 +1,15 @@
 /**
- * Q86 seed script — produces 180 verified questions (§12 phase 2).
+ * Q86 seed script — installs the 180-question verified bank (§12 phase 2).
  *
- * Distribution:
+ * Default mode loads scripts/seed-bank.json — questions that already
+ * passed verification (the two-model pipeline or authored-with-
+ * programmatic-verification) — offline, idempotently, no API key needed.
+ *
+ * --api generates fresh questions through the §8 pipeline instead
+ * (requires ANTHROPIC_API_KEY): resumable, tops up shortfalls, aborts
+ * after 15 consecutive verification failures with a pattern report.
+ *
+ * Distribution (both modes):
  *   - Value/Order/Factors: 70 (≥7 per VOF subtopic)
  *   - Equalities/Inequalities/Algebra (excl. translation): 35
  *   - Counting/Sets/Series/Prob/Stats: 30
@@ -10,11 +18,8 @@
  *   - Difficulty ≈ 10% D2 / 30% D3 / 40% D4 / 20% D5
  *   - ~25% of VOF and Equal/Unequal items in DS format
  *
- * Resumable: progress persists in the settings table; rerunning continues
- * where it stopped and tops up any verification shortfall. Aborts after 15
- * consecutive verification failures and reports the failure pattern.
- *
- * Usage: pnpm seed          (requires ANTHROPIC_API_KEY in .env.local)
+ * Usage: pnpm seed          (offline, from scripts/seed-bank.json)
+ *        pnpm seed --api    (generate via the AI pipeline)
  *        pnpm seed --plan   (print the generation plan, no API calls)
  */
 
@@ -24,6 +29,8 @@ try {
   // .env.local may not exist; the key may come from the environment
 }
 
+import fs from "node:fs";
+import path from "node:path";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
 import { questions, settings } from "../lib/db/schema.ts";
@@ -36,89 +43,10 @@ import {
   type Subtopic,
 } from "../lib/taxonomy.ts";
 import { mulberry32, pick, shuffle } from "../lib/generators/rng.ts";
+import { buildPlan, TARGET_TOTAL, type PlanItem } from "./seed-plan.ts";
 
-const TARGET_TOTAL = 180;
 const MAX_CONSECUTIVE_FAILURES = 15;
 const CONCURRENCY = 3;
-const PLAN_SEED = 8686;
-
-type PlanItem = {
-  subtopic: Subtopic;
-  difficulty: number;
-  format: QuestionFormat;
-  context: Context;
-};
-
-function buildPlan(): PlanItem[] {
-  const rng = mulberry32(PLAN_SEED);
-  const subtopics: Subtopic[] = [];
-
-  // VOF: 7 per subtopic (56) + 14 more cycling → 70
-  const vof = SUBTOPICS_BY_SKILL.value_order_factors;
-  for (const s of vof) for (let i = 0; i < 7; i++) subtopics.push(s);
-  for (let i = 0; i < 14; i++) subtopics.push(vof[i % vof.length]);
-
-  // Equal/Unequal excluding algebraic_translation: 7 × 5 = 35
-  const eu = SUBTOPICS_BY_SKILL.equal_unequal_alg.filter(
-    (s) => s !== "algebraic_translation",
-  );
-  for (const s of eu) for (let i = 0; i < 7; i++) subtopics.push(s);
-
-  // Counting/Sets/Series/Prob/Stats: 6 × 5 = 30
-  for (const s of SUBTOPICS_BY_SKILL.counting_sets_series_prob_stats)
-    for (let i = 0; i < 6; i++) subtopics.push(s);
-
-  // Rates/Ratio/Percent: 4 × 5 = 20
-  for (const s of SUBTOPICS_BY_SKILL.rates_ratio_percent)
-    for (let i = 0; i < 4; i++) subtopics.push(s);
-
-  // algebraic_translation 13 + mixed 12 = 25
-  for (let i = 0; i < 13; i++) subtopics.push("algebraic_translation");
-  const all = Object.values(SUBTOPICS_BY_SKILL).flat() as Subtopic[];
-  for (let i = 0; i < 12; i++) subtopics.push(pick(rng, all));
-
-  if (subtopics.length !== TARGET_TOTAL) {
-    throw new Error(`plan builds ${subtopics.length} items, expected 180`);
-  }
-
-  // Difficulty deck: exactly 18 D2 / 54 D3 / 72 D4 / 36 D5
-  const difficulties = shuffle(
-    [
-      ...Array<number>(18).fill(2),
-      ...Array<number>(54).fill(3),
-      ...Array<number>(72).fill(4),
-      ...Array<number>(36).fill(5),
-    ],
-    rng,
-  );
-
-  const items: PlanItem[] = subtopics.map((subtopic, i) => ({
-    subtopic,
-    difficulty: difficulties[i],
-    format: "problem_solving" as QuestionFormat,
-    context: "pure" as Context,
-  }));
-
-  // DS format: exactly 25% of VOF + Equal/Unequal items
-  const dsEligible = items
-    .map((item, i) => ({ item, i }))
-    .filter(({ item }) => {
-      const skill = SKILL_BY_SUBTOPIC[item.subtopic];
-      return skill === "value_order_factors" || skill === "equal_unequal_alg";
-    });
-  const dsPickCount = Math.round(dsEligible.length * 0.25);
-  for (const { i } of shuffle(dsEligible, rng).slice(0, dsPickCount)) {
-    items[i].format = "data_sufficiency";
-  }
-
-  // Context: VOF leans pure (60%) — the diagnosed gap; everything else 50/50
-  for (const item of items) {
-    const isVof = SKILL_BY_SUBTOPIC[item.subtopic] === "value_order_factors";
-    item.context = rng() < (isVof ? 0.6 : 0.5) ? "pure" : "real";
-  }
-
-  return shuffle(items, rng);
-}
 
 function verifiedSeedCount(): number {
   const row = db
@@ -194,6 +122,95 @@ function buildTopUp(plan: PlanItem[], deficit: number): PlanItem[] {
   return shuffle(candidates, rng).slice(0, deficit);
 }
 
+
+type BankQuestion = {
+  format: string;
+  content_domain: string;
+  context: string;
+  fundamental_skill: string;
+  subtopic: string;
+  difficulty: number;
+  stem_md: string;
+  choices: string[];
+  correct_index: number;
+  solution_md: string;
+  fastest_path_md: string;
+  trap_map: Record<string, string>;
+  numeric_check: string | null;
+};
+
+const BANK_PATH = path.join(import.meta.dirname, "seed-bank.json");
+
+/** Offline mode: load the committed, already-verified bank. Idempotent —
+ *  items whose stem already exists are skipped, so reruns are safe. */
+function loadBank(): void {
+  if (!fs.existsSync(BANK_PATH)) {
+    console.error(
+      `No seed bank at ${BANK_PATH}. Run pnpm seed --api to generate one.`,
+    );
+    process.exit(1);
+  }
+  const bank = JSON.parse(fs.readFileSync(BANK_PATH, "utf8")) as {
+    questions: BankQuestion[];
+  };
+  const existing = new Map(
+    db
+      .select({ id: questions.id, stem: questions.stemMd })
+      .from(questions)
+      .all()
+      .map((r) => [r.stem, r.id]),
+  );
+  let inserted = 0;
+  let updated = 0;
+  db.transaction((tx) => {
+    for (const q of bank.questions) {
+      const existingId = existing.get(q.stem_md);
+      if (existingId != null) {
+        // Upsert: editorial fixes in the bank propagate to installed rows.
+        tx.update(questions)
+          .set({
+            choices: q.choices,
+            correctIndex: q.correct_index,
+            solutionMd: q.solution_md,
+            fastestPathMd: q.fastest_path_md,
+            trapMap: q.trap_map,
+            numericCheck: q.numeric_check,
+            verified: true,
+          })
+          .where(eq(questions.id, existingId))
+          .run();
+        updated++;
+        continue;
+      }
+      tx.insert(questions)
+        .values({
+          source: "seed",
+          format: q.format as (typeof questions.$inferInsert)["format"],
+          contentDomain:
+            q.content_domain as (typeof questions.$inferInsert)["contentDomain"],
+          context: q.context as (typeof questions.$inferInsert)["context"],
+          fundamentalSkill:
+            q.fundamental_skill as (typeof questions.$inferInsert)["fundamentalSkill"],
+          subtopic: q.subtopic as (typeof questions.$inferInsert)["subtopic"],
+          difficulty: q.difficulty,
+          stemMd: q.stem_md,
+          choices: q.choices,
+          correctIndex: q.correct_index,
+          solutionMd: q.solution_md,
+          fastestPathMd: q.fastest_path_md,
+          trapMap: q.trap_map,
+          numericCheck: q.numeric_check,
+          verified: true,
+        })
+        .run();
+      inserted++;
+    }
+  });
+  console.log(
+    `Seed bank loaded: ${inserted} inserted, ${updated} refreshed, ${verifiedSeedCount()} verified seed questions total.`,
+  );
+}
+
 async function main() {
   try {
     verifiedSeedCount();
@@ -206,6 +223,11 @@ async function main() {
 
   if (process.argv.includes("--plan")) {
     printPlanSummary(plan);
+    return;
+  }
+
+  if (!process.argv.includes("--api")) {
+    loadBank();
     return;
   }
 
