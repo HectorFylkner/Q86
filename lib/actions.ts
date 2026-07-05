@@ -32,6 +32,8 @@ import {
   type QuestionFilter,
 } from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
+import { rampBudgets } from "./ramp-server.ts";
+import type { RampBudget } from "./ramp.ts";
 import type {
   Confidence,
   EditReason,
@@ -49,6 +51,8 @@ export type StartDrillResult = {
   error: string | null;
   sessionId: number | null;
   questions: Question[];
+  /** Timed-transfer ramp target per question id (lib/ramp.ts). */
+  budgets: Record<number, RampBudget>;
 };
 
 export async function startDrill(config: {
@@ -64,6 +68,7 @@ export async function startDrill(config: {
         "No verified questions match this filter. Generate some from this screen or run pnpm seed.",
       sessionId: null,
       questions: [],
+      budgets: {},
     };
   }
   const session = await db
@@ -74,7 +79,12 @@ export async function startDrill(config: {
     })
     .returning()
     .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  return {
+    error: null,
+    sessionId: session.id,
+    questions: picked,
+    budgets: await rampBudgets(picked),
+  };
 }
 
 /** Chapter test: the pass-bar gate behind a Learn chapter. */
@@ -87,6 +97,7 @@ export async function startChapterTest(
       error: "Not enough verified questions in this chapter for a test.",
       sessionId: null,
       questions: [],
+      budgets: {},
     };
   }
   const session = await db
@@ -97,14 +108,24 @@ export async function startChapterTest(
     })
     .returning()
     .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  return {
+    error: null,
+    sessionId: session.id,
+    questions: picked,
+    budgets: await rampBudgets(picked),
+  };
 }
 
 export async function startRedoSession(
   questionIds: number[],
 ): Promise<StartDrillResult> {
   if (questionIds.length === 0) {
-    return { error: "Nothing due to redo.", sessionId: null, questions: [] };
+    return {
+      error: "Nothing due to redo.",
+      sessionId: null,
+      questions: [],
+      budgets: {},
+    };
   }
   const rows = await db
     .select()
@@ -122,7 +143,12 @@ export async function startRedoSession(
     .values({ mode: "redo", config: { questionIds } })
     .returning()
     .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  return {
+    error: null,
+    sessionId: session.id,
+    questions: ordered,
+    budgets: await rampBudgets(ordered),
+  };
 }
 
 /** Start a drill with an exact question list (redo of twins, coach
@@ -131,7 +157,12 @@ export async function startDrillWithQuestions(
   questionIds: number[],
 ): Promise<StartDrillResult> {
   if (questionIds.length === 0) {
-    return { error: "No questions to drill.", sessionId: null, questions: [] };
+    return {
+      error: "No questions to drill.",
+      sessionId: null,
+      questions: [],
+      budgets: {},
+    };
   }
   const rows = await db
     .select()
@@ -149,6 +180,7 @@ export async function startDrillWithQuestions(
       error: "Those questions no longer exist.",
       sessionId: null,
       questions: [],
+      budgets: {},
     };
   }
   const session = await db
@@ -156,7 +188,12 @@ export async function startDrillWithQuestions(
     .values({ mode: "drill", config: { questionIds } })
     .returning()
     .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  return {
+    error: null,
+    sessionId: session.id,
+    questions: ordered,
+    budgets: await rampBudgets(ordered),
+  };
 }
 
 export async function logAttempt(input: {
@@ -275,6 +312,7 @@ export async function startTimedSet(config: {
       error: `Not enough verified questions for a ${total}-question set (${picked.length} available). Run pnpm seed or generate more from the drill screen.`,
       sessionId: null,
       questions: [],
+      budgets: {},
       mode: null,
     };
   }
@@ -284,7 +322,15 @@ export async function startTimedSet(config: {
     .values({ mode, config: config as unknown as Record<string, unknown> })
     .returning()
     .get();
-  return { error: null, sessionId: session.id, questions: picked, mode };
+  // Timed sets run on the section clock; per-question ramp budgets do
+  // not apply there.
+  return {
+    error: null,
+    sessionId: session.id,
+    questions: picked,
+    budgets: {},
+    mode,
+  };
 }
 
 export type TimedResultInput = {

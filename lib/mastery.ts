@@ -19,6 +19,7 @@ import {
   rungState,
   type RungState,
 } from "./mastery-rules.ts";
+import { clampDifficulty, rampStage, type RampStage } from "./ramp.ts";
 
 export { MASTERY_BAR, MIN_ATTEMPTS, type RungState } from "./mastery-rules.ts";
 
@@ -29,6 +30,8 @@ export type Rung = {
   total: number;
   /** Verified questions available in this cell. */
   available: number;
+  /** Timed-transfer ramp stage for this cell (lib/ramp.ts). */
+  pace: RampStage;
 };
 
 export type Ladder = {
@@ -46,6 +49,7 @@ export async function computeLadders(): Promise<Ladder[]> {
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
       correct: attempts.correct,
+      timeSeconds: attempts.timeSeconds,
       id: attempts.id,
     })
     .from(attempts)
@@ -67,12 +71,15 @@ export async function computeLadders(): Promise<Ladder[]> {
   }
 
   // Most recent MASTERY_WINDOW attempts per cell (rows arrive newest-first).
-  const cellAttempts = new Map<string, boolean[]>();
+  const cellAttempts = new Map<
+    string,
+    Array<{ correct: boolean; timeSeconds: number }>
+  >();
   for (const r of rows) {
     const key = `${r.subtopic}|${r.difficulty}`;
     const list = cellAttempts.get(key) ?? [];
     if (list.length < MASTERY_WINDOW) {
-      list.push(r.correct);
+      list.push({ correct: r.correct, timeSeconds: r.timeSeconds });
       cellAttempts.set(key, list);
     }
   }
@@ -82,14 +89,18 @@ export async function computeLadders(): Promise<Ladder[]> {
       const key = `${subtopic}|${difficulty}`;
       const available = availableByCell.get(key) ?? 0;
       const recent = cellAttempts.get(key) ?? [];
-      const correct = recent.filter(Boolean).length;
+      const correct = recent.filter((a) => a.correct).length;
       const total = recent.length;
       return {
         difficulty,
-        state: rungState(recent, available),
+        state: rungState(
+          recent.map((a) => a.correct),
+          available,
+        ),
         correct,
         total,
         available,
+        pace: rampStage(recent, clampDifficulty(difficulty)),
       };
     });
     const next = rungs.find(

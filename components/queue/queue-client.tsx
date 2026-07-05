@@ -8,6 +8,7 @@ import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import type { RampBudget } from "@/lib/ramp";
 import {
   CONFIDENCE_LABELS,
   ERROR_TYPES,
@@ -74,6 +75,7 @@ export function QueueClient({
   const [runner, setRunner] = useState<{
     sessionId: number;
     questions: Question[];
+    budgets: Record<number, RampBudget>;
   } | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +97,11 @@ export function QueueClient({
       if (res.error != null || res.sessionId == null) {
         setError(res.error ?? "Could not start the redo run.");
       } else {
-        setRunner({ sessionId: res.sessionId, questions: res.questions });
+        setRunner({
+          sessionId: res.sessionId,
+          questions: res.questions,
+          budgets: res.budgets,
+        });
       }
     } catch {
       setError("Could not start the redo run — the server did not respond.");
@@ -182,6 +188,7 @@ export function QueueClient({
         mode="redo"
         questions={runner.questions}
         timing="soft"
+        budgets={runner.budgets}
         onRestart={() => {
           setRunner(null);
           router.refresh();

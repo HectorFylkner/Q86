@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
 import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
+import { RAMP_STAGE_LABELS } from "@/lib/ramp";
 import {
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
@@ -22,8 +23,10 @@ export default async function MasteryPage() {
         <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
         <p className="text-xs text-graphite">
           A rung clears at ≥{Math.round(MASTERY_BAR * 100)}% over your last 10
-          attempts (minimum {MIN_ATTEMPTS}). {masteredCount} of{" "}
-          {ladders.length} ladders fully climbed.
+          attempts (minimum {MIN_ATTEMPTS}). Each cell also carries a pace
+          stage — no clock until accuracy is proven, then a soft cap, then
+          exam pace. {masteredCount} of {ladders.length} ladders fully
+          climbed.
         </p>
       </div>
 
@@ -65,7 +68,7 @@ export default async function MasteryPage() {
                           title={
                             rung.state === "empty"
                               ? `D${rung.difficulty}: no questions in the bank`
-                              : `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window`
+                              : `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window · pace: ${RAMP_STAGE_LABELS[rung.pace]}`
                           }
                           className={cn(
                             "rounded-[4px] border text-center font-mono text-[11px] leading-6",
@@ -86,12 +89,23 @@ export default async function MasteryPage() {
                     ))}
                   </div>
                   {ladder.currentRung != null && (
-                    <Link
-                      href={`/drill?sub=${ladder.subtopic}&d=${ladder.currentRung}`}
-                      className="mt-2 inline-block text-xs font-medium text-ballpoint hover:underline"
-                    >
-                      Work rung D{ladder.currentRung} →
-                    </Link>
+                    <div className="mt-2 flex items-baseline gap-2">
+                      <Link
+                        href={`/drill?sub=${ladder.subtopic}&d=${ladder.currentRung}`}
+                        className="text-xs font-medium text-ballpoint hover:underline"
+                      >
+                        Work rung D{ladder.currentRung} →
+                      </Link>
+                      <span className="font-mono text-[10px] uppercase tracking-wide text-graphite/80">
+                        {
+                          RAMP_STAGE_LABELS[
+                            ladder.rungs.find(
+                              (r) => r.difficulty === ladder.currentRung,
+                            )?.pace ?? "build"
+                          ]
+                        }
+                      </span>
+                    </div>
                   )}
                 </div>
               ))}

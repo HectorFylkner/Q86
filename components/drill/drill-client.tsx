@@ -8,6 +8,7 @@ import {
   type DrillTiming,
 } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import type { RampBudget } from "@/lib/ramp";
 import type { SessionFocus, Subtopic } from "@/lib/taxonomy";
 import { DrillSetup, type CountRow, type DrillConfigValue } from "./drill-setup";
 import { QuestionRunner } from "./question-runner";
@@ -21,6 +22,7 @@ type Stage =
       questions: Question[];
       timing: DrillTiming;
       focus: SessionFocus;
+      budgets: Record<number, RampBudget>;
       test?: Subtopic;
     };
 
@@ -71,6 +73,7 @@ export function DrillClient({
             questions: res.questions,
             timing: "soft",
             focus: "focused",
+            budgets: res.budgets,
             test: autoStartTest,
           });
         }
@@ -99,6 +102,7 @@ export function DrillClient({
             questions: res.questions,
             timing: "soft",
             focus: "focused",
+            budgets: res.budgets,
           });
         }
       })
@@ -124,6 +128,7 @@ export function DrillClient({
         questions: res.questions,
         timing: config.timing,
         focus: config.focus,
+        budgets: res.budgets,
       });
     } catch {
       setStage({
@@ -152,6 +157,7 @@ export function DrillClient({
         timing={stage.timing}
         focus={stage.focus}
         test={stage.test}
+        budgets={stage.budgets}
         onRestart={() => setStage({ kind: "setup", error: null })}
       />
     );

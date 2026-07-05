@@ -11,6 +11,7 @@ import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
+import { RAMP_STAGE_LABELS, type RampBudget } from "@/lib/ramp";
 import type { Question } from "@/lib/db/schema";
 import {
   DIFFICULTY_LABELS,
@@ -46,6 +47,7 @@ export function QuestionRunner({
   timing,
   focus = "focused",
   test,
+  budgets,
   onRestart,
 }: {
   sessionId: number;
@@ -55,6 +57,9 @@ export function QuestionRunner({
   focus?: SessionFocus;
   /** Set when this run is a chapter test for the given subtopic. */
   test?: Subtopic | null;
+  /** Timed-transfer ramp target per question id; the clock tightens
+   *  only where recent accuracy has earned it. */
+  budgets?: Record<number, RampBudget>;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -341,7 +346,15 @@ export function QuestionRunner({
   }
 
   const revealed = phase === "revealed";
-  const overTarget = timing === "soft" && elapsed > SOFT_TARGET_SECONDS;
+  const ramp = budgets?.[question.id] ?? null;
+  // The ramp overrides the blanket 2:15: build-stage cells show no
+  // ticking clock at all (accuracy first), later stages show their
+  // earned target.
+  const targetSeconds = ramp
+    ? ramp.budgetSeconds
+    : SOFT_TARGET_SECONDS;
+  const overTarget =
+    timing === "soft" && targetSeconds != null && elapsed > targetSeconds;
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
@@ -355,17 +368,36 @@ export function QuestionRunner({
           <Chip>{DIFFICULTY_LABELS[question.difficulty as Difficulty]}</Chip>
           {question.format === "data_sufficiency" && <Chip>DS</Chip>}
         </div>
-        {timing === "soft" && !revealed && (
-          <span
-            className={cn(
-              "font-mono text-sm",
-              overTarget ? "text-amber" : "text-graphite",
-            )}
-          >
-            {formatSeconds(elapsed)}
-            <span className="ml-1.5 text-[10px] opacity-70">/ 2:15</span>
-          </span>
-        )}
+        {timing === "soft" &&
+          !revealed &&
+          (targetSeconds != null ? (
+            <span
+              className={cn(
+                "font-mono text-sm",
+                overTarget ? "text-amber" : "text-graphite",
+              )}
+              title={
+                ramp
+                  ? ramp.stage === "exam"
+                    ? "Exam pace — accuracy held inside the soft cap, so this cell now trains at the exam benchmark."
+                    : "Soft cap — accuracy is proven here; the exam benchmark comes once you hold it under this cap."
+                  : undefined
+              }
+            >
+              {formatSeconds(elapsed)}
+              <span className="ml-1.5 text-[10px] opacity-70">
+                / {formatSeconds(targetSeconds)}
+                {ramp && ` · ${RAMP_STAGE_LABELS[ramp.stage]}`}
+              </span>
+            </span>
+          ) : (
+            <span
+              className="font-mono text-[10px] uppercase tracking-wide text-graphite/80"
+              title="This cell hasn't proven accuracy yet, so no clock is shown. Get it accurate; the cap arrives on its own."
+            >
+              no clock yet — accuracy first
+            </span>
+          ))}
       </div>
 
       <motion.div
