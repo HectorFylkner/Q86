@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 
 export const dynamic = "force-dynamic";
 
+/** The front door: bare graph paper, the wordmark at display scale, one
+ *  input in the global chrome, one working-ink button. No shell chrome
+ *  renders until the visitor is in. */
 export default async function LoginPage({
   searchParams,
 }: {
@@ -10,32 +14,44 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="mx-auto mt-16 max-w-sm">
-      <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
-        <h1 className="font-display text-lg font-semibold">Q86</h1>
-        <p className="mt-1 text-sm text-graphite">
-          This instance is private. Enter the site password to train.
+    <div className="mx-auto flex min-h-[70vh] w-full max-w-sm flex-col justify-center">
+      <div className="text-center">
+        <p className="font-mono text-caption uppercase tracking-wider text-graphite">
+          Private instance
         </p>
-        <form method="POST" action="/api/login" className="mt-4 space-y-3">
+        <h1 className="mt-2 font-display text-5xl font-bold tracking-tight text-ink">
+          Q86
+        </h1>
+        <p className="mt-1.5 text-sm text-graphite">the target is the name</p>
+      </div>
+      <div className="mt-8 rounded-card border border-grid bg-surface p-6 shadow-ambient">
+        <form method="POST" action="/api/login" className="space-y-3">
+          <label
+            htmlFor="password"
+            className="block font-mono text-caption uppercase tracking-wider text-graphite"
+          >
+            Site password
+          </label>
           <input
+            id="password"
             type="password"
             name="password"
             autoFocus
             required
-            placeholder="Site password"
-            aria-label="Site password"
-            className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm outline-none focus:border-ballpoint"
+            placeholder="••••••••"
+            className="w-full text-sm"
           />
           {error && (
-            <p className="text-sm text-redpen">
-              That password is not right — try again.
-            </p>
+            <ErrorBanner>That password is not right — try again.</ErrorBanner>
           )}
           <Button type="submit" className="w-full">
             Enter
           </Button>
         </form>
       </div>
+      <p className="mt-6 text-center font-mono text-caption text-graphite">
+        Q1 pays the same as Q21.
+      </p>
     </div>
   );
 }
