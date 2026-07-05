@@ -19,7 +19,7 @@ export default async function MasteryPage() {
     <div className="space-y-4">
       <SectionTabs group="progress" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
+        <h1 className="font-display text-2xl font-semibold">Mastery ladders</h1>
         <p className="text-xs text-graphite">
           A rung clears at ≥{Math.round(MASTERY_BAR * 100)}% over your last 10
           attempts (minimum {MIN_ATTEMPTS}). {masteredCount} of{" "}
@@ -32,7 +32,7 @@ export default async function MasteryPage() {
           key={skill}
           className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             {SKILL_LABELS[skill]}
           </h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -49,7 +49,7 @@ export default async function MasteryPage() {
                   )}
                 >
                   <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="text-sm font-medium">
+                    <h3 className="font-display text-sm font-semibold">
                       {SUBTOPIC_LABELS[ladder.subtopic]}
                     </h3>
                     {ladder.mastered && (

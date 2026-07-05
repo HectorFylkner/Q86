@@ -110,7 +110,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
           transition={{ duration: 0.15, ease: "easeOut" }}
           className="block"
         >
-        <p className="font-mono text-micro uppercase tracking-wide text-graphite">
+        <p className="font-mono text-micro uppercase tracking-wider text-graphite">
           {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
           missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
         </p>

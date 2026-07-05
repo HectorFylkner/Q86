@@ -66,12 +66,12 @@ export function MarkingSummary({
 
   return (
     <div className="space-y-5">
-      <h2 className="font-display text-lg font-semibold">Section marked</h2>
+      <h2 className="font-display text-base font-semibold">Section marked</h2>
 
       <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-grid text-left text-xs text-graphite">
+            <tr className="border-b border-grid text-left font-mono text-micro uppercase tracking-wider text-graphite">
               <th className="px-3 py-2 font-normal">Q#</th>
               <th className="px-3 py-2 font-normal">Time</th>
               <th className="px-3 py-2 font-normal">Result</th>
@@ -398,7 +398,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-caption leading-tight text-graphite">{label}</div>
+      <div className="font-mono text-micro uppercase tracking-wider text-graphite leading-tight">{label}</div>
       <Odometer
         text={value}
         className={cn(

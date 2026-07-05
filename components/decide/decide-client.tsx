@@ -133,7 +133,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
   if (phase === "done") {
     return (
       <section className="mx-auto max-w-2xl rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
-        <p className="font-display text-lg font-semibold">
+        <p className="font-display text-base font-semibold">
           {aligned} / {items.length} calls aligned with your record
         </p>
         <p className="mt-2 text-sm text-graphite">

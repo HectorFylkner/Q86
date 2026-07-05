@@ -20,7 +20,7 @@ export default async function ImportPage() {
   return (
     <div className="space-y-5">
       <SectionTabs group="progress" />
-      <h1 className="font-display text-xl font-semibold">
+      <h1 className="font-display text-2xl font-semibold">
         Score-report import
       </h1>
       <ImportClient />
@@ -28,7 +28,7 @@ export default async function ImportPage() {
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-display text-sm font-semibold">
+            <h2 className="font-display text-base font-semibold">
               Backup your data
             </h2>
             <p className="mt-0.5 text-xs text-graphite">
@@ -44,7 +44,7 @@ export default async function ImportPage() {
 
       {reports.length > 0 && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Imported baselines · {reports.length}
           </h2>
           <p className="mt-0.5 text-xs text-graphite">

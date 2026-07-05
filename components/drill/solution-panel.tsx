@@ -97,7 +97,7 @@ export function SolutionPanel({
 
       {priorAttempts.length > 0 && (
         <section className="mt-4 border-t border-grid pt-3">
-          <h3 className="font-display text-xs font-semibold text-graphite">
+          <h3 className="font-display text-sm font-semibold text-graphite">
             Your history on this question
           </h3>
           <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite">

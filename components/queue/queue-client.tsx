@@ -198,7 +198,7 @@ export function QueueClient({
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Due now · {due.length}
           </h2>
           {due.length > 0 && (
@@ -256,7 +256,7 @@ export function QueueClient({
 
       {upcoming.length > 0 && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Scheduled · {upcoming.length}
           </h2>
           <ul className="mt-2 space-y-1">
@@ -279,7 +279,7 @@ export function QueueClient({
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Error log
             <span className="ml-2 font-mono text-xs font-normal text-graphite">
               {filteredLog.length} of {log.length} attempts
@@ -340,7 +340,7 @@ export function QueueClient({
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-grid text-left text-xs text-graphite">
+              <tr className="border-b border-grid text-left font-mono text-micro uppercase tracking-wider text-graphite">
                 <th className="py-2 pr-3 font-normal">When</th>
                 <th className="py-2 pr-3 font-normal">Subtopic</th>
                 <th className="py-2 pr-3 font-normal">D</th>

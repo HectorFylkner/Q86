@@ -55,7 +55,7 @@ export default async function PatternsPage({
   return (
     <div className="space-y-4">
       <SectionTabs group="trainers" />
-      <h1 className="font-display text-xl font-semibold">Pattern trainer</h1>
+      <h1 className="font-display text-2xl font-semibold">Pattern trainer</h1>
       <PatternsClient
         stats={stats}
         dayStreak={await computeDayStreak()}

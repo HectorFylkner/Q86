@@ -192,7 +192,7 @@ export function DrillSetup({
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="text-sm font-medium">Difficulty</h3>
+            <h3 className="font-display text-sm font-semibold">Difficulty</h3>
             <div className="mt-1.5 flex items-center gap-2 text-sm">
               <select
                 aria-label="Minimum difficulty"
@@ -234,7 +234,7 @@ export function DrillSetup({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Questions</h3>
+            <h3 className="font-display text-sm font-semibold">Questions</h3>
             <div className="mt-1.5 flex gap-1.5">
               {COUNT_OPTIONS.map((c) => (
                 <button
@@ -254,7 +254,7 @@ export function DrillSetup({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Timing</h3>
+            <h3 className="font-display text-sm font-semibold">Timing</h3>
             <div className="mt-1.5 flex gap-1.5">
               {(
                 [
@@ -279,7 +279,7 @@ export function DrillSetup({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Format</h3>
+            <h3 className="font-display text-sm font-semibold">Format</h3>
             <div className="mt-1.5 flex gap-1.5">
               {(
                 [
@@ -306,7 +306,7 @@ export function DrillSetup({
         </div>
 
         <div className="mt-4 border-t border-grid pt-4">
-          <h3 className="text-sm font-medium">Session focus</h3>
+          <h3 className="font-display text-sm font-semibold">Session focus</h3>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {(
               [

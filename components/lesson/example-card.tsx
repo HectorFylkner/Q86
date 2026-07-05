@@ -33,7 +33,7 @@ export function ExampleCard({
   return (
     <div className="overflow-hidden rounded-card border border-grid bg-surface shadow-ambient">
       <div className="flex items-center justify-between gap-2 border-b border-grid px-4 py-2.5 sm:px-5">
-        <span className="font-mono text-caption uppercase tracking-wider text-graphite">
+        <span className="font-mono text-micro uppercase tracking-wider text-graphite">
           Example {n}
         </span>
         <span

@@ -23,7 +23,7 @@ export default async function TimedPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-xl font-semibold">Timed sets</h1>
+      <h1 className="font-display text-2xl font-semibold">Timed sets</h1>
       <TimedClient
         verifiedTotal={verifiedTotal}
         autoStart={start === "full" || start === "mini" ? start : null}

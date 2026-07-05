@@ -74,7 +74,7 @@ export default async function QueuePage({
   return (
     <div className="space-y-4">
       <SectionTabs group="review" />
-      <h1 className="font-display text-xl font-semibold">
+      <h1 className="font-display text-2xl font-semibold">
         Redo queue &amp; error log
       </h1>
       <QueueClient

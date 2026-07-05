@@ -187,7 +187,7 @@ export function PostmortemClient({
       </details>
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
+        <h2 className="font-display text-base font-semibold">
           Scratch work
         </h2>
         <p className="mb-3 mt-1 text-sm text-graphite">
@@ -232,7 +232,7 @@ export function PostmortemClient({
 
       {!coach && attempt.aiFeedbackMd && coachState.kind !== "running" && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="mb-2 font-display text-sm font-semibold">
+          <h2 className="mb-2 font-display text-base font-semibold">
             Saved post-mortem
           </h2>
           <Md source={attempt.aiFeedbackMd} className="text-body" />
@@ -275,7 +275,7 @@ export function PostmortemClient({
 
       {(coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Classification
             <span className="ml-2 text-xs font-normal text-graphite">
               AI-suggested — confirm or override before it enters the log
@@ -351,7 +351,7 @@ export function PostmortemClient({
 
       {(coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">Twin drills</h2>
+          <h2 className="font-display text-base font-semibold">Twin drills</h2>
           <p className="mt-1 text-sm text-graphite">
             Two fresh twins of this question — same math skeleton, opposite
             context ({question.context === "pure" ? "real" : "pure"}). Both

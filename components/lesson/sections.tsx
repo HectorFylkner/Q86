@@ -22,7 +22,7 @@ export function SectionShell({
         <span className="font-mono text-caption font-medium text-ballpoint">
           {String(index).padStart(2, "0")}
         </span>
-        <h2 className="font-display text-lg font-semibold">{title}</h2>
+        <h2 className="font-display text-base font-semibold">{title}</h2>
         {tagline && (
           <span className="text-xs text-graphite">{tagline}</span>
         )}

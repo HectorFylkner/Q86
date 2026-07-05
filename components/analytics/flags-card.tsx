@@ -32,7 +32,7 @@ export async function FlagsCard() {
   return (
     <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient sm:p-5">
       <div className="flex items-baseline gap-2">
-        <h2 className="font-display text-sm font-semibold">Content flags</h2>
+        <h2 className="font-display text-base font-semibold">Content flags</h2>
         <span className="font-mono text-caption text-graphite">
           {open.length} open
         </span>

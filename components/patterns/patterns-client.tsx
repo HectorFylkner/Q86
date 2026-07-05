@@ -271,7 +271,7 @@ export function PatternsClient({
                   text={String(s.rating)}
                   className="font-mono text-lg font-medium"
                 />
-                <span className="text-micro text-graphite">ELO</span>
+                <span className="font-mono text-micro uppercase tracking-wider text-graphite">ELO</span>
               </span>
               <span className="mt-1 font-mono text-xs text-graphite">
                 best {s.bestRound} · streak {s.streak} ·{" "}
@@ -481,7 +481,7 @@ function answersMatch(user: string, canonical: string): boolean {
 function StatTile({ label, text }: { label: string; text: string }) {
   return (
     <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-caption text-graphite">{label}</div>
+      <div className="font-mono text-micro uppercase tracking-wider text-graphite">{label}</div>
       <Odometer text={text} className="mt-1 font-mono text-xl font-medium" />
     </div>
   );

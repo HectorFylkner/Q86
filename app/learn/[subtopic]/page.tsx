@@ -59,7 +59,7 @@ export default async function LessonPage({
 
   const header = (
     <div>
-      <p className="font-mono text-caption uppercase tracking-wide text-graphite">
+      <p className="font-mono text-caption uppercase tracking-wider text-graphite">
         <Link href="/learn" className="hover:text-ink">
           Learn
         </Link>{" "}

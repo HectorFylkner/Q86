@@ -80,7 +80,7 @@ export function ImportClient() {
   return (
     <div className="space-y-5">
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
+        <h2 className="font-display text-base font-semibold">
           Paste the score report text
         </h2>
         <p className="mt-1 text-xs text-graphite">
@@ -131,13 +131,13 @@ export function ImportClient() {
           transition={{ duration: 0.15, ease: "easeOut" }}
           className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
-          <h2 className="font-display text-sm font-semibold">
+          <h2 className="font-display text-base font-semibold">
             Parsed result — confirm before saving
           </h2>
 
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div>
-              <h3 className="text-xs font-medium text-graphite">Sections</h3>
+              <h3 className="font-mono text-micro uppercase tracking-wider text-graphite">Sections</h3>
               <table className="mt-1 w-full text-sm">
                 <tbody>
                   {parsed.sections.map((s) => (
@@ -166,7 +166,7 @@ export function ImportClient() {
             </div>
 
             <div>
-              <h3 className="text-xs font-medium text-graphite">
+              <h3 className="font-mono text-micro uppercase tracking-wider text-graphite">
                 Quant fundamental skills
               </h3>
               <table className="mt-1 w-full text-sm">
@@ -189,7 +189,7 @@ export function ImportClient() {
                 </tbody>
               </table>
 
-              <h3 className="mt-3 text-xs font-medium text-graphite">
+              <h3 className="mt-3 font-mono text-micro uppercase tracking-wider text-graphite">
                 Domains &amp; contexts
               </h3>
               <p className="mt-1 text-sm">

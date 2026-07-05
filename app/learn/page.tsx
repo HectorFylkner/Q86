@@ -24,7 +24,7 @@ export default async function LearnPage() {
     <div className="space-y-5">
       <div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="font-display text-xl font-semibold">Learn</h1>
+          <h1 className="font-display text-2xl font-semibold">Learn</h1>
           <p className="text-xs text-graphite">
             {lessons.length} concept chapters, one per drillable subtopic
             {passedCount > 0 &&
@@ -66,7 +66,7 @@ export default async function LearnPage() {
         return (
           <section key={skill}>
             <div className="mb-2 flex items-baseline gap-2">
-              <h2 className="font-display text-sm font-semibold">
+              <h2 className="font-display text-base font-semibold">
                 {SKILL_LABELS[skill]}
               </h2>
               <span className="font-mono text-caption text-graphite">

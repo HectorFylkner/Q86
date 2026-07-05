@@ -92,13 +92,13 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <table className="text-sm">
               <thead>
                 <tr>
-                  <th className="pr-3 text-left text-xs font-normal text-graphite">
+                  <th className="pr-3 text-left font-mono text-micro uppercase tracking-wider font-normal text-graphite">
                     Subtopic
                   </th>
                   {ERROR_TYPES.map((et) => (
                     <th
                       key={et}
-                      className="px-1 pb-1 text-center text-micro font-normal text-graphite"
+                      className="px-1 pb-1 text-center font-mono text-micro uppercase tracking-wider font-normal text-graphite"
                     >
                       {ERROR_TYPE_LABELS[et]}
                     </th>
@@ -156,7 +156,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-xs">
               <thead>
-                <tr className="text-left text-graphite">
+                <tr className="text-left font-mono text-micro uppercase tracking-wider text-graphite">
                   <th className="py-1 pr-2 font-medium">Subtopic</th>
                   {[2, 3, 4, 5].map((d) => (
                     <th key={d} className="w-24 py-1 pr-2 font-medium">
@@ -379,7 +379,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-grid text-left text-xs text-graphite">
+                <tr className="border-b border-grid text-left font-mono text-micro uppercase tracking-wider text-graphite">
                   <th className="py-2 pr-3 font-normal">When</th>
                   <th className="py-2 pr-3 font-normal">Subtopic</th>
                   <th className="py-2 pr-3 font-normal">Reason</th>
@@ -656,7 +656,7 @@ function Section({
       transition={{ duration: 0.15, ease: "easeOut" }}
       className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
     >
-      <h2 className="font-display text-sm font-semibold">{title}</h2>
+      <h2 className="font-display text-base font-semibold">{title}</h2>
       <p className="mb-3 mt-0.5 text-xs text-graphite">{subtitle}</p>
       {children}
     </motion.section>
@@ -666,7 +666,7 @@ function Section({
 function MirrorGroup({ title, bars }: { title: string; bars: MirrorBar[] }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-medium text-graphite">{title}</h3>
+      <h3 className="mb-2 font-mono text-micro uppercase tracking-wider text-graphite">{title}</h3>
       <div className="space-y-2">
         {bars.map((bar) => {
           const pct = bar.total > 0 ? percent(bar.correct, bar.total) : null;
@@ -708,7 +708,7 @@ function ZoneStat({
 }) {
   return (
     <div className="rounded-card border border-grid bg-surface px-3 py-2">
-      <div className="text-caption text-graphite">{label}</div>
+      <div className="font-mono text-micro uppercase tracking-wider text-graphite">{label}</div>
       <div
         className={cn(
           "font-mono text-xl font-medium",
@@ -725,7 +725,7 @@ function ZoneStat({
 
 function Footer() {
   return (
-    <p className="border-t border-grid pt-4 text-center text-xs text-graphite">
+    <p className="border-t border-grid pt-4 text-center text-caption text-graphite">
       Calibration comes from official GMAC material only. This platform
       trains; official mocks measure.
     </p>

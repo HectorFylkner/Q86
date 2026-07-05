@@ -40,12 +40,12 @@ export default async function TodayPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold">Today</h1>
+          <h1 className="font-display text-2xl font-semibold">Today</h1>
           {days != null ? (
             <p className="mt-1 flex items-baseline gap-2">
               <Odometer
                 text={String(Math.max(0, days))}
-                className="font-display text-5xl font-bold"
+                className="font-mono text-5xl font-semibold"
               />
               <span className="text-sm text-graphite">
                 days to the test
@@ -113,7 +113,7 @@ export default async function TodayPage() {
       {plan.phase && (
         <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
+            <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-caption font-semibold uppercase tracking-wider">
               {PHASE_LABELS[plan.phase]}
             </span>
             <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
@@ -249,7 +249,7 @@ export default async function TodayPage() {
       </div>
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
+        <h2 className="font-display text-base font-semibold">
           Skill weights driving today&apos;s mix
         </h2>
         <p className="mt-0.5 text-xs text-graphite">
@@ -297,7 +297,7 @@ function PlanCard({
 }) {
   return (
     <div className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient">
-      <h2 className="font-display text-sm font-semibold">{title}</h2>
+      <h2 className="font-display text-base font-semibold">{title}</h2>
       <p className="mt-1 flex-1 text-xs text-graphite">{body}</p>
       <div className="mt-3">{children}</div>
     </div>

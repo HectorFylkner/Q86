@@ -239,7 +239,7 @@ export function QuestionRunner({
                 : "border-amber/50 bg-amber/5",
             )}
           >
-            <h2 className="font-display text-lg font-semibold">
+            <h2 className="font-display text-base font-semibold">
               {passed ? "Chapter test passed" : "Not passed yet"}
             </h2>
             <p className="mt-1 text-sm text-graphite">
@@ -260,7 +260,7 @@ export function QuestionRunner({
           </div>
         )}
         <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
-          <h2 className="font-display text-lg font-semibold">
+          <h2 className="font-display text-base font-semibold">
             {test != null
               ? "The paper trail"
               : mode === "redo"
@@ -276,7 +276,7 @@ export function QuestionRunner({
         <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-grid text-left text-xs text-graphite">
+              <tr className="border-b border-grid text-left font-mono text-micro uppercase tracking-wider text-graphite">
                 <th className="px-3 py-2 font-normal">#</th>
                 <th className="px-3 py-2 font-normal">Subtopic</th>
                 <th className="px-3 py-2 font-normal">Result</th>
@@ -467,7 +467,7 @@ export function QuestionRunner({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-xs text-graphite">{label}</div>
+      <div className="font-mono text-micro uppercase tracking-wider text-graphite">{label}</div>
       <div className="font-mono text-2xl font-medium">{value}</div>
     </div>
   );
