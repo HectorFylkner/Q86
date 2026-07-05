@@ -12,6 +12,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
     "db:push": "node -e \"require('fs').mkdirSync('data',{recursive:true})\" && drizzle-kit push",
     "seed": "node --experimental-strip-types scripts/seed.ts",
     "backup": "node --experimental-strip-types scripts/backup.ts"

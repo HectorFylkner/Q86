@@ -85,6 +85,8 @@ export type DailyPlan = {
   weights: Record<FundamentalSkill, number>;
   dueRedoCount: number;
   timedSetToday: boolean;
+  /** The cadence actually driving timedSetToday, after phase adjustment. */
+  effectiveCadenceDays: number;
 };
 
 /** Floor 5% per skill so every skill always gets maintenance reps. */
@@ -193,15 +195,8 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     .slice(0, 2)
     .map(([key]) => key);
 
-  // The Speed phase forces timed work at least every other day, whatever
-  // the configured cadence; Peak week backs off to every third day.
   const phase = phaseOf(inputs.daysToTest);
-  const effectiveCadence =
-    phase === "speed"
-      ? Math.min(inputs.cadenceDays, 2)
-      : phase === "peak"
-        ? Math.max(inputs.cadenceDays, 3)
-        : inputs.cadenceDays;
+  const cadence = effectiveCadence(phase, inputs.cadenceDays);
 
   return {
     phase,
@@ -213,7 +208,18 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     },
     weights,
     dueRedoCount: inputs.dueRedoCount,
-    timedSetToday:
-      effectiveCadence > 0 && inputs.dayIndex % effectiveCadence === 0,
+    timedSetToday: cadence > 0 && inputs.dayIndex % cadence === 0,
+    effectiveCadenceDays: cadence,
   };
+}
+
+/** The Speed phase forces timed work at least every other day, whatever
+ *  the configured cadence; Peak week backs off to every third day. */
+export function effectiveCadence(
+  phase: TrainingPhase | null,
+  cadenceDays: number,
+): number {
+  if (phase === "speed") return Math.min(cadenceDays, 2);
+  if (phase === "peak") return Math.max(cadenceDays, 3);
+  return cadenceDays;
 }

@@ -10,17 +10,17 @@ import {
 
 /**
  * Mastery ladders (TTP-style structure, original implementation): every
- * subtopic is a ladder of difficulty rungs D2→D5. A rung is mastered by
- * sustained accuracy — at least MIN_ATTEMPTS focused attempts in that
- * cell with ≥ MASTERY_BAR accuracy over the most recent WINDOW. Rungs
- * are never hard-locked: the ladder tells you where to work, it does
- * not forbid working elsewhere.
+ * subtopic is a ladder of difficulty rungs D2→D5. Rung rules live in
+ * lib/mastery-rules.ts. Rungs are never hard-locked: the ladder tells
+ * you where to work, it does not forbid working elsewhere.
  */
-export const MASTERY_BAR = 0.85;
-export const MIN_ATTEMPTS = 6;
-const WINDOW = 10;
+import {
+  MASTERY_WINDOW,
+  rungState,
+  type RungState,
+} from "./mastery-rules.ts";
 
-export type RungState = "mastered" | "working" | "untouched" | "empty";
+export { MASTERY_BAR, MIN_ATTEMPTS, type RungState } from "./mastery-rules.ts";
 
 export type Rung = {
   difficulty: number;
@@ -66,12 +66,12 @@ export async function computeLadders(): Promise<Ladder[]> {
     availableByCell.set(key, (availableByCell.get(key) ?? 0) + 1);
   }
 
-  // Most recent WINDOW attempts per cell (rows arrive newest-first).
+  // Most recent MASTERY_WINDOW attempts per cell (rows arrive newest-first).
   const cellAttempts = new Map<string, boolean[]>();
   for (const r of rows) {
     const key = `${r.subtopic}|${r.difficulty}`;
     const list = cellAttempts.get(key) ?? [];
-    if (list.length < WINDOW) {
+    if (list.length < MASTERY_WINDOW) {
       list.push(r.correct);
       cellAttempts.set(key, list);
     }
@@ -84,13 +84,13 @@ export async function computeLadders(): Promise<Ladder[]> {
       const recent = cellAttempts.get(key) ?? [];
       const correct = recent.filter(Boolean).length;
       const total = recent.length;
-      let state: RungState;
-      if (available === 0) state = "empty";
-      else if (total === 0) state = "untouched";
-      else if (total >= MIN_ATTEMPTS && correct / total >= MASTERY_BAR)
-        state = "mastered";
-      else state = "working";
-      return { difficulty, state, correct, total, available };
+      return {
+        difficulty,
+        state: rungState(recent, available),
+        correct,
+        total,
+        available,
+      };
     });
     const next = rungs.find(
       (r) => r.state !== "mastered" && r.state !== "empty",

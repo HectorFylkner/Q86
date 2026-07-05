@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveSetting } from "@/lib/actions";
 
 export function SettingsForm({
   testDate,
   cadence,
+  timeZone,
 }: {
   testDate: string | null;
   cadence: number;
+  timeZone: string | null;
 }) {
   const router = useRouter();
   const [date, setDate] = useState(testDate ?? "");
@@ -18,10 +20,21 @@ export function SettingsForm({
     "idle",
   );
 
+  // Day boundaries (streaks, cadence, volume) follow the browser's
+  // timezone, not the server's — sync it silently whenever it changes.
+  useEffect(() => {
+    const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (browserTz && browserTz !== timeZone) {
+      saveSetting("timezone", browserTz)
+        .then(() => router.refresh())
+        .catch(() => {});
+    }
+  }, [timeZone, router]);
+
   async function save() {
     setState("saving");
     try {
-      if (date) await saveSetting("test_date", date);
+      await saveSetting("test_date", date);
       await saveSetting("timed_set_cadence", cadenceDays);
       setState("saved");
       router.refresh();

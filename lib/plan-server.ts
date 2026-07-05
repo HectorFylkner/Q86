@@ -18,17 +18,20 @@ import {
   type PlanInputs,
   type SkillRecord,
 } from "./plan.ts";
-import { baselineWeakness, getSetting, weightOverrides } from "./settings.ts";
+import { dayIndex, dayIndexFromKey } from "./local-day.ts";
+import {
+  appTimeZone,
+  baselineWeakness,
+  getSetting,
+  weightOverrides,
+} from "./settings.ts";
 import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
 
 export async function daysToTest(): Promise<number | null> {
   const raw = await getSetting("test_date");
-  if (!raw) return null;
-  const target = new Date(`${raw}T00:00:00`);
-  if (Number.isNaN(target.getTime())) return null;
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+  const tz = await appTimeZone();
+  return dayIndexFromKey(raw) - dayIndex(new Date(), tz);
 }
 
 async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
@@ -76,11 +79,9 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   ) as Record<PatternCategoryKey, number>;
 
   const cadenceRaw = Number((await getSetting("timed_set_cadence")) ?? "3");
-  // Local-calendar day index so the cadence flips at local midnight.
-  const now = new Date();
-  const localDayIndex = Math.floor(
-    (now.getTime() - now.getTimezoneOffset() * 60_000) / 86_400_000,
-  );
+  // Local-calendar day index (user timezone) so the cadence flips at the
+  // user's midnight, not the server's.
+  const localDayIndex = dayIndex(new Date(), await appTimeZone());
   return {
     daysToTest: await daysToTest(),
     skillAccuracy: await skillAccuracy(),

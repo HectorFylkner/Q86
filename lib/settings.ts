@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { baselineReports, settings, type BaselineReport } from "./db/schema.ts";
+import { isValidTimeZone } from "./local-day.ts";
 import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
 
 /** The only settings keys that exist (§6). */
@@ -11,6 +12,7 @@ export const SETTING_KEYS = [
   "model",
   "seed_progress",
   "user_retired_qids",
+  "timezone",
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
@@ -29,6 +31,16 @@ export async function putSetting(key: SettingKey, value: string): Promise<void> 
     .values({ key, value })
     .onConflictDoUpdate({ target: settings.key, set: { value } })
     .run();
+}
+
+/** The IANA zone all local-day math runs in (volume calendar, streaks,
+ *  plan cadence, days-to-test). Synced from the browser by the dashboard;
+ *  until then, the server's zone — wrong on a UTC host, but only until
+ *  the first dashboard visit. */
+export async function appTimeZone(): Promise<string> {
+  const raw = await getSetting("timezone");
+  if (raw && isValidTimeZone(raw)) return raw;
+  return new Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 export async function getLatestBaseline(): Promise<BaselineReport | null> {

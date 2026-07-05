@@ -6,10 +6,17 @@ import { attempts, questions, type Question } from "./db/schema.ts";
  * Decision drills (pacing triage): 45 seconds to look at a question and
  * commit — solve, educated guess, or bail — without solving it. The
  * verdict compares your call against what your own record says about
- * questions like it. The skill being trained is the one that saves
- * ruined sections: knowing which battles to fight.
+ * questions like it (rules in lib/decide-rules.ts). The skill being
+ * trained is the one that saves ruined sections: knowing which battles
+ * to fight.
  */
-export type DecideRecommendation = "solve" | "guess" | "bail";
+import {
+  predictCell,
+  recommend,
+  type DecideRecommendation,
+} from "./decide-rules.ts";
+
+export { recommend, type DecideRecommendation } from "./decide-rules.ts";
 
 export type DecideItem = {
   question: Question;
@@ -19,15 +26,6 @@ export type DecideItem = {
   sample: number;
   recommendation: DecideRecommendation;
 };
-
-/** Difficulty priors used until you have personal data in a cell. */
-const PRIORS: Record<number, number> = { 2: 0.85, 3: 0.7, 4: 0.55, 5: 0.4 };
-
-export function recommend(p: number): DecideRecommendation {
-  if (p >= 0.65) return "solve";
-  if (p >= 0.4) return "guess";
-  return "bail";
-}
 
 export async function buildDecideRound(size = 8): Promise<DecideItem[]> {
   const pool = await db
@@ -81,15 +79,14 @@ export async function buildDecideRound(size = 8): Promise<DecideItem[]> {
 
   return picked.map((question) => {
     const key = `${question.subtopic}|${question.difficulty}`;
-    const s = cellStats.get(key);
-    const usePersonal = s != null && s.total >= 4;
-    const predicted = usePersonal
-      ? s.correct / s.total
-      : (PRIORS[question.difficulty] ?? 0.5);
+    const { predicted, sample } = predictCell(
+      cellStats.get(key) ?? null,
+      question.difficulty,
+    );
     return {
       question,
       predicted,
-      sample: usePersonal ? s.total : 0,
+      sample,
       recommendation: recommend(predicted),
     };
   });

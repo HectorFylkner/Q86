@@ -30,7 +30,8 @@ export default async function TodayPage() {
   const cadence = inputs.cadenceDays;
   const daysUntilTimed = plan.timedSetToday
     ? 0
-    : cadence - (inputs.dayIndex % cadence);
+    : plan.effectiveCadenceDays -
+      (inputs.dayIndex % plan.effectiveCadenceDays);
   const deck = await todaysDeck();
   const deckWaiting = deck.due + deck.fresh;
   const firstRun =
@@ -57,7 +58,11 @@ export default async function TodayPage() {
             </p>
           )}
         </div>
-        <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
+        <SettingsForm
+          testDate={await getSetting("test_date")}
+          cadence={cadence}
+          timeZone={await getSetting("timezone")}
+        />
       </div>
 
       {firstRun && (

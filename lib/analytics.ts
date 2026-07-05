@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
@@ -8,6 +8,8 @@ import {
   redoQueue,
 } from "./db/schema.ts";
 import { ELO_START } from "./elo.ts";
+import { dayIndex, dayKey, keyFromDayIndex, shortLabelFromKey } from "./local-day.ts";
+import { appTimeZone } from "./settings.ts";
 import {
   PATTERN_CATEGORY_KEYS,
   PATTERN_CATEGORY_LABELS,
@@ -117,6 +119,7 @@ const EXPECTED_BY_CONFIDENCE: Record<Confidence, number> = {
 };
 
 export async function gatherAnalytics(): Promise<AnalyticsData> {
+  const tz = await appTimeZone();
   const rows = await db
     .select({
       id: attempts.id,
@@ -217,18 +220,26 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   const improved = editRows.filter((e) => !e.fromCorrect && e.toCorrect).length;
   const destroyed = editRows.filter((e) => e.fromCorrect && !e.toCorrect).length;
 
-  // Lock-confidence answers that were correct and then changed.
-  const attemptConfidence = await db
-    .select({
-      sessionId: attempts.sessionId,
-      questionId: attempts.questionId,
-      confidence: attempts.confidence,
-    })
-    .from(attempts)
-    .all();
-  const confidenceByKey = new Map(
-    attemptConfidence.map((a) => [`${a.sessionId}|${a.questionId}`, a.confidence]),
-  );
+  // Lock-confidence answers that were correct and then changed. Only the
+  // edited sessions' attempts matter; on a repeat attempt of the same
+  // question in one session the latest attempt wins, deterministically.
+  const editSessionIds = [...new Set(editRows.map((e) => e.sessionId))];
+  const attemptConfidence = editSessionIds.length
+    ? await db
+        .select({
+          id: attempts.id,
+          sessionId: attempts.sessionId,
+          questionId: attempts.questionId,
+          confidence: attempts.confidence,
+        })
+        .from(attempts)
+        .where(inArray(attempts.sessionId, editSessionIds))
+        .all()
+    : [];
+  const confidenceByKey = new Map<string, Confidence>();
+  for (const a of [...attemptConfidence].sort((x, y) => x.id - y.id)) {
+    confidenceByKey.set(`${a.sessionId}|${a.questionId}`, a.confidence);
+  }
   const lockCorrectChanged = editRows.filter(
     (e) =>
       e.fromCorrect &&
@@ -252,39 +263,30 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   });
 
   // --- rolling 7-day accuracy per skill, last 30 days -------------------------
+  // Day boundaries follow the user's timezone; each row's local day is
+  // computed once and windows compare whole days.
+  const rowDayIdx = rows.map((r) => dayIndex(new Date(r.createdAt), tz));
+  const todayIdx = dayIndex(new Date(), tz);
   const trend: TrendPoint[] = [];
-  const now = new Date();
   for (let back = 29; back >= 0; back--) {
-    const dayEnd = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - back,
-      23,
-      59,
-      59,
-    );
-    const windowStart = new Date(dayEnd.getTime() - 7 * 86_400_000);
+    const idx = todayIdx - back;
     const point: TrendPoint = {
-      date: `${dayEnd.getMonth() + 1}/${dayEnd.getDate()}`,
+      date: shortLabelFromKey(keyFromDayIndex(idx)),
       rates_ratio_percent: null,
       value_order_factors: null,
       equal_unequal_alg: null,
       counting_sets_series_prob_stats: null,
     };
     for (const skill of FUNDAMENTAL_SKILLS) {
-      const subset = rows.filter((r) => {
-        const t = new Date(r.createdAt).getTime();
-        return (
-          r.skill === skill &&
-          t > windowStart.getTime() &&
-          t <= dayEnd.getTime()
-        );
-      });
-      if (subset.length > 0) {
-        point[skill] = Math.round(
-          (subset.filter((r) => r.correct).length / subset.length) * 100,
-        );
+      let correct = 0;
+      let total = 0;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].skill !== skill) continue;
+        if (rowDayIdx[i] <= idx - 7 || rowDayIdx[i] > idx) continue;
+        total++;
+        if (rows[i].correct) correct++;
       }
+      if (total > 0) point[skill] = Math.round((correct / total) * 100);
     }
     trend.push(point);
   }
@@ -308,18 +310,11 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   {
     const counts = new Map<string, number>();
     for (const r of rows) {
-      const d = new Date(r.createdAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const key = dayKey(new Date(r.createdAt), tz);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
-    const today = new Date();
     for (let back = 83; back >= 0; back--) {
-      const d = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - back,
-      );
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const key = keyFromDayIndex(todayIdx - back);
       volume.push({ date: key, count: counts.get(key) ?? 0 });
     }
   }

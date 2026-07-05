@@ -1,15 +1,16 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { redoQueue } from "./db/schema.ts";
+import {
+  nextRedoState,
+  STAGE_DELAY_DAYS,
+  type RedoStage,
+} from "./redo-rules.ts";
 
-/** Stage 0|1|2 → due +2d / +7d / +21d after the scheduling event. */
-const STAGE_DELAY_DAYS = [2, 7, 21] as const;
+export { COLD_SOLVE_LIMIT_SECONDS, nextRedoState } from "./redo-rules.ts";
 
-/** Day-21 cold-solve gate: correct, unaided, within 2:30. */
-export const COLD_SOLVE_LIMIT_SECONDS = 150;
-
-function dueAt(stage: 0 | 1 | 2): Date {
-  return new Date(Date.now() + STAGE_DELAY_DAYS[stage] * 24 * 60 * 60 * 1000);
+function dueAfterDays(days: number): Date {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 }
 
 /** Enqueue a miss at stage 0 (+2d). If the question is already queued
@@ -25,7 +26,7 @@ export async function enqueueMiss(
     .get();
   if (existing) {
     await db.update(redoQueue)
-      .set({ stage: 0, dueAt: dueAt(0) })
+      .set({ stage: 0, dueAt: dueAfterDays(STAGE_DELAY_DAYS[0]) })
       .where(eq(redoQueue.id, existing.id))
       .run();
     return;
@@ -35,60 +36,42 @@ export async function enqueueMiss(
       questionId,
       sourceAttemptId,
       stage: 0,
-      dueAt: dueAt(0),
+      dueAt: dueAfterDays(STAGE_DELAY_DAYS[0]),
     })
     .run();
 }
 
 /**
- * Apply a redo attempt to the question's open queue item.
- *
- * Correct: stage 0 → 1 (+7d), stage 1 → 2 (+21d); stage 2 clears only via
- * the cold-solve gate (≤ 2:30), otherwise it re-enters at stage 1 (+7d).
- * Wrong at any stage: back to stage 0 (+2d).
+ * Apply a redo attempt to the question's open queue item (transition
+ * rules in lib/redo-rules.ts). Returns false when no open item exists —
+ * the caller decides whether the result should re-enter the ladder.
  */
 export async function applyRedoResult(
   questionId: number,
   correct: boolean,
   timeSeconds: number,
-): Promise<void> {
+): Promise<boolean> {
   const item = await db
     .select()
     .from(redoQueue)
     .where(and(eq(redoQueue.questionId, questionId), eq(redoQueue.cleared, false)))
     .orderBy(asc(redoQueue.dueAt))
     .get();
-  if (!item) return;
+  if (!item) return false;
 
-  if (!correct) {
+  const stage: RedoStage =
+    item.stage === 1 || item.stage === 2 ? item.stage : 0;
+  const next = nextRedoState(stage, correct, timeSeconds);
+  if (next.cleared) {
     await db.update(redoQueue)
-      .set({ stage: 0, dueAt: dueAt(0) })
-      .where(eq(redoQueue.id, item.id))
-      .run();
-    return;
-  }
-
-  if (item.stage === 0) {
-    await db.update(redoQueue)
-      .set({ stage: 1, dueAt: dueAt(1) })
-      .where(eq(redoQueue.id, item.id))
-      .run();
-  } else if (item.stage === 1) {
-    await db.update(redoQueue)
-      .set({ stage: 2, dueAt: dueAt(2) })
+      .set({ cleared: true })
       .where(eq(redoQueue.id, item.id))
       .run();
   } else {
-    if (timeSeconds <= COLD_SOLVE_LIMIT_SECONDS) {
-      await db.update(redoQueue)
-        .set({ cleared: true })
-        .where(eq(redoQueue.id, item.id))
-        .run();
-    } else {
-      await db.update(redoQueue)
-        .set({ stage: 1, dueAt: dueAt(1) })
-        .where(eq(redoQueue.id, item.id))
-        .run();
-    }
+    await db.update(redoQueue)
+      .set({ stage: next.stage, dueAt: dueAfterDays(next.delayDays) })
+      .where(eq(redoQueue.id, item.id))
+      .run();
   }
+  return true;
 }

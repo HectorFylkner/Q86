@@ -1,4 +1,13 @@
-import { and, count, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  gte,
+  inArray,
+  lte,
+  notInArray,
+  type SQL,
+} from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions, type Question } from "./db/schema.ts";
 import type {
@@ -36,6 +45,8 @@ function whereFromFilter(filter: QuestionFilter): SQL | undefined {
     conds.push(gte(questions.difficulty, filter.difficultyMin));
   if (filter.difficultyMax != null)
     conds.push(lte(questions.difficulty, filter.difficultyMax));
+  if (filter.excludeIds?.length)
+    conds.push(notInArray(questions.id, filter.excludeIds));
   return and(...conds);
 }
 
@@ -57,10 +68,11 @@ export async function selectQuestions(
   filter: QuestionFilter,
   count: number,
 ): Promise<Question[]> {
-  const excluded = new Set(filter.excludeIds ?? []);
-  const candidates = (
-    await db.select().from(questions).where(whereFromFilter(filter)).all()
-  ).filter((q) => !excluded.has(q.id));
+  const candidates = await db
+    .select()
+    .from(questions)
+    .where(whereFromFilter(filter))
+    .all();
   if (candidates.length === 0) return [];
 
   const correctRows = await db

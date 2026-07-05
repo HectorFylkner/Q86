@@ -1,26 +1,22 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { patternAttempts, sessions } from "./db/schema.ts";
+import { dayIndex, dayKey, keyFromDayIndex } from "./local-day.ts";
+import { appTimeZone } from "./settings.ts";
 
-/** Consecutive local days with pattern work, ending today. */
+/** Consecutive local days (user timezone) with pattern work, ending today. */
 export async function computeDayStreak(): Promise<number> {
-  const dayRows = await db.all<{ d: string }>(
-    sql`select distinct date(created_at / 1000.0, 'unixepoch', 'localtime') as d
-        from pattern_attempts order by d desc`,
-  );
+  const tz = await appTimeZone();
+  const rows = await db
+    .select({ createdAt: patternAttempts.createdAt })
+    .from(patternAttempts)
+    .orderBy(desc(patternAttempts.id))
+    .limit(20_000)
+    .all();
+  const days = new Set(rows.map((r) => dayKey(r.createdAt, tz)));
+  const today = dayIndex(new Date(), tz);
   let streak = 0;
-  const today = new Date();
-  for (let i = 0; i < dayRows.length; i++) {
-    const expected = new Date(today);
-    expected.setDate(today.getDate() - i);
-    const expectedStr = [
-      expected.getFullYear(),
-      String(expected.getMonth() + 1).padStart(2, "0"),
-      String(expected.getDate()).padStart(2, "0"),
-    ].join("-");
-    if (dayRows[i]?.d === expectedStr) streak++;
-    else break;
-  }
+  while (days.has(keyFromDayIndex(today - streak))) streak++;
   return streak;
 }
 

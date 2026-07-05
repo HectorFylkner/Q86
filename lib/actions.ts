@@ -192,7 +192,10 @@ export async function logAttempt(input: {
     .get();
 
   if (input.mode === "redo") {
-    await applyRedoResult(q.id, correct, input.timeSeconds);
+    // A redo miss whose ladder item is already cleared (or was never
+    // queued) must not vanish silently — re-enter the ladder at stage 0.
+    const applied = await applyRedoResult(q.id, correct, input.timeSeconds);
+    if (!applied && !correct) await enqueueMiss(q.id, attempt.id);
   } else if (!correct) {
     await enqueueMiss(q.id, attempt.id);
   }
@@ -575,7 +578,12 @@ export async function saveDecisionRound(input: {
 // ---------------------------------------------------------------------------
 
 export async function saveSetting(
-  key: "test_date" | "timed_set_cadence" | "weight_overrides" | "model",
+  key:
+    | "test_date"
+    | "timed_set_cadence"
+    | "weight_overrides"
+    | "model"
+    | "timezone",
   value: string,
 ): Promise<void> {
   await putSetting(key, value);
