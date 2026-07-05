@@ -311,7 +311,7 @@ export function QueueClient({
             onChange={(e) =>
               setSkillFilter(e.target.value as FundamentalSkill | "all")
             }
-            className="rounded-control border border-grid bg-surface px-2 py-1"
+            className="px-2 py-1"
           >
             <option value="all">All skills</option>
             {FUNDAMENTAL_SKILLS.map((s) => (
@@ -324,7 +324,7 @@ export function QueueClient({
             aria-label="Filter by error type"
             value={errorFilter}
             onChange={(e) => setErrorFilter(e.target.value as ErrorType | "all")}
-            className="rounded-control border border-grid bg-surface px-2 py-1"
+            className="px-2 py-1"
           >
             <option value="all">All error types</option>
             {ERROR_TYPES.map((et) => (
@@ -339,7 +339,7 @@ export function QueueClient({
             onChange={(e) =>
               setResultFilter(e.target.value as "all" | "wrong" | "correct")
             }
-            className="rounded-control border border-grid bg-surface px-2 py-1"
+            className="px-2 py-1"
           >
             <option value="all">All results</option>
             <option value="wrong">Wrong only</option>

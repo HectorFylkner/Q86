@@ -43,7 +43,7 @@ export function SettingsForm({
             setDate(e.target.value);
             setState("idle");
           }}
-          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="px-2 py-1.5 text-sm"
         />
       </label>
       <label className="flex flex-col gap-1 text-xs text-graphite">
@@ -54,7 +54,7 @@ export function SettingsForm({
             setCadenceDays(e.target.value);
             setState("idle");
           }}
-          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="px-2 py-1.5 text-sm"
         >
           {[2, 3, 4, 7].map((d) => (
             <option key={d} value={d}>

@@ -27,9 +27,10 @@ import {
   type FundamentalSkill,
   type SessionFocus,
 } from "@/lib/taxonomy";
+import { OVERTIME_SECONDS } from "@/components/timed/overtime";
 import { cn, formatSeconds } from "@/lib/utils";
 
-const PULSE_THRESHOLD_SECONDS = 165; // 2:45 decision pulse
+const PULSE_THRESHOLD_SECONDS = OVERTIME_SECONDS; // 2:45 decision pulse
 
 export type AnswerRecord = {
   selectedIndex: number;

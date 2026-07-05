@@ -29,7 +29,7 @@ export function TimeInkBar({
   const fraction = Math.max(0, Math.min(1, remainingSeconds / totalSeconds));
 
   return (
-    <div className="sticky top-14 z-30 -mx-4 bg-paper/95 px-4 pb-1 pt-2 sm:-mx-6 sm:px-6">
+    <div className="sticky top-nav z-30 -mx-4 bg-paper/95 px-4 pb-1 pt-2 sm:-mx-6 sm:px-6">
       <div className="relative">
         <div className="h-[3px] w-full rounded-full bg-grid" />
         <motion.div

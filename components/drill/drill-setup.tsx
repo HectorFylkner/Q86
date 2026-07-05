@@ -202,7 +202,7 @@ export function DrillSetup({
                   setDiffMin(v);
                   if (v > diffMax) setDiffMax(v);
                 }}
-                className="rounded-control border border-grid bg-surface px-2 py-1"
+                className="px-2 py-1"
               >
                 {DIFFICULTIES.map((d) => (
                   <option key={d} value={d}>
@@ -219,7 +219,7 @@ export function DrillSetup({
                   setDiffMax(v);
                   if (v < diffMin) setDiffMin(v);
                 }}
-                className="rounded-control border border-grid bg-surface px-2 py-1"
+                className="px-2 py-1"
               >
                 {DIFFICULTIES.map((d) => (
                   <option key={d} value={d}>

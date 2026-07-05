@@ -46,7 +46,7 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-grid bg-paper/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm">
-      <div className="mx-auto flex h-14 w-full max-w-[1120px] items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-nav w-full max-w-shell items-center gap-6 px-4 sm:px-6">
         <Link
           href="/"
           className="font-display text-lg font-bold tracking-tight text-ink"
@@ -60,7 +60,7 @@ export function Nav() {
             ballpoint underline — never a fill, never a weight change. */}
         <nav
           aria-label="Primary"
-          className="flex flex-1 items-stretch gap-1 self-stretch overflow-x-auto"
+          className="scrollbar-none flex flex-1 items-stretch gap-1 self-stretch overflow-x-auto"
         >
           {LINKS.map((link) => {
             const active = isActive(link.routes, pathname);

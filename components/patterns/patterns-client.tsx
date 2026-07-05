@@ -446,7 +446,7 @@ export function PatternsClient({
                 autoComplete="off"
                 aria-label="Your answer"
                 placeholder="Type the number"
-                className="w-44 rounded-control border border-grid bg-surface px-3 py-2 font-mono text-lg"
+                className="w-44 px-3 py-2 font-mono text-lg"
               />
               <Button type="submit">
                 Answer

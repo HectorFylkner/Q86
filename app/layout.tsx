@@ -83,11 +83,11 @@ export default async function RootLayout({
         <Providers>
           {authed && <Nav />}
           {authed && <BottomTabs />}
-          <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-6 sm:px-6 sm:pb-16">
+          <main className="mx-auto w-full max-w-shell px-4 pb-24 pt-6 sm:px-6 sm:pb-16">
             {children}
           </main>
           {authed && (
-            <footer className="mx-auto w-full max-w-[1120px] px-4 pb-24 sm:px-6 sm:pb-8">
+            <footer className="mx-auto w-full max-w-shell px-4 pb-24 sm:px-6 sm:pb-8">
               <p className="border-t border-grid pt-4 text-center text-caption text-graphite">
                 Calibration comes from official GMAC material only. This
                 platform trains; official mocks measure.

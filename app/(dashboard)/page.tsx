@@ -269,7 +269,12 @@ export default async function TodayPage() {
             const record = inputs.skillAccuracy[skill];
             return (
               <div key={skill} className="flex items-center gap-3 text-sm">
-                <span className="w-64 shrink-0">{SKILL_LABELS[skill]}</span>
+                <span
+                  className="w-40 shrink-0 truncate sm:w-64"
+                  title={SKILL_LABELS[skill]}
+                >
+                  {SKILL_LABELS[skill]}
+                </span>
                 <div className="h-2 flex-1 rounded-full bg-grid">
                   <div
                     className={cn("h-2 rounded-full bg-ballpoint")}
@@ -279,7 +284,7 @@ export default async function TodayPage() {
                 <span className="w-12 text-right font-mono text-xs">
                   {Math.round(weight * 100)}%
                 </span>
-                <span className="w-24 text-right font-mono text-xs text-graphite">
+                <span className="hidden w-24 text-right font-mono text-xs text-graphite sm:block">
                   {record.total > 0
                     ? `${record.correct}/${record.total} recent`
                     : "no data"}

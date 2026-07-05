@@ -311,7 +311,7 @@ export function PostmortemClient({
                 setErrorSubtag((e.target.value || null) as Subtopic | null);
                 setConfirmState("unsaved");
               }}
-              className="rounded-control border border-grid bg-surface px-2 py-1 text-sm"
+              className="px-2 py-1 text-sm"
             >
               <option value="">—</option>
               {ALL_SUBTOPICS.map((s) => (
@@ -329,7 +329,7 @@ export function PostmortemClient({
             }}
             placeholder="Your own note on this miss (optional)"
             rows={2}
-            className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
+            className="mt-3 w-full px-3 py-2 text-sm"
           />
           <div className="mt-3 flex items-center gap-3">
             <Button

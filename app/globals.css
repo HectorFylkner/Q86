@@ -87,6 +87,10 @@
   --text-stem: 1rem;
   --text-stem--line-height: 1.625;
 
+  /* Shared shell metrics: content column and sticky-nav height. */
+  --container-shell: 70rem;
+  --spacing-nav: 3.5rem;
+
   --radius-card: 10px;
   --radius-control: 6px;
 
@@ -118,16 +122,6 @@ body {
       color-mix(in srgb, var(--grid) 42%, transparent) 23px,
       color-mix(in srgb, var(--grid) 42%, transparent) 24px
     );
-}
-
-/* Visible keyboard focus, always. */
-:focus-visible {
-  outline: 2px solid var(--ballpoint);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: var(--highlight);
 }
 
 /* KaTeX display math should scroll, never overflow the card. */
@@ -225,6 +219,9 @@ textarea:focus {
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ballpoint) 15%, transparent);
 }
+::placeholder {
+  color: color-mix(in srgb, var(--graphite) 60%, transparent);
+}
 input[type="date"] {
   color-scheme: light;
 }
@@ -237,6 +234,14 @@ input[type="date"] {
   }
 }
 
+/* Overflow rows that should scroll chromelessly (the primary nav). */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Thin, theme-aware scrollbars for the overflow rows (nav, tables). */
 * {
   scrollbar-width: thin;
@@ -247,5 +252,10 @@ input[type="date"] {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  /* The skeleton holds a steady mid-tone instead of a frozen flicker. */
+  .skeleton {
+    animation: none !important;
+    opacity: 0.7;
   }
 }

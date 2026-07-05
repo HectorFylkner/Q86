@@ -30,6 +30,7 @@ import {
 import { cn, percent } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { OVERTIME_SECONDS } from "@/components/timed/overtime";
 import { useChartTokens } from "@/components/use-chart-tokens";
 
 export function AnalyticsClient({ data }: { data: AnalyticsData }) {
@@ -294,7 +295,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               }}
             />
             <ReferenceArea
-              x1={165}
+              x1={OVERTIME_SECONDS}
               fill={AMBER}
               fillOpacity={0.07}
               label={{

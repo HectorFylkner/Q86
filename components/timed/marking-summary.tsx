@@ -11,6 +11,7 @@ import { Chip } from "@/components/ui/chip";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import { OVERTIME_SECONDS } from "@/components/timed/overtime";
 import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
 import {
   CONTEXT_LABELS,
@@ -93,7 +94,7 @@ export function MarkingSummary({
                   <td
                     className={cn(
                       "px-3 py-2 font-mono text-xs",
-                      a && a.timeSeconds > 165 && "text-amber",
+                      a && a.timeSeconds > OVERTIME_SECONDS && "text-amber",
                       a && a.timeSeconds < 60 && !correct && "text-redpen",
                     )}
                   >

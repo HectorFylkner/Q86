@@ -97,7 +97,7 @@ export function ImportClient() {
           }}
           rows={10}
           placeholder="Paste the raw report text here…"
-          className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
+          className="mt-3 w-full px-3 py-2 font-mono text-xs"
         />
         <div className="mt-3 flex items-center gap-3">
           <Button

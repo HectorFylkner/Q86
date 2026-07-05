@@ -128,7 +128,7 @@ export function ReviewGrid({
                   onChange={(e) => setJustification(e.target.value)}
                   placeholder="Name the specific error: which line, which number, which condition you misread…"
                   rows={2}
-                  className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
+                  className="w-full px-3 py-2 text-sm"
                 />
                 <p
                   className={cn(
@@ -212,7 +212,7 @@ export function ReviewGrid({
           Your record: quant edits have destroyed more points than they
           earned. Open a question only if you can name a specific error.
         </p>
-        <div className="mt-4 grid grid-cols-7 gap-2">
+        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-7">
           {questions.map((q, i) => (
             <button
               key={q.id}
