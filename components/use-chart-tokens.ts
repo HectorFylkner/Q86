@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 export type ChartTokens = {
   ink: string;
@@ -9,6 +9,8 @@ export type ChartTokens = {
   ballpoint: string;
   redpen: string;
   amber: string;
+  surface: string;
+  onAccent: string;
 };
 
 const FALLBACK: ChartTokens = {
@@ -17,7 +19,9 @@ const FALLBACK: ChartTokens = {
   grid: "#E9E6DD",
   ballpoint: "#2239C4",
   redpen: "#C63B2F",
-  amber: "#B7791F",
+  amber: "#8F5C0C",
+  surface: "#FFFFFF",
+  onAccent: "#FFFFFF",
 };
 
 function read(): ChartTokens {
@@ -30,15 +34,23 @@ function read(): ChartTokens {
     ballpoint: v("--ballpoint", FALLBACK.ballpoint),
     redpen: v("--redpen", FALLBACK.redpen),
     amber: v("--amber", FALLBACK.amber),
+    surface: v("--surface", FALLBACK.surface),
+    onAccent: v("--on-accent", FALLBACK.onAccent),
   };
 }
+
+// useLayoutEffect on the client so the first read lands before paint —
+// night desk never flashes the light FALLBACK — while SSR (where
+// useLayoutEffect warns) keeps the plain effect.
+const useClientLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** Chart colors that follow the active theme (SVG attributes cannot use
  *  CSS variables, so charts read the resolved values and re-read on
  *  theme changes). */
 export function useChartTokens(): ChartTokens {
   const [tokens, setTokens] = useState<ChartTokens>(FALLBACK);
-  useEffect(() => {
+  useClientLayoutEffect(() => {
     const update = () => setTokens(read());
     update();
     const mq = window.matchMedia("(prefers-color-scheme: dark)");

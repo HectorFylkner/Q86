@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
 import {
   Bar,
   BarChart,
@@ -38,14 +39,17 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
     ballpoint: BALLPOINT,
     redpen: REDPEN,
     amber: AMBER,
+    surface: SURFACE,
+    onAccent: ON_ACCENT,
   } = useChartTokens();
   const AXIS_TICK = { fill: GRAPHITE, fontSize: 11 } as const;
   const tooltipStyle = {
     backgroundColor: "var(--surface)",
-    border: `1px solid ${GRID}`,
-    borderRadius: 6,
+    border: "1px solid var(--grid)",
+    borderRadius: "var(--radius-control)",
+    boxShadow: "var(--shadow-ambient)",
     fontSize: 12,
-    color: INK,
+    color: "var(--ink)",
   } as const;
   if (data.attemptCount === 0) {
     return (
@@ -122,8 +126,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                                   ? "transparent"
                                   : `color-mix(in srgb, ${REDPEN} ${Math.round(
                                       12 + intensity * 68,
-                                    )}%, white)`,
-                              color: intensity > 0.55 ? "white" : INK,
+                                    )}%, ${SURFACE})`,
+                              color: intensity > 0.55 ? ON_ACCENT : INK,
                             }}
                           >
                             {count > 0 ? count : ""}
@@ -304,6 +308,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               }}
             />
             <Tooltip
+              isAnimationActive={false}
               cursor={{ stroke: GRAPHITE, strokeDasharray: "3 3" }}
               contentStyle={tooltipStyle}
               formatter={(value: number, name: string) =>
@@ -311,12 +316,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               }
             />
             <Scatter
+              isAnimationActive={false}
               name="Correct"
               data={data.scatter.filter((p) => p.correct)}
               fill={BALLPOINT}
               fillOpacity={0.55}
             />
             <Scatter
+              isAnimationActive={false}
               name="Wrong"
               data={data.scatter.filter((p) => !p.correct)}
               fill={REDPEN}
@@ -449,6 +456,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               tickLine={false}
             />
             <Tooltip
+              isAnimationActive={false}
               contentStyle={tooltipStyle}
               formatter={(value: number, name: string) => [
                 `${value}%`,
@@ -456,6 +464,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               ]}
             />
             <Bar
+              isAnimationActive={false}
               dataKey="expected"
               name="Expected"
               fill={GRAPHITE}
@@ -463,6 +472,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               radius={[4, 4, 0, 0]}
             />
             <Bar
+              isAnimationActive={false}
               dataKey="actual"
               name="Actual"
               fill={BALLPOINT}
@@ -502,35 +512,39 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               stroke={GRID}
               tickLine={false}
             />
-            <Tooltip contentStyle={tooltipStyle} />
+            <Tooltip isAnimationActive={false} contentStyle={tooltipStyle} />
             <Line
+              isAnimationActive={false}
               type="monotone"
               dataKey="value_order_factors"
               name={SKILL_LABELS.value_order_factors}
-              stroke={REDPEN}
-              strokeWidth={2}
-              dot={{ r: 2, strokeWidth: 0 }}
-              connectNulls
-            />
-            <Line
-              type="monotone"
-              dataKey="equal_unequal_alg"
-              name={SKILL_LABELS.equal_unequal_alg}
               stroke={BALLPOINT}
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
               connectNulls
             />
             <Line
+              isAnimationActive={false}
               type="monotone"
-              dataKey="rates_ratio_percent"
-              name={SKILL_LABELS.rates_ratio_percent}
-              stroke={AMBER}
+              dataKey="equal_unequal_alg"
+              name={SKILL_LABELS.equal_unequal_alg}
+              stroke={INK}
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
               connectNulls
             />
             <Line
+              isAnimationActive={false}
+              type="monotone"
+              dataKey="rates_ratio_percent"
+              name={SKILL_LABELS.rates_ratio_percent}
+              stroke={GRAPHITE}
+              strokeWidth={2}
+              dot={{ r: 2, strokeWidth: 0 }}
+              connectNulls
+            />
+            <Line
+              isAnimationActive={false}
               type="monotone"
               dataKey="counting_sets_series_prob_stats"
               name={SKILL_LABELS.counting_sets_series_prob_stats}
@@ -596,9 +610,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 stroke={GRID}
                 tickLine={false}
               />
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip isAnimationActive={false} contentStyle={tooltipStyle} />
               <ReferenceLine x={1200} stroke={GRAPHITE} strokeDasharray="4 3" />
               <Bar
+                isAnimationActive={false}
                 dataKey="rating"
                 name="ELO"
                 fill={BALLPOINT}
@@ -622,6 +637,9 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
 
 
+/** Recharts' 1.5s mount tween is disabled on every series; the report
+ *  instead arrives with the house entrance (reduced motion drops the
+ *  lift and keeps the fade, via MotionConfig). */
 function Section({
   title,
   subtitle,
@@ -632,11 +650,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+    <motion.section
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+      className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
+    >
       <h2 className="font-display text-sm font-semibold">{title}</h2>
       <p className="mb-3 mt-0.5 text-xs text-graphite">{subtitle}</p>
       {children}
-    </section>
+    </motion.section>
   );
 }
 

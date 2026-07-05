@@ -147,6 +147,17 @@ body {
   font-size: 1.15em;
 }
 
+/* Charts speak the numeric voice: mono, tabular, graphite chrome. */
+.recharts-text {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.recharts-legend-wrapper,
+.recharts-tooltip-wrapper {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Loading skeleton shimmer (opacity only — safe under reduced motion). */
 @keyframes q86-skeleton {
   0%,
