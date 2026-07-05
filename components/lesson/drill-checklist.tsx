@@ -91,7 +91,7 @@ export function DrillChecklist({
               />
               <span
                 aria-hidden
-                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border text-[11px] leading-none text-on-accent transition-colors peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ballpoint ${
+                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border text-caption leading-none text-on-accent transition-colors peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ballpoint ${
                   checked[i]
                     ? "border-ballpoint bg-ballpoint"
                     : "border-graphite/70 bg-paper"

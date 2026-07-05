@@ -19,7 +19,7 @@ export default async function DeckPage() {
           forget come back tomorrow.
         </p>
       </div>
-      <p className="font-mono text-[11px] text-graphite">
+      <p className="font-mono text-caption text-graphite">
         {due} due · {fresh} new miss{fresh === 1 ? "" : "es"} · {scheduled}{" "}
         scheduled ahead
       </p>

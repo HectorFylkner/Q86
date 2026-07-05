@@ -43,7 +43,7 @@ export default async function LearnPage() {
             key={m.step}
             className="rounded-card border border-grid bg-surface px-3.5 py-3 shadow-ambient"
           >
-            <p className="font-mono text-[10px] text-ballpoint">
+            <p className="font-mono text-micro text-ballpoint">
               {String(i + 1).padStart(2, "0")}
             </p>
             <p className="mt-0.5 text-sm font-medium">{m.step}</p>
@@ -69,7 +69,7 @@ export default async function LearnPage() {
               <h2 className="font-display text-sm font-semibold">
                 {SKILL_LABELS[skill]}
               </h2>
-              <span className="font-mono text-[11px] text-graphite">
+              <span className="font-mono text-caption text-graphite">
                 {group.length} chapters
               </span>
             </div>
@@ -82,14 +82,14 @@ export default async function LearnPage() {
                     href={`/learn/${lesson.subtopic}`}
                     className="group flex items-start gap-3 rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
                   >
-                    <span className="mt-0.5 font-mono text-[11px] text-graphite transition-colors group-hover:text-ballpoint">
+                    <span className="mt-0.5 font-mono text-caption text-graphite transition-colors group-hover:text-ballpoint">
                       {String(chapterNo).padStart(2, "0")}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium transition-colors group-hover:text-ballpoint">
                         {lesson.title}
                       </span>
-                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
+                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-caption text-graphite">
                         <span>~{lesson.minutes} min</span>
                         {tests[lesson.subtopic]?.passed ? (
                           <span className="text-ballpoint">✓ test passed</span>

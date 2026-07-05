@@ -32,14 +32,14 @@ export async function FlagsCard() {
     <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient sm:p-5">
       <div className="flex items-baseline gap-2">
         <h2 className="font-display text-sm font-semibold">Content flags</h2>
-        <span className="font-mono text-[11px] text-graphite">
+        <span className="font-mono text-caption text-graphite">
           {open.length} open
         </span>
       </div>
       <ul className="mt-3 divide-y divide-grid">
         {open.map((f) => (
           <li key={f.id} className="py-3 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 font-mono text-[11px] text-graphite">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 font-mono text-caption text-graphite">
               <span className="font-medium text-redpen">
                 {FLAG_REASON_LABELS[f.reason]}
               </span>

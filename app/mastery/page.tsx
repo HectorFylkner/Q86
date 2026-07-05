@@ -53,7 +53,7 @@ export default async function MasteryPage() {
                       {SUBTOPIC_LABELS[ladder.subtopic]}
                     </h3>
                     {ladder.mastered && (
-                      <span className="font-mono text-[10px] font-semibold text-ballpoint">
+                      <span className="font-mono text-micro font-semibold text-ballpoint">
                         CLIMBED
                       </span>
                     )}
@@ -68,7 +68,7 @@ export default async function MasteryPage() {
                               : `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window`
                           }
                           className={cn(
-                            "rounded-[4px] border text-center font-mono text-[11px] leading-6",
+                            "rounded-[4px] border text-center font-mono text-caption leading-6",
                             rung.state === "mastered" &&
                               "border-ballpoint bg-ballpoint text-on-accent",
                             rung.state === "working" &&

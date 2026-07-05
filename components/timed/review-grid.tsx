@@ -82,7 +82,7 @@ export function ReviewGrid({
         </div>
 
         <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
-          <Md source={q.stemMd} className="text-[16px]" />
+          <Md source={q.stemMd} className="text-stem" />
           <div className="mt-5">
             <ChoiceList
               choices={q.choices}
@@ -134,7 +134,7 @@ export function ReviewGrid({
                 />
                 <p
                   className={cn(
-                    "mt-1 text-right font-mono text-[11px]",
+                    "mt-1 text-right font-mono text-caption",
                     justificationOk ? "text-graphite" : "text-amber",
                   )}
                 >
@@ -228,7 +228,7 @@ export function ReviewGrid({
               )}
             >
               <span className="font-mono">{i + 1}</span>
-              <span className="text-[9px] text-graphite">
+              <span className="text-micro text-graphite">
                 {answers[i] ? "answered" : "—"}
               </span>
               {bookmarks[i] && (

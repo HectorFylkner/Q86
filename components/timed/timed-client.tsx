@@ -436,7 +436,7 @@ export function TimedClient({
           Casual session — exclude this set from analytics and the daily plan
         </label>
         {focus === "casual" && (
-          <p className="text-[11px] text-amber">
+          <p className="text-caption text-amber">
             Misses still join the redo queue; only the statistics skip this
             session.
           </p>
@@ -589,7 +589,7 @@ export function TimedClient({
             >
               <Bookmark size={12} />
               {bookmarks[currentIndex] ? "Bookmarked" : "Bookmark"}
-              <span className="font-mono text-[10px] opacity-60">B</span>
+              <span className="font-mono text-micro opacity-60">B</span>
             </button>
           </span>
         </div>
@@ -602,7 +602,7 @@ export function TimedClient({
               title="Past the 2:45 checkpoint"
             />
           )}
-          <Md source={question.stemMd} className="text-[16px]" />
+          <Md source={question.stemMd} className="text-stem" />
           <div className="mt-5">
             <ChoiceList
               choices={question.choices}
@@ -624,7 +624,7 @@ export function TimedClient({
               {currentIndex + 1 < questions.length
                 ? "Confirm and advance"
                 : "Confirm final answer"}
-              <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
+              <span className="ml-2 font-mono text-micro opacity-70">↵</span>
             </button>
           </div>
           {hint && (
@@ -633,7 +633,7 @@ export function TimedClient({
             </p>
           )}
         </div>
-        <p className="text-center text-[11px] text-graphite/80">
+        <p className="text-center text-caption text-graphite/80">
           1–5 or A/C/D/E select · B bookmark · G/L/K confidence · Enter
           confirm — you cannot return until the review screen
         </p>

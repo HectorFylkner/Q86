@@ -173,7 +173,7 @@ export function PostmortemClient({
           The question
         </summary>
         <div className="mt-3 space-y-4 border-t border-grid pt-3">
-          <Md source={question.stemMd} className="text-[15px]" />
+          <Md source={question.stemMd} className="text-stem" />
           <ChoiceList
             choices={question.choices}
             selected={attempt.selectedIndex}
@@ -237,7 +237,7 @@ export function PostmortemClient({
           <h2 className="mb-2 font-display text-sm font-semibold">
             Saved post-mortem
           </h2>
-          <Md source={attempt.aiFeedbackMd} className="text-[15px]" />
+          <Md source={attempt.aiFeedbackMd} className="text-body" />
         </section>
       )}
 
@@ -249,19 +249,19 @@ export function PostmortemClient({
           className="space-y-4 rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
           <CoachBlock title="Divergence point" tone="red">
-            <Md source={coach.divergence_point_md} className="text-[15px]" />
+            <Md source={coach.divergence_point_md} className="text-body" />
           </CoachBlock>
           <CoachBlock title="Diagnosis">
-            <Md source={coach.diagnosis_md} className="text-[15px]" />
+            <Md source={coach.diagnosis_md} className="text-body" />
           </CoachBlock>
           <CoachBlock title="Fastest path vs. your path" tone="blue">
-            <Md source={coach.fastest_path_md} className="text-[15px]" />
+            <Md source={coach.fastest_path_md} className="text-body" />
           </CoachBlock>
           <CoachBlock title="Trigger cue">
-            <Md source={coach.trigger_cue_md} className="text-[15px]" />
+            <Md source={coach.trigger_cue_md} className="text-body" />
           </CoachBlock>
           <CoachBlock title="Prescription">
-            <p className="text-[15px]">
+            <p className="text-body">
               {coach.prescription.count} questions of{" "}
               <span className="font-medium">
                 {SUBTOPIC_LABELS[coach.prescription.subtopic]}
@@ -427,7 +427,7 @@ function Chip({
   return (
     <span
       className={cn(
-        "rounded-control border px-1.5 py-0.5 text-[11px]",
+        "rounded-control border px-1.5 py-0.5 text-caption",
         tone === "red"
           ? "border-redpen/50 text-redpen"
           : tone === "blue"

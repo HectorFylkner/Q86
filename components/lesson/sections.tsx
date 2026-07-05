@@ -19,7 +19,7 @@ export function SectionShell({
   return (
     <section id={id} className="scroll-mt-24">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-        <span className="font-mono text-[11px] font-medium text-ballpoint">
+        <span className="font-mono text-caption font-medium text-ballpoint">
           {String(index).padStart(2, "0")}
         </span>
         <h2 className="font-display text-lg font-semibold">{title}</h2>
@@ -36,7 +36,7 @@ export function SectionShell({
 export function WhyLede({ source }: { source: string }) {
   return (
     <div className="border-l-2 border-ballpoint pl-4 sm:pl-5">
-      <Md source={source} className="max-w-[70ch] text-[16px] leading-7" />
+      <Md source={source} className="max-w-[70ch] text-stem leading-7" />
     </div>
   );
 }
@@ -57,10 +57,10 @@ export function CoreIdeas({
           key={i}
           className="flex gap-3.5 rounded-card border border-grid bg-surface p-4 shadow-ambient sm:px-5"
         >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ballpoint/10 font-mono text-[11px] font-medium text-ballpoint">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ballpoint/10 font-mono text-caption font-medium text-ballpoint">
             {i + 1}
           </span>
-          <Md source={idea} className="min-w-0 max-w-[70ch] flex-1 text-[14.5px]" />
+          <Md source={idea} className="min-w-0 max-w-[70ch] flex-1 text-body" />
         </div>
       ))}
     </div>
@@ -76,13 +76,13 @@ export function CueGrid({ cues }: { cues: Cue[] }) {
           key={i}
           className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient sm:px-5"
         >
-          <p className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+          <p className="font-mono text-micro uppercase tracking-wider text-graphite">
             When you see
           </p>
           <Md source={cue.see} className="mt-1 text-sm font-medium" />
           {cue.act && (
             <>
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-ballpoint">
+              <p className="mt-3 font-mono text-micro uppercase tracking-wider text-ballpoint">
                 → Reach for
               </p>
               <Md source={cue.act} className="mt-1 text-sm text-graphite" />
@@ -112,7 +112,7 @@ function TitledCard({
     >
       <div className="flex gap-2.5">
         <span
-          className={`select-none font-mono text-[13px] leading-6 ${accentText}`}
+          className={`select-none font-mono text-sm leading-6 ${accentText}`}
           aria-hidden
         >
           {marker}

@@ -271,7 +271,7 @@ export function PatternsClient({
                   text={String(s.rating)}
                   className="font-mono text-lg font-medium"
                 />
-                <span className="text-[10px] text-graphite">ELO</span>
+                <span className="text-micro text-graphite">ELO</span>
               </span>
               <span className="mt-1 font-mono text-xs text-graphite">
                 best {s.bestRound} · streak {s.streak} ·{" "}
@@ -465,13 +465,13 @@ export function PatternsClient({
                 className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
               >
                 Answer
-                <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
+                <span className="ml-2 font-mono text-micro opacity-70">↵</span>
               </button>
             </form>
           )}
         </div>
       )}
-      <p className="text-center text-[11px] text-graphite/80">
+      <p className="text-center text-caption text-graphite/80">
         {active?.item.options
           ? "Keys 1–4 answer"
           : "Type the number, Enter answers"}
@@ -496,7 +496,7 @@ function answersMatch(user: string, canonical: string): boolean {
 function StatTile({ label, text }: { label: string; text: string }) {
   return (
     <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] text-graphite">{label}</div>
+      <div className="text-caption text-graphite">{label}</div>
       <Odometer text={text} className="mt-1 font-mono text-xl font-medium" />
     </div>
   );

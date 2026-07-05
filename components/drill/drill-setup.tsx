@@ -230,7 +230,7 @@ export function DrillSetup({
                 ))}
               </select>
             </div>
-            <p className="mt-1 text-[11px] text-graphite">
+            <p className="mt-1 text-caption text-graphite">
               Approximate: D3 ≈ mid official, D5 ≈ hardest.
             </p>
           </div>
@@ -331,7 +331,7 @@ export function DrillSetup({
             ))}
           </div>
           {focus === "casual" && (
-            <p className="mt-1.5 text-[11px] text-amber">
+            <p className="mt-1.5 text-caption text-amber">
               Casual attempts stay out of analytics, calibration, and the daily
               plan. Misses still join the redo queue.
             </p>

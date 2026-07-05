@@ -363,7 +363,7 @@ export function QuestionRunner({
             )}
           >
             {formatSeconds(elapsed)}
-            <span className="ml-1.5 text-[10px] opacity-70">/ 2:15</span>
+            <span className="ml-1.5 text-micro opacity-70">/ 2:15</span>
           </span>
         )}
       </div>
@@ -375,7 +375,7 @@ export function QuestionRunner({
         transition={{ duration: 0.15 }}
         className="rounded-card border border-grid bg-surface p-5 shadow-ambient"
       >
-        <Md source={question.stemMd} className="text-[16px]" />
+        <Md source={question.stemMd} className="text-stem" />
         <div className="mt-5">
           <ChoiceList
             choices={question.choices}
@@ -399,7 +399,7 @@ export function QuestionRunner({
               className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
             >
               Confirm answer
-              <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
+              <span className="ml-2 font-mono text-micro opacity-70">↵</span>
             </button>
           </div>
         )}
@@ -455,20 +455,20 @@ export function QuestionRunner({
               )}
             >
               Send to post-mortem
-              <span className="ml-2 font-mono text-[10px] text-graphite">P</span>
+              <span className="ml-2 font-mono text-micro text-graphite">P</span>
             </button>
             <button
               onClick={next}
               className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
             >
               {index + 1 < questions.length ? "Next question" : "Finish"}
-              <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
+              <span className="ml-2 font-mono text-micro opacity-70">N</span>
             </button>
           </div>
         </>
       )}
 
-      <p className="text-center text-[11px] text-graphite/80">
+      <p className="text-center text-caption text-graphite/80">
         1–5 or A–E select · G/L/K confidence · Enter confirm · N next
       </p>
     </div>
@@ -477,7 +477,7 @@ export function QuestionRunner({
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-[11px]">
+    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-caption">
       {children}
     </span>
   );

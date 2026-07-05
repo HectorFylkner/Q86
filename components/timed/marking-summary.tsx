@@ -108,7 +108,7 @@ export function MarkingSummary({
                         {edit && (
                           <span
                             className={cn(
-                              "rounded-[4px] border px-1 py-px text-[10px]",
+                              "rounded-[4px] border px-1 py-px text-micro",
                               edit.toIndex === q.correctIndex
                                 ? "border-ballpoint/50 text-ballpoint"
                                 : "border-redpen/50 text-redpen",
@@ -285,7 +285,7 @@ export function MarkingSummary({
                   correct is {CHOICE_LETTERS[q.correctIndex]}
                 </summary>
                 <div className="mt-3 space-y-3 border-t border-grid pt-3">
-                  <Md source={q.stemMd} className="text-[15px]" />
+                  <Md source={q.stemMd} className="text-stem" />
                   <div>
                     <h4 className="mb-1 font-display text-xs font-semibold text-ballpoint">
                       Fastest path
@@ -406,7 +406,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] leading-tight text-graphite">{label}</div>
+      <div className="text-caption leading-tight text-graphite">{label}</div>
       <Odometer
         text={value}
         className={cn(

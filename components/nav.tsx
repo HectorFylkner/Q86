@@ -100,7 +100,7 @@ export function BottomTabs() {
               key={link.href}
               href={link.href}
               className={cn(
-                "flex min-h-[52px] flex-1 items-center justify-center text-[13px]",
+                "flex min-h-[52px] flex-1 items-center justify-center text-sm",
                 active ? "font-semibold text-ballpoint" : "text-graphite",
               )}
             >

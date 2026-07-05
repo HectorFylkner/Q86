@@ -86,7 +86,7 @@ export function LessonRail({ items }: { items: RailItem[] }) {
 
   return (
     <nav aria-label="On this page" className="space-y-0.5">
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-graphite">
+      <p className="mb-2 font-mono text-micro uppercase tracking-wider text-graphite">
         On this page
       </p>
       {items.map((it) => (
@@ -94,7 +94,7 @@ export function LessonRail({ items }: { items: RailItem[] }) {
           key={it.id}
           href={`#${it.id}`}
           className={cn(
-            "block border-l-2 py-1 pl-3 text-[13px] transition-colors",
+            "block border-l-2 py-1 pl-3 text-sm transition-colors",
             active === it.id
               ? "border-ballpoint font-medium text-ink"
               : "border-grid text-graphite hover:text-ink",

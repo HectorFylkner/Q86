@@ -367,7 +367,7 @@ export function QueueClient({
                   </td>
                   <td className="py-1.5 pr-3">
                     {SUBTOPIC_LABELS[r.subtopic]}
-                    <span className="ml-1.5 text-[10px] text-graphite">
+                    <span className="ml-1.5 text-micro text-graphite">
                       {r.context === "pure" ? "Pure" : "Real"}
                       {r.format === "data_sufficiency" ? " · DS" : ""}
                     </span>

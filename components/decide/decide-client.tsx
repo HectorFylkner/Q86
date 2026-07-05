@@ -166,7 +166,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
       </div>
 
       <section className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
-        <Md source={item.question.stemMd} />
+        <Md source={item.question.stemMd} className="text-stem" />
         <ol className="mt-4 space-y-1.5">
           {item.question.choices.map((c, i) => (
             <li key={i} className="flex gap-2 text-sm">

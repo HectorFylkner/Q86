@@ -42,7 +42,7 @@ export function ConfidencePicker({
             )}
           >
             {CONFIDENCE_LABELS[c]}
-            <span className="ml-1.5 font-mono text-[10px] opacity-60">
+            <span className="ml-1.5 font-mono text-micro opacity-60">
               {KEY_HINTS[c]}
             </span>
           </button>

@@ -52,11 +52,11 @@ export function SolutionPanel({
         <h3 className="mb-1.5 font-display text-sm font-semibold text-ballpoint">
           Fastest path
         </h3>
-        <Md source={question.fastestPathMd} className="text-[15px]" />
+        <Md source={question.fastestPathMd} className="text-body" />
       </section>
 
       <section className="border-t border-grid pt-3">
-        <Md source={question.solutionMd} className="text-[15px]" />
+        <Md source={question.solutionMd} className="text-body" />
       </section>
 
       {traps.length > 0 && (

@@ -94,7 +94,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   {ERROR_TYPES.map((et) => (
                     <th
                       key={et}
-                      className="px-1 pb-1 text-center text-[10px] font-normal text-graphite"
+                      className="px-1 pb-1 text-center text-micro font-normal text-graphite"
                     >
                       {ERROR_TYPE_LABELS[et]}
                     </th>
@@ -227,7 +227,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             );
           })}
         </div>
-        <p className="mt-2 text-[11px] text-graphite">
+        <p className="mt-2 text-caption text-graphite">
           Each square is a day: blank → none, light → under 10, mid → under 25,
           full → 25+.
         </p>
@@ -685,7 +685,7 @@ function ZoneStat({
 }) {
   return (
     <div className="rounded-card border border-grid bg-surface px-3 py-2">
-      <div className="text-[11px] text-graphite">{label}</div>
+      <div className="text-caption text-graphite">{label}</div>
       <div
         className={cn(
           "font-mono text-xl font-medium",

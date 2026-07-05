@@ -62,7 +62,7 @@ export function TimeInkBar({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: passed ? 1 : 0.45 }}
                 transition={{ duration: 0.4 }}
-                className="mt-0.5 -translate-x-1/2 whitespace-nowrap font-mono text-[9px] text-graphite"
+                className="mt-0.5 -translate-x-1/2 whitespace-nowrap font-mono text-micro text-graphite"
               >
                 {cp.label}
               </motion.div>

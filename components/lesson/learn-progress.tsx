@@ -25,7 +25,7 @@ export function ReadBadge({ subtopic }: { subtopic: string }) {
   const done = state.t > 0 && state.c >= state.t;
   return (
     <span
-      className={`font-mono text-[11px] ${done ? "text-ballpoint" : "text-graphite"}`}
+      className={`font-mono text-caption ${done ? "text-ballpoint" : "text-graphite"}`}
     >
       {done ? "✓ prepared" : `${state.c}/${state.t} checks`}
     </span>

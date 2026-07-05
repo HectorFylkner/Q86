@@ -55,7 +55,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="mx-auto w-full max-w-[1120px] px-4 pb-24 sm:px-6 sm:pb-8">
-            <p className="border-t border-grid pt-4 text-center text-[11px] text-graphite">
+            <p className="border-t border-grid pt-4 text-center text-caption text-graphite">
               Calibration comes from official GMAC material only. This
               platform trains; official mocks measure.
             </p>

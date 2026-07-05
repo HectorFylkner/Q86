@@ -73,6 +73,20 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
     monospace;
 
+  /* The named type scale below text-sm/base — the only sub-sizes allowed.
+     micro: keyboard hints, kickers, tiny badges (mono voice).
+     caption: metadata lines, chips, footnotes (mostly mono).
+     body: reading prose — solutions, choices, lesson cards.
+     stem: question stems and ledes, one size everywhere. */
+  --text-micro: 0.625rem;
+  --text-micro--line-height: 1.5;
+  --text-caption: 0.6875rem;
+  --text-caption--line-height: 1.5;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.625;
+  --text-stem: 1rem;
+  --text-stem--line-height: 1.625;
+
   --radius-card: 10px;
   --radius-control: 6px;
 

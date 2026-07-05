@@ -103,11 +103,11 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
           flipped ? "border-ballpoint/50 bg-highlight" : "border-grid bg-surface",
         )}
       >
-        <p className="font-mono text-[10px] uppercase tracking-wide text-graphite">
+        <p className="font-mono text-micro uppercase tracking-wide text-graphite">
           {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
           missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
         </p>
-        <div className="mt-2 text-[15px]">
+        <div className="mt-2 text-body">
           <Md source={flipped ? card.back : card.front} />
         </div>
         {!flipped && (
@@ -122,7 +122,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               className="min-h-[44px] rounded-control border border-redpen/40 px-3 py-2 text-sm font-medium text-redpen transition-colors hover:bg-redpen/10"
             >
               Forgot{" "}
-              <span className="font-mono text-[11px] opacity-70">
+              <span className="font-mono text-caption opacity-70">
                 {days(card.intervals.forgot)} · 1
               </span>
             </button>
@@ -131,7 +131,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               className="min-h-[44px] rounded-control border border-amber/50 px-3 py-2 text-sm font-medium text-amber transition-colors hover:bg-amber/10"
             >
               Hard{" "}
-              <span className="font-mono text-[11px] opacity-70">
+              <span className="font-mono text-caption opacity-70">
                 {days(card.intervals.hard)} · 2
               </span>
             </button>
@@ -140,7 +140,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               className="min-h-[44px] rounded-control border border-ballpoint/50 px-3 py-2 text-sm font-medium text-ballpoint transition-colors hover:bg-ballpoint/10"
             >
               Good{" "}
-              <span className="font-mono text-[11px] opacity-70">
+              <span className="font-mono text-caption opacity-70">
                 {days(card.intervals.good)} · 3
               </span>
             </button>

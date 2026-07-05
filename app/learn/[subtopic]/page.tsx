@@ -59,7 +59,7 @@ export default async function LessonPage({
 
   const header = (
     <div>
-      <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
+      <p className="font-mono text-caption uppercase tracking-wide text-graphite">
         <Link href="/learn" className="hover:text-ink">
           Learn
         </Link>{" "}
@@ -69,7 +69,7 @@ export default async function LessonPage({
         {lesson.title}
       </h1>
       {meta && (
-        <p className="mt-1.5 flex flex-wrap gap-x-3 font-mono text-[11px] text-graphite">
+        <p className="mt-1.5 flex flex-wrap gap-x-3 font-mono text-caption text-graphite">
           <span>
             Chapter {at + 1} of {chapters.length}
           </span>
@@ -90,7 +90,7 @@ export default async function LessonPage({
           href={`/learn/${prev.subtopic}`}
           className="group rounded-card border border-grid bg-surface p-4 shadow-ambient transition-colors hover:border-ballpoint/50 sm:px-5"
         >
-          <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+          <span className="font-mono text-micro uppercase tracking-wider text-graphite">
             ← Previous chapter
           </span>
           <span className="mt-1 block text-sm font-medium group-hover:text-ballpoint">
@@ -105,7 +105,7 @@ export default async function LessonPage({
           href={`/learn/${next.subtopic}`}
           className="group rounded-card border border-grid bg-surface p-4 text-right shadow-ambient transition-colors hover:border-ballpoint/50 sm:px-5"
         >
-          <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+          <span className="font-mono text-micro uppercase tracking-wider text-graphite">
             Next chapter →
           </span>
           <span className="mt-1 block text-sm font-medium group-hover:text-ballpoint">
@@ -123,7 +123,7 @@ export default async function LessonPage({
       <div className="mx-auto max-w-3xl space-y-4">
         {header}
         <article className="rounded-card border border-grid bg-surface p-6 shadow-ambient sm:p-8">
-          <Md source={lesson.body} className="text-[15px]" />
+          <Md source={lesson.body} className="text-body" />
         </article>
         {footer}
       </div>
