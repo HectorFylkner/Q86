@@ -16,10 +16,11 @@ export default async function DrillPage({
     plan?: string;
     sub?: string;
     d?: string;
+    n?: string;
     test?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, test } = await searchParams;
+  const { qids, plan, sub, d, n, test } = await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -44,11 +45,21 @@ export default async function DrillPage({
     .groupBy(questions.subtopic, questions.difficulty, questions.format)
     .all()) as CountRow[];
 
-  // Mastery-ladder deep link: /drill?sub=<subtopic>&d=<difficulty>
+  // Mastery-ladder deep link: /drill?sub=<subtopic>&d=<difficulty>.
+  // Coach prescriptions arrive without a rung: /drill?sub=<subtopic>&n=<count>.
   const rungDifficulty = Number(d);
+  const prescribedCount = Number(n);
   const autoStartRung =
-    sub && Number.isInteger(rungDifficulty) && rungDifficulty >= 2 && rungDifficulty <= 5
-      ? { subtopic: sub, difficulty: rungDifficulty }
+    sub && ALL_SUBTOPICS.includes(sub as Subtopic)
+      ? Number.isInteger(rungDifficulty) &&
+        rungDifficulty >= 2 &&
+        rungDifficulty <= 5
+        ? { subtopic: sub, difficulty: rungDifficulty, count: 6 }
+        : Number.isInteger(prescribedCount) &&
+            prescribedCount >= 1 &&
+            prescribedCount <= 20
+          ? { subtopic: sub, difficulty: null, count: prescribedCount }
+          : null
       : null;
 
   // Chapter-test deep link from a Learn chapter: /drill?test=<subtopic>

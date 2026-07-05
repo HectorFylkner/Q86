@@ -25,6 +25,8 @@ import {
   SKILL_LABELS,
   SUBTOPIC_LABELS,
   type EditReason,
+  type ErrorType,
+  type Subtopic,
 } from "@/lib/taxonomy";
 import { cn, percent } from "@/lib/utils";
 import { useChartTokens } from "@/components/use-chart-tokens";
@@ -84,60 +86,108 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             confirm a post-mortem.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="text-sm">
-              <thead>
-                <tr>
-                  <th className="pr-3 text-left text-xs font-normal text-graphite">
-                    Subtopic
-                  </th>
-                  {ERROR_TYPES.map((et) => (
-                    <th
-                      key={et}
-                      className="px-1 pb-1 text-center text-[10px] font-normal text-graphite"
-                    >
-                      {ERROR_TYPE_LABELS[et]}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.heatmap.rows.map((row) => (
-                  <tr key={row.subtopic}>
-                    <td className="whitespace-nowrap pr-3 text-xs">
-                      {SUBTOPIC_LABELS[row.subtopic]}
-                    </td>
-                    {ERROR_TYPES.map((et) => {
-                      const count = row.counts[et];
-                      const intensity =
-                        data.heatmap.max > 0 ? count / data.heatmap.max : 0;
-                      return (
-                        <td key={et} className="p-0.5">
-                          <div
-                            title={`${SUBTOPIC_LABELS[row.subtopic]} × ${ERROR_TYPE_LABELS[et]}: ${count}`}
-                            className="flex h-8 w-16 items-center justify-center rounded-[4px] border border-grid font-mono text-xs"
-                            style={{
-                              backgroundColor:
-                                count === 0
-                                  ? "transparent"
-                                  : `color-mix(in srgb, ${REDPEN} ${Math.round(
-                                      12 + intensity * 68,
-                                    )}%, white)`,
-                              color: intensity > 0.55 ? "white" : INK,
-                            }}
-                          >
-                            {count > 0 ? count : ""}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <HeatTable
+              rows={data.heatmap.rows}
+              max={data.heatmap.max}
+              redpen={REDPEN}
+            />
+            <SlipSiteLinks slipSites={data.slipSites} />
+          </>
         )}
       </Section>
+
+      {/* 2a — subtag heatmap: the subtopic that actually failed */}
+      <Section
+        title="Where misses actually fail"
+        subtitle="The post-mortem's failing subtopic — often not the chapter the question was filed under."
+      >
+        {data.subtagHeatmap.rows.length === 0 ? (
+          <p className="text-sm text-graphite">
+            No failing-subtopic tags yet. The coach suggests one on every
+            post-mortem — confirm it there and this view fills in.
+          </p>
+        ) : (
+          <HeatTable
+            rows={data.subtagHeatmap.rows}
+            max={data.subtagHeatmap.max}
+            redpen={REDPEN}
+            meta={(row) => (
+              <span className="ml-2 whitespace-nowrap text-[10px] text-graphite">
+                {row.crossTopic ? `${row.crossTopic} leaked in · ` : ""}
+                <a
+                  href={`/learn/${row.subtopic}#traps`}
+                  className="text-ballpoint hover:underline"
+                >
+                  chapter →
+                </a>
+              </span>
+            )}
+          />
+        )}
+      </Section>
+
+      {/* 2b — error mechanism trend */}
+      {data.errorTrend.top.length > 0 && (
+        <Section
+          title="Error mechanism trend"
+          subtitle="Classified misses per week by mechanism. The question is whether each line is falling."
+        >
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart
+              data={data.errorTrend.weeks.map((w) => ({
+                week: w.weekStartKey.slice(5).replace("-", "/"),
+                ...w.counts,
+              }))}
+              margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
+            >
+              <CartesianGrid stroke={GRID} vertical={false} />
+              <XAxis
+                dataKey="week"
+                tick={AXIS_TICK}
+                stroke={GRID}
+                tickLine={false}
+              />
+              <YAxis
+                allowDecimals={false}
+                tick={AXIS_TICK}
+                stroke={GRID}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                formatter={(value: number, name: string) => [
+                  value,
+                  ERROR_TYPE_LABELS[name as (typeof ERROR_TYPES)[number]] ??
+                    name,
+                ]}
+              />
+              {data.errorTrend.top.map((et, i) => (
+                <Line
+                  key={et}
+                  type="monotone"
+                  dataKey={et}
+                  name={et}
+                  stroke={[REDPEN, BALLPOINT, AMBER, GRAPHITE][i]}
+                  strokeWidth={2}
+                  dot={{ r: 2, strokeWidth: 0 }}
+                />
+              ))}
+              <Legend
+                wrapperStyle={{ fontSize: 12 }}
+                iconSize={9}
+                formatter={(value) => (
+                  <span style={{ color: INK }}>
+                    {ERROR_TYPE_LABELS[
+                      value as (typeof ERROR_TYPES)[number]
+                    ] ?? value}
+                  </span>
+                )}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Section>
+      )}
 
       {/* 2b — accuracy × difficulty matrix */}
       <Section
@@ -801,6 +851,111 @@ function MirrorGroup({ title, bars }: { title: string; bars: MirrorBar[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+type HeatRow = {
+  subtopic: Subtopic;
+  counts: Record<ErrorType, number>;
+  crossTopic?: number;
+};
+
+/** Subtopic × error-type grid. Cells mix the redpen toward the surface
+ *  token (not literal white) so the ramp reads in both themes. */
+function HeatTable({
+  rows,
+  max,
+  redpen,
+  meta,
+}: {
+  rows: HeatRow[];
+  max: number;
+  redpen: string;
+  meta?: (row: HeatRow) => React.ReactNode;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="text-sm">
+        <thead>
+          <tr>
+            <th className="pr-3 text-left text-xs font-normal text-graphite">
+              Subtopic
+            </th>
+            {ERROR_TYPES.map((et) => (
+              <th
+                key={et}
+                className="px-1 pb-1 text-center text-[10px] font-normal text-graphite"
+              >
+                {ERROR_TYPE_LABELS[et]}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.subtopic}>
+              <td className="whitespace-nowrap pr-3 text-xs">
+                {SUBTOPIC_LABELS[row.subtopic]}
+                {meta?.(row)}
+              </td>
+              {ERROR_TYPES.map((et) => {
+                const count = row.counts[et];
+                const intensity = max > 0 ? count / max : 0;
+                return (
+                  <td key={et} className="p-0.5">
+                    <div
+                      title={`${SUBTOPIC_LABELS[row.subtopic]} × ${ERROR_TYPE_LABELS[et]}: ${count}`}
+                      className="flex h-8 w-16 items-center justify-center rounded-[4px] border border-grid font-mono text-xs"
+                      style={{
+                        backgroundColor:
+                          count === 0
+                            ? "transparent"
+                            : `color-mix(in srgb, ${redpen} ${Math.round(
+                                12 + intensity * 68,
+                              )}%, var(--surface))`,
+                        color:
+                          intensity > 0.55 ? "var(--paper)" : "var(--ink)",
+                      }}
+                    >
+                      {count > 0 ? count : ""}
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** One-click drill sets assembled from the questions where a given slip
+ *  historically occurs. */
+function SlipSiteLinks({
+  slipSites,
+}: {
+  slipSites: Partial<Record<ErrorType, number[]>>;
+}) {
+  const entries = ERROR_TYPES.filter(
+    (et) => (slipSites[et]?.length ?? 0) >= 2,
+  );
+  if (entries.length === 0) return null;
+  return (
+    <div className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-xs">
+      <span className="text-graphite">
+        Re-solve the questions where each slip happened:
+      </span>
+      {entries.map((et) => (
+        <a
+          key={et}
+          href={`/drill?qids=${slipSites[et]!.join(",")}`}
+          className="text-ballpoint hover:underline"
+        >
+          {ERROR_TYPE_LABELS[et]} ({slipSites[et]!.length}) →
+        </a>
+      ))}
     </div>
   );
 }

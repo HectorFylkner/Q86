@@ -70,11 +70,15 @@ export const SKILL_BY_SUBTOPIC: Record<Subtopic, FundamentalSkill> =
     ).flatMap(([skill, subs]) => subs.map((s) => [s, skill])),
   ) as Record<Subtopic, FundamentalSkill>;
 
+// misread = wrong parse of the givens; answered_wrong_question = solved
+// cleanly, reported a different quantity than the one asked (the x vs
+// x+y slip). Distinct mechanisms, distinct fixes.
 export const ERROR_TYPES = [
   "content_gap",
   "setup_error",
   "calculation_error",
   "misread",
+  "answered_wrong_question",
   "time_pressure",
   "guess",
 ] as const;
@@ -178,6 +182,7 @@ export const ERROR_TYPE_LABELS: Record<ErrorType, string> = {
   setup_error: "Setup error",
   calculation_error: "Calculation error",
   misread: "Misread",
+  answered_wrong_question: "Answered the wrong question",
   time_pressure: "Time pressure",
   guess: "Guess",
 };

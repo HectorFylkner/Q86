@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { FlagButton } from "@/components/drill/flag-button";
 import { Md } from "@/components/math";
 import { getQuestionHistory, type QuestionHistoryRow } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import { SUBTOPIC_LABELS } from "@/lib/taxonomy";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
 
 /**
@@ -91,7 +93,19 @@ export function SolutionPanel({
         </section>
       )}
 
-      <section className="border-t border-grid pt-3">
+      <section className="flex flex-wrap items-center justify-between gap-2 border-t border-grid pt-3">
+        <Link
+          href={`/learn/${question.subtopic}${
+            selectedIndex != null && selectedIndex !== question.correctIndex
+              ? "#traps"
+              : "#cues"
+          }`}
+          className="text-xs font-medium text-ballpoint hover:underline"
+        >
+          {selectedIndex != null && selectedIndex !== question.correctIndex
+            ? `Reopen ${SUBTOPIC_LABELS[question.subtopic]} at its trap gallery →`
+            : `Chapter refresher: ${SUBTOPIC_LABELS[question.subtopic]} trigger cues →`}
+        </Link>
         <FlagButton questionId={question.id} />
       </section>
 

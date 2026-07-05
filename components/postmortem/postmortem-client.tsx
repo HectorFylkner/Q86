@@ -268,6 +268,21 @@ export function PostmortemClient({
               </span>
               .
             </p>
+            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              <Link
+                href={`/drill?sub=${coach.prescription.subtopic}&n=${coach.prescription.count}`}
+                className="font-medium text-ballpoint hover:underline"
+              >
+                Start the prescription now →
+              </Link>
+              <Link
+                href={`/learn/${coach.error_subtag}#ideas`}
+                className="text-ballpoint hover:underline"
+              >
+                Reread the failing chapter:{" "}
+                {SUBTOPIC_LABELS[coach.error_subtag]} →
+              </Link>
+            </div>
           </CoachBlock>
           <div className="rounded-control bg-highlight px-3 py-2 text-sm font-medium">
             {coach.takeaway_15_words}

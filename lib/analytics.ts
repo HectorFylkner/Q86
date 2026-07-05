@@ -9,6 +9,11 @@ import {
 } from "./db/schema.ts";
 import { ELO_START } from "./elo.ts";
 import { gatherDiscipline, type DisciplineData } from "./discipline-server.ts";
+import {
+  topMechanisms,
+  weeklyErrorRates,
+  type ErrorWeek,
+} from "./forensics.ts";
 import { dayIndex, dayKey, keyFromDayIndex, shortLabelFromKey } from "./local-day.ts";
 import { appTimeZone } from "./settings.ts";
 import {
@@ -81,6 +86,24 @@ export type AnalyticsData = {
     }>;
     max: number;
   };
+  /** Second heatmap keyed on attempts.error_subtag — the subtopic that
+   *  actually failed, which may differ from the question's own. */
+  subtagHeatmap: {
+    rows: Array<{
+      subtopic: Subtopic;
+      counts: Record<ErrorType, number>;
+      total: number;
+      /** How many of these failures came from questions filed under a
+       *  different chapter. */
+      crossTopic: number;
+    }>;
+    max: number;
+  };
+  /** Recent question ids per error mechanism — the slip sites, ready to
+   *  reassemble as a drill. */
+  slipSites: Partial<Record<ErrorType, number[]>>;
+  /** Weekly recurrence per error mechanism (lib/forensics.ts). */
+  errorTrend: { weeks: ErrorWeek[]; top: ErrorType[] };
   scatter: ScatterPoint[];
   zones: { over245: number; sub60Wrong: number; luckyCorrect: number };
   editLedger: {
@@ -126,10 +149,12 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   const rows = await db
     .select({
       id: attempts.id,
+      questionId: attempts.questionId,
       correct: attempts.correct,
       timeSeconds: attempts.timeSeconds,
       confidence: attempts.confidence,
       errorType: attempts.errorType,
+      errorSubtag: attempts.errorSubtag,
       createdAt: attempts.createdAt,
       subtopic: questions.subtopic,
       skill: questions.fundamentalSkill,
@@ -188,6 +213,36 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     (m, r) => Math.max(m, ...ERROR_TYPES.map((et) => r.counts[et])),
     0,
   );
+
+  // --- subtag heatmap: the subtopic that actually failed -------------------
+  const subtagRows = ALL_SUBTOPICS.map((subtopic) => {
+    const counts = {} as Record<ErrorType, number>;
+    for (const et of ERROR_TYPES) counts[et] = 0;
+    let total = 0;
+    let crossTopic = 0;
+    for (const r of rows) {
+      if (r.errorSubtag !== subtopic || r.correct || !r.errorType) continue;
+      counts[r.errorType]++;
+      total++;
+      if (r.subtopic !== subtopic) crossTopic++;
+    }
+    return { subtopic, counts, total, crossTopic };
+  }).filter((r) => r.total > 0);
+  const subtagMax = subtagRows.reduce(
+    (m, r) => Math.max(m, ...ERROR_TYPES.map((et) => r.counts[et])),
+    0,
+  );
+
+  // --- slip sites: recent distinct questions per error mechanism -----------
+  const slipSites: Partial<Record<ErrorType, number[]>> = {};
+  for (const r of rows) {
+    if (r.correct || !r.errorType) continue;
+    const list = slipSites[r.errorType] ?? [];
+    if (list.length < 10 && !list.includes(r.questionId)) {
+      list.push(r.questionId);
+      slipSites[r.errorType] = list;
+    }
+  }
 
   // --- scatter + zones ------------------------------------------------------
   const scatter = rows.slice(0, 800).map((r) => ({
@@ -351,6 +406,17 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     rating: Math.round(eloMap.get(category) ?? ELO_START),
   }));
 
+  // --- error-mechanism recurrence, weekly ------------------------------------
+  const errorWeeks = weeklyErrorRates(
+    rows.map((r, i) => ({
+      dayIdx: rowDayIdx[i],
+      correct: r.correct,
+      errorType: r.errorType,
+    })),
+    todayIdx,
+    keyFromDayIndex,
+  );
+
   return {
     attemptCount: rows.length,
     casualExcluded,
@@ -360,6 +426,9 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       skills: bars(FUNDAMENTAL_SKILLS, SKILL_LABELS, (r) => r.skill),
     },
     heatmap: { rows: heatRows, max: heatMax },
+    subtagHeatmap: { rows: subtagRows, max: subtagMax },
+    slipSites,
+    errorTrend: { weeks: errorWeeks, top: topMechanisms(errorWeeks) },
     scatter,
     zones,
     editLedger: {

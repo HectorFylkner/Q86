@@ -165,7 +165,7 @@ Voice contract (hard rules):
 ${METHODOLOGY}
 
 Field notes:
-- error_type: the primary failure. content_gap = missing knowledge; setup_error = wrong equation/framework from a correct read; calculation_error = right setup, arithmetic slip; misread = wrong parse of the stem; time_pressure = rushed or bailed; guess = no real attempt.
+- error_type: the primary failure. content_gap = missing knowledge; setup_error = wrong equation/framework from a correct read; calculation_error = right setup, arithmetic slip; misread = wrong parse of the givens; answered_wrong_question = solved cleanly but reported a different quantity than the one asked (solved for x, answered x+y); time_pressure = rushed or bailed; guess = no real attempt.
 - error_subtag: the subtopic that actually failed (may differ from the question's own subtopic).
 - divergence_point_md: the first written line where the work leaves the correct path, quoted, and what should have been written instead.
 - diagnosis_md: why this happened, tied to the case file's known patterns when they apply (pure-context number properties, early-question rush, time sink).

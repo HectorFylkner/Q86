@@ -212,7 +212,7 @@ export function QuestionRunner({
         } else if (k === "p") {
           gotoPostmortem();
           e.preventDefault();
-        } else if (currentResult && !currentResult.correct && /^[1-6]$/.test(k)) {
+        } else if (currentResult && !currentResult.correct && /^[1-7]$/.test(k)) {
           tagError(ERROR_TYPES[Number(k) - 1]);
           e.preventDefault();
         }
@@ -459,7 +459,7 @@ export function QuestionRunner({
           )}
           {!currentResult.correct && (
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
+              <span className="text-graphite">Tag the miss (keys 1–7):</span>
               {ERROR_TYPES.map((et, i) => (
                 <button
                   key={et}
