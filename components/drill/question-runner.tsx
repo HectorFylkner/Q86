@@ -254,7 +254,7 @@ export function QuestionRunner({
               {!passed && (
                 <Link
                   href={`/drill?test=${test}`}
-                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-ballpoint/90"
                 >
                   Retake with fresh questions →
                 </Link>
@@ -331,7 +331,7 @@ export function QuestionRunner({
           )}
           <Link
             href="/"
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
           >
             Back to today
           </Link>
@@ -396,7 +396,7 @@ export function QuestionRunner({
             <ConfidencePicker value={confidence} onChange={setConfidence} />
             <button
               onClick={submit}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
             >
               Confirm answer
               <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
@@ -459,7 +459,7 @@ export function QuestionRunner({
             </button>
             <button
               onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
             >
               {index + 1 < questions.length ? "Next question" : "Finish"}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>

@@ -285,7 +285,7 @@ export function PatternsClient({
           onClick={startRound}
           disabled={isSaving}
           className={cn(
-            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
             isSaving && "cursor-wait opacity-60",
           )}
         >
@@ -373,7 +373,7 @@ export function PatternsClient({
         <div className="flex gap-3">
           <button
             onClick={startRound}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
           >
             Another round
           </button>
@@ -462,7 +462,7 @@ export function PatternsClient({
               />
               <button
                 type="submit"
-                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
               >
                 Answer
                 <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>

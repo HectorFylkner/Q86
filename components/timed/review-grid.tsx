@@ -156,7 +156,7 @@ export function ReviewGrid({
                   }}
                   disabled={!canCommit}
                   className={cn(
-                    "rounded-control bg-redpen px-4 py-1.5 text-sm font-medium text-white hover:bg-redpen/90",
+                    "rounded-control bg-redpen px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-redpen/90",
                     !canCommit && "cursor-not-allowed opacity-50",
                   )}
                 >
@@ -250,7 +250,7 @@ export function ReviewGrid({
         <div className="mt-5 flex justify-end border-t border-grid pt-4">
           <button
             onClick={onSubmit}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
           >
             Submit section and see the marking
           </button>

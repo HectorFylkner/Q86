@@ -123,7 +123,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         </p>
         <button
           onClick={() => setPhase("running")}
-          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
         >
           Start · Enter
         </button>

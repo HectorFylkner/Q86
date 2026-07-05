@@ -261,7 +261,7 @@ export function MarkingSummary({
             </button>
             <Link
               href="/"
-              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
             >
               Back to today
             </Link>

@@ -102,7 +102,7 @@ export function ImportClient() {
             onClick={parse}
             disabled={rawText.trim().length < 40 || stage.kind === "parsing"}
             className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
               (rawText.trim().length < 40 || stage.kind === "parsing") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -219,7 +219,7 @@ export function ImportClient() {
               onClick={() => confirmSave(parsed)}
               disabled={stage.kind === "saving"}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
                 stage.kind === "saving" && "cursor-wait opacity-60",
               )}
             >

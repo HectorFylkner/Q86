@@ -202,7 +202,7 @@ export function PostmortemClient({
             onClick={runCoach}
             disabled={images.length === 0 || coachState.kind === "running"}
             className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
               (images.length === 0 || coachState.kind === "running") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -338,7 +338,7 @@ export function PostmortemClient({
               onClick={confirmClassification}
               disabled={errorType == null || confirmState === "saving"}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
                 (errorType == null || confirmState === "saving") &&
                   "opacity-50",
               )}
@@ -403,7 +403,7 @@ export function PostmortemClient({
                 {twinState.ids.length > 0 && (
                   <Link
                     href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
                   >
                     Drill the twins now
                   </Link>

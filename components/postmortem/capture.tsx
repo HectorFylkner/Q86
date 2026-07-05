@@ -198,7 +198,7 @@ export function ScratchCapture({
               onClick={captureStill}
               disabled={busy || full}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
                 (busy || full) && "opacity-50",
               )}
             >

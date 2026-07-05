@@ -15,11 +15,16 @@
   --graphite: #5e6268;
   --ballpoint: #2239c4;
   --redpen: #c63b2f;
-  --amber: #b7791f;
+  /* Deep enough that small amber text holds AA on paper, surface, and
+     the highlighter fill. */
+  --amber: #8f5c0c;
   --highlight: #f5efd9;
+  /* Label ink on accent fills (ballpoint/redpen buttons, mastered rungs). */
+  --on-accent: #ffffff;
 }
 
-/* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
+/* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast.
+   Accents are lifted for use AS text, so labels ON them carry dark ink. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #141519;
@@ -31,6 +36,7 @@
     --redpen: #e0705f;
     --amber: #d9a050;
     --highlight: #2b2820;
+    --on-accent: #141519;
   }
 }
 :root[data-theme="dark"] {
@@ -43,6 +49,7 @@
   --redpen: #e0705f;
   --amber: #d9a050;
   --highlight: #2b2820;
+  --on-accent: #141519;
 }
 
 /* KaTeX inherits currentColor, but its rules/fraction bars use borders that
@@ -58,6 +65,7 @@
   --color-redpen: var(--redpen);
   --color-amber: var(--amber);
   --color-highlight: var(--highlight);
+  --color-on-accent: var(--on-accent);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
@@ -123,18 +131,6 @@ body {
 }
 .katex-display .katex {
   font-size: 1.15em;
-}
-
-/* Night desk lifts --ballpoint for contrast AS TEXT, which leaves white
-   labels on ballpoint fills at ~2.5:1. On dark, every ballpoint-filled
-   control carries paper-dark text instead. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .bg-ballpoint.text-white {
-    color: var(--paper);
-  }
-}
-:root[data-theme="dark"] .bg-ballpoint.text-white {
-  color: var(--paper);
 }
 
 /* Loading skeleton shimmer (opacity only — safe under reduced motion). */

@@ -70,7 +70,7 @@ export default async function MasteryPage() {
                           className={cn(
                             "rounded-[4px] border text-center font-mono text-[11px] leading-6",
                             rung.state === "mastered" &&
-                              "border-ballpoint bg-ballpoint text-white",
+                              "border-ballpoint bg-ballpoint text-on-accent",
                             rung.state === "working" &&
                               "border-amber bg-amber/10 text-amber",
                             rung.state === "untouched" &&

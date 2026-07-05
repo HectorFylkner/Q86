@@ -208,7 +208,7 @@ export function QueueClient({
               onClick={() => startRedo(due.map((d) => d.questionId))}
               disabled={starting}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
                 starting && "cursor-wait opacity-60",
               )}
             >

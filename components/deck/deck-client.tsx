@@ -67,7 +67,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
         </p>
         <Link
           href="/drill"
-          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
         >
           Go drill →
         </Link>
