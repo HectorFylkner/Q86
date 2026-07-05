@@ -105,7 +105,7 @@ export function DrillClient({
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-6 w-48" />
-        <div className="skeleton h-64 w-full rounded-[10px]" />
+        <div className="skeleton h-64 w-full rounded-card" />
         <p className="text-sm text-graphite">Selecting questions…</p>
       </div>
     );

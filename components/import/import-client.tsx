@@ -77,7 +77,7 @@ export function ImportClient() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
           Paste the score report text
         </h2>
@@ -95,14 +95,14 @@ export function ImportClient() {
           }}
           rows={10}
           placeholder="Paste the raw report text here…"
-          className="mt-3 w-full rounded-[6px] border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
+          className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
         />
         <div className="mt-3 flex items-center gap-3">
           <button
             onClick={parse}
             disabled={rawText.trim().length < 40 || stage.kind === "parsing"}
             className={cn(
-              "rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
               (rawText.trim().length < 40 || stage.kind === "parsing") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -127,7 +127,7 @@ export function ImportClient() {
       </section>
 
       {parsed && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
             Parsed result — confirm before saving
           </h2>
@@ -219,7 +219,7 @@ export function ImportClient() {
               onClick={() => confirmSave(parsed)}
               disabled={stage.kind === "saving"}
               className={cn(
-                "rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
                 stage.kind === "saving" && "cursor-wait opacity-60",
               )}
             >
@@ -229,7 +229,7 @@ export function ImportClient() {
             </button>
             <button
               onClick={() => setStage({ kind: "editing" })}
-              className="rounded-[6px] border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               Discard the parse
             </button>

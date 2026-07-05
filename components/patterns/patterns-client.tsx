@@ -218,7 +218,7 @@ export function PatternsClient({
     return (
       <div className="space-y-5">
         {stage.kind === "setup" && stage.error && (
-          <p className="rounded-[6px] border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
+          <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
             {stage.error}
           </p>
         )}
@@ -238,7 +238,7 @@ export function PatternsClient({
           <button
             onClick={() => setSelection("mixed")}
             className={cn(
-              "flex flex-col rounded-[10px] border p-4 text-left shadow-ambient transition-colors duration-150",
+              "flex flex-col rounded-card border p-4 text-left shadow-ambient transition-colors duration-150",
               selection === "mixed"
                 ? "border-ink bg-highlight"
                 : "border-grid bg-surface hover:border-graphite/50",
@@ -257,7 +257,7 @@ export function PatternsClient({
               key={s.key}
               onClick={() => setSelection(s.key)}
               className={cn(
-                "flex flex-col rounded-[10px] border p-4 text-left shadow-ambient transition-colors duration-150",
+                "flex flex-col rounded-card border p-4 text-left shadow-ambient transition-colors duration-150",
                 selection === s.key
                   ? "border-ink bg-highlight"
                   : "border-grid bg-surface hover:border-graphite/50",
@@ -285,7 +285,7 @@ export function PatternsClient({
           onClick={startRound}
           disabled={isSaving}
           className={cn(
-            "rounded-[6px] bg-ballpoint px-5 py-2.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-white hover:bg-ballpoint/90",
             isSaving && "cursor-wait opacity-60",
           )}
         >
@@ -315,7 +315,7 @@ export function PatternsClient({
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.15 }}
-            className="rounded-[6px] border border-ballpoint/50 bg-highlight px-3 py-2 text-sm font-medium text-ballpoint"
+            className="rounded-control border border-ballpoint/50 bg-highlight px-3 py-2 text-sm font-medium text-ballpoint"
           >
             New personal best: {result.personalBest.current} (previous{" "}
             {result.personalBest.previous}).
@@ -331,7 +331,7 @@ export function PatternsClient({
           <StatTile label="Day streak" text={String(result.dayStreak)} />
         </div>
 
-        <div className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h3 className="font-display text-sm font-semibold">Rating changes</h3>
           <ul className="mt-2 space-y-2">
             {Object.keys(result.newRatings).map((category) => {
@@ -373,13 +373,13 @@ export function PatternsClient({
         <div className="flex gap-3">
           <button
             onClick={startRound}
-            className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
             Another round
           </button>
           <button
             onClick={() => setStage({ kind: "setup", error: null })}
-            className="rounded-[6px] border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+            className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
           >
             Change category
           </button>
@@ -409,7 +409,7 @@ export function PatternsClient({
       </div>
 
       {active && (
-        <div className="rounded-[10px] border border-grid bg-surface p-6 shadow-ambient">
+        <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
           <div className="text-xs text-graphite">
             {PATTERN_CATEGORY_LABELS[active.category]}
           </div>
@@ -433,7 +433,7 @@ export function PatternsClient({
                 <button
                   key={i}
                   onClick={() => submitAnswer(option)}
-                  className="flex items-center gap-2 rounded-[6px] border border-grid px-3 py-2 text-left text-sm hover:border-graphite/50"
+                  className="flex items-center gap-2 rounded-control border border-grid px-3 py-2 text-left text-sm hover:border-graphite/50"
                 >
                   <span className="font-mono text-xs text-graphite">
                     {i + 1}
@@ -458,11 +458,11 @@ export function PatternsClient({
                 autoComplete="off"
                 aria-label="Your answer"
                 placeholder="Type the number"
-                className="w-44 rounded-[6px] border border-grid bg-surface px-3 py-2 font-mono text-lg"
+                className="w-44 rounded-control border border-grid bg-surface px-3 py-2 font-mono text-lg"
               />
               <button
                 type="submit"
-                className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
               >
                 Answer
                 <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
@@ -495,7 +495,7 @@ function answersMatch(user: string, canonical: string): boolean {
 
 function StatTile({ label, text }: { label: string; text: string }) {
   return (
-    <div className="rounded-[10px] border border-grid bg-surface p-3 shadow-ambient">
+    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
       <div className="text-[11px] text-graphite">{label}</div>
       <Odometer text={text} className="mt-1 font-mono text-xl font-medium" />
     </div>

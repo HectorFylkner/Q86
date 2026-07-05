@@ -101,7 +101,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded-[10px] border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
+      <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
         No questions available — run <code>pnpm seed</code> first.
       </p>
     );
@@ -109,7 +109,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
 
   if (phase === "intro") {
     return (
-      <section className="mx-auto max-w-2xl rounded-[10px] border border-grid bg-surface p-6 shadow-ambient">
+      <section className="mx-auto max-w-2xl rounded-card border border-grid bg-surface p-6 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
           {items.length} questions · 45 seconds each
         </h2>
@@ -123,7 +123,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         </p>
         <button
           onClick={() => setPhase("running")}
-          className="mt-4 rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
           Start · Enter
         </button>
@@ -133,7 +133,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
 
   if (phase === "done") {
     return (
-      <section className="mx-auto max-w-2xl rounded-[10px] border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
+      <section className="mx-auto max-w-2xl rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
         <p className="font-display text-lg font-semibold">
           {aligned} / {items.length} calls aligned with your record
         </p>
@@ -165,7 +165,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         )}
       </div>
 
-      <section className="rounded-[10px] border border-grid bg-surface p-6 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
         <Md source={item.question.stemMd} />
         <ol className="mt-4 space-y-1.5">
           {item.question.choices.map((c, i) => (
@@ -185,7 +185,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
             <button
               key={call}
               onClick={() => commit(call)}
-              className="rounded-[6px] border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               {CALL_LABELS[call]}{" "}
               <span className="font-mono text-xs text-graphite">
@@ -197,7 +197,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
       ) : (
         <section
           className={cn(
-            "rounded-[10px] border p-4 shadow-ambient",
+            "rounded-card border p-4 shadow-ambient",
             lastCall?.call === item.recommendation
               ? "border-ballpoint/50 bg-ballpoint/5"
               : "border-amber/50 bg-amber/5",

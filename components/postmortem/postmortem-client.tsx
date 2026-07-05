@@ -166,7 +166,7 @@ export function PostmortemClient({
       </div>
 
       <details
-        className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient"
+        className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
         open
       >
         <summary className="cursor-pointer font-display text-sm font-semibold">
@@ -184,7 +184,7 @@ export function PostmortemClient({
         </div>
       </details>
 
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
           Scratch work
         </h2>
@@ -202,7 +202,7 @@ export function PostmortemClient({
             onClick={runCoach}
             disabled={images.length === 0 || coachState.kind === "running"}
             className={cn(
-              "rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
               (images.length === 0 || coachState.kind === "running") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -224,7 +224,7 @@ export function PostmortemClient({
       </section>
 
       {coachState.kind === "running" && (
-        <div className="space-y-2 rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <div className="space-y-2 rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <div className="skeleton h-4 w-1/3" />
           <div className="skeleton h-3 w-full" />
           <div className="skeleton h-3 w-5/6" />
@@ -233,7 +233,7 @@ export function PostmortemClient({
       )}
 
       {!coach && attempt.aiFeedbackMd && coachState.kind !== "running" && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="mb-2 font-display text-sm font-semibold">
             Saved post-mortem
           </h2>
@@ -246,7 +246,7 @@ export function PostmortemClient({
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15 }}
-          className="space-y-4 rounded-[10px] border border-grid bg-surface p-4 shadow-ambient"
+          className="space-y-4 rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
           <CoachBlock title="Divergence point" tone="red">
             <Md source={coach.divergence_point_md} className="text-[15px]" />
@@ -269,14 +269,14 @@ export function PostmortemClient({
               .
             </p>
           </CoachBlock>
-          <div className="rounded-[6px] bg-highlight px-3 py-2 text-sm font-medium">
+          <div className="rounded-control bg-highlight px-3 py-2 text-sm font-medium">
             {coach.takeaway_15_words}
           </div>
         </motion.section>
       )}
 
       {(coach || attempt.aiFeedbackMd) && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
             Classification
             <span className="ml-2 text-xs font-normal text-graphite">
@@ -292,7 +292,7 @@ export function PostmortemClient({
                   setConfirmState("unsaved");
                 }}
                 className={cn(
-                  "rounded-[6px] border px-2.5 py-1 text-xs",
+                  "rounded-control border px-2.5 py-1 text-xs",
                   errorType === et
                     ? "border-ink bg-highlight font-medium"
                     : "border-grid text-graphite hover:border-graphite/50",
@@ -313,7 +313,7 @@ export function PostmortemClient({
                 setErrorSubtag((e.target.value || null) as Subtopic | null);
                 setConfirmState("unsaved");
               }}
-              className="rounded-[6px] border border-grid bg-surface px-2 py-1 text-sm"
+              className="rounded-control border border-grid bg-surface px-2 py-1 text-sm"
             >
               <option value="">—</option>
               {ALL_SUBTOPICS.map((s) => (
@@ -331,14 +331,14 @@ export function PostmortemClient({
             }}
             placeholder="Your own note on this miss (optional)"
             rows={2}
-            className="mt-3 w-full rounded-[6px] border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
+            className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
           />
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={confirmClassification}
               disabled={errorType == null || confirmState === "saving"}
               className={cn(
-                "rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
                 (errorType == null || confirmState === "saving") &&
                   "opacity-50",
               )}
@@ -358,7 +358,7 @@ export function PostmortemClient({
       )}
 
       {(coach || attempt.aiFeedbackMd) && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">Twin drills</h2>
           <p className="mt-1 text-sm text-graphite">
             Two fresh twins of this question — same math skeleton, opposite
@@ -371,7 +371,7 @@ export function PostmortemClient({
                 onClick={queueTwins}
                 disabled={twinState.kind === "working"}
                 className={cn(
-                  "rounded-[6px] border border-ballpoint px-4 py-1.5 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
+                  "rounded-control border border-ballpoint px-4 py-1.5 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
                   twinState.kind === "working" && "cursor-wait opacity-60",
                 )}
               >
@@ -403,7 +403,7 @@ export function PostmortemClient({
                 {twinState.ids.length > 0 && (
                   <Link
                     href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
                   >
                     Drill the twins now
                   </Link>
@@ -427,7 +427,7 @@ function Chip({
   return (
     <span
       className={cn(
-        "rounded-[6px] border px-1.5 py-0.5 text-[11px]",
+        "rounded-control border px-1.5 py-0.5 text-[11px]",
         tone === "red"
           ? "border-redpen/50 text-redpen"
           : tone === "blue"

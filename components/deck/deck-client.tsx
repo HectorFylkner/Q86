@@ -60,14 +60,14 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
 
   if (cards.length === 0) {
     return (
-      <section className="rounded-[10px] border border-grid bg-surface p-6 text-center shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-6 text-center shadow-ambient">
         <p className="text-sm text-graphite">
           Nothing due — the deck builds itself from questions you miss, and
           cards you&apos;ve graded return when their interval comes up.
         </p>
         <Link
           href="/drill"
-          className="mt-3 inline-block rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
           Go drill →
         </Link>
@@ -77,7 +77,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
 
   if (!card) {
     return (
-      <section className="rounded-[10px] border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
+      <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
         <p className="font-display text-base font-semibold">
           Deck done — {cards.length} takeaway{cards.length === 1 ? "" : "s"}{" "}
           graded.
@@ -99,7 +99,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
       <button
         onClick={advance}
         className={cn(
-          "block w-full rounded-[10px] border p-6 text-left shadow-ambient transition-colors",
+          "block w-full rounded-card border p-6 text-left shadow-ambient transition-colors",
           flipped ? "border-ballpoint/50 bg-highlight" : "border-grid bg-surface",
         )}
       >

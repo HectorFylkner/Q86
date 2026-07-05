@@ -9,7 +9,7 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto mt-16 max-w-sm">
-      <div className="rounded-[10px] border border-grid bg-surface p-6 shadow-ambient">
+      <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
         <h1 className="font-display text-lg font-semibold">Q86</h1>
         <p className="mt-1 text-sm text-graphite">
           This instance is private. Enter the site password to train.
@@ -22,7 +22,7 @@ export default async function LoginPage({
             required
             placeholder="Site password"
             aria-label="Site password"
-            className="w-full rounded-[6px] border border-grid bg-surface px-3 py-2 text-sm outline-none focus:border-ballpoint"
+            className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm outline-none focus:border-ballpoint"
           />
           {error && (
             <p className="text-sm text-redpen">
@@ -31,7 +31,7 @@ export default async function LoginPage({
           )}
           <button
             type="submit"
-            className="w-full rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="w-full rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
             Enter
           </button>

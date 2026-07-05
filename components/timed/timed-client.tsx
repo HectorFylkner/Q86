@@ -348,12 +348,12 @@ export function TimedClient({
     return (
       <div className="space-y-5">
         {stage.error && (
-          <p className="rounded-[6px] border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
+          <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
             {stage.error}
           </p>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+          <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
             <h2 className="font-display text-base font-semibold">
               Full section
             </h2>
@@ -366,7 +366,7 @@ export function TimedClient({
               onClick={() => handleStart("full")}
               disabled={!enough(21)}
               className={cn(
-                "mt-4 rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
                 !enough(21) && "cursor-not-allowed opacity-50",
               )}
             >
@@ -378,7 +378,7 @@ export function TimedClient({
               </p>
             )}
           </div>
-          <div className="flex flex-col rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+          <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
             <h2 className="font-display text-base font-semibold">Mini set</h2>
             <p className="mt-1 text-sm text-graphite">
               7 questions, 15:00. Mixed or single-skill.
@@ -389,7 +389,7 @@ export function TimedClient({
                   key={s}
                   onClick={() => setMiniSkill(s)}
                   className={cn(
-                    "rounded-[6px] border px-2.5 py-1 text-xs",
+                    "rounded-control border px-2.5 py-1 text-xs",
                     miniSkill === s
                       ? "border-ink bg-highlight font-medium"
                       : "border-grid text-graphite hover:border-graphite/50",
@@ -404,7 +404,7 @@ export function TimedClient({
               onClick={() => handleStart("mini")}
               disabled={!enough(7)}
               className={cn(
-                "mt-4 rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
                 !enough(7) && "cursor-not-allowed opacity-50",
               )}
             >
@@ -449,7 +449,7 @@ export function TimedClient({
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-3 w-full" />
-        <div className="skeleton h-64 w-full rounded-[10px]" />
+        <div className="skeleton h-64 w-full rounded-card" />
         <p className="text-sm text-graphite">Assembling the set…</p>
       </div>
     );
@@ -462,7 +462,7 @@ export function TimedClient({
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15 }}
-          className="rounded-[10px] border border-grid bg-surface px-10 py-8 text-center shadow-ambient"
+          className="rounded-card border border-grid bg-surface px-10 py-8 text-center shadow-ambient"
         >
           <p className="font-display text-2xl font-semibold">
             Q1 pays the same as Q{questionCount}.
@@ -479,7 +479,7 @@ export function TimedClient({
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-6 w-40" />
-        <div className="skeleton h-48 w-full rounded-[10px]" />
+        <div className="skeleton h-48 w-full rounded-card" />
         <p className="text-sm text-graphite">Marking the section…</p>
       </div>
     );
@@ -487,11 +487,11 @@ export function TimedClient({
 
   if (stage.kind === "error") {
     return (
-      <div className="mx-auto max-w-xl space-y-3 rounded-[10px] border border-redpen/40 bg-surface p-5 shadow-ambient">
+      <div className="mx-auto max-w-xl space-y-3 rounded-card border border-redpen/40 bg-surface p-5 shadow-ambient">
         <p className="text-sm text-redpen">{stage.message}</p>
         <button
           onClick={() => finalize(answers, editRecords, bookmarks)}
-          className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
           Retry saving the session
         </button>
@@ -581,7 +581,7 @@ export function TimedClient({
             <button
               onClick={() => toggleBookmark(currentIndex)}
               className={cn(
-                "flex items-center gap-1 rounded-[6px] border px-2 py-1",
+                "flex items-center gap-1 rounded-control border px-2 py-1",
                 bookmarks[currentIndex]
                   ? "border-amber bg-highlight text-amber"
                   : "border-grid text-graphite hover:border-graphite/50",
@@ -594,7 +594,7 @@ export function TimedClient({
           </span>
         </div>
 
-        <div className="relative rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+        <div className="relative rounded-card border border-grid bg-surface p-5 shadow-ambient">
           {violatedCurrent && (
             <div
               aria-hidden
@@ -619,7 +619,7 @@ export function TimedClient({
             <ConfidencePicker value={confidence} onChange={setConfidence} />
             <button
               onClick={confirmAnswer}
-              className="rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
               {currentIndex + 1 < questions.length
                 ? "Confirm and advance"

@@ -1,4 +1,5 @@
 import { count } from "drizzle-orm";
+import { SectionTabs } from "@/components/section-tabs";
 import { PatternsClient, type CategoryStats } from "@/components/patterns/patterns-client";
 import { db } from "@/lib/db";
 import { eloRatings, patternAttempts } from "@/lib/db/schema";
@@ -53,6 +54,7 @@ export default async function PatternsPage({
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="trainers" />
       <h1 className="font-display text-xl font-semibold">Pattern trainer</h1>
       <PatternsClient
         stats={stats}

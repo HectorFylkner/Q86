@@ -50,7 +50,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   if (data.attemptCount === 0) {
     return (
       <div className="space-y-4">
-        <p className="rounded-[10px] border border-grid bg-surface p-5 text-sm text-graphite shadow-ambient">
+        <p className="rounded-card border border-grid bg-surface p-5 text-sm text-graphite shadow-ambient">
           No attempts logged yet. Run a drill or a timed set and the report
           fills in.
         </p>
@@ -632,7 +632,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+    <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
       <h2 className="font-display text-sm font-semibold">{title}</h2>
       <p className="mb-3 mt-0.5 text-xs text-graphite">{subtitle}</p>
       {children}
@@ -684,7 +684,7 @@ function ZoneStat({
   signed?: boolean;
 }) {
   return (
-    <div className="rounded-[10px] border border-grid bg-surface px-3 py-2">
+    <div className="rounded-card border border-grid bg-surface px-3 py-2">
       <div className="text-[11px] text-graphite">{label}</div>
       <div
         className={cn(

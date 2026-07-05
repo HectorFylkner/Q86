@@ -1,4 +1,5 @@
 import { desc } from "drizzle-orm";
+import { SectionTabs } from "@/components/section-tabs";
 import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
 import { db } from "@/lib/db";
@@ -17,12 +18,13 @@ export default async function ImportPage() {
 
   return (
     <div className="space-y-5">
+      <SectionTabs group="progress" />
       <h1 className="font-display text-xl font-semibold">
         Score-report import
       </h1>
       <ImportClient />
 
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-sm font-semibold">
@@ -44,7 +46,7 @@ export default async function ImportPage() {
       </section>
 
       {reports.length > 0 && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
             Imported baselines · {reports.length}
           </h2>

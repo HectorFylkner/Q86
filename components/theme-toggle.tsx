@@ -32,7 +32,7 @@ export function ThemeToggle() {
     <button
       onClick={cycle}
       title="Theme: auto follows your system; Night is the dark desk; Paper is the exam-light default"
-      className="rounded-[6px] border border-grid px-2.5 py-1 font-mono text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
+      className="rounded-control border border-grid px-2.5 py-1 font-mono text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
     >
       {LABELS[mode]}
     </button>

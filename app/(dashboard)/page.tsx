@@ -4,6 +4,7 @@ import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
+import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
@@ -30,6 +31,10 @@ export default async function TodayPage() {
   const daysUntilTimed = plan.timedSetToday
     ? 0
     : cadence - (inputs.dayIndex % cadence);
+  const deck = await todaysDeck();
+  const deckWaiting = deck.due + deck.fresh;
+  const firstRun =
+    Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
   return (
     <div className="space-y-6">
@@ -55,10 +60,60 @@ export default async function TodayPage() {
         <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
       </div>
 
+      {firstRun && (
+        <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-5 shadow-ambient">
+          <h2 className="font-display text-base font-semibold">
+            New here? The loop is simple.
+          </h2>
+          <ol className="mt-2 space-y-1.5 text-sm">
+            <li>
+              <span className="font-mono text-xs text-ballpoint">1</span>{" "}
+              <Link
+                href="/learn"
+                className="font-medium text-ballpoint hover:underline"
+              >
+                Read a chapter
+              </Link>{" "}
+              <span className="text-graphite">
+                on a topic you want to sharpen — each one ends with a
+                checklist.
+              </span>
+            </li>
+            <li>
+              <span className="font-mono text-xs text-ballpoint">2</span>{" "}
+              <Link
+                href="/drill"
+                className="font-medium text-ballpoint hover:underline"
+              >
+                Drill it immediately
+              </Link>{" "}
+              <span className="text-graphite">
+                — every miss is dissected: fastest path, trap anatomy,
+                takeaway.
+              </span>
+            </li>
+            <li>
+              <span className="font-mono text-xs text-ballpoint">3</span>{" "}
+              <span className="text-graphite">
+                Come back tomorrow: your misses return as flashcards and
+                spaced redos in{" "}
+                <Link
+                  href="/deck"
+                  className="font-medium text-ballpoint hover:underline"
+                >
+                  Review
+                </Link>
+                , and this page starts planning your days.
+              </span>
+            </li>
+          </ol>
+        </section>
+      )}
+
       {plan.phase && (
-        <section className="rounded-[10px] border border-grid bg-surface px-4 py-3 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="rounded-[6px] bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
+            <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
               {PHASE_LABELS[plan.phase]}
             </span>
             <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
@@ -125,34 +180,44 @@ export default async function TodayPage() {
         </PlanCard>
 
         <PlanCard
-          title="Redo queue"
+          title="Review"
           body={
-            plan.dueRedoCount > 0 ? (
-              <span>
-                {plan.dueRedoCount} questions due for spaced redo.
-              </span>
-            ) : (
-              <span>
-                Nothing due. Generate a VOF drill or start a timed set.
-              </span>
-            )
+            <span>
+              {plan.dueRedoCount > 0
+                ? `${plan.dueRedoCount} redo${plan.dueRedoCount === 1 ? "" : "s"} due`
+                : "No redos due"}
+              {" · "}
+              {deckWaiting > 0
+                ? `${deckWaiting} deck card${deckWaiting === 1 ? "" : "s"} waiting`
+                : "deck clear"}
+            </span>
           }
         >
-          {plan.dueRedoCount > 0 ? (
-            <Link
-              href="/queue?start=1"
-              className="text-sm font-medium text-ballpoint hover:underline"
-            >
-              Redo all {plan.dueRedoCount} due →
-            </Link>
-          ) : (
-            <Link
-              href="/queue"
-              className="text-sm text-graphite hover:underline"
-            >
-              Open the queue →
-            </Link>
-          )}
+          <div className="flex flex-col gap-1.5">
+            {deckWaiting > 0 && (
+              <Link
+                href="/deck"
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
+              </Link>
+            )}
+            {plan.dueRedoCount > 0 ? (
+              <Link
+                href="/queue?start=1"
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Redo all {plan.dueRedoCount} due →
+              </Link>
+            ) : (
+              <Link
+                href="/queue"
+                className="text-sm text-graphite hover:underline"
+              >
+                Open the queue →
+              </Link>
+            )}
+          </div>
         </PlanCard>
 
         <PlanCard
@@ -183,7 +248,7 @@ export default async function TodayPage() {
         </PlanCard>
       </div>
 
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
           Skill weights driving today&apos;s mix
         </h2>
@@ -231,7 +296,7 @@ function PlanCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+    <div className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient">
       <h2 className="font-display text-sm font-semibold">{title}</h2>
       <p className="mt-1 flex-1 text-xs text-graphite">{body}</p>
       <div className="mt-3">{children}</div>

@@ -145,7 +145,7 @@ export function ScratchCapture({
           onClick={cameraOpen ? closeCamera : openCamera}
           disabled={disabled || (full && !cameraOpen)}
           className={cn(
-            "flex items-center gap-1.5 rounded-[6px] border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
+            "flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
             (disabled || (full && !cameraOpen)) && "opacity-50",
           )}
         >
@@ -156,7 +156,7 @@ export function ScratchCapture({
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || full}
           className={cn(
-            "flex items-center gap-1.5 rounded-[6px] border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
+            "flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
             (disabled || full) && "opacity-50",
           )}
         >
@@ -184,21 +184,21 @@ export function ScratchCapture({
       {cameraError && <p className="text-sm text-redpen">{cameraError}</p>}
 
       {cameraOpen && (
-        <div className="space-y-2 rounded-[10px] border border-grid bg-surface p-3 shadow-ambient">
+        <div className="space-y-2 rounded-card border border-grid bg-surface p-3 shadow-ambient">
           {/* Live camera preview; stills are captured to canvas */}
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className="w-full rounded-[6px]"
+            className="w-full rounded-control"
           />
           <div className="flex gap-2">
             <button
               onClick={captureStill}
               disabled={busy || full}
               className={cn(
-                "rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
                 (busy || full) && "opacity-50",
               )}
             >
@@ -228,7 +228,7 @@ export function ScratchCapture({
           if (files.length > 0) void addBlobs(files);
         }}
         className={cn(
-          "flex min-h-24 items-center justify-center rounded-[10px] border border-dashed p-3 text-sm transition-colors duration-150",
+          "flex min-h-24 items-center justify-center rounded-card border border-dashed p-3 text-sm transition-colors duration-150",
           dragOver ? "border-ballpoint bg-highlight/50" : "border-grid",
         )}
       >
@@ -244,7 +244,7 @@ export function ScratchCapture({
                 <img
                   src={src}
                   alt={`Scratch work ${i + 1}`}
-                  className="h-28 rounded-[6px] border border-grid object-contain"
+                  className="h-28 rounded-control border border-grid object-contain"
                 />
                 {!disabled && (
                   <button

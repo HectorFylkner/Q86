@@ -41,7 +41,7 @@ export function SettingsForm({
             setDate(e.target.value);
             setState("idle");
           }}
-          className="rounded-[6px] border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
         />
       </label>
       <label className="flex flex-col gap-1 text-xs text-graphite">
@@ -52,7 +52,7 @@ export function SettingsForm({
             setCadenceDays(e.target.value);
             setState("idle");
           }}
-          className="rounded-[6px] border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
         >
           {[2, 3, 4, 7].map((d) => (
             <option key={d} value={d}>
@@ -64,7 +64,7 @@ export function SettingsForm({
       <button
         onClick={save}
         disabled={state === "saving"}
-        className="rounded-[6px] border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50"
+        className="rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50"
       >
         {state === "saving" ? "Saving…" : "Save settings"}
       </button>

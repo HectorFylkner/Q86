@@ -64,7 +64,7 @@ export function MarkingSummary({
     <div className="space-y-5">
       <h2 className="font-display text-lg font-semibold">Section marked</h2>
 
-      <div className="overflow-x-auto rounded-[10px] border border-grid bg-surface shadow-ambient">
+      <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-grid text-left text-xs text-graphite">
@@ -205,7 +205,7 @@ export function MarkingSummary({
           )}
 
           {edits.length > 0 && (
-            <div className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+            <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
               <h3 className="font-display text-sm font-semibold">
                 Edits this session
               </h3>
@@ -250,13 +250,13 @@ export function MarkingSummary({
           <div className="flex gap-3">
             <button
               onClick={onRestart}
-              className="rounded-[6px] border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               Set up another timed set
             </button>
             <Link
               href="/"
-              className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
               Back to today
             </Link>
@@ -273,7 +273,7 @@ export function MarkingSummary({
             return (
               <details
                 key={q.id}
-                className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient"
+                className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
               >
                 <summary className="cursor-pointer text-sm font-medium">
                   Q{i + 1} — you picked {CHOICE_LETTERS[a.selectedIndex]},
@@ -312,7 +312,7 @@ function StatCard({
   tone?: "red" | "amber" | "blue";
 }) {
   return (
-    <div className="rounded-[10px] border border-grid bg-surface p-3 shadow-ambient">
+    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
       <div className="text-[11px] leading-tight text-graphite">{label}</div>
       <Odometer
         text={value}

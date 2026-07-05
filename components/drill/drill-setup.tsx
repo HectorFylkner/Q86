@@ -142,12 +142,12 @@ export function DrillSetup({
   return (
     <div className="space-y-5">
       {error && (
-        <p className="rounded-[6px] border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
+        <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
           {error}
         </p>
       )}
 
-      <section className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">Skill</h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {(["all", ...FUNDAMENTAL_SKILLS] as const).map((s) => (
@@ -158,7 +158,7 @@ export function DrillSetup({
                 setSubtopics([]);
               }}
               className={cn(
-                "rounded-[6px] border px-3 py-1.5 text-sm transition-colors duration-150",
+                "rounded-control border px-3 py-1.5 text-sm transition-colors duration-150",
                 skill === s
                   ? "border-ink bg-highlight font-medium"
                   : "border-grid text-graphite hover:border-graphite/50",
@@ -181,7 +181,7 @@ export function DrillSetup({
               key={s}
               onClick={() => toggleSubtopic(s)}
               className={cn(
-                "rounded-[6px] border px-2.5 py-1 text-xs transition-colors duration-150",
+                "rounded-control border px-2.5 py-1 text-xs transition-colors duration-150",
                 subtopics.includes(s)
                   ? "border-ink bg-highlight font-medium"
                   : "border-grid text-graphite hover:border-graphite/50",
@@ -204,7 +204,7 @@ export function DrillSetup({
                   setDiffMin(v);
                   if (v > diffMax) setDiffMax(v);
                 }}
-                className="rounded-[6px] border border-grid bg-surface px-2 py-1"
+                className="rounded-control border border-grid bg-surface px-2 py-1"
               >
                 {DIFFICULTIES.map((d) => (
                   <option key={d} value={d}>
@@ -221,7 +221,7 @@ export function DrillSetup({
                   setDiffMax(v);
                   if (v < diffMin) setDiffMin(v);
                 }}
-                className="rounded-[6px] border border-grid bg-surface px-2 py-1"
+                className="rounded-control border border-grid bg-surface px-2 py-1"
               >
                 {DIFFICULTIES.map((d) => (
                   <option key={d} value={d}>
@@ -243,7 +243,7 @@ export function DrillSetup({
                   key={c}
                   onClick={() => setCount(c)}
                   className={cn(
-                    "rounded-[6px] border px-2.5 py-1 font-mono text-sm",
+                    "rounded-control border px-2.5 py-1 font-mono text-sm",
                     count === c
                       ? "border-ink bg-highlight font-medium"
                       : "border-grid text-graphite hover:border-graphite/50",
@@ -268,7 +268,7 @@ export function DrillSetup({
                   key={value}
                   onClick={() => setTiming(value)}
                   className={cn(
-                    "rounded-[6px] border px-2.5 py-1 text-sm",
+                    "rounded-control border px-2.5 py-1 text-sm",
                     timing === value
                       ? "border-ink bg-highlight font-medium"
                       : "border-grid text-graphite hover:border-graphite/50",
@@ -294,7 +294,7 @@ export function DrillSetup({
                   key={value}
                   onClick={() => setFormat(value)}
                   className={cn(
-                    "rounded-[6px] border px-2.5 py-1 text-sm",
+                    "rounded-control border px-2.5 py-1 text-sm",
                     format === value
                       ? "border-ink bg-highlight font-medium"
                       : "border-grid text-graphite hover:border-graphite/50",
@@ -320,7 +320,7 @@ export function DrillSetup({
                 key={value}
                 onClick={() => setFocus(value)}
                 className={cn(
-                  "rounded-[6px] border px-2.5 py-1 text-sm",
+                  "rounded-control border px-2.5 py-1 text-sm",
                   focus === value
                     ? "border-ink bg-highlight font-medium"
                     : "border-grid text-graphite hover:border-graphite/50",
@@ -350,7 +350,7 @@ export function DrillSetup({
             }
             disabled={matching === 0}
             className={cn(
-              "rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
               matching === 0 && "cursor-not-allowed opacity-50",
             )}
           >
@@ -363,7 +363,7 @@ export function DrillSetup({
         </div>
       </section>
 
-      <section className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
           Generate more questions
         </h2>
@@ -376,7 +376,7 @@ export function DrillSetup({
             onClick={generateMore}
             disabled={genState.kind === "working"}
             className={cn(
-              "rounded-[6px] border border-ballpoint px-4 py-2 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
+              "rounded-control border border-ballpoint px-4 py-2 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
               genState.kind === "working" && "cursor-wait opacity-60",
             )}
           >

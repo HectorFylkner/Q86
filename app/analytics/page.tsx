@@ -1,4 +1,5 @@
 import { AnalyticsClient } from "@/components/analytics/analytics-client";
+import { SectionTabs } from "@/components/section-tabs";
 import { FlagsCard } from "@/components/analytics/flags-card";
 import { gatherAnalytics } from "@/lib/analytics";
 
@@ -10,6 +11,7 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="progress" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h1 className="font-display text-xl font-semibold">Analytics</h1>
         {data.casualExcluded > 0 && (

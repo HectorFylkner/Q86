@@ -193,12 +193,12 @@ export function QueueClient({
   return (
     <div className="space-y-6">
       {error && (
-        <p className="rounded-[6px] border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
+        <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
           {error}
         </p>
       )}
 
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
             Due now · {due.length}
@@ -208,7 +208,7 @@ export function QueueClient({
               onClick={() => startRedo(due.map((d) => d.questionId))}
               disabled={starting}
               className={cn(
-                "rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
                 starting && "cursor-wait opacity-60",
               )}
             >
@@ -260,7 +260,7 @@ export function QueueClient({
       </section>
 
       {upcoming.length > 0 && (
-        <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
             Scheduled · {upcoming.length}
           </h2>
@@ -282,7 +282,7 @@ export function QueueClient({
         </section>
       )}
 
-      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
             Error log
@@ -292,7 +292,7 @@ export function QueueClient({
           </h2>
           <button
             onClick={exportCsv}
-            className="flex items-center gap-1.5 rounded-[6px] border border-grid bg-surface px-3 py-1.5 text-xs hover:border-graphite/50"
+            className="flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-xs hover:border-graphite/50"
           >
             <Download size={13} />
             Export CSV ({filteredLog.length} rows)
@@ -306,7 +306,7 @@ export function QueueClient({
             onChange={(e) =>
               setSkillFilter(e.target.value as FundamentalSkill | "all")
             }
-            className="rounded-[6px] border border-grid bg-surface px-2 py-1"
+            className="rounded-control border border-grid bg-surface px-2 py-1"
           >
             <option value="all">All skills</option>
             {FUNDAMENTAL_SKILLS.map((s) => (
@@ -319,7 +319,7 @@ export function QueueClient({
             aria-label="Filter by error type"
             value={errorFilter}
             onChange={(e) => setErrorFilter(e.target.value as ErrorType | "all")}
-            className="rounded-[6px] border border-grid bg-surface px-2 py-1"
+            className="rounded-control border border-grid bg-surface px-2 py-1"
           >
             <option value="all">All error types</option>
             {ERROR_TYPES.map((et) => (
@@ -334,7 +334,7 @@ export function QueueClient({
             onChange={(e) =>
               setResultFilter(e.target.value as "all" | "wrong" | "correct")
             }
-            className="rounded-[6px] border border-grid bg-surface px-2 py-1"
+            className="rounded-control border border-grid bg-surface px-2 py-1"
           >
             <option value="all">All results</option>
             <option value="wrong">Wrong only</option>

@@ -219,7 +219,7 @@ export function QuestionRunner({
       Math.max(1, results.length);
     return (
       <div className="space-y-4">
-        <div className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+        <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
           <h2 className="font-display text-lg font-semibold">
             {mode === "redo" ? "Redo complete" : "Drill complete"}
           </h2>
@@ -229,7 +229,7 @@ export function QuestionRunner({
             <Stat label="Avg time" value={formatSeconds(avg)} />
           </div>
         </div>
-        <div className="overflow-x-auto rounded-[10px] border border-grid bg-surface shadow-ambient">
+        <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-grid text-left text-xs text-graphite">
@@ -277,14 +277,14 @@ export function QuestionRunner({
           {onRestart && (
             <button
               onClick={onRestart}
-              className="rounded-[6px] border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               Set up another drill
             </button>
           )}
           <Link
             href="/"
-            className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
             Back to today
           </Link>
@@ -326,7 +326,7 @@ export function QuestionRunner({
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.15 }}
-        className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient"
+        className="rounded-card border border-grid bg-surface p-5 shadow-ambient"
       >
         <Md source={question.stemMd} className="text-[16px]" />
         <div className="mt-5">
@@ -349,7 +349,7 @@ export function QuestionRunner({
             <ConfidencePicker value={confidence} onChange={setConfidence} />
             <button
               onClick={submit}
-              className="rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
               Confirm answer
               <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
@@ -381,7 +381,7 @@ export function QuestionRunner({
                   onClick={() => tagError(et)}
                   disabled={currentResult.attemptId == null}
                   className={cn(
-                    "rounded-[6px] border px-2 py-1 transition-colors duration-150",
+                    "rounded-control border px-2 py-1 transition-colors duration-150",
                     currentResult.errorType === et
                       ? "border-redpen bg-redpen/5 font-medium text-redpen"
                       : "border-grid text-graphite hover:border-graphite/50",
@@ -403,7 +403,7 @@ export function QuestionRunner({
               onClick={gotoPostmortem}
               disabled={currentResult.attemptId == null}
               className={cn(
-                "rounded-[6px] border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
+                "rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
                 currentResult.attemptId == null && "opacity-50",
               )}
             >
@@ -412,7 +412,7 @@ export function QuestionRunner({
             </button>
             <button
               onClick={next}
-              className="rounded-[6px] bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
               {index + 1 < questions.length ? "Next question" : "Finish"}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
@@ -430,7 +430,7 @@ export function QuestionRunner({
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-[6px] border border-grid bg-surface px-1.5 py-0.5 text-[11px]">
+    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-[11px]">
       {children}
     </span>
   );

@@ -46,7 +46,7 @@ export function SolutionPanel({
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15 }}
-      className="space-y-4 rounded-[10px] border border-grid bg-surface p-4 shadow-ambient"
+      className="space-y-4 rounded-card border border-grid bg-surface p-4 shadow-ambient"
     >
       <section>
         <h3 className="mb-1.5 font-display text-sm font-semibold text-ballpoint">
@@ -69,7 +69,7 @@ export function SolutionPanel({
               <li
                 key={trap.index}
                 className={cn(
-                  "flex items-start gap-2 rounded-[6px] px-2 py-1 text-sm",
+                  "flex items-start gap-2 rounded-control px-2 py-1 text-sm",
                   trap.index === selectedIndex &&
                     "bg-redpen/5 text-redpen",
                 )}

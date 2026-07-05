@@ -34,7 +34,7 @@ export function ConfidencePicker({
             disabled={disabled}
             onClick={() => onChange(c)}
             className={cn(
-              "rounded-[6px] border px-2.5 py-1 text-xs transition-colors duration-150",
+              "rounded-control border px-2.5 py-1 text-xs transition-colors duration-150",
               value === c
                 ? "border-ink bg-highlight font-medium text-ink"
                 : "border-grid text-graphite hover:border-graphite/50",

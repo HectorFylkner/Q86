@@ -1,4 +1,5 @@
 import { and, desc, eq, gt, lte } from "drizzle-orm";
+import { SectionTabs } from "@/components/section-tabs";
 import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
 import { db } from "@/lib/db";
 import { attempts, questions, redoQueue } from "@/lib/db/schema";
@@ -72,6 +73,7 @@ export default async function QueuePage({
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="review" />
       <h1 className="font-display text-xl font-semibold">
         Redo queue &amp; error log
       </h1>

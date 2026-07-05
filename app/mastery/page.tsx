@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SectionTabs } from "@/components/section-tabs";
 import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
@@ -16,6 +17,7 @@ export default async function MasteryPage() {
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="progress" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
         <p className="text-xs text-graphite">
@@ -28,7 +30,7 @@ export default async function MasteryPage() {
       {FUNDAMENTAL_SKILLS.map((skill) => (
         <section
           key={skill}
-          className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient"
+          className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
           <h2 className="font-display text-sm font-semibold">
             {SKILL_LABELS[skill]}

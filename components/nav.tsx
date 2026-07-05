@@ -5,28 +5,40 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
+/** Seven destinations; grouped sections carry their own tab bars.
+ *  `routes` lists every path that should light the entry up. */
 const LINKS = [
-  { href: "/", label: "Today" },
-  { href: "/learn", label: "Learn" },
-  { href: "/drill", label: "Drill" },
-  { href: "/mastery", label: "Mastery" },
-  { href: "/timed", label: "Timed" },
-  { href: "/queue", label: "Queue" },
-  { href: "/deck", label: "Deck" },
-  { href: "/decide", label: "Decide" },
-  { href: "/patterns", label: "Patterns" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/import", label: "Import" },
+  { href: "/", label: "Today", routes: ["/"] },
+  { href: "/learn", label: "Learn", routes: ["/learn"] },
+  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
+  { href: "/timed", label: "Timed", routes: ["/timed"] },
+  { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
+  { href: "/patterns", label: "Trainers", routes: ["/patterns", "/decide"] },
+  {
+    href: "/mastery",
+    label: "Progress",
+    routes: ["/mastery", "/analytics", "/import"],
+  },
 ];
 
 /** The daily loop, thumb-reachable on phones. */
 const TAB_LINKS = [
-  { href: "/", label: "Today" },
-  { href: "/drill", label: "Drill" },
-  { href: "/timed", label: "Timed" },
-  { href: "/deck", label: "Deck" },
-  { href: "/analytics", label: "Stats" },
+  { href: "/", label: "Today", routes: ["/"] },
+  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
+  { href: "/timed", label: "Timed", routes: ["/timed"] },
+  { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
+  {
+    href: "/analytics",
+    label: "Stats",
+    routes: ["/analytics", "/mastery", "/import"],
+  },
 ];
+
+function isActive(routes: string[], pathname: string): boolean {
+  return routes.some((r) =>
+    r === "/" ? pathname === "/" : pathname.startsWith(r),
+  );
+}
 
 export function Nav() {
   const pathname = usePathname();
@@ -48,16 +60,13 @@ export function Nav() {
           className="flex flex-1 items-center gap-1 overflow-x-auto"
         >
           {LINKS.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href);
+            const active = isActive(link.routes, pathname);
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "rounded-[6px] px-3 py-1.5 text-sm whitespace-nowrap transition-colors duration-150",
+                  "rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors duration-150",
                   active
                     ? "bg-highlight font-medium text-ink"
                     : "text-graphite hover:bg-highlight/60 hover:text-ink",
@@ -85,10 +94,7 @@ export function BottomTabs() {
         className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
       >
         {TAB_LINKS.map((link) => {
-          const active =
-            link.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(link.href);
+          const active = isActive(link.routes, pathname);
           return (
             <Link
               key={link.href}

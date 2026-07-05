@@ -32,7 +32,7 @@ export function ChoiceList({
             disabled={revealed}
             onClick={() => onSelect(i)}
             className={cn(
-              "relative block min-h-[44px] w-full overflow-hidden rounded-[6px] border px-3 py-2.5 text-left text-[15px] transition-colors duration-150",
+              "relative block min-h-[44px] w-full overflow-hidden rounded-control border px-3 py-2.5 text-left text-[15px] transition-colors duration-150",
               !revealed && "cursor-pointer hover:border-graphite/50",
               isCorrect
                 ? "border-ballpoint/70"
@@ -57,7 +57,7 @@ export function ChoiceList({
             <span className="relative flex items-start gap-3">
               <span
                 className={cn(
-                  "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border font-mono text-xs font-medium",
+                  "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-control border font-mono text-xs font-medium",
                   isSelected && !revealed
                     ? "border-ink bg-ink text-surface"
                     : "border-grid text-graphite",

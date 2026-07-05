@@ -72,7 +72,7 @@ export function ReviewGrid({
         <div className="flex items-center justify-between text-xs text-graphite">
           <button
             onClick={() => setOpenIndex(null)}
-            className="rounded-[6px] border border-grid bg-surface px-2.5 py-1 hover:border-graphite/50"
+            className="rounded-control border border-grid bg-surface px-2.5 py-1 hover:border-graphite/50"
           >
             ← Back to review grid
           </button>
@@ -81,7 +81,7 @@ export function ReviewGrid({
           </span>
         </div>
 
-        <div className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+        <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
           <Md source={q.stemMd} className="text-[16px]" />
           <div className="mt-5">
             <ChoiceList
@@ -103,7 +103,7 @@ export function ReviewGrid({
           )}
 
           {editing && (
-            <div className="mt-4 space-y-3 rounded-[6px] border border-amber/50 bg-highlight/50 p-4">
+            <div className="mt-4 space-y-3 rounded-control border border-amber/50 bg-highlight/50 p-4">
               <p className="text-sm font-medium">
                 You are changing this answer. Name the specific error you
                 found — a feeling is not a reason.
@@ -114,7 +114,7 @@ export function ReviewGrid({
                     key={r}
                     onClick={() => setReason(r)}
                     className={cn(
-                      "rounded-[6px] border px-2.5 py-1 text-xs",
+                      "rounded-control border px-2.5 py-1 text-xs",
                       reason === r
                         ? "border-ink bg-surface font-medium"
                         : "border-grid bg-surface/60 text-graphite hover:border-graphite/50",
@@ -130,7 +130,7 @@ export function ReviewGrid({
                   onChange={(e) => setJustification(e.target.value)}
                   placeholder="Name the specific error: which line, which number, which condition you misread…"
                   rows={2}
-                  className="w-full rounded-[6px] border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
+                  className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
                 />
                 <p
                   className={cn(
@@ -156,7 +156,7 @@ export function ReviewGrid({
                   }}
                   disabled={!canCommit}
                   className={cn(
-                    "rounded-[6px] bg-redpen px-4 py-1.5 text-sm font-medium text-white hover:bg-redpen/90",
+                    "rounded-control bg-redpen px-4 py-1.5 text-sm font-medium text-white hover:bg-redpen/90",
                     !canCommit && "cursor-not-allowed opacity-50",
                   )}
                 >
@@ -168,7 +168,7 @@ export function ReviewGrid({
                     setReason(null);
                     setJustification("");
                   }}
-                  className="rounded-[6px] border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
+                  className="rounded-control border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
                 >
                   Keep the original answer
                 </button>
@@ -180,7 +180,7 @@ export function ReviewGrid({
             <button
               onClick={() => onToggleBookmark(openIndex)}
               className={cn(
-                "flex items-center gap-1 rounded-[6px] border px-2 py-1 text-xs",
+                "flex items-center gap-1 rounded-control border px-2 py-1 text-xs",
                 bookmarks[openIndex]
                   ? "border-amber bg-highlight text-amber"
                   : "border-grid text-graphite hover:border-graphite/50",
@@ -202,7 +202,7 @@ export function ReviewGrid({
 
   return (
     <div className="mx-auto mt-4 max-w-3xl space-y-4">
-      <div className="rounded-[10px] border border-grid bg-surface p-5 shadow-ambient">
+      <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">
             Review &amp; edit
@@ -221,7 +221,7 @@ export function ReviewGrid({
               key={q.id}
               onClick={() => openQuestion(i)}
               className={cn(
-                "relative flex h-12 flex-col items-center justify-center rounded-[6px] border text-sm transition-colors duration-150 hover:border-graphite/50",
+                "relative flex h-12 flex-col items-center justify-center rounded-control border text-sm transition-colors duration-150 hover:border-graphite/50",
                 editedQuestionIds.has(q.id)
                   ? "border-redpen/50 bg-redpen/5"
                   : "border-grid bg-surface",
@@ -250,7 +250,7 @@ export function ReviewGrid({
         <div className="mt-5 flex justify-end border-t border-grid pt-4">
           <button
             onClick={onSubmit}
-            className="rounded-[6px] bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
             Submit section and see the marking
           </button>
