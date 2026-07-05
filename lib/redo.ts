@@ -4,10 +4,16 @@ import { redoQueue } from "./db/schema.ts";
 import {
   nextRedoState,
   STAGE_DELAY_DAYS,
+  type RedoOutcome,
   type RedoStage,
 } from "./redo-rules.ts";
 
-export { COLD_SOLVE_LIMIT_SECONDS, nextRedoState } from "./redo-rules.ts";
+export {
+  COLD_SOLVE_LIMIT_SECONDS,
+  nextRedoState,
+  redoOutcome,
+  type RedoOutcome,
+} from "./redo-rules.ts";
 
 function dueAfterDays(days: number): Date {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
@@ -48,7 +54,7 @@ export async function enqueueMiss(
  */
 export async function applyRedoResult(
   questionId: number,
-  correct: boolean,
+  outcome: RedoOutcome,
   timeSeconds: number,
 ): Promise<boolean> {
   const item = await db
@@ -61,7 +67,7 @@ export async function applyRedoResult(
 
   const stage: RedoStage =
     item.stage === 1 || item.stage === 2 ? item.stage : 0;
-  const next = nextRedoState(stage, correct, timeSeconds);
+  const next = nextRedoState(stage, outcome, timeSeconds);
   if (next.cleared) {
     await db.update(redoQueue)
       .set({ cleared: true })

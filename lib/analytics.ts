@@ -81,7 +81,7 @@ export type AnalyticsData = {
     max: number;
   };
   scatter: ScatterPoint[];
-  zones: { over245: number; sub60Wrong: number };
+  zones: { over245: number; sub60Wrong: number; luckyCorrect: number };
   editLedger: {
     lifetimeNet: number;
     total: number;
@@ -195,6 +195,8 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   const zones = {
     over245: rows.filter((r) => r.timeSeconds > 165).length,
     sub60Wrong: rows.filter((r) => r.timeSeconds < 60 && !r.correct).length,
+    luckyCorrect: rows.filter((r) => r.correct && r.confidence === "guess")
+      .length,
   };
 
   // --- edit ledger ----------------------------------------------------------

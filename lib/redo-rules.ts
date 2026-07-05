@@ -10,22 +10,38 @@ export const COLD_SOLVE_LIMIT_SECONDS = 150;
 
 export type RedoStage = 0 | 1 | 2;
 
+/** What an attempt proves: a guessed correct is luck, not evidence. */
+export type RedoOutcome = "wrong" | "lucky" | "solid";
+
+export function redoOutcome(
+  correct: boolean,
+  confidence: string | null | undefined,
+): RedoOutcome {
+  if (!correct) return "wrong";
+  return confidence === "guess" ? "lucky" : "solid";
+}
+
 export type RedoTransition =
   | { cleared: true }
   | { cleared: false; stage: RedoStage; delayDays: number };
 
 /**
- * Correct: stage 0 → 1 (+7d), stage 1 → 2 (+21d); stage 2 clears only via
+ * Solid: stage 0 → 1 (+7d), stage 1 → 2 (+21d); stage 2 clears only via
  * the cold-solve gate (≤ 2:30), otherwise it re-enters at stage 1 (+7d).
  * Wrong at any stage: back to stage 0 (+2d).
+ * Lucky (guessed correct): no progress, no regress — same stage, checked
+ * again in +2d.
  */
 export function nextRedoState(
   stage: RedoStage,
-  correct: boolean,
+  outcome: RedoOutcome,
   timeSeconds: number,
 ): RedoTransition {
-  if (!correct) {
+  if (outcome === "wrong") {
     return { cleared: false, stage: 0, delayDays: STAGE_DELAY_DAYS[0] };
+  }
+  if (outcome === "lucky") {
+    return { cleared: false, stage, delayDays: STAGE_DELAY_DAYS[0] };
   }
   if (stage === 0) {
     return { cleared: false, stage: 1, delayDays: STAGE_DELAY_DAYS[1] };

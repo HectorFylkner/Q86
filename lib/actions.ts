@@ -31,7 +31,7 @@ import {
   selectTimedSet,
   type QuestionFilter,
 } from "./engine.ts";
-import { applyRedoResult, enqueueMiss } from "./redo.ts";
+import { applyRedoResult, enqueueMiss, redoOutcome } from "./redo.ts";
 import { rampBudgets } from "./ramp-server.ts";
 import type { RampBudget } from "./ramp.ts";
 import type {
@@ -228,12 +228,15 @@ export async function logAttempt(input: {
     .returning()
     .get();
 
+  const outcome = redoOutcome(correct, input.confidence);
   if (input.mode === "redo") {
-    // A redo miss whose ladder item is already cleared (or was never
-    // queued) must not vanish silently — re-enter the ladder at stage 0.
-    const applied = await applyRedoResult(q.id, correct, input.timeSeconds);
-    if (!applied && !correct) await enqueueMiss(q.id, attempt.id);
-  } else if (!correct) {
+    // A non-solid result whose ladder item is already cleared (or was
+    // never queued) must not vanish silently — re-enter at stage 0.
+    const applied = await applyRedoResult(q.id, outcome, input.timeSeconds);
+    if (!applied && outcome !== "solid") await enqueueMiss(q.id, attempt.id);
+  } else if (outcome !== "solid") {
+    // Misses and lucky guesses both enter the ladder — a guessed correct
+    // is a point the exam would not reliably give back.
     await enqueueMiss(q.id, attempt.id);
   }
 
@@ -435,8 +438,13 @@ export async function saveTimedSession(input: {
   });
 
   // Redo enqueue outside the transaction: it has its own dedupe logic.
+  // Lucky guesses queue alongside misses — landed or not, a guess is a
+  // cell the exam can still take back.
   for (const result of input.results) {
-    if (!correctByQuestionId[result.questionId]) {
+    if (
+      !correctByQuestionId[result.questionId] ||
+      result.confidence === "guess"
+    ) {
       await enqueueMiss(
         result.questionId,
         attemptIdByQuestionId[result.questionId],

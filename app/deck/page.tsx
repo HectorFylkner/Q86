@@ -16,7 +16,8 @@ export default async function DeckPage() {
         <p className="text-xs text-graphite">
           Front: when to reach for the method. Back: the takeaway. Grade
           honestly — cards you know stretch to longer intervals, cards you
-          forget come back tomorrow.
+          forget come back tomorrow. Guessed corrects count as misses here;
+          the cue clearly didn&apos;t fire.
         </p>
       </div>
       <p className="font-mono text-[11px] text-graphite">

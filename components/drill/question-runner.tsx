@@ -451,6 +451,12 @@ export function QuestionRunner({
 
       {revealed && currentResult && (
         <>
+          {currentResult.correct && currentResult.confidence === "guess" && (
+            <p className="text-xs text-amber">
+              Landed, but it was a guess — this one re-enters the redo
+              ladder and does not count toward mastery.
+            </p>
+          )}
           {!currentResult.correct && (
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="text-graphite">Tag the miss (keys 1–6):</span>

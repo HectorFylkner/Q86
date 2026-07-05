@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, or } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, deckReviews, questions } from "./db/schema.ts";
 import { previewIntervals, type ReviewGrade } from "./srs.ts";
@@ -7,7 +7,8 @@ import { SUBTOPIC_LABELS, type Subtopic } from "./taxonomy.ts";
 /**
  * The takeaway deck: every missed question's one-line Takeaway becomes a
  * flashcard (front: the trigger cue — when to reach for the method;
- * back: the takeaway). Scheduling is graded recall (lib/srs.ts): due
+ * back: the takeaway). Guessed corrects count as misses here — the cue
+ * clearly didn't fire. Scheduling is graded recall (lib/srs.ts): due
  * cards always appear, new misses fill the remaining slots, and cards
  * you know stretch out to longer and longer intervals.
  */
@@ -48,7 +49,12 @@ export async function todaysDeck(): Promise<{
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(and(eq(attempts.correct, false), eq(attempts.focus, "focused")))
+    .where(
+      and(
+        or(eq(attempts.correct, false), eq(attempts.confidence, "guess")),
+        eq(attempts.focus, "focused"),
+      ),
+    )
     .orderBy(desc(attempts.id))
     .limit(300)
     .all();

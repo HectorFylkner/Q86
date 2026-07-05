@@ -38,7 +38,7 @@ async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
   const out = {} as Record<FundamentalSkill, SkillRecord>;
   for (const skill of FUNDAMENTAL_SKILLS) {
     const rows = await db
-      .select({ correct: attempts.correct })
+      .select({ correct: attempts.correct, confidence: attempts.confidence })
       .from(attempts)
       .innerJoin(questions, eq(attempts.questionId, questions.id))
       .where(
@@ -51,7 +51,10 @@ async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
       .limit(30)
       .all();
     out[skill] = {
-      correct: rows.filter((r) => r.correct).length,
+      // Guessed corrects don't count — they'd deflate the skill's
+      // weakness and starve it of drill volume it still needs.
+      correct: rows.filter((r) => r.correct && r.confidence !== "guess")
+        .length,
       total: rows.length,
     };
   }

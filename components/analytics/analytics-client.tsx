@@ -249,6 +249,11 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             value={data.zones.sub60Wrong}
             tone="red"
           />
+          <ZoneStat
+            label="Guessed corrects (re-queued, not mastery)"
+            value={data.zones.luckyCorrect}
+            tone="amber"
+          />
         </div>
         <ResponsiveContainer width="100%" height={320}>
           <ScatterChart margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>

@@ -21,6 +21,7 @@ export async function rampBudgets(
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
       correct: attempts.correct,
+      confidence: attempts.confidence,
       timeSeconds: attempts.timeSeconds,
     })
     .from(attempts)
@@ -40,7 +41,11 @@ export async function rampBudgets(
     const key = `${r.subtopic}|${r.difficulty}`;
     const list = cells.get(key) ?? [];
     if (list.length < RAMP_WINDOW) {
-      list.push({ correct: r.correct, timeSeconds: r.timeSeconds });
+      list.push({
+        correct: r.correct,
+        confidence: r.confidence,
+        timeSeconds: r.timeSeconds,
+      });
       cells.set(key, list);
     }
   }

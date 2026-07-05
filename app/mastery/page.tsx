@@ -23,10 +23,10 @@ export default async function MasteryPage() {
         <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
         <p className="text-xs text-graphite">
           A rung clears at ≥{Math.round(MASTERY_BAR * 100)}% over your last 10
-          attempts (minimum {MIN_ATTEMPTS}). Each cell also carries a pace
-          stage — no clock until accuracy is proven, then a soft cap, then
-          exam pace. {masteredCount} of {ladders.length} ladders fully
-          climbed.
+          attempts (minimum {MIN_ATTEMPTS}); guessed corrects don&apos;t
+          count. Each cell also carries a pace stage — no clock until
+          accuracy is proven, then a soft cap, then exam pace.{" "}
+          {masteredCount} of {ladders.length} ladders fully climbed.
         </p>
       </div>
 

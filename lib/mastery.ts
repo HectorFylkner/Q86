@@ -4,6 +4,7 @@ import { attempts, questions } from "./db/schema.ts";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
+  type Confidence,
   type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
@@ -17,6 +18,7 @@ import {
 import {
   MASTERY_WINDOW,
   rungState,
+  solidCorrect,
   type RungState,
 } from "./mastery-rules.ts";
 import { clampDifficulty, rampStage, type RampStage } from "./ramp.ts";
@@ -49,6 +51,7 @@ export async function computeLadders(): Promise<Ladder[]> {
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
       correct: attempts.correct,
+      confidence: attempts.confidence,
       timeSeconds: attempts.timeSeconds,
       id: attempts.id,
     })
@@ -73,13 +76,17 @@ export async function computeLadders(): Promise<Ladder[]> {
   // Most recent MASTERY_WINDOW attempts per cell (rows arrive newest-first).
   const cellAttempts = new Map<
     string,
-    Array<{ correct: boolean; timeSeconds: number }>
+    Array<{ correct: boolean; confidence: Confidence; timeSeconds: number }>
   >();
   for (const r of rows) {
     const key = `${r.subtopic}|${r.difficulty}`;
     const list = cellAttempts.get(key) ?? [];
     if (list.length < MASTERY_WINDOW) {
-      list.push({ correct: r.correct, timeSeconds: r.timeSeconds });
+      list.push({
+        correct: r.correct,
+        confidence: r.confidence,
+        timeSeconds: r.timeSeconds,
+      });
       cellAttempts.set(key, list);
     }
   }
@@ -89,14 +96,12 @@ export async function computeLadders(): Promise<Ladder[]> {
       const key = `${subtopic}|${difficulty}`;
       const available = availableByCell.get(key) ?? 0;
       const recent = cellAttempts.get(key) ?? [];
-      const correct = recent.filter((a) => a.correct).length;
+      // Solid corrects only — a lucky guess never climbs a ladder.
+      const correct = recent.filter(solidCorrect).length;
       const total = recent.length;
       return {
         difficulty,
-        state: rungState(
-          recent.map((a) => a.correct),
-          available,
-        ),
+        state: rungState(recent, available),
         correct,
         total,
         available,

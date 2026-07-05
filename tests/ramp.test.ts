@@ -19,6 +19,11 @@ const miss = (timeSeconds: number): RampAttempt => ({
   correct: false,
   timeSeconds,
 });
+const luckyHit = (timeSeconds: number): RampAttempt => ({
+  correct: true,
+  timeSeconds,
+  confidence: "guess",
+});
 
 test("soft caps are bench × 1.4 rounded to 5s", () => {
   assert.equal(softCapSeconds(3), 175); // 125 × 1.4
@@ -68,6 +73,16 @@ test("only the newest RAMP_WINDOW attempts count", () => {
     ...Array(10).fill(miss(90)),
   ];
   assert.equal(rampStage(recent, 3), "exam");
+});
+
+test("guessed corrects are not pace evidence", () => {
+  // Five fast 'corrects' — all guesses. The cell has proven nothing.
+  assert.equal(rampStage(Array(5).fill(luckyHit(60)), 3), "build");
+  // 4 solid fast + 1 lucky: 4/5 = 0.8 solid accuracy and paced → exam.
+  assert.equal(
+    rampStage([...Array(4).fill(hit(80)), luckyHit(60)], 3),
+    "exam",
+  );
 });
 
 test("build stage shows no budget at all", () => {
