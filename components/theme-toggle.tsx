@@ -7,9 +7,16 @@ const ORDER: Mode[] = ["auto", "dark", "light"];
 const LABELS: Record<Mode, string> = { auto: "Auto", dark: "Night", light: "Paper" };
 
 function apply(mode: Mode) {
+  // The resolved theme is always stamped (see themeInit in app/layout.tsx)
+  // so the stylesheet keeps a single dark-token source; auto resolves the
+  // OS preference here and on every OS change.
   const root = document.documentElement;
-  if (mode === "auto") delete root.dataset.theme;
-  else root.dataset.theme = mode;
+  root.dataset.theme =
+    mode === "auto"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : mode;
   window.dispatchEvent(new Event("q86-theme"));
 }
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Md } from "@/components/math";
+import { button } from "@/components/ui";
 import { saveDecisionRound } from "@/lib/actions";
 import type { DecideItem, DecideRecommendation } from "@/lib/decide";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
@@ -123,7 +124,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         </p>
         <button
           onClick={() => setPhase("running")}
-          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className={cn(button("primary"), "mt-4")}
         >
           Start · Enter
         </button>
@@ -185,7 +186,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
             <button
               key={call}
               onClick={() => commit(call)}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className={button("quiet")}
             >
               {CALL_LABELS[call]}{" "}
               <span className="font-mono text-xs text-graphite">

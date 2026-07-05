@@ -1,5 +1,5 @@
 /**
- * Q86 seed script — installs the 180-question verified bank (§12 phase 2).
+ * Q86 seed script — installs the committed 360-question verified bank.
  *
  * Default mode loads scripts/seed-bank.json — questions that already
  * passed verification (the two-model pipeline or authored-with-

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { button } from "@/components/ui";
 import { saveBaselineReport } from "@/lib/actions";
 import type { ParsedReport } from "@/lib/ai/schemas";
 import {
@@ -102,7 +103,7 @@ export function ImportClient() {
             onClick={parse}
             disabled={rawText.trim().length < 40 || stage.kind === "parsing"}
             className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              button("primary"),
               (rawText.trim().length < 40 || stage.kind === "parsing") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -219,7 +220,7 @@ export function ImportClient() {
               onClick={() => confirmSave(parsed)}
               disabled={stage.kind === "saving"}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary"),
                 stage.kind === "saving" && "cursor-wait opacity-60",
               )}
             >
@@ -229,7 +230,7 @@ export function ImportClient() {
             </button>
             <button
               onClick={() => setStage({ kind: "editing" })}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className={button("quiet")}
             >
               Discard the parse
             </button>

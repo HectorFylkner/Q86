@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ScratchCapture } from "@/components/postmortem/capture";
+import { button } from "@/components/ui";
 import { tagAttempt } from "@/lib/actions";
 import type { CoachResponse } from "@/lib/ai/schemas";
 import type { Attempt, Question } from "@/lib/db/schema";
@@ -202,7 +203,7 @@ export function PostmortemClient({
             onClick={runCoach}
             disabled={images.length === 0 || coachState.kind === "running"}
             className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              button("primary"),
               (images.length === 0 || coachState.kind === "running") &&
                 "cursor-not-allowed opacity-50",
             )}
@@ -353,7 +354,7 @@ export function PostmortemClient({
               onClick={confirmClassification}
               disabled={errorType == null || confirmState === "saving"}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary", "sm"),
                 (errorType == null || confirmState === "saving") &&
                   "opacity-50",
               )}
@@ -386,7 +387,7 @@ export function PostmortemClient({
                 onClick={queueTwins}
                 disabled={twinState.kind === "working"}
                 className={cn(
-                  "rounded-control border border-ballpoint px-4 py-1.5 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
+                  button("outline", "sm"),
                   twinState.kind === "working" && "cursor-wait opacity-60",
                 )}
               >
@@ -418,7 +419,7 @@ export function PostmortemClient({
                 {twinState.ids.length > 0 && (
                   <Link
                     href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+                    className={button("primary", "sm")}
                   >
                     Drill the twins now
                   </Link>

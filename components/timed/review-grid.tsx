@@ -5,6 +5,7 @@ import { Bookmark, Pencil } from "lucide-react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import type { AnswerRecord } from "@/components/timed/timed-client";
+import { button } from "@/components/ui";
 import type { TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import {
@@ -168,7 +169,7 @@ export function ReviewGrid({
                     setReason(null);
                     setJustification("");
                   }}
-                  className="rounded-control border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
+                  className={button("quiet", "sm")}
                 >
                   Keep the original answer
                 </button>
@@ -250,7 +251,7 @@ export function ReviewGrid({
         <div className="mt-5 flex justify-end border-t border-grid pt-4">
           <button
             onClick={onSubmit}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className={button("primary")}
           >
             Submit section and see the marking
           </button>

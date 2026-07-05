@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { button } from "@/components/ui";
 import { resolveExternalRedo, startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import type { RampBudget } from "@/lib/ramp";
@@ -233,7 +234,7 @@ export function QueueClient({
               onClick={() => startRedo(runnable.map((d) => d.questionId))}
               disabled={starting}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary", "sm"),
                 starting && "cursor-wait opacity-60",
               )}
             >

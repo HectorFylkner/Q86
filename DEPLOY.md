@@ -1,7 +1,7 @@
 # Putting Q86 on the web (no terminal needed)
 
 The app sets itself up on its first visit: it creates its database
-tables and loads all 180 verified questions automatically. That means
+tables and loads all 360 verified questions automatically. That means
 deployment is entirely point-and-click in the browser — two free
 accounts, roughly ten minutes.
 

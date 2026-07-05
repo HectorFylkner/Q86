@@ -34,8 +34,11 @@ export const metadata: Metadata = {
   icons: { apple: "/apple-touch-icon.png" },
 };
 
-// Applied before hydration so a saved theme never flashes the wrong ground.
-const themeInit = `try{var t=localStorage.getItem("q86-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
+// Applied before hydration so a saved theme never flashes the wrong
+// ground. The resolved theme is ALWAYS stamped on <html data-theme> —
+// auto mode resolves the OS preference here (and re-resolves on OS
+// change) — so the stylesheet needs exactly one dark-token source.
+const themeInit = `try{var r=document.documentElement,m=window.matchMedia("(prefers-color-scheme: dark)"),s=function(){var t=localStorage.getItem("q86-theme");r.dataset.theme=(t==="dark"||t==="light")?t:(m.matches?"dark":"light")};s();m.addEventListener("change",function(){s();window.dispatchEvent(new Event("q86-theme"))})}catch(e){}`;
 
 export default function RootLayout({
   children,

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { Camera, ClipboardPaste, Upload, X } from "lucide-react";
+import { button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGES = 3;
@@ -198,7 +199,7 @@ export function ScratchCapture({
               onClick={captureStill}
               disabled={busy || full}
               className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary", "sm"),
                 (busy || full) && "opacity-50",
               )}
             >

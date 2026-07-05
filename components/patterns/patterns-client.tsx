@@ -7,6 +7,7 @@ import { Flame } from "lucide-react";
 import { Md } from "@/components/math";
 import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { button, StatTile } from "@/components/ui";
 import {
   savePatternRound,
   type PatternRoundItem,
@@ -306,7 +307,7 @@ export function PatternsClient({
           onClick={startRound}
           disabled={isSaving}
           className={cn(
-            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-white hover:bg-ballpoint/90",
+            button("primary"),
             isSaving && "cursor-wait opacity-60",
           )}
         >
@@ -343,13 +344,13 @@ export function PatternsClient({
           </motion.p>
         )}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatTile label="Score" text={String(score)} />
+          <StatTile label="Score" value={String(score)} />
           <StatTile
             label="Accuracy"
-            text={`${answered > 0 ? Math.round((score / answered) * 100) : 0}%`}
+            value={`${answered > 0 ? Math.round((score / answered) * 100) : 0}%`}
           />
-          <StatTile label="Avg time" text={`${(avgMs / 1000).toFixed(1)}s`} />
-          <StatTile label="Day streak" text={String(result.dayStreak)} />
+          <StatTile label="Avg time" value={`${(avgMs / 1000).toFixed(1)}s`} />
+          <StatTile label="Day streak" value={String(result.dayStreak)} />
         </div>
 
         <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
@@ -394,13 +395,13 @@ export function PatternsClient({
         <div className="flex gap-3">
           <button
             onClick={startRound}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className={button("primary")}
           >
             Another round
           </button>
           <button
             onClick={() => setStage({ kind: "setup", error: null })}
-            className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+            className={button("quiet")}
           >
             Change category
           </button>
@@ -483,7 +484,7 @@ export function PatternsClient({
               />
               <button
                 type="submit"
-                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+                className={button("primary")}
               >
                 Answer
                 <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
@@ -512,13 +513,4 @@ function answersMatch(user: string, canonical: string): boolean {
     return Math.abs(un - cn) < 1e-9;
   }
   return false;
-}
-
-function StatTile({ label, text }: { label: string; text: string }) {
-  return (
-    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] text-graphite">{label}</div>
-      <Odometer text={text} className="mt-1 font-mono text-xl font-medium" />
-    </div>
-  );
 }

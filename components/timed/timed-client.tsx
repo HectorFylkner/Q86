@@ -9,6 +9,7 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { TimeInkBar, type Checkpoint } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
 import { MarkingSummary } from "@/components/timed/marking-summary";
+import { button } from "@/components/ui";
 import {
   saveTimedSession,
   startTimedSet,
@@ -370,7 +371,8 @@ export function TimedClient({
               onClick={() => handleStart("full")}
               disabled={!enough(21)}
               className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary"),
+                "mt-4",
                 !enough(21) && "cursor-not-allowed opacity-50",
               )}
             >
@@ -408,7 +410,8 @@ export function TimedClient({
               onClick={() => handleStart("mini")}
               disabled={!enough(7)}
               className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+                button("primary"),
+                "mt-4",
                 !enough(7) && "cursor-not-allowed opacity-50",
               )}
             >
@@ -515,7 +518,7 @@ export function TimedClient({
         <p className="text-sm text-redpen">{stage.message}</p>
         <button
           onClick={() => finalize(answers, editRecords, bookmarks)}
-          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          className={button("primary")}
         >
           Retry saving the session
         </button>
@@ -643,7 +646,7 @@ export function TimedClient({
             <ConfidencePicker value={confidence} onChange={setConfidence} />
             <button
               onClick={confirmAnswer}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className={button("primary", "sm")}
             >
               {currentIndex + 1 < questions.length
                 ? "Confirm and advance"

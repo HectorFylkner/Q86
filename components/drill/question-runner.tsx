@@ -9,6 +9,7 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { button, Chip } from "@/components/ui";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import {
   CHAPTER_TEST_BAR,
@@ -289,14 +290,14 @@ export function QuestionRunner({
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
                 href={`/learn/${test}`}
-                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                className={button("quiet")}
               >
                 Back to the chapter
               </Link>
               {passed && nextTier && (
                 <Link
                   href={`/drill?test=${test}&tier=${nextTier}`}
-                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  className={button("primary")}
                 >
                   Step up: {TIER_LABELS[nextTier]} tier →
                 </Link>
@@ -305,19 +306,19 @@ export function QuestionRunner({
                 <>
                   <Link
                     href={`/drill?sub=${test}&d=${testStepDown}`}
-                    className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                    className={button("primary")}
                   >
                     Rebuild: 6 questions at D{testStepDown} →
                   </Link>
                   <Link
                     href={`/learn/${test}#ideas`}
-                    className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                    className={button("quiet")}
                   >
                     Reread the core ideas
                   </Link>
                   <Link
                     href={`/drill?test=${test}${testTier ? `&tier=${testTier}` : ""}`}
-                    className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                    className={button("quiet")}
                   >
                     Retake anyway →
                   </Link>
@@ -340,14 +341,14 @@ export function QuestionRunner({
               {rung.difficulty > 2 && (
                 <Link
                   href={`/drill?sub=${rung.subtopic}&d=${rung.difficulty - 1}`}
-                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  className={button("primary")}
                 >
                   Rebuild: 6 questions at D{rung.difficulty - 1} →
                 </Link>
               )}
               <Link
                 href={`/learn/${rung.subtopic}#ideas`}
-                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                className={button("quiet")}
               >
                 Reread the core ideas
               </Link>
@@ -416,14 +417,14 @@ export function QuestionRunner({
           {onRestart && (
             <button
               onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className={button("quiet")}
             >
               Set up another drill
             </button>
           )}
           <Link
             href="/"
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+            className={button("primary")}
           >
             Back to today
           </Link>
@@ -515,7 +516,7 @@ export function QuestionRunner({
             <ConfidencePicker value={confidence} onChange={setConfidence} />
             <button
               onClick={submit}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className={button("primary", "sm")}
             >
               Confirm answer
               <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
@@ -584,7 +585,7 @@ export function QuestionRunner({
             </button>
             <button
               onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className={button("primary", "sm")}
             >
               {index + 1 < questions.length ? "Next question" : "Finish"}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
@@ -597,14 +598,6 @@ export function QuestionRunner({
         1–5 or A–E select · G/L/K confidence · Enter confirm · N next
       </p>
     </div>
-  );
-}
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-[11px]">
-      {children}
-    </span>
   );
 }
 

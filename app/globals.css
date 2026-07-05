@@ -19,20 +19,10 @@
   --highlight: #f5efd9;
 }
 
-/* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #141519;
-    --surface: #1c1e24;
-    --grid: #2b2e36;
-    --ink: #eceae4;
-    --graphite: #9ca1a8;
-    --ballpoint: #8fa0f2;
-    --redpen: #e0705f;
-    --amber: #d9a050;
-    --highlight: #2b2820;
-  }
-}
+/* Night desk: dark graphite paper, warm ink, ballpoint lifted for
+   contrast. Single source: the pre-hydration script in app/layout.tsx
+   always stamps the resolved theme on <html data-theme>, including in
+   auto mode, so no prefers-color-scheme duplicate is needed here. */
 :root[data-theme="dark"] {
   --paper: #141519;
   --surface: #1c1e24;
@@ -98,16 +88,6 @@ body {
     );
 }
 
-/* Visible keyboard focus, always. */
-:focus-visible {
-  outline: 2px solid var(--ballpoint);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: var(--highlight);
-}
-
 /* KaTeX display math should scroll, never overflow the card. */
 .katex-display {
   overflow-x: auto;
@@ -125,15 +105,11 @@ body {
   font-size: 1.15em;
 }
 
-/* Night desk lifts --ballpoint for contrast AS TEXT, which leaves white
-   labels on ballpoint fills at ~2.5:1. On dark, every ballpoint-filled
+/* Night desk lifts --ballpoint and --redpen for contrast AS TEXT, which
+   leaves white labels on those fills at ~2.5:1. On dark, every filled
    control carries paper-dark text instead. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .bg-ballpoint.text-white {
-    color: var(--paper);
-  }
-}
-:root[data-theme="dark"] .bg-ballpoint.text-white {
+:root[data-theme="dark"] .bg-ballpoint.text-white,
+:root[data-theme="dark"] .bg-redpen.text-white {
   color: var(--paper);
 }
 
@@ -149,7 +125,7 @@ body {
 }
 .skeleton {
   background: var(--grid);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   animation: q86-skeleton 1.4s ease-in-out infinite;
 }
 
@@ -159,10 +135,11 @@ body {
    churn. Keyboard focus is always visible; touch feels immediate.
 --------------------------------------------------------------------------- */
 
+/* Visible keyboard focus, always. The outline follows each element's
+   own radius — no global border-radius mutation. */
 :focus-visible {
   outline: 2px solid var(--ballpoint);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 * {
@@ -209,11 +186,6 @@ input[type="date"] {
 }
 :root[data-theme="dark"] input[type="date"] {
   color-scheme: dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) input[type="date"] {
-    color-scheme: dark;
-  }
 }
 
 /* Thin, theme-aware scrollbars for the overflow rows (nav, tables). */

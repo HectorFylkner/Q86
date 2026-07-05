@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { button } from "@/components/ui";
 import type { QuestionFilter } from "@/lib/engine";
 import type { DrillTiming } from "@/lib/actions";
 import {
@@ -350,7 +351,7 @@ export function DrillSetup({
             }
             disabled={matching === 0}
             className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
+              button("primary"),
               matching === 0 && "cursor-not-allowed opacity-50",
             )}
           >
@@ -376,7 +377,7 @@ export function DrillSetup({
             onClick={generateMore}
             disabled={genState.kind === "working"}
             className={cn(
-              "rounded-control border border-ballpoint px-4 py-2 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
+              button("outline"),
               genState.kind === "working" && "cursor-wait opacity-60",
             )}
           >

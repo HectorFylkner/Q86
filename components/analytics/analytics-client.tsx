@@ -236,6 +236,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   stroke={[REDPEN, BALLPOINT, AMBER, GRAPHITE][i]}
                   strokeWidth={2}
                   dot={{ r: 2, strokeWidth: 0 }}
+                  isAnimationActive={false}
                 />
               ))}
               <Legend
@@ -294,7 +295,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                         <td key={d} className="py-1.5 pr-2">
                           <span
                             className={cn(
-                              "inline-block rounded-[4px] px-1.5 py-0.5 font-mono",
+                              "inline-block rounded-control px-1.5 py-0.5 font-mono",
                               pct >= 80
                                 ? "bg-ballpoint/10 text-ballpoint"
                                 : pct >= 60
@@ -435,12 +436,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               data={data.scatter.filter((p) => p.correct)}
               fill={BALLPOINT}
               fillOpacity={0.55}
+              isAnimationActive={false}
             />
             <Scatter
               name="Wrong"
               data={data.scatter.filter((p) => !p.correct)}
               fill={REDPEN}
               fillOpacity={0.75}
+              isAnimationActive={false}
             />
             <Legend
               wrapperStyle={{ fontSize: 12 }}
@@ -531,6 +534,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   name="Sunk costs"
                   fill={REDPEN}
                   radius={[4, 4, 0, 0]}
+                  isAnimationActive={false}
                 />
                 <Bar
                   dataKey="donated"
@@ -538,6 +542,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   fill={AMBER}
                   fillOpacity={0.5}
                   radius={[4, 4, 0, 0]}
+                  isAnimationActive={false}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
@@ -714,6 +719,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   stroke={AMBER}
                   strokeWidth={2}
                   dot={{ r: 2, strokeWidth: 0 }}
+                  isAnimationActive={false}
                 />
                 <Line
                   type="monotone"
@@ -721,6 +727,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   stroke={REDPEN}
                   strokeWidth={2}
                   dot={{ r: 2, strokeWidth: 0 }}
+                  isAnimationActive={false}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -765,6 +772,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   strokeWidth={2}
                   dot={{ r: 2, strokeWidth: 0 }}
                   connectNulls
+                  isAnimationActive={false}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -802,7 +810,12 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   ]}
                 />
                 <ReferenceLine y={0} stroke={GRAPHITE} />
-                <Bar dataKey="net" fill={BALLPOINT} radius={[3, 3, 0, 0]} />
+                <Bar
+                  dataKey="net"
+                  fill={BALLPOINT}
+                  radius={[3, 3, 0, 0]}
+                  isAnimationActive={false}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -981,12 +994,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               fill={GRAPHITE}
               fillOpacity={0.35}
               radius={[4, 4, 0, 0]}
+              isAnimationActive={false}
             />
             <Bar
               dataKey="actual"
               name="Actual"
               fill={BALLPOINT}
               radius={[4, 4, 0, 0]}
+              isAnimationActive={false}
             />
             <Legend
               wrapperStyle={{ fontSize: 12 }}
@@ -1031,6 +1046,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
               connectNulls
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -1040,6 +1056,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
               connectNulls
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -1049,6 +1066,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
               connectNulls
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -1059,6 +1077,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               strokeDasharray="5 3"
               dot={false}
               connectNulls
+              isAnimationActive={false}
             />
             <Legend
               wrapperStyle={{ fontSize: 12 }}
@@ -1129,6 +1148,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   fill: INK,
                   fontSize: 11,
                 }}
+                isAnimationActive={false}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -1291,7 +1311,7 @@ function HeatTable({
                   <td key={et} className="p-0.5">
                     <div
                       title={`${SUBTOPIC_LABELS[row.subtopic]} × ${ERROR_TYPE_LABELS[et]}: ${count}`}
-                      className="flex h-8 w-16 items-center justify-center rounded-[4px] border border-grid font-mono text-xs"
+                      className="flex h-8 w-16 items-center justify-center rounded-control border border-grid font-mono text-xs"
                       style={{
                         backgroundColor:
                           count === 0

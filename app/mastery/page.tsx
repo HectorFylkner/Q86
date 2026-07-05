@@ -45,7 +45,7 @@ export default async function MasteryPage() {
                 <div
                   key={ladder.subtopic}
                   className={cn(
-                    "rounded-[8px] border p-3",
+                    "rounded-card border p-3",
                     ladder.mastered
                       ? "border-ballpoint/40 bg-ballpoint/5"
                       : "border-grid",
@@ -71,7 +71,7 @@ export default async function MasteryPage() {
                               : `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window · pace: ${RAMP_STAGE_LABELS[rung.pace]}`
                           }
                           className={cn(
-                            "rounded-[4px] border text-center font-mono text-[11px] leading-6",
+                            "rounded-control border text-center font-mono text-[11px] leading-6",
                             rung.state === "mastered" &&
                               "border-ballpoint bg-ballpoint text-white",
                             rung.state === "working" &&

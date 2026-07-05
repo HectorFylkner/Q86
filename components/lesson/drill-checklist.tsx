@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 /** localStorage key per chapter; value {c: checked indexes, t: item count}.
  *  The Learn index reads the same keys to show readiness badges. */
@@ -144,7 +146,7 @@ export function DrillChecklist({
             className={
               all && test
                 ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-                : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                : cn(button("primary"), "inline-flex min-h-[44px] items-center")
             }
           >
             Drill this now →
@@ -154,7 +156,7 @@ export function DrillChecklist({
               href={`/drill?test=${subtopic}`}
               className={
                 all
-                  ? "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  ? cn(button("primary"), "inline-flex min-h-[44px] items-center")
                   : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
               }
             >

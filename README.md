@@ -3,16 +3,37 @@
 Local-first, single-user training platform for GMAT Focus Edition
 Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
-- AI question engine with independent verification — no generated question
-  is ever served unless a second, blind solver agreed with its key
-- Drill mode and full-section simulation with the official Review & Edit
-  mechanic (max 3 edits, justification gate, edit ledger)
+- 360-question verified bank — every question's answer recomputed
+  programmatically from the stem before admission; AI never generates
+  into the bank
+- 24-chapter Learn section with difficulty-tiered chapter tests
+  (easy → medium → hard, 6/7 to pass) and spaced re-certification when
+  a passed chapter goes stale or starts slipping
+- Drill mode with a timed-transfer ramp: no clock on a subtopic ×
+  difficulty cell until accuracy is proven there, then a soft cap, then
+  exam pace
+- Full-section simulation with the official Review & Edit mechanic
+  (max 3 edits, justification gate, edit ledger), plus pressure modes:
+  one-shot sims (no retake today — the result stands) and rough-start
+  seeding
+- Honest scoring: a guessed correct is luck, not mastery — it re-enters
+  the redo ladder, joins the deck, and never climbs a mastery rung
+- Triage discipline: /decide trains the solve/guess/bail call; timed
+  sections measure it ("3:10 on a D5 your record solves 38% of the
+  time; your own call was bail") and analytics trends the violations
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
-  card that names the exact line where the work went wrong
-- Spaced redo queue (+2d → +7d → +21d, day-21 cold-solve gate)
-- Deterministic rapid-fire pattern trainer with per-category ELO
-- Analytics mirroring the official score-report format, plus a
-  deterministic daily plan
+  card that names the exact line where the work went wrong, with
+  one-click prescriptions into the exact drill and chapter section
+- Spaced redo queue (+2d → +7d → +21d, day-21 cold-solve gate), takeaway
+  flashcard deck, and cross-source capture for misses on official mocks
+  and OG problems (they re-solve on paper, on the same ladder)
+- Analytics mirroring the official score-report format: readiness panel
+  anchored to imported official scores, section-quarter replay (in-app
+  sims beside official per-question rows), weekly pacing and edit-net
+  trends, careless-error forensics, and a failing-subtopic heatmap
+- Deterministic rapid-fire pattern trainer with per-category ELO and
+  speed trends; deterministic daily plan that sequences review before
+  volume
 - Session focus tags: mark a drill or timed set "casual" and it stays
   out of analytics, calibration, and the daily plan — misses still
   join the redo queue
@@ -24,7 +45,7 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-180-question bank into it — offline, no API key:
+360-question bank into it — offline, no API key:
 
 ```sh
 pnpm install
@@ -35,7 +56,7 @@ pnpm dev
 
 Open http://localhost:3000. The full training loop — drill, timed sets,
 redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 180-question bank ships in `scripts/seed-bank.json`, every
+key: the 360-question bank ships in `scripts/seed-bank.json`, every
 question verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
@@ -46,7 +67,7 @@ score-report import) need a key — copy the template and fill in
 cp .env.example .env.local
 ```
 
-`ANTHROPIC_MODEL` is optional and defaults to `claude-sonnet-4-6`.
+`ANTHROPIC_MODEL` is optional and defaults to `claude-sonnet-5`.
 
 ## Scripts
 
@@ -54,14 +75,17 @@ cp .env.example .env.local
 | --- | --- |
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
+| `pnpm test` | Run the engine test suite (node:test — plan, redo, ramp, mastery, discipline, readiness, …) |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed 360-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
 Everything — attempt history, ELO, scratch-work photos — lives in one
 SQLite database at `./data/q86.db`, gitignored, no accounts, no cloud.
-`pnpm backup` snapshots it.
+`pnpm backup` snapshots it. Day boundaries (streaks, cadence, the volume
+calendar) follow your browser's timezone, synced automatically on the
+dashboard — a UTC server never flips your day at the wrong midnight.
 
 Want it as a website instead of localhost? See [DEPLOY.md](DEPLOY.md) —
 free Vercel + Turso hosting (push-to-deploy, password gate) is the

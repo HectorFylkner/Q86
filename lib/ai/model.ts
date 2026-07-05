@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { settings } from "../db/schema.ts";
 
-export const DEFAULT_MODEL = "claude-sonnet-4-6";
+export const DEFAULT_MODEL = "claude-sonnet-5";
 
 /** ANTHROPIC_BASE_URL is honored whether or not it includes the /v1
  *  path segment the SDK expects (some environments export just the host). */

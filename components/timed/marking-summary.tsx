@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
-import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import type { AnswerRecord } from "@/components/timed/timed-client";
+import { button, StatTile } from "@/components/ui";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
@@ -109,7 +109,7 @@ export function MarkingSummary({
                         {edit && (
                           <span
                             className={cn(
-                              "rounded-[4px] border px-1 py-px text-[10px]",
+                              "rounded-control border px-1 py-px text-[10px]",
                               edit.toIndex === q.correctIndex
                                 ? "border-ballpoint/50 text-ballpoint"
                                 : "border-redpen/50 text-redpen",
@@ -158,25 +158,25 @@ export function MarkingSummary({
           className="space-y-5"
         >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard
+            <StatTile
               label="Section accuracy"
               value={`${percent(correctCount, questions.length)}%`}
             />
-            <StatCard
+            <StatTile
               label="Correct"
               value={`${correctCount}/${questions.length}`}
             />
-            <StatCard
+            <StatTile
               label="Time violations (>2:45)"
               value={String(violations)}
               tone={violations > 0 ? "amber" : undefined}
             />
-            <StatCard
+            <StatTile
               label="Sub-60s wrong"
               value={String(sub60Wrong)}
               tone={sub60Wrong > 0 ? "red" : undefined}
             />
-            <StatCard
+            <StatTile
               label="Edit net (this session)"
               value={signed(saved.sessionEditNet)}
               tone={
@@ -187,7 +187,7 @@ export function MarkingSummary({
                     : undefined
               }
             />
-            <StatCard
+            <StatTile
               label="Edit net (lifetime)"
               value={signed(saved.lifetimeEditNet)}
               tone={
@@ -258,13 +258,13 @@ export function MarkingSummary({
           <div className="flex gap-3">
             <button
               onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
+              className={button("quiet")}
             >
               Set up another timed set
             </button>
             <Link
               href="/"
-              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+              className={button("primary")}
             >
               Back to today
             </Link>
@@ -486,31 +486,6 @@ function TriageCard({
           out of character.
         </p>
       )}
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "red" | "amber" | "blue";
-}) {
-  return (
-    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] leading-tight text-graphite">{label}</div>
-      <Odometer
-        text={value}
-        className={cn(
-          "mt-1 font-mono text-xl font-medium",
-          tone === "red" && "text-redpen",
-          tone === "amber" && "text-amber",
-          tone === "blue" && "text-ballpoint",
-        )}
-      />
     </div>
   );
 }
