@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 
 const TAGS = [
@@ -47,7 +48,13 @@ export function ExampleCard({
       </div>
 
       {open && (
-        <div id={solutionId} className="border-t border-grid px-4 py-4 sm:px-5">
+        <motion.div
+          id={solutionId}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="border-t border-grid px-4 py-4 sm:px-5"
+        >
           <Md source={work} className="text-sm" />
           <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-control border border-ballpoint/30 bg-ballpoint/10 px-3 py-2">
             <span className="font-mono text-micro uppercase tracking-wider text-ballpoint">
@@ -55,7 +62,7 @@ export function ExampleCard({
             </span>
             <Md source={answer} className="text-sm font-medium" />
           </div>
-        </div>
+        </motion.div>
       )}
 
       <button

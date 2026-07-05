@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +45,7 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-grid bg-paper/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-grid bg-paper/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm">
       <div className="mx-auto flex h-14 w-full max-w-[1120px] items-center gap-6 px-4 sm:px-6">
         <Link
           href="/"
@@ -55,9 +56,11 @@ export function Nav() {
             the target is the name
           </span>
         </Link>
+        {/* Location grammar: the current section carries a sliding
+            ballpoint underline — never a fill, never a weight change. */}
         <nav
           aria-label="Primary"
-          className="flex flex-1 items-center gap-1 overflow-x-auto"
+          className="flex flex-1 items-stretch gap-1 self-stretch overflow-x-auto"
         >
           {LINKS.map((link) => {
             const active = isActive(link.routes, pathname);
@@ -65,14 +68,21 @@ export function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors duration-150",
-                  active
-                    ? "bg-highlight font-medium text-ink"
-                    : "text-graphite hover:bg-highlight/60 hover:text-ink",
+                  "relative flex items-center whitespace-nowrap px-3 text-sm transition-colors duration-150",
+                  active ? "text-ink" : "text-graphite hover:text-ink",
                 )}
               >
                 {link.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute inset-x-2 bottom-0 h-0.5 bg-ballpoint"
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    aria-hidden
+                  />
+                )}
               </Link>
             );
           })}
@@ -91,7 +101,7 @@ export function BottomTabs() {
   return (
       <nav
         aria-label="Quick access"
-        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm sm:hidden"
       >
         {TAB_LINKS.map((link) => {
           const active = isActive(link.routes, pathname);
@@ -99,12 +109,21 @@ export function BottomTabs() {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-[52px] flex-1 items-center justify-center text-sm",
-                active ? "font-semibold text-ballpoint" : "text-graphite",
+                "relative flex min-h-[52px] flex-1 items-center justify-center text-sm transition-colors duration-150",
+                active ? "text-ballpoint" : "text-graphite",
               )}
             >
               {link.label}
+              {active && (
+                <motion.span
+                  layoutId="bottom-tab-mark"
+                  className="absolute inset-x-0 top-0 mx-auto h-0.5 w-8 bg-ballpoint"
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  aria-hidden
+                />
+              )}
             </Link>
           );
         })}

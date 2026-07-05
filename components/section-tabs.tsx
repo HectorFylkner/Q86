@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /** The grouped sections behind the consolidated top nav. Each page in a
@@ -23,6 +24,8 @@ export const SECTION_GROUPS = {
   ],
 } as const;
 
+/** Location grammar: the current view carries a ballpoint underline —
+ *  never a weight change, so tabs keep their width. */
 export function SectionTabs({
   group,
 }: {
@@ -39,13 +42,19 @@ export function SectionTabs({
             href={tab.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 pb-2 text-sm transition-colors",
-              active
-                ? "border-ballpoint font-medium text-ink"
-                : "border-transparent text-graphite hover:text-ink",
+              "relative -mb-px pb-2 text-sm transition-colors duration-150",
+              active ? "text-ink" : "text-graphite hover:text-ink",
             )}
           >
             {tab.label}
+            {active && (
+              <motion.span
+                layoutId={`section-tab-${group}`}
+                className="absolute inset-x-0 bottom-0 h-0.5 bg-ballpoint"
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                aria-hidden
+              />
+            )}
           </Link>
         );
       })}

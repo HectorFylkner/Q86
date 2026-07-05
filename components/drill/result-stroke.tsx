@@ -10,10 +10,14 @@ export function ResultStroke({
   kind,
   size = 18,
   delay = 0,
+  instant = false,
 }: {
   kind: "check" | "cross";
   size?: number;
   delay?: number;
+  /** Already-marked history renders fully drawn: the pen animation is
+   *  reserved for the moment a result is first revealed. */
+  instant?: boolean;
 }) {
   const stroke = kind === "check" ? "var(--ballpoint)" : "var(--redpen)";
   const paths =
@@ -30,23 +34,34 @@ export function ResultStroke({
       aria-hidden
       className="shrink-0"
     >
-      {paths.map((d, i) => (
-        <motion.path
-          key={i}
-          d={d}
-          stroke={stroke}
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{
-            duration: 0.22,
-            delay: delay + i * 0.09,
-            ease: "easeOut",
-          }}
-        />
-      ))}
+      {paths.map((d, i) =>
+        instant ? (
+          <path
+            key={i}
+            d={d}
+            stroke={stroke}
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ) : (
+          <motion.path
+            key={i}
+            d={d}
+            stroke={stroke}
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{
+              duration: 0.22,
+              delay: delay + i * 0.09,
+              ease: "easeOut",
+            }}
+          />
+        ),
+      )}
     </svg>
   );
 }
