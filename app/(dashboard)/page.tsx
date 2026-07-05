@@ -3,7 +3,7 @@ import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { db } from "@/lib/db";
-import { questions } from "@/lib/db/schema";
+import { baselineReports, questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
@@ -34,6 +34,13 @@ export default async function TodayPage() {
       (inputs.dayIndex % plan.effectiveCadenceDays);
   const deck = await todaysDeck();
   const deckWaiting = deck.due + deck.fresh;
+  const mockConsumed =
+    (
+      await db
+        .select({ n: count() })
+        .from(baselineReports)
+        .get()
+    )?.n ?? 0;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
@@ -126,7 +133,11 @@ export default async function TodayPage() {
               <p className={plan.mock.today ? "text-sm font-medium text-ballpoint" : "text-sm text-graphite"}>
                 {plan.mock.today
                   ? "Official mock today — take it, then import the score report."
-                  : `Next official mock in ${plan.mock.inDays} day${plan.mock.inDays === 1 ? "" : "s"}.`}
+                  : `Next official mock in ${plan.mock.inDays} day${plan.mock.inDays === 1 ? "" : "s"}.`}{" "}
+                <span className="text-xs">
+                  {Math.max(0, 6 - mockConsumed)} of 6 official mocks in
+                  reserve.
+                </span>
               </p>
             )}
           </div>

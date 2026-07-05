@@ -9,12 +9,18 @@ import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+/** GMAC sells exactly six official practice exams; a retake of a consumed
+ *  one scores against remembered questions and calibrates nothing. */
+const OFFICIAL_MOCK_POOL = 6;
+
 export default async function ImportPage() {
   const reports = await db
     .select()
     .from(baselineReports)
     .orderBy(desc(baselineReports.createdAt))
     .all();
+  const consumed = reports.length;
+  const remaining = Math.max(0, OFFICIAL_MOCK_POOL - consumed);
 
   return (
     <div className="space-y-5">
@@ -22,6 +28,50 @@ export default async function ImportPage() {
       <h1 className="font-display text-xl font-semibold">
         Score-report import
       </h1>
+
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+          <div>
+            <h2 className="font-display text-sm font-semibold">
+              Official-signal ledger
+            </h2>
+            <p className="mt-0.5 max-w-xl text-xs text-graphite">
+              GMAC sells six practice exams, ever. Each sitting is one
+              calibration point you cannot buy again — a retake of a
+              consumed mock scores against remembered questions and
+              calibrates nothing. Schedule the rest against your T-35 /
+              T-21 / T-10 milestones on Today.
+            </p>
+          </div>
+          <div className="flex gap-6">
+            <div>
+              <div className="text-[11px] text-graphite">Consumed</div>
+              <div className="font-mono text-2xl font-medium">
+                {consumed}
+              </div>
+            </div>
+            <div>
+              <div className="text-[11px] text-graphite">In reserve</div>
+              <div
+                className={
+                  remaining <= 2
+                    ? "font-mono text-2xl font-medium text-amber"
+                    : "font-mono text-2xl font-medium"
+                }
+              >
+                {remaining}
+              </div>
+            </div>
+          </div>
+        </div>
+        {consumed > OFFICIAL_MOCK_POOL && (
+          <p className="mt-2 text-xs text-amber">
+            More imports than the official pool — if any were retakes,
+            treat those scores as soft.
+          </p>
+        )}
+      </section>
+
       <ImportClient />
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
@@ -52,7 +102,8 @@ export default async function ImportPage() {
           </h2>
           <p className="mt-0.5 text-xs text-graphite">
             The most recent import seeds the daily plan&apos;s weakness
-            weights.
+            weights; every import is a calibration checkpoint on the
+            Analytics readiness panel.
           </p>
           <ul className="mt-2 space-y-1.5">
             {reports.map((r) => {

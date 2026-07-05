@@ -15,6 +15,11 @@ import {
   type ErrorWeek,
 } from "./forensics.ts";
 import { dayIndex, dayKey, keyFromDayIndex, shortLabelFromKey } from "./local-day.ts";
+import {
+  gatherLongitudinal,
+  type LongitudinalData,
+} from "./longitudinal-server.ts";
+import { readinessRead, type ReadinessData } from "./readiness.ts";
 import { appTimeZone } from "./settings.ts";
 import {
   PATTERN_CATEGORY_KEYS,
@@ -135,6 +140,16 @@ export type AnalyticsData = {
   eloBars: Array<{ category: PatternCategoryKey; label: string; rating: number }>;
   /** Triage discipline: sunk costs vs your own record (lib/discipline.ts). */
   discipline: DisciplineData;
+  /** Section replay, weekly pacing, edit-net trend (lib/longitudinal.ts). */
+  longitudinal: LongitudinalData;
+  /** What's still leaking points, anchored to official scores. */
+  readiness: ReadinessData;
+  /** Twin lineage: original vs twin performance, when twins exist. */
+  twins: {
+    pairs: number;
+    originals: { correct: number; total: number };
+    twins: { correct: number; total: number };
+  } | null;
 };
 
 /** Expected accuracy per confidence bucket for the calibration curve. */
@@ -417,6 +432,45 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     keyFromDayIndex,
   );
 
+  // --- twin lineage -----------------------------------------------------------
+  const twinRows = await db
+    .select({ id: questions.id, twinOf: questions.twinOf })
+    .from(questions)
+    .all();
+  const twinIds = new Set(
+    twinRows.filter((q) => q.twinOf != null).map((q) => q.id),
+  );
+  const originalIds = new Set(
+    twinRows
+      .map((q) => q.twinOf)
+      .filter((id): id is number => id != null),
+  );
+  let twins: AnalyticsData["twins"] = null;
+  if (twinIds.size > 0) {
+    const t = { correct: 0, total: 0 };
+    const o = { correct: 0, total: 0 };
+    for (const r of rows) {
+      if (twinIds.has(r.questionId)) {
+        t.total++;
+        if (r.correct) t.correct++;
+      } else if (originalIds.has(r.questionId)) {
+        o.total++;
+        if (r.correct) o.correct++;
+      }
+    }
+    twins = { pairs: twinIds.size, originals: o, twins: t };
+  }
+
+  const discipline = await gatherDiscipline();
+  const longitudinal = await gatherLongitudinal(tz);
+  const readiness = readinessRead({
+    series: longitudinal.scoreSeries,
+    disciplineWeeks: discipline.weekly,
+    errorWeeks,
+    pacingWeeks: longitudinal.pacingWeeks,
+    editWeeks: longitudinal.editWeeks,
+  });
+
   return {
     attemptCount: rows.length,
     casualExcluded,
@@ -454,6 +508,9 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     volume,
     redoCompliance,
     eloBars,
-    discipline: await gatherDiscipline(),
+    discipline,
+    longitudinal,
+    readiness,
+    twins,
   };
 }

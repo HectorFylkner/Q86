@@ -32,6 +32,9 @@ export type CategoryStats = {
   attempts: number;
   bestRound: number;
   streak: number;
+  /** Mean ms over the last 20 answers, and the 20 before those. */
+  avgMsRecent: number | null;
+  avgMsPrior: number | null;
 };
 
 type Selection = PatternCategoryKey | "mixed";
@@ -277,6 +280,24 @@ export function PatternsClient({
                 best {s.bestRound} · streak {s.streak} ·{" "}
                 {s.attempts} answered
               </span>
+              {s.avgMsRecent != null && (
+                <span className="mt-0.5 font-mono text-xs text-graphite">
+                  {(s.avgMsRecent / 1000).toFixed(1)}s avg
+                  {s.avgMsPrior != null && s.avgMsPrior !== s.avgMsRecent && (
+                    <span
+                      className={
+                        s.avgMsRecent < s.avgMsPrior
+                          ? "text-ballpoint"
+                          : "text-amber"
+                      }
+                    >
+                      {" "}
+                      {s.avgMsRecent < s.avgMsPrior ? "▾" : "▴"} was{" "}
+                      {(s.avgMsPrior / 1000).toFixed(1)}s
+                    </span>
+                  )}
+                </span>
+              )}
             </button>
           ))}
         </div>

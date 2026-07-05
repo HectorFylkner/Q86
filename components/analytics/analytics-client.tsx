@@ -63,6 +63,71 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
   return (
     <div className="space-y-6">
+      {/* 0 — readiness */}
+      <Section
+        title="Readiness"
+        subtitle="Anchored to official scores only. Everything below the anchor is a leading indicator from practice data — direction, not destination. No predicted score, ever."
+      >
+        <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
+          <div>
+            <div className="text-[11px] text-graphite">
+              Latest official quant
+            </div>
+            <div className="font-mono text-3xl font-semibold">
+              {data.readiness.anchor.score ?? "—"}
+            </div>
+            {data.readiness.anchor.date && (
+              <div className="font-mono text-xs text-graphite">
+                {data.readiness.anchor.date}
+              </div>
+            )}
+          </div>
+          {data.readiness.series.filter((p) => p.score != null).length >= 2 ? (
+            <div className="font-mono text-xs text-graphite">
+              {data.readiness.series
+                .filter((p) => p.score != null)
+                .map((p) => `${p.date.slice(5)}: ${p.score}`)
+                .join("  →  ")}
+            </div>
+          ) : data.readiness.anchor.score == null ? (
+            <p className="max-w-md text-sm text-graphite">
+              No official score imported yet. Take an official mock, import
+              the report, and this panel gains its anchor — until then it
+              reads leading indicators only.
+            </p>
+          ) : null}
+        </div>
+        <ul className="mt-4 space-y-2">
+          {data.readiness.leaks.map((leak) => (
+            <li key={leak.key} className="flex items-start gap-2.5 text-sm">
+              <span
+                className={cn(
+                  "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                  leak.severity === "red" && "bg-redpen",
+                  leak.severity === "amber" && "bg-amber",
+                  leak.severity === "ok" && "bg-ballpoint",
+                )}
+              />
+              <span>
+                <span className="font-medium">{leak.label}.</span>{" "}
+                <span className="text-graphite">{leak.detail}</span>
+                {leak.href && (
+                  <>
+                    {" "}
+                    <a
+                      href={leak.href}
+                      className="font-medium text-ballpoint hover:underline"
+                    >
+                      Work it →
+                    </a>
+                  </>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
       {/* 1 — score-report mirror */}
       <Section
         title="Score-report mirror"
@@ -516,6 +581,278 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         )}
       </Section>
 
+      {/* 3c — section replay */}
+      <Section
+        title="Section replay"
+        subtitle="Accuracy and pace by section quarter — fatigue and end-rushing live here. In-app sims beside your imported official rows."
+      >
+        {data.longitudinal.simCount === 0 &&
+        data.longitudinal.officialRowReports === 0 ? (
+          <p className="text-sm text-graphite">
+            Needs a full 21-question section sim or an imported report with
+            per-question rows. Run one; the replay reads itself.
+          </p>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full max-w-xl text-sm">
+                <thead>
+                  <tr className="border-b border-grid text-left text-xs text-graphite">
+                    <th className="py-1.5 pr-3 font-normal">Quarter</th>
+                    {data.longitudinal.simCount > 0 && (
+                      <>
+                        <th className="py-1.5 pr-3 font-normal">
+                          Sims · accuracy
+                        </th>
+                        <th className="py-1.5 pr-3 font-normal">
+                          Sims · avg time
+                        </th>
+                      </>
+                    )}
+                    {data.longitudinal.officialRowReports > 0 && (
+                      <>
+                        <th className="py-1.5 pr-3 font-normal">
+                          Official · accuracy
+                        </th>
+                        <th className="py-1.5 font-normal">
+                          Official · avg time
+                        </th>
+                      </>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[0, 1, 2, 3].map((i) => {
+                    const sim = data.longitudinal.quarters[i];
+                    const off = data.longitudinal.officialQuarters[i];
+                    return (
+                      <tr key={i} className="border-b border-grid last:border-0">
+                        <td className="py-1.5 pr-3 font-mono text-xs">
+                          Q{i + 1}
+                        </td>
+                        {data.longitudinal.simCount > 0 && (
+                          <>
+                            <td className="py-1.5 pr-3 font-mono text-xs">
+                              {sim?.accuracy != null
+                                ? `${Math.round(sim.accuracy * 100)}%`
+                                : "—"}
+                            </td>
+                            <td className="py-1.5 pr-3 font-mono text-xs">
+                              {sim?.avgSeconds != null
+                                ? `${Math.round(sim.avgSeconds)}s`
+                                : "—"}
+                            </td>
+                          </>
+                        )}
+                        {data.longitudinal.officialRowReports > 0 && (
+                          <>
+                            <td className="py-1.5 pr-3 font-mono text-xs">
+                              {off?.accuracy != null
+                                ? `${Math.round(off.accuracy * 100)}%`
+                                : "—"}
+                            </td>
+                            <td className="py-1.5 font-mono text-xs">
+                              {off?.avgSeconds != null
+                                ? `${Math.round(off.avgSeconds)}s`
+                                : "—"}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <ReplayNotes quarters={data.longitudinal.quarters} />
+          </>
+        )}
+      </Section>
+
+      {/* 3d — pacing across weeks */}
+      <Section
+        title="Pacing across weeks"
+        subtitle="The marking summary's pacing read, re-read longitudinally: are the sinks drying up, is the bench ratio settling toward 1.0, is editing earning points?"
+      >
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div>
+            <h4 className="mb-1 text-xs font-medium text-graphite">
+              Sinks & panic answers per week
+            </h4>
+            <ResponsiveContainer width="100%" height={170}>
+              <LineChart
+                data={data.longitudinal.pacingWeeks.map((w) => ({
+                  week: w.weekStartKey.slice(5).replace("-", "/"),
+                  sinks: w.sinks,
+                  rushedWrong: w.rushedWrong,
+                }))}
+                margin={{ top: 4, right: 8, bottom: 0, left: -22 }}
+              >
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value: number, name: string) => [
+                    value,
+                    name === "sinks" ? "Time sinks" : "Rushed & wrong",
+                  ]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sinks"
+                  stroke={AMBER}
+                  strokeWidth={2}
+                  dot={{ r: 2, strokeWidth: 0 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rushedWrong"
+                  stroke={REDPEN}
+                  strokeWidth={2}
+                  dot={{ r: 2, strokeWidth: 0 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div>
+            <h4 className="mb-1 text-xs font-medium text-graphite">
+              Time ÷ benchmark (1.0 = exam pace)
+            </h4>
+            <ResponsiveContainer width="100%" height={170}>
+              <LineChart
+                data={data.longitudinal.pacingWeeks.map((w) => ({
+                  week: w.weekStartKey.slice(5).replace("-", "/"),
+                  ratio:
+                    w.benchRatioAvg != null
+                      ? Math.round(w.benchRatioAvg * 100) / 100
+                      : null,
+                }))}
+                margin={{ top: 4, right: 8, bottom: 0, left: -22 }}
+              >
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={[0, 2]}
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value: number) => [`${value}×`, "vs bench"]}
+                />
+                <ReferenceLine y={1} stroke={GRAPHITE} strokeDasharray="4 3" />
+                <Line
+                  type="monotone"
+                  dataKey="ratio"
+                  stroke={BALLPOINT}
+                  strokeWidth={2}
+                  dot={{ r: 2, strokeWidth: 0 }}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div>
+            <h4 className="mb-1 text-xs font-medium text-graphite">
+              Edit net per week
+            </h4>
+            <ResponsiveContainer width="100%" height={170}>
+              <BarChart
+                data={data.longitudinal.editWeeks.map((w) => ({
+                  week: w.weekStartKey.slice(5).replace("-", "/"),
+                  net: w.net,
+                }))}
+                margin={{ top: 4, right: 8, bottom: 0, left: -22 }}
+              >
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value: number) => [
+                    value > 0 ? `+${value}` : value,
+                    "Edit net",
+                  ]}
+                />
+                <ReferenceLine y={0} stroke={GRAPHITE} />
+                <Bar dataKey="net" fill={BALLPOINT} radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </Section>
+
+      {/* 3e — twin transfer */}
+      {data.twins && (
+        <Section
+          title="Twin transfer"
+          subtitle="Twins share their original's skeleton but flip pure ↔ real context. The accuracy gap is the transfer cost the feature exists to measure."
+        >
+          {data.twins.originals.total + data.twins.twins.total === 0 ? (
+            <p className="text-sm text-graphite">
+              {data.twins.pairs} twins exist but haven&apos;t been attempted
+              yet — drill them from a post-mortem&apos;s twin block.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-4">
+              <ZoneStat
+                label={`Originals (${data.twins.originals.total} attempts)`}
+                value={percent(
+                  data.twins.originals.correct,
+                  data.twins.originals.total,
+                )}
+              />
+              <ZoneStat
+                label={`Twins (${data.twins.twins.total} attempts)`}
+                value={percent(
+                  data.twins.twins.correct,
+                  data.twins.twins.total,
+                )}
+                tone={
+                  data.twins.twins.total > 0 &&
+                  data.twins.originals.total > 0 &&
+                  percent(data.twins.twins.correct, data.twins.twins.total) <
+                    percent(
+                      data.twins.originals.correct,
+                      data.twins.originals.total,
+                    ) -
+                      10
+                    ? "amber"
+                    : undefined
+                }
+              />
+            </div>
+          )}
+        </Section>
+      )}
+
       {/* 4 — edit ledger */}
       <Section
         title="Edit ledger"
@@ -851,6 +1188,54 @@ function MirrorGroup({ title, bars }: { title: string; bars: MirrorBar[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/** Coaching lines under the section replay: fade and end-rush, named. */
+function ReplayNotes({
+  quarters,
+}: {
+  quarters: AnalyticsData["longitudinal"]["quarters"];
+}) {
+  const q1 = quarters[0];
+  const q4 = quarters[3];
+  if (!q1 || !q4 || q1.accuracy == null || q4.accuracy == null) return null;
+  const fade = q1.accuracy - q4.accuracy > 0.12;
+  const rush =
+    q1.avgSeconds != null &&
+    q4.avgSeconds != null &&
+    q4.avgSeconds < q1.avgSeconds * 0.65;
+  if (!fade && !rush) {
+    return (
+      <p className="mt-2 text-sm text-ballpoint">
+        Quarters hold steady — no fade, no end-rush on record.
+      </p>
+    );
+  }
+  return (
+    <div className="mt-2 space-y-1 text-sm">
+      {fade && (
+        <p>
+          <span className="font-medium text-redpen">Late-section fade:</span>{" "}
+          <span className="text-graphite">
+            accuracy drops {Math.round((q1.accuracy - q4.accuracy) * 100)}{" "}
+            points from Q1 to Q4. That is stamina, not knowledge — train
+            full sections, not fragments.
+          </span>
+        </p>
+      )}
+      {rush && (
+        <p>
+          <span className="font-medium text-amber">End-rushing:</span>{" "}
+          <span className="text-graphite">
+            Q4 answers take{" "}
+            {Math.round(((q4.avgSeconds ?? 0) / (q1.avgSeconds ?? 1)) * 100)}%
+            of Q1&apos;s time. The early questions are borrowing minutes the
+            late ones repay in guesses.
+          </span>
+        </p>
+      )}
     </div>
   );
 }

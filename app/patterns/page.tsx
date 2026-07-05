@@ -1,4 +1,4 @@
-import { count } from "drizzle-orm";
+import { count, desc } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { PatternsClient, type CategoryStats } from "@/components/patterns/patterns-client";
 import { db } from "@/lib/db";
@@ -41,6 +41,27 @@ export default async function PatternsPage({
     ).map((r) => [r.category, r.n]),
   );
 
+  // Speed trend per category: last 20 answers vs the 20 before those.
+  const msRows = await db
+    .select({ category: patternAttempts.category, ms: patternAttempts.ms })
+    .from(patternAttempts)
+    .orderBy(desc(patternAttempts.id))
+    .limit(8000)
+    .all();
+  const msByCategory = new Map<string, number[]>();
+  for (const r of msRows) {
+    const list = msByCategory.get(r.category) ?? [];
+    if (list.length < 40) {
+      list.push(r.ms);
+      msByCategory.set(r.category, list);
+    }
+  }
+  const avgMs = (list: number[] | undefined, from: number, to: number) => {
+    const slice = (list ?? []).slice(from, to);
+    if (slice.length < 8) return null;
+    return slice.reduce((s, x) => s + x, 0) / slice.length;
+  };
+
   const stats: CategoryStats[] = await Promise.all(
     PATTERN_CATEGORIES.map(async (c) => ({
       key: c.key,
@@ -49,6 +70,8 @@ export default async function PatternsPage({
       attempts: attemptCounts.get(c.key) ?? 0,
       bestRound: await bestRoundScore(c.key),
       streak: await computeCategoryStreak(c.key),
+      avgMsRecent: avgMs(msByCategory.get(c.key), 0, 20),
+      avgMsPrior: avgMs(msByCategory.get(c.key), 20, 40),
     })),
   );
 
