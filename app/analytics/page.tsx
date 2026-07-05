@@ -1,4 +1,5 @@
 import { AnalyticsClient } from "@/components/analytics/analytics-client";
+import { FlagsCard } from "@/components/analytics/flags-card";
 import { gatherAnalytics } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ export default async function AnalyticsPage() {
         )}
       </div>
       <AnalyticsClient data={data} />
+      <FlagsCard />
     </div>
   );
 }

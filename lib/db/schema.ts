@@ -12,6 +12,7 @@ import type {
   Context,
   EditReason,
   ErrorType,
+  FlagReason,
   FundamentalSkill,
   QuestionFormat,
   QuestionSource,
@@ -188,6 +189,45 @@ export const settings = sqliteTable("settings", {
   value: text("value").notNull(),
 });
 
+// Graded-recall scheduling for the takeaway deck: one row per question,
+// updated on every grade (SM-2-lite; see lib/srs.ts).
+export const deckReviews = sqliteTable(
+  "deck_reviews",
+  {
+    questionId: integer("question_id")
+      .primaryKey()
+      .references(() => questions.id),
+    ease: real("ease").notNull().default(2.5),
+    intervalDays: integer("interval_days").notNull().default(0),
+    reps: integer("reps").notNull().default(0),
+    lapses: integer("lapses").notNull().default(0),
+    dueAt: integer("due_at", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("deck_reviews_due_idx").on(t.dueAt)],
+);
+
+// Content QC: questions the user flags mid-review. Resolving may retire
+// the question (verified = false) — rows are never deleted.
+export const questionFlags = sqliteTable(
+  "question_flags",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    reason: text("reason").$type<FlagReason>().notNull(),
+    note: text("note"),
+    status: text("status").$type<"open" | "resolved">().notNull().default("open"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("question_flags_status_idx").on(t.status)],
+);
+
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
@@ -199,3 +239,5 @@ export type RedoItem = typeof redoQueue.$inferSelect;
 export type PatternAttempt = typeof patternAttempts.$inferSelect;
 export type EloRating = typeof eloRatings.$inferSelect;
 export type BaselineReport = typeof baselineReports.$inferSelect;
+export type DeckReview = typeof deckReviews.$inferSelect;
+export type QuestionFlag = typeof questionFlags.$inferSelect;

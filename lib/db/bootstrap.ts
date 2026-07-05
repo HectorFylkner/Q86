@@ -1,7 +1,12 @@
 import path from "node:path";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { client, db } from "./index.ts";
-import { loadBank, readBank, verifiedSeedCount } from "./seed-bank.ts";
+import {
+  loadBank,
+  readBank,
+  userRetiredIds,
+  verifiedSeedCount,
+} from "./seed-bank.ts";
 
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
@@ -32,13 +37,50 @@ async function provision(): Promise<void> {
       migrationsFolder: path.join(process.cwd(), "drizzle"),
     });
     console.log("Q86 bootstrap: schema applied to empty database.");
+  } else {
+    // Existing databases never re-run migrate() (db:push-created ones
+    // have no ledger to build on), so late additions land as guarded
+    // DDL mirroring the migration files. Idempotent by construction.
+    await evolveSchema();
   }
 
-  const bankSize = readBank().questions.length;
+  // User-retired questions stay unverified, so the expected count shrinks
+  // by that many — otherwise every boot would re-run the loader forever.
+  const bankSize =
+    readBank().questions.length - (await userRetiredIds()).size;
   if ((await verifiedSeedCount()) < bankSize) {
     const { inserted, updated, retired } = await loadBank();
     console.log(
       `Q86 bootstrap: seed bank loaded (${inserted} inserted, ${updated} refreshed, ${retired} retired).`,
     );
   }
+}
+
+/** Mirrors drizzle/0001_deep_talon.sql for databases that predate it. */
+async function evolveSchema(): Promise<void> {
+  await client.execute(`create table if not exists deck_reviews (
+    question_id integer primary key not null,
+    ease real default 2.5 not null,
+    interval_days integer default 0 not null,
+    reps integer default 0 not null,
+    lapses integer default 0 not null,
+    due_at integer not null,
+    updated_at integer default (unixepoch() * 1000) not null,
+    foreign key (question_id) references questions(id)
+  )`);
+  await client.execute(
+    "create index if not exists deck_reviews_due_idx on deck_reviews (due_at)",
+  );
+  await client.execute(`create table if not exists question_flags (
+    id integer primary key autoincrement not null,
+    question_id integer not null,
+    reason text not null,
+    note text,
+    status text default 'open' not null,
+    created_at integer default (unixepoch() * 1000) not null,
+    foreign key (question_id) references questions(id)
+  )`);
+  await client.execute(
+    "create index if not exists question_flags_status_idx on question_flags (status)",
+  );
 }

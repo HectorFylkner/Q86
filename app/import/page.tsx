@@ -22,6 +22,27 @@ export default async function ImportPage() {
       </h1>
       <ImportClient />
 
+      <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-sm font-semibold">
+              Backup your data
+            </h2>
+            <p className="mt-0.5 text-xs text-graphite">
+              One JSON file with everything: attempts, sessions, deck
+              scheduling, flags, settings, and the installed question bank.
+            </p>
+          </div>
+          <a
+            href="/api/export"
+            download
+            className="rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+          >
+            Download backup ↓
+          </a>
+        </div>
+      </section>
+
       {reports.length > 0 && (
         <section className="rounded-[10px] border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">

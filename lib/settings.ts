@@ -10,6 +10,7 @@ export const SETTING_KEYS = [
   "weight_overrides",
   "model",
   "seed_progress",
+  "user_retired_qids",
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 

@@ -1,17 +1,22 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
   baselineReports,
+  deckReviews,
   edits,
   eloRatings,
   patternAttempts,
+  questionFlags,
   questions,
   sessions,
   type Question,
 } from "./db/schema.ts";
+import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
+import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
   bestRoundScore,
@@ -30,6 +35,7 @@ import type {
   Confidence,
   EditReason,
   ErrorType,
+  FlagReason,
   FundamentalSkill,
   SessionFocus,
   SessionMode,
@@ -564,4 +570,76 @@ export async function saveBaselineReport(input: {
     .returning()
     .get();
   return { id: row.id };
+}
+
+// ---------------------------------------------------------------------------
+// Takeaway deck grading (SRS) & content flags
+// ---------------------------------------------------------------------------
+
+export async function gradeDeckCard(
+  questionId: number,
+  grade: ReviewGrade,
+): Promise<void> {
+  const existing =
+    (await db
+      .select()
+      .from(deckReviews)
+      .where(eq(deckReviews.questionId, questionId))
+      .get()) ?? null;
+  const next = nextReview(existing, grade);
+  const dueAt = new Date(Date.now() + next.intervalDays * 86_400_000);
+  if (existing) {
+    await db
+      .update(deckReviews)
+      .set({ ...next, dueAt, updatedAt: new Date() })
+      .where(eq(deckReviews.questionId, questionId))
+      .run();
+  } else {
+    await db.insert(deckReviews).values({ questionId, ...next, dueAt }).run();
+  }
+}
+
+export async function flagQuestion(input: {
+  questionId: number;
+  reason: FlagReason;
+  note?: string;
+}): Promise<void> {
+  await db
+    .insert(questionFlags)
+    .values({
+      questionId: input.questionId,
+      reason: input.reason,
+      note: input.note?.trim() || null,
+    })
+    .run();
+}
+
+/** Resolve a flag; optionally retire the question (verified=false — rows
+ *  are never deleted, and the seed loader will not re-verify it). */
+export async function resolveFlag(
+  flagId: number,
+  retire: boolean,
+): Promise<void> {
+  const flag = await db
+    .select()
+    .from(questionFlags)
+    .where(eq(questionFlags.id, flagId))
+    .get();
+  if (!flag) return;
+  await db
+    .update(questionFlags)
+    .set({ status: "resolved" })
+    .where(eq(questionFlags.id, flagId))
+    .run();
+  if (retire) {
+    await db
+      .update(questions)
+      .set({ verified: false })
+      .where(eq(questions.id, flag.questionId))
+      .run();
+    const retired = await userRetiredIds();
+    retired.add(flag.questionId);
+    await putSetting(USER_RETIRED_KEY, JSON.stringify([...retired]));
+  }
+  revalidatePath("/analytics");
 }

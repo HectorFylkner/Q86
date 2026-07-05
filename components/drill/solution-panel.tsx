@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { FlagButton } from "@/components/drill/flag-button";
 import { Md } from "@/components/math";
 import { getQuestionHistory, type QuestionHistoryRow } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -89,6 +90,10 @@ export function SolutionPanel({
           </ul>
         </section>
       )}
+
+      <section className="border-t border-grid pt-3">
+        <FlagButton questionId={question.id} />
+      </section>
 
       {priorAttempts.length > 0 && (
         <section className="mt-4 border-t border-grid pt-3">

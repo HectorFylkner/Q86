@@ -101,6 +101,15 @@ export type SessionFocus = (typeof SESSION_FOCUS)[number];
 export const QUESTION_SOURCES = ["seed", "generated", "twin"] as const;
 export type QuestionSource = (typeof QUESTION_SOURCES)[number];
 
+// Content QC: reasons a question can be flagged from the runner.
+export const FLAG_REASONS = [
+  "suspected_error",
+  "ambiguous",
+  "typo",
+  "other",
+] as const;
+export type FlagReason = (typeof FLAG_REASONS)[number];
+
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 export const DIFFICULTIES: Difficulty[] = [1, 2, 3, 4, 5];
 
@@ -177,6 +186,13 @@ export const CONFIDENCE_LABELS: Record<Confidence, string> = {
   guess: "Guess",
   lean: "Lean",
   lock: "Lock",
+};
+
+export const FLAG_REASON_LABELS: Record<FlagReason, string> = {
+  suspected_error: "Suspected error",
+  ambiguous: "Ambiguous",
+  typo: "Typo / formatting",
+  other: "Other",
 };
 
 export const EDIT_REASONS = [
