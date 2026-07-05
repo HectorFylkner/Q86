@@ -8,7 +8,7 @@ The GMAT Focus treats these three statistics as three lenses on the same data: t
 2. Changing one value: raise a single value by $d$ and the mean rises by exactly $\dfrac{d}{n}$. In a replacement, $\text{new} - \text{old} = n \cdot (\text{change in mean})$.
 3. Balance-point view: deviations from the mean sum to zero, $\sum (x_i - \bar{x}) = 0$ — surpluses cancel deficits, which finds missing values fast.
 4. Median location: sort first. Odd $n$: position $\dfrac{n+1}{2}$. Even $n$: average of positions $\dfrac{n}{2}$ and $\dfrac{n}{2}+1$ — two positions, double the constraint.
-5. Median is positional: moving a value without changing which values occupy the middle leaves it untouched. Raising the maximum never moves the median but always raises the mean.
+5. Median is positional: moving a value without changing which values occupy the middle leaves it untouched. In a list of three or more values, raising the maximum never moves the median but always raises the mean.
 6. Evenly spaced sets: $\text{mean} = \text{median} = \dfrac{\text{first} + \text{last}}{2}$, because terms pair off symmetrically. For $7, 11, 15, 19$, all three equal $13$.
 7. Standard deviation measures spread: $\text{SD} = \sqrt{\dfrac{\sum (x_i - \bar{x})^2}{n}}$ — root-mean-square distance from the mean. The exam asks you to compare or transform it, not compute it.
 8. SD transformations: adding a constant $c$ to every value leaves SD unchanged (the set slides; distances don't); multiplying every value by $k$ multiplies SD by $|k|$ (distances stretch). $\text{SD} = 0$ exactly when all values are equal.
@@ -73,7 +73,7 @@ The GMAT Focus treats these three statistics as three lenses on the same data: t
 - Deviation bookkeeping: to find a fifth number with mean $14$ given $9, 12, 15, 18$, tally deviations from $14$ ($-5, -2, +1, +4$ sum to $-2$), so the fifth number is $14 + 2 = 16$.
 - One-value change shortcut: raising a single value by $20$ in a $5$-element set raises the mean by $\dfrac{20}{5} = 4$ and, if it was already the maximum, the median by $0$.
 - Eyeball SD comparisons: mark each set's mean and judge how far the values sit from it; the set hugging its mean loses.
-- test the answer choices mean-median questions: insert each answer choice, sort, and test $\text{mean} = \text{median}$ directly — often faster than casework.
+- **Test the choices on mean-median questions.** Insert each answer choice, sort, and test $\text{mean} = \text{median}$ directly — often faster than casework.
 
 ## Before you drill
 - I convert every stated mean into a total before doing anything else.
