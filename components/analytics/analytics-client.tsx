@@ -338,6 +338,134 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         </ResponsiveContainer>
       </Section>
 
+      {/* 3b — triage discipline */}
+      <Section
+        title="Triage discipline"
+        subtitle="Sunk costs: timed questions where you stayed past 1.5× benchmark on a cell your own record rates guess-or-bail."
+      >
+        {data.discipline.timedAnswered === 0 ? (
+          <p className="text-sm text-graphite">
+            No timed sets yet — the triage read needs real sections. Run one
+            from Timed, then check back here.
+          </p>
+        ) : (
+          <>
+            <div className="mb-3 flex flex-wrap gap-4">
+              <ZoneStat
+                label="Sunk-cost violations"
+                value={data.discipline.sunkCount}
+                tone={data.discipline.sunkCount > 0 ? "red" : undefined}
+              />
+              <ZoneStat
+                label="Minutes donated past the bail line"
+                value={data.discipline.minutesDonated}
+                tone={data.discipline.minutesDonated > 0 ? "amber" : undefined}
+              />
+              <ZoneStat
+                label="Triage honored (kept to benchmark)"
+                value={data.discipline.wins}
+                tone="blue"
+              />
+              {data.discipline.decideCalls > 0 && (
+                <ZoneStat
+                  label={`/decide alignment (${data.discipline.decideCalls} calls)`}
+                  value={percent(
+                    data.discipline.decideAligned,
+                    data.discipline.decideCalls,
+                  )}
+                />
+              )}
+            </div>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart
+                data={data.discipline.weekly.map((w) => ({
+                  week: w.weekStartKey.slice(5).replace("-", "/"),
+                  sunkCosts: w.sunkCosts,
+                  answered: w.timedAnswered,
+                  donated: Math.round(w.secondsDonated / 60),
+                }))}
+                margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
+                barCategoryGap="35%"
+              >
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={AXIS_TICK}
+                  stroke={GRID}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value: number, name: string) => [
+                    name === "donated" ? `${value} min` : value,
+                    name === "sunkCosts"
+                      ? "Sunk costs"
+                      : name === "donated"
+                        ? "Minutes donated"
+                        : "Timed answers",
+                  ]}
+                />
+                <Bar
+                  dataKey="sunkCosts"
+                  name="Sunk costs"
+                  fill={REDPEN}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="donated"
+                  name="Minutes donated"
+                  fill={AMBER}
+                  fillOpacity={0.5}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 12 }}
+                  iconSize={9}
+                  formatter={(value) => (
+                    <span style={{ color: INK }}>{value}</span>
+                  )}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            {data.discipline.worst.length > 0 && (
+              <ul className="mt-3 space-y-1.5">
+                {data.discipline.worst.slice(0, 6).map((v) => (
+                  <li key={v.attemptId} className="text-sm text-graphite">
+                    <span className="font-mono text-xs text-redpen">
+                      {Math.round(v.timeSeconds)}s
+                    </span>{" "}
+                    on a D{v.difficulty} {SUBTOPIC_LABELS[v.subtopic]} your
+                    record solves {Math.round(v.verdict.predicted * 100)}%
+                    of the time
+                    {v.verdict.yourCall != null &&
+                      ` — your own call: ${v.verdict.yourCall}`}
+                    .{" "}
+                    <a
+                      href={`/postmortem/${v.attemptId}`}
+                      className="text-ballpoint hover:underline"
+                    >
+                      Post-mortem
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {data.discipline.sunkCount === 0 && (
+              <p className="mt-3 text-sm text-ballpoint">
+                No sunk costs on record — every expensive question you have
+                walked into was one your record backs.
+              </p>
+            )}
+          </>
+        )}
+      </Section>
+
       {/* 4 — edit ledger */}
       <Section
         title="Edit ledger"

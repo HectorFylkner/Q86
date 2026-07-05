@@ -15,6 +15,7 @@ import {
   DOMAIN_LABELS,
   EDIT_REASON_LABELS,
   SKILL_LABELS,
+  SUBTOPIC_LABELS,
   type Difficulty,
 } from "@/lib/taxonomy";
 import { CHOICE_LETTERS, cn, formatSeconds, percent } from "@/lib/utils";
@@ -208,6 +209,8 @@ export function MarkingSummary({
 
           <PacingCard questions={questions} answers={answers} saved={saved} />
 
+          <TriageCard questions={questions} answers={answers} saved={saved} />
+
 
           {edits.length > 0 && (
             <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
@@ -389,6 +392,98 @@ function PacingCard({
       {read.sinks.length === 0 && read.rushedWrong.length === 0 && (
         <p className="mt-3 text-sm text-ballpoint">
           Clean pacing — no sinks, no panic answers.
+        </p>
+      )}
+    </div>
+  );
+}
+
+const CALL_LABELS: Record<string, string> = {
+  solve: "solve",
+  guess: "educated guess",
+  bail: "bail",
+};
+
+/** The triage read: what your own record said each question was worth,
+ *  against what you actually did on the clock. */
+function TriageCard({
+  questions,
+  answers,
+  saved,
+}: {
+  questions: Question[];
+  answers: (AnswerRecord | null)[];
+  saved: SaveTimedResponse;
+}) {
+  const triage = saved.triageByQuestionId;
+  if (!triage || Object.keys(triage).length === 0) return null;
+
+  const rows = questions.flatMap((q, i) => {
+    const a = answers[i];
+    const v = triage[q.id];
+    if (!a || !v || v.recommendation === "solve") return [];
+    const bench = TIME_BENCH[q.difficulty as Difficulty];
+    const sunk = a.timeSeconds > bench * 1.5;
+    const honored = a.timeSeconds <= bench;
+    if (!sunk && !honored) return [];
+    return [
+      {
+        qNum: i + 1,
+        sunk,
+        difficulty: q.difficulty,
+        subtopic: q.subtopic,
+        timeSeconds: a.timeSeconds,
+        correct: !!saved.correctByQuestionId[q.id],
+        verdict: v,
+      },
+    ];
+  });
+  const sunk = rows.filter((r) => r.sunk);
+  const honored = rows.filter((r) => !r.sunk);
+
+  return (
+    <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <h3 className="font-display text-sm font-semibold">Triage read</h3>
+      <p className="mt-0.5 text-xs text-graphite">
+        Your record (before this section) rated some of these questions
+        guess-or-bail. Did the call show up on the clock?
+      </p>
+      {sunk.length > 0 && (
+        <ul className="mt-3 space-y-1.5">
+          {sunk.map((r) => (
+            <li key={r.qNum} className="text-sm">
+              <span className="font-medium text-redpen">
+                Q{r.qNum} — sunk cost.
+              </span>{" "}
+              <span className="text-graphite">
+                {formatSeconds(r.timeSeconds)} on a D{r.difficulty}{" "}
+                {SUBTOPIC_LABELS[r.subtopic]} question your record solves{" "}
+                {Math.round(r.verdict.predicted * 100)}% of the time
+                {r.verdict.sample > 0
+                  ? ` (${r.verdict.sample} attempts)`
+                  : " (difficulty prior)"}
+                ;{" "}
+                {r.verdict.yourCall != null
+                  ? `your own triage call was ${CALL_LABELS[r.verdict.yourCall]}.`
+                  : `the record says ${CALL_LABELS[r.verdict.recommendation]}.`}
+                {r.correct && " It landed — this time."}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {honored.length > 0 && (
+        <p className={cn("text-sm text-ballpoint", sunk.length > 0 ? "mt-2" : "mt-3")}>
+          Triage honored on{" "}
+          {honored.map((r) => `Q${r.qNum}`).join(", ")} — kept to benchmark
+          on {honored.length === 1 ? "a cell" : "cells"} your record rates
+          guess-or-bail.
+        </p>
+      )}
+      {sunk.length === 0 && honored.length === 0 && (
+        <p className="mt-3 text-sm text-graphite">
+          No guess-or-bail cells came up this section, or none were played
+          out of character.
         </p>
       )}
     </div>

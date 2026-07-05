@@ -34,6 +34,8 @@ import {
 import { applyRedoResult, enqueueMiss, redoOutcome } from "./redo.ts";
 import { rampBudgets } from "./ramp-server.ts";
 import type { RampBudget } from "./ramp.ts";
+import { triageVerdicts } from "./discipline-server.ts";
+import type { TriageVerdict } from "./discipline.ts";
 import type {
   Confidence,
   EditReason,
@@ -358,6 +360,9 @@ export type SaveTimedResponse = {
   correctByQuestionId: Record<number, boolean>;
   sessionEditNet: number;
   lifetimeEditNet: number;
+  /** Triage verdict per question id — what your record (excluding this
+   *  session) said each question was worth. */
+  triageByQuestionId: Record<number, TriageVerdict>;
 };
 
 export async function saveTimedSession(input: {
@@ -493,6 +498,7 @@ export async function saveTimedSession(input: {
     correctByQuestionId,
     sessionEditNet,
     lifetimeEditNet,
+    triageByQuestionId: await triageVerdicts(questionRows, input.sessionId),
   };
 }
 

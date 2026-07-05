@@ -8,6 +8,7 @@ import {
   redoQueue,
 } from "./db/schema.ts";
 import { ELO_START } from "./elo.ts";
+import { gatherDiscipline, type DisciplineData } from "./discipline-server.ts";
 import { dayIndex, dayKey, keyFromDayIndex, shortLabelFromKey } from "./local-day.ts";
 import { appTimeZone } from "./settings.ts";
 import {
@@ -109,6 +110,8 @@ export type AnalyticsData = {
     dueNow: number;
   };
   eloBars: Array<{ category: PatternCategoryKey; label: string; rating: number }>;
+  /** Triage discipline: sunk costs vs your own record (lib/discipline.ts). */
+  discipline: DisciplineData;
 };
 
 /** Expected accuracy per confidence bucket for the calibration curve. */
@@ -382,5 +385,6 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     volume,
     redoCompliance,
     eloBars,
+    discipline: await gatherDiscipline(),
   };
 }
