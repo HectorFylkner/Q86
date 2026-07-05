@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { saveBaselineReport } from "@/lib/actions";
 import type { ParsedReport } from "@/lib/ai/schemas";
 import {
@@ -9,7 +11,6 @@ import {
   DOMAIN_LABELS,
   SKILL_LABELS,
 } from "@/lib/taxonomy";
-import { cn } from "@/lib/utils";
 
 type Stage =
   | { kind: "editing" }
@@ -98,17 +99,13 @@ export function ImportClient() {
           className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
         />
         <div className="mt-3 flex items-center gap-3">
-          <button
+          <Button
             onClick={parse}
-            disabled={rawText.trim().length < 40 || stage.kind === "parsing"}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-              (rawText.trim().length < 40 || stage.kind === "parsing") &&
-                "cursor-not-allowed opacity-50",
-            )}
+            disabled={rawText.trim().length < 40}
+            busy={stage.kind === "parsing"}
           >
             Parse the report
-          </button>
+          </Button>
           {stage.kind === "parsing" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
@@ -121,7 +118,7 @@ export function ImportClient() {
             </span>
           )}
           {stage.kind === "error" && (
-            <span className="text-sm text-redpen">{stage.message}</span>
+            <ErrorBanner compact>{stage.message}</ErrorBanner>
           )}
         </div>
       </section>
@@ -215,24 +212,20 @@ export function ImportClient() {
           </div>
 
           <div className="mt-4 flex gap-3 border-t border-grid pt-3">
-            <button
+            <Button
               onClick={() => confirmSave(parsed)}
-              disabled={stage.kind === "saving"}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                stage.kind === "saving" && "cursor-wait opacity-60",
-              )}
+              busy={stage.kind === "saving"}
             >
               {stage.kind === "saving"
                 ? "Saving…"
                 : "Confirm and save as baseline"}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => setStage({ kind: "editing" })}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               Discard the parse
-            </button>
+            </Button>
           </div>
         </section>
       )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Md } from "@/components/math";
+import { Button, KeyHint } from "@/components/ui/button";
 import { saveDecisionRound } from "@/lib/actions";
 import type { DecideItem, DecideRecommendation } from "@/lib/decide";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
@@ -121,12 +122,9 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           — pick anything and bank the time. Letting the clock run out counts
           as an unforced &quot;solve&quot;.
         </p>
-        <button
-          onClick={() => setPhase("running")}
-          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-        >
+        <Button onClick={() => setPhase("running")} className="mt-4">
           Start · Enter
-        </button>
+        </Button>
       </section>
     );
   }
@@ -182,16 +180,13 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
       {phase === "running" ? (
         <div className="flex flex-wrap gap-2">
           {(["solve", "guess", "bail"] as const).map((call) => (
-            <button
+            <Button
               key={call}
+              variant="secondary"
               onClick={() => commit(call)}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              {CALL_LABELS[call]}{" "}
-              <span className="font-mono text-xs text-graphite">
-                {call[0].toUpperCase()}
-              </span>
-            </button>
+              {CALL_LABELS[call]} <KeyHint>{call[0].toUpperCase()}</KeyHint>
+            </Button>
           ))}
         </div>
       ) : (

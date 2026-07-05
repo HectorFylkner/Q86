@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import type { QuestionFilter } from "@/lib/engine";
 import type { DrillTiming } from "@/lib/actions";
 import {
@@ -141,11 +143,7 @@ export function DrillSetup({
 
   return (
     <div className="space-y-5">
-      {error && (
-        <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
-          {error}
-        </p>
-      )}
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">Skill</h2>
@@ -339,7 +337,7 @@ export function DrillSetup({
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-grid pt-4">
-          <button
+          <Button
             onClick={() =>
               onStart({
                 filter: buildFilter(),
@@ -349,13 +347,9 @@ export function DrillSetup({
               })
             }
             disabled={matching === 0}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-              matching === 0 && "cursor-not-allowed opacity-50",
-            )}
           >
             Start drill: {Math.min(count, matching)} questions
-          </button>
+          </Button>
           <span className="text-sm text-graphite">
             {matching} verified questions match this filter
             {matching > 0 && matching < count && " — drill clamped to match"}
@@ -372,16 +366,13 @@ export function DrillSetup({
           verified before it can appear in a drill.
         </p>
         <div className="mt-3 flex items-center gap-3">
-          <button
+          <Button
+            variant="accent"
             onClick={generateMore}
-            disabled={genState.kind === "working"}
-            className={cn(
-              "rounded-control border border-ballpoint px-4 py-2 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
-              genState.kind === "working" && "cursor-wait opacity-60",
-            )}
+            busy={genState.kind === "working"}
           >
             Generate 10 more
-          </button>
+          </Button>
           {genState.kind === "working" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
@@ -402,7 +393,7 @@ export function DrillSetup({
             </span>
           )}
           {genState.kind === "error" && (
-            <span className="text-sm text-redpen">{genState.message}</span>
+            <ErrorBanner compact>{genState.message}</ErrorBanner>
           )}
         </div>
       </section>

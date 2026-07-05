@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -106,17 +108,15 @@ export function MarkingSummary({
                           delay={i * STROKE_STAGGER_SECONDS}
                         />
                         {edit && (
-                          <span
-                            className={cn(
-                              "rounded-[4px] border px-1 py-px text-micro",
-                              edit.toIndex === q.correctIndex
-                                ? "border-ballpoint/50 text-ballpoint"
-                                : "border-redpen/50 text-redpen",
-                            )}
+                          <Chip
+                            mono
+                            tone={
+                              edit.toIndex === q.correctIndex ? "blue" : "red"
+                            }
                           >
                             edited {CHOICE_LETTERS[edit.fromIndex]}→
                             {CHOICE_LETTERS[edit.toIndex]}
-                          </span>
+                          </Chip>
                         )}
                       </span>
                     ) : (
@@ -253,18 +253,10 @@ export function MarkingSummary({
           )}
 
           <div className="flex gap-3">
-            <button
-              onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
-            >
+            <Button variant="secondary" onClick={onRestart}>
               Set up another timed set
-            </button>
-            <Link
-              href="/"
-              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-            >
-              Back to today
-            </Link>
+            </Button>
+            <ButtonLink href="/">Back to today</ButtonLink>
           </div>
         </motion.div>
       )}

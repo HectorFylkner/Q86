@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
+import { Button } from "@/components/ui/button";
 import { resolveFlag } from "@/lib/actions";
 import { db } from "@/lib/db";
 import { questionFlags, questions } from "@/lib/db/schema";
@@ -61,15 +62,15 @@ export async function FlagsCard() {
             )}
             <div className="mt-2 flex flex-wrap gap-2">
               <form action={resolveFlag.bind(null, f.id, false)}>
-                <button className="rounded-control border border-grid px-3 py-1.5 text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink">
+                <Button variant="secondary" size="sm">
                   Dismiss — question is fine
-                </button>
+                </Button>
               </form>
               {f.verified && (
                 <form action={resolveFlag.bind(null, f.id, true)}>
-                  <button className="rounded-control border border-redpen/50 px-3 py-1.5 text-xs font-medium text-redpen transition-colors hover:bg-redpen/10">
+                  <Button variant="dangerOutline" size="sm">
                     Retire question
-                  </button>
+                  </Button>
                 </form>
               )}
             </div>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { saveSetting } from "@/lib/actions";
 
 export function SettingsForm({
@@ -61,16 +63,17 @@ export function SettingsForm({
           ))}
         </select>
       </label>
-      <button
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={save}
         disabled={state === "saving"}
-        className="rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50"
       >
         {state === "saving" ? "Saving…" : "Save settings"}
-      </button>
+      </Button>
       {state === "saved" && <span className="text-xs text-ballpoint">Saved.</span>}
       {state === "error" && (
-        <span className="text-xs text-redpen">Saving failed — retry.</span>
+        <ErrorBanner compact>Saving failed — retry.</ErrorBanner>
       )}
     </div>
   );

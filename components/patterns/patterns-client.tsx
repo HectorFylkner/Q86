@@ -7,6 +7,8 @@ import { Flame } from "lucide-react";
 import { Md } from "@/components/math";
 import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { Button, KeyHint } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import {
   savePatternRound,
   type PatternRoundItem,
@@ -218,9 +220,7 @@ export function PatternsClient({
     return (
       <div className="space-y-5">
         {stage.kind === "setup" && stage.error && (
-          <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
-            {stage.error}
-          </p>
+          <ErrorBanner>{stage.error}</ErrorBanner>
         )}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5 text-sm">
@@ -281,14 +281,7 @@ export function PatternsClient({
           ))}
         </div>
 
-        <button
-          onClick={startRound}
-          disabled={isSaving}
-          className={cn(
-            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-            isSaving && "cursor-wait opacity-60",
-          )}
-        >
+        <Button onClick={startRound} busy={isSaving}>
           {isSaving
             ? "Saving the round…"
             : `Start 90-second round: ${
@@ -296,7 +289,7 @@ export function PatternsClient({
                   ? "Mixed"
                   : PATTERN_CATEGORY_LABELS[selection]
               }`}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -371,18 +364,13 @@ export function PatternsClient({
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={startRound}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-          >
-            Another round
-          </button>
-          <button
+          <Button onClick={startRound}>Another round</Button>
+          <Button
+            variant="secondary"
             onClick={() => setStage({ kind: "setup", error: null })}
-            className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
           >
             Change category
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -460,13 +448,10 @@ export function PatternsClient({
                 placeholder="Type the number"
                 className="w-44 rounded-control border border-grid bg-surface px-3 py-2 font-mono text-lg"
               />
-              <button
-                type="submit"
-                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-              >
+              <Button type="submit">
                 Answer
-                <span className="ml-2 font-mono text-micro opacity-70">↵</span>
-              </button>
+                <KeyHint>↵</KeyHint>
+              </Button>
             </form>
           )}
         </div>

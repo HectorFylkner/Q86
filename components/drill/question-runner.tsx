@@ -9,6 +9,9 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { Button, ButtonLink, KeyHint } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
@@ -245,19 +248,13 @@ export function QuestionRunner({
                 : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <Link
-                href={`/learn/${test}`}
-                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
-              >
+              <ButtonLink href={`/learn/${test}`} variant="secondary">
                 Back to the chapter
-              </Link>
+              </ButtonLink>
               {!passed && (
-                <Link
-                  href={`/drill?test=${test}`}
-                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-ballpoint/90"
-                >
+                <ButtonLink href={`/drill?test=${test}`}>
                   Retake with fresh questions →
-                </Link>
+                </ButtonLink>
               )}
             </div>
           </div>
@@ -322,19 +319,11 @@ export function QuestionRunner({
         </div>
         <div className="flex gap-3">
           {onRestart && (
-            <button
-              onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
-            >
+            <Button variant="secondary" onClick={onRestart}>
               Set up another drill
-            </button>
+            </Button>
           )}
-          <Link
-            href="/"
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-          >
-            Back to today
-          </Link>
+          <ButtonLink href="/">Back to today</ButtonLink>
         </div>
       </div>
     );
@@ -394,13 +383,10 @@ export function QuestionRunner({
         {!revealed && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
             <ConfidencePicker value={confidence} onChange={setConfidence} />
-            <button
-              onClick={submit}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-            >
+            <Button size="sm" onClick={submit}>
               Confirm answer
-              <span className="ml-2 font-mono text-micro opacity-70">↵</span>
-            </button>
+              <KeyHint>↵</KeyHint>
+            </Button>
           </div>
         )}
 
@@ -410,10 +396,10 @@ export function QuestionRunner({
           </p>
         )}
         {currentResult?.saveFailed && (
-          <p className="mt-2 text-sm text-redpen" role="alert">
+          <ErrorBanner className="mt-2">
             This attempt was not saved — check that the dev server can reach
             ./data/q86.db.
-          </p>
+          </ErrorBanner>
         )}
       </motion.div>
 
@@ -446,24 +432,19 @@ export function QuestionRunner({
             selectedIndex={currentResult.selectedIndex}
           />
           <div className="flex items-center justify-between">
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={gotoPostmortem}
               disabled={currentResult.attemptId == null}
-              className={cn(
-                "rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
-                currentResult.attemptId == null && "opacity-50",
-              )}
             >
               Send to post-mortem
-              <span className="ml-2 font-mono text-micro text-graphite">P</span>
-            </button>
-            <button
-              onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-            >
+              <KeyHint>P</KeyHint>
+            </Button>
+            <Button size="sm" onClick={next}>
               {index + 1 < questions.length ? "Next question" : "Finish"}
-              <span className="ml-2 font-mono text-micro opacity-70">N</span>
-            </button>
+              <KeyHint>N</KeyHint>
+            </Button>
           </div>
         </>
       )}
@@ -472,14 +453,6 @@ export function QuestionRunner({
         1–5 or A–E select · G/L/K confidence · Enter confirm · N next
       </p>
     </div>
-  );
-}
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-caption">
-      {children}
-    </span>
   );
 }
 

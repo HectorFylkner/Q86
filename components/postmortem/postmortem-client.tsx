@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ScratchCapture } from "@/components/postmortem/capture";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { tagAttempt } from "@/lib/actions";
 import type { CoachResponse } from "@/lib/ai/schemas";
 import type { Attempt, Question } from "@/lib/db/schema";
@@ -198,19 +200,15 @@ export function PostmortemClient({
           disabled={coachState.kind === "running"}
         />
         <div className="mt-3 flex items-center gap-3">
-          <button
+          <Button
             onClick={runCoach}
-            disabled={images.length === 0 || coachState.kind === "running"}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-              (images.length === 0 || coachState.kind === "running") &&
-                "cursor-not-allowed opacity-50",
-            )}
+            disabled={images.length === 0}
+            busy={coachState.kind === "running"}
           >
             {coach || attempt.aiFeedbackMd
               ? "Re-run the post-mortem"
               : "Run the post-mortem"}
-          </button>
+          </Button>
           {coachState.kind === "running" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
@@ -218,7 +216,7 @@ export function PostmortemClient({
             </span>
           )}
           {coachState.kind === "error" && (
-            <span className="text-sm text-redpen">{coachState.message}</span>
+            <ErrorBanner compact>{coachState.message}</ErrorBanner>
           )}
         </div>
       </section>
@@ -334,24 +332,18 @@ export function PostmortemClient({
             className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
           />
           <div className="mt-3 flex items-center gap-3">
-            <button
+            <Button
+              size="sm"
               onClick={confirmClassification}
               disabled={errorType == null || confirmState === "saving"}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                (errorType == null || confirmState === "saving") &&
-                  "opacity-50",
-              )}
             >
               Confirm classification
-            </button>
+            </Button>
             {confirmState === "saved" && (
               <span className="text-sm text-ballpoint">Logged.</span>
             )}
             {confirmState === "error" && (
-              <span className="text-sm text-redpen">
-                Saving failed — retry.
-              </span>
+              <ErrorBanner compact>Saving failed — retry.</ErrorBanner>
             )}
           </div>
         </section>
@@ -367,16 +359,14 @@ export function PostmortemClient({
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {twinState.kind !== "done" && (
-              <button
+              <Button
+                variant="accent"
+                size="sm"
                 onClick={queueTwins}
-                disabled={twinState.kind === "working"}
-                className={cn(
-                  "rounded-control border border-ballpoint px-4 py-1.5 text-sm font-medium text-ballpoint hover:bg-ballpoint/5",
-                  twinState.kind === "working" && "cursor-wait opacity-60",
-                )}
+                busy={twinState.kind === "working"}
               >
                 Queue two verified twin drills
-              </button>
+              </Button>
             )}
             {twinState.kind === "working" && (
               <span className="flex items-center gap-2 text-sm text-graphite">
@@ -385,7 +375,7 @@ export function PostmortemClient({
               </span>
             )}
             {twinState.kind === "error" && (
-              <span className="text-sm text-redpen">{twinState.message}</span>
+              <ErrorBanner compact>{twinState.message}</ErrorBanner>
             )}
             {twinState.kind === "done" && (
               <>
@@ -401,12 +391,12 @@ export function PostmortemClient({
                   )}
                 </span>
                 {twinState.ids.length > 0 && (
-                  <Link
+                  <ButtonLink
                     href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
+                    size="sm"
                   >
                     Drill the twins now
-                  </Link>
+                  </ButtonLink>
                 )}
               </>
             )}
@@ -414,29 +404,6 @@ export function PostmortemClient({
         </section>
       )}
     </div>
-  );
-}
-
-function Chip({
-  children,
-  tone,
-}: {
-  children: React.ReactNode;
-  tone?: "red" | "blue";
-}) {
-  return (
-    <span
-      className={cn(
-        "rounded-control border px-1.5 py-0.5 text-caption",
-        tone === "red"
-          ? "border-redpen/50 text-redpen"
-          : tone === "blue"
-            ? "border-ballpoint/50 text-ballpoint"
-            : "border-grid bg-surface",
-      )}
-    >
-      {children}
-    </span>
   );
 }
 

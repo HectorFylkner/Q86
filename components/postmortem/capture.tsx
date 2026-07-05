@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { Camera, ClipboardPaste, Upload, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGES = 3;
@@ -141,28 +143,24 @@ export function ScratchCapture({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={cameraOpen ? closeCamera : openCamera}
           disabled={disabled || (full && !cameraOpen)}
-          className={cn(
-            "flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
-            (disabled || (full && !cameraOpen)) && "opacity-50",
-          )}
         >
           <Camera size={14} />
           {cameraOpen ? "Close camera" : "Use the webcam"}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || full}
-          className={cn(
-            "flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
-            (disabled || full) && "opacity-50",
-          )}
         >
           <Upload size={14} />
           Upload a photo
-        </button>
+        </Button>
         <span className="flex items-center gap-1.5 text-xs text-graphite">
           <ClipboardPaste size={13} />
           or paste from the clipboard
@@ -181,7 +179,7 @@ export function ScratchCapture({
         />
       </div>
 
-      {cameraError && <p className="text-sm text-redpen">{cameraError}</p>}
+      {cameraError && <ErrorBanner>{cameraError}</ErrorBanner>}
 
       {cameraOpen && (
         <div className="space-y-2 rounded-card border border-grid bg-surface p-3 shadow-ambient">
@@ -194,16 +192,9 @@ export function ScratchCapture({
             className="w-full rounded-control"
           />
           <div className="flex gap-2">
-            <button
-              onClick={captureStill}
-              disabled={busy || full}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                (busy || full) && "opacity-50",
-              )}
-            >
+            <Button size="sm" onClick={captureStill} disabled={busy || full}>
               Capture this frame
-            </button>
+            </Button>
             {full && (
               <span className="self-center text-xs text-graphite">
                 3 images max — remove one to retake.

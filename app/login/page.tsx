@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage({
@@ -29,12 +31,9 @@ export default async function LoginPage({
               That password is not right — try again.
             </p>
           )}
-          <button
-            type="submit"
-            className="w-full rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-          >
+          <Button type="submit" className="w-full">
             Enter
-          </button>
+          </Button>
         </form>
       </div>
     </div>

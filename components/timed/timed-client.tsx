@@ -9,6 +9,8 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { TimeInkBar, type Checkpoint } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
 import { MarkingSummary } from "@/components/timed/marking-summary";
+import { Button, KeyHint } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import {
   saveTimedSession,
   startTimedSet,
@@ -347,11 +349,7 @@ export function TimedClient({
     const enough = (n: number) => verifiedTotal >= n;
     return (
       <div className="space-y-5">
-        {stage.error && (
-          <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
-            {stage.error}
-          </p>
-        )}
+        {stage.error && <ErrorBanner>{stage.error}</ErrorBanner>}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
             <h2 className="font-display text-base font-semibold">
@@ -362,16 +360,13 @@ export function TimedClient({
               Faithful mechanics: answer to advance, B bookmarks, review
               screen with up to 3 edits if time remains.
             </p>
-            <button
+            <Button
               onClick={() => handleStart("full")}
               disabled={!enough(21)}
-              className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                !enough(21) && "cursor-not-allowed opacity-50",
-              )}
+              className="mt-4"
             >
               Start 21-question section
-            </button>
+            </Button>
             {!enough(21) && (
               <p className="mt-2 text-xs text-graphite">
                 Needs 21 verified questions; the bank has {verifiedTotal}.
@@ -400,16 +395,13 @@ export function TimedClient({
               ))}
             </div>
             <div className="flex-1" />
-            <button
+            <Button
               onClick={() => handleStart("mini")}
               disabled={!enough(7)}
-              className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                !enough(7) && "cursor-not-allowed opacity-50",
-              )}
+              className="mt-4"
             >
               Start 7-question mini
-            </button>
+            </Button>
             {!enough(7) && (
               <p className="mt-2 text-xs text-graphite">
                 Needs 7 verified questions; the bank has {verifiedTotal}.
@@ -488,13 +480,10 @@ export function TimedClient({
   if (stage.kind === "error") {
     return (
       <div className="mx-auto max-w-xl space-y-3 rounded-card border border-redpen/40 bg-surface p-5 shadow-ambient">
-        <p className="text-sm text-redpen">{stage.message}</p>
-        <button
-          onClick={() => finalize(answers, editRecords, bookmarks)}
-          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-        >
+        <ErrorBanner>{stage.message}</ErrorBanner>
+        <Button onClick={() => finalize(answers, editRecords, bookmarks)}>
           Retry saving the session
-        </button>
+        </Button>
       </div>
     );
   }
@@ -617,15 +606,12 @@ export function TimedClient({
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
             <ConfidencePicker value={confidence} onChange={setConfidence} />
-            <button
-              onClick={confirmAnswer}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-            >
+            <Button size="sm" onClick={confirmAnswer}>
               {currentIndex + 1 < questions.length
                 ? "Confirm and advance"
                 : "Confirm final answer"}
-              <span className="ml-2 font-mono text-micro opacity-70">↵</span>
-            </button>
+              <KeyHint>↵</KeyHint>
+            </Button>
           </div>
           {hint && (
             <p className="mt-2 text-sm text-amber" role="status">

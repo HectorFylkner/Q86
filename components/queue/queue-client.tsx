@@ -6,6 +6,8 @@ import { formatDistanceToNow } from "date-fns";
 import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ui/error-banner";
 import { startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import {
@@ -24,7 +26,7 @@ import {
   type SessionMode,
   type Subtopic,
 } from "@/lib/taxonomy";
-import { cn, formatSeconds } from "@/lib/utils";
+import { formatSeconds } from "@/lib/utils";
 
 export type DueRow = {
   id: number;
@@ -192,11 +194,7 @@ export function QueueClient({
 
   return (
     <div className="space-y-6">
-      {error && (
-        <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
-          {error}
-        </p>
-      )}
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -204,16 +202,13 @@ export function QueueClient({
             Due now · {due.length}
           </h2>
           {due.length > 0 && (
-            <button
+            <Button
+              size="sm"
               onClick={() => startRedo(due.map((d) => d.questionId))}
-              disabled={starting}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-ballpoint/90",
-                starting && "cursor-wait opacity-60",
-              )}
+              busy={starting}
             >
               Redo all {due.length} due
-            </button>
+            </Button>
           )}
         </div>
         {due.length === 0 ? (

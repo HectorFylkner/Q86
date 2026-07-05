@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { ButtonLink } from "@/components/ui/button";
 
 /** localStorage key per chapter; value {c: checked indexes, t: item count}.
  *  The Learn index reads the same keys to show readiness badges. */
@@ -129,27 +129,21 @@ export function DrillChecklist({
           )}
         </p>
         <div className="flex flex-wrap gap-2">
-          <Link
+          <ButtonLink
             href={`/drill?sub=${subtopic}&d=3`}
-            className={
-              all && test
-                ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-                : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-ballpoint/90"
-            }
+            variant={all && test ? "secondary" : "primary"}
+            className="min-h-[44px]"
           >
             Drill this now →
-          </Link>
+          </ButtonLink>
           {test && (
-            <Link
+            <ButtonLink
               href={`/drill?test=${subtopic}`}
-              className={
-                all
-                  ? "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-ballpoint/90"
-                  : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-              }
+              variant={all ? "primary" : "secondary"}
+              className="min-h-[44px]"
             >
               {test.passed ? "Retake the test" : "Chapter test →"}
-            </Link>
+            </ButtonLink>
           )}
         </div>
       </div>

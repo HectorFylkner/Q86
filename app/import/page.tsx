@@ -2,6 +2,7 @@ import { desc } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
+import { buttonClasses } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { baselineReports } from "@/lib/db/schema";
 import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
@@ -35,11 +36,7 @@ export default async function ImportPage() {
               scheduling, flags, settings, and the installed question bank.
             </p>
           </div>
-          <a
-            href="/api/export"
-            download
-            className="rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-          >
+          <a href="/api/export" download className={buttonClasses("secondary")}>
             Download backup ↓
           </a>
         </div>

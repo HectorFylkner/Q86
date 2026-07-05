@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import { flagQuestion } from "@/lib/actions";
 import {
   FLAG_REASONS,
@@ -47,7 +48,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
             type="button"
             onClick={() => setReason(r)}
             className={cn(
-              "rounded-full border px-2.5 py-1 text-xs transition-colors",
+              "rounded-control border px-2.5 py-1 text-xs transition-colors",
               reason === r
                 ? "border-redpen bg-redpen/10 font-medium text-redpen"
                 : "border-grid text-graphite hover:border-graphite/50 hover:text-ink",
@@ -65,8 +66,10 @@ export function FlagButton({ questionId }: { questionId: number }) {
           placeholder="What looks wrong? (optional)"
           className="min-w-0 flex-1 text-sm"
         />
-        <button
+        <Button
           type="button"
+          variant="dangerOutline"
+          size="sm"
           disabled={!reason || pending}
           onClick={() => {
             if (!reason) return;
@@ -75,10 +78,9 @@ export function FlagButton({ questionId }: { questionId: number }) {
               setSent(true);
             });
           }}
-          className="rounded-control border border-redpen/50 px-3 py-1.5 text-sm font-medium text-redpen transition-colors hover:bg-redpen/10 disabled:opacity-40"
         >
           {pending ? "Flagging…" : "Flag question"}
-        </button>
+        </Button>
         <button
           type="button"
           onClick={() => setOpen(false)}

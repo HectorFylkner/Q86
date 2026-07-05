@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Bookmark, Pencil } from "lucide-react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
+import { Button } from "@/components/ui/button";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -70,12 +71,9 @@ export function ReviewGrid({
     return (
       <div className="mx-auto mt-4 max-w-3xl space-y-4">
         <div className="flex items-center justify-between text-xs text-graphite">
-          <button
-            onClick={() => setOpenIndex(null)}
-            className="rounded-control border border-grid bg-surface px-2.5 py-1 hover:border-graphite/50"
-          >
+          <Button variant="secondary" size="sm" onClick={() => setOpenIndex(null)}>
             ← Back to review grid
-          </button>
+          </Button>
           <span className="font-mono">
             Question {openIndex + 1} · edits used {editsUsed}/{MAX_EDITS}
           </span>
@@ -142,7 +140,9 @@ export function ReviewGrid({
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="danger"
+                  size="sm"
                   onClick={() => {
                     if (!canCommit || reason == null || pendingIndex == null)
                       return;
@@ -155,23 +155,20 @@ export function ReviewGrid({
                     setOpenIndex(null);
                   }}
                   disabled={!canCommit}
-                  className={cn(
-                    "rounded-control bg-redpen px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-redpen/90",
-                    !canCommit && "cursor-not-allowed opacity-50",
-                  )}
                 >
                   Commit the change
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setPendingIndex(null);
                     setReason(null);
                     setJustification("");
                   }}
-                  className="rounded-control border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
                 >
                   Keep the original answer
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -248,12 +245,9 @@ export function ReviewGrid({
           ))}
         </div>
         <div className="mt-5 flex justify-end border-t border-grid pt-4">
-          <button
-            onClick={onSubmit}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-          >
+          <Button onClick={onSubmit}>
             Submit section and see the marking
-          </button>
+          </Button>
         </div>
       </div>
     </div>

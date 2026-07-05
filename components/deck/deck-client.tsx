@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
+import { ButtonLink } from "@/components/ui/button";
 import { gradeDeckCard } from "@/lib/actions";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
@@ -65,12 +66,9 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
           Nothing due — the deck builds itself from questions you miss, and
           cards you&apos;ve graded return when their interval comes up.
         </p>
-        <Link
-          href="/drill"
-          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-on-accent hover:bg-ballpoint/90"
-        >
+        <ButtonLink href="/drill" className="mt-3">
           Go drill →
-        </Link>
+        </ButtonLink>
       </section>
     );
   }
