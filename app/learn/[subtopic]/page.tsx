@@ -16,6 +16,7 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
 import { listLessons, readLesson } from "@/lib/lessons";
 import {
@@ -49,6 +50,7 @@ export default async function LessonPage({
   if (!lesson) notFound();
 
   const parsed = parseLesson(lesson.body);
+  const testState = (await chapterTestStates())[subtopic as Subtopic];
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;
@@ -73,6 +75,9 @@ export default async function LessonPage({
           </span>
           <span>~{meta.minutes} min</span>
           <span>3 worked examples</span>
+          {testState?.passed && (
+            <span className="text-ballpoint">✓ test passed</span>
+          )}
         </p>
       )}
     </div>
@@ -192,7 +197,16 @@ export default async function LessonPage({
         </SectionShell>
 
         <SectionShell id="checklist" index={7} title="Before you drill">
-          <DrillChecklist subtopic={subtopic} items={parsed.checklist} />
+          <DrillChecklist
+            subtopic={subtopic}
+            items={parsed.checklist}
+            test={{
+              passed: testState?.passed ?? false,
+              lastScore: testState
+                ? `${testState.lastCorrect}/${testState.lastTotal}`
+                : null,
+            }}
+          />
         </SectionShell>
 
         {footer}

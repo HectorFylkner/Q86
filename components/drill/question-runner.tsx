@@ -10,6 +10,7 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
+import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import {
   DIFFICULTY_LABELS,
@@ -21,6 +22,7 @@ import {
   type Difficulty,
   type ErrorType,
   type SessionFocus,
+  type Subtopic,
 } from "@/lib/taxonomy";
 import { cn, formatSeconds, percent } from "@/lib/utils";
 
@@ -43,6 +45,7 @@ export function QuestionRunner({
   questions,
   timing,
   focus = "focused",
+  test,
   onRestart,
 }: {
   sessionId: number;
@@ -50,6 +53,8 @@ export function QuestionRunner({
   questions: Question[];
   timing: "untimed" | "soft";
   focus?: SessionFocus;
+  /** Set when this run is a chapter test for the given subtopic. */
+  test?: Subtopic | null;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -217,11 +222,53 @@ export function QuestionRunner({
     const avg =
       results.reduce((s, r) => s + r.timeSeconds, 0) /
       Math.max(1, results.length);
+    const passed =
+      test != null && correct / Math.max(1, results.length) >= CHAPTER_TEST_BAR;
+    const bar = Math.ceil(results.length * CHAPTER_TEST_BAR);
     return (
       <div className="space-y-4">
+        {test != null && (
+          <div
+            className={cn(
+              "rounded-card border p-5 shadow-ambient",
+              passed
+                ? "border-ballpoint/50 bg-ballpoint/5"
+                : "border-amber/50 bg-amber/5",
+            )}
+          >
+            <h2 className="font-display text-lg font-semibold">
+              {passed ? "Chapter test passed" : "Not passed yet"}
+            </h2>
+            <p className="mt-1 text-sm text-graphite">
+              {passed
+                ? `${correct}/${results.length} — this chapter now shows as passed on the Learn index. Keep it warm with drills; retakes can't demote you.`
+                : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <Link
+                href={`/learn/${test}`}
+                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+              >
+                Back to the chapter
+              </Link>
+              {!passed && (
+                <Link
+                  href={`/drill?test=${test}`}
+                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                >
+                  Retake with fresh questions →
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
         <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
           <h2 className="font-display text-lg font-semibold">
-            {mode === "redo" ? "Redo complete" : "Drill complete"}
+            {test != null
+              ? "The paper trail"
+              : mode === "redo"
+                ? "Redo complete"
+                : "Drill complete"}
           </h2>
           <div className="mt-3 flex flex-wrap gap-6">
             <Stat label="Accuracy" value={`${percent(correct, results.length)}%`} />

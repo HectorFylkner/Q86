@@ -16,6 +16,7 @@ import {
   type Question,
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
+import { selectChapterTest } from "./chapter-tests.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -70,6 +71,29 @@ export async function startDrill(config: {
     .values({
       mode: "drill",
       config: config as unknown as Record<string, unknown>,
+    })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: picked };
+}
+
+/** Chapter test: the pass-bar gate behind a Learn chapter. */
+export async function startChapterTest(
+  subtopic: Subtopic,
+): Promise<StartDrillResult> {
+  const picked = await selectChapterTest(subtopic);
+  if (picked.length < 4) {
+    return {
+      error: "Not enough verified questions in this chapter for a test.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const session = await db
+    .insert(sessions)
+    .values({
+      mode: "drill",
+      config: { chapter_test: subtopic, count: picked.length },
     })
     .returning()
     .get();

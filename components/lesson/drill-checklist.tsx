@@ -10,12 +10,21 @@ export function checklistKey(subtopic: string): string {
   return `q86-learn:${subtopic}`;
 }
 
+export type ChecklistTestState = {
+  passed: boolean;
+  lastScore: string | null; // "6/8" from the most recent take
+};
+
 export function DrillChecklist({
   subtopic,
   items,
+  test,
 }: {
   subtopic: string;
   items: string[];
+  /** Chapter-test state; when present the completed checklist promotes
+   *  the test to the primary action (read → drill → prove it). */
+  test?: ChecklistTestState;
 }) {
   const [checked, setChecked] = useState<boolean[]>(() =>
     items.map(() => false),
@@ -103,22 +112,46 @@ export function DrillChecklist({
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grid px-4 py-3 sm:px-5">
         <p className="text-sm">
-          {all ? (
+          {test?.passed ? (
             <span className="font-medium text-ballpoint">
-              All checked — you&apos;re ready.
+              Test passed ✓{test.lastScore ? ` · last ${test.lastScore}` : ""}
+            </span>
+          ) : all ? (
+            <span className="font-medium text-ballpoint">
+              All checked — prove it on the test.
             </span>
           ) : (
             <span className="text-graphite">
-              The drill will tell you if the ticks were honest.
+              {test?.lastScore
+                ? `Last test: ${test.lastScore} — the bar is 6/8.`
+                : "The drill will tell you if the ticks were honest."}
             </span>
           )}
         </p>
-        <Link
-          href={`/drill?sub=${subtopic}&d=3`}
-          className="inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-        >
-          Drill this now →
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/drill?sub=${subtopic}&d=3`}
+            className={
+              all && test
+                ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+                : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+            }
+          >
+            Drill this now →
+          </Link>
+          {test && (
+            <Link
+              href={`/drill?test=${subtopic}`}
+              className={
+                all
+                  ? "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+              }
+            >
+              {test.passed ? "Retake the test" : "Chapter test →"}
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

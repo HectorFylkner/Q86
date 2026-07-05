@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
+import { chapterTestStates } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
@@ -13,8 +14,10 @@ const METHOD = [
   { step: "Drill", detail: "the same subtopic while it's warm" },
 ];
 
-export default function LearnPage() {
+export default async function LearnPage() {
   const lessons = listLessons();
+  const tests = await chapterTestStates();
+  const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
 
   return (
@@ -23,7 +26,10 @@ export default function LearnPage() {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="font-display text-xl font-semibold">Learn</h1>
           <p className="text-xs text-graphite">
-            {lessons.length} concept chapters, one per drillable subtopic.
+            {lessons.length} concept chapters, one per drillable subtopic
+            {passedCount > 0 &&
+              ` — ${passedCount} test${passedCount === 1 ? "" : "s"} passed`}
+            .
           </p>
         </div>
         <div className="mt-1">
@@ -85,6 +91,14 @@ export default function LearnPage() {
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
                         <span>~{lesson.minutes} min</span>
+                        {tests[lesson.subtopic]?.passed ? (
+                          <span className="text-ballpoint">✓ test passed</span>
+                        ) : tests[lesson.subtopic] ? (
+                          <span className="text-amber">
+                            test {tests[lesson.subtopic]!.lastCorrect}/
+                            {tests[lesson.subtopic]!.lastTotal}
+                          </span>
+                        ) : null}
                         <ReadBadge subtopic={lesson.subtopic} />
                       </span>
                     </span>

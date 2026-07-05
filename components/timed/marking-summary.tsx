@@ -9,11 +9,13 @@ import { ResultStroke } from "@/components/drill/result-stroke";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
 import {
   CONTEXT_LABELS,
   DOMAIN_LABELS,
   EDIT_REASON_LABELS,
   SKILL_LABELS,
+  type Difficulty,
 } from "@/lib/taxonomy";
 import { CHOICE_LETTERS, cn, formatSeconds, percent } from "@/lib/utils";
 
@@ -204,6 +206,9 @@ export function MarkingSummary({
             </p>
           )}
 
+          <PacingCard questions={questions} answers={answers} saved={saved} />
+
+
           {edits.length > 0 && (
             <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
               <h3 className="font-display text-sm font-semibold">
@@ -300,6 +305,94 @@ export function MarkingSummary({
 
 function signed(n: number): string {
   return n > 0 ? `+${n}` : String(n);
+}
+
+/** Per-difficulty benchmarks, time sinks, and rushed-wrong questions —
+ *  where the section's minutes actually went. */
+function PacingCard({
+  questions,
+  answers,
+  saved,
+}: {
+  questions: Question[];
+  answers: (AnswerRecord | null)[];
+  saved: SaveTimedResponse;
+}) {
+  const items: PacedItem[] = questions.flatMap((q, i) => {
+    const a = answers[i];
+    if (!a) return [];
+    return [
+      {
+        index: i,
+        difficulty: q.difficulty as Difficulty,
+        timeSeconds: a.timeSeconds,
+        correct: !!saved.correctByQuestionId[q.id],
+      },
+    ];
+  });
+  if (items.length === 0) return null;
+  const read = pacingRead(items);
+
+  return (
+    <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <h3 className="font-display text-sm font-semibold">Pacing read</h3>
+      <p className="mt-0.5 text-xs text-graphite">
+        Benchmarks by difficulty — harder questions earn more of the
+        128s/question budget.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {read.byDifficulty.map((row) => {
+          const over = row.avgSeconds > row.benchSeconds * 1.2;
+          const under = row.avgSeconds < row.benchSeconds * 0.8;
+          return (
+            <span
+              key={row.difficulty}
+              className={cn(
+                "rounded-control border border-grid px-2.5 py-1 font-mono text-xs",
+                over && "border-amber/60 text-amber",
+                under && "text-graphite",
+              )}
+            >
+              D{row.difficulty} · you {formatSeconds(row.avgSeconds)} · bench{" "}
+              {formatSeconds(row.benchSeconds)} · ×{row.n}
+            </span>
+          );
+        })}
+      </div>
+      {read.sinks.length > 0 && (
+        <p className="mt-3 text-sm">
+          <span className="font-medium text-amber">Time sinks:</span>{" "}
+          <span className="text-graphite">
+            {read.sinks
+              .slice(0, 4)
+              .map(
+                (s) =>
+                  `Q${s.index + 1} (${formatSeconds(s.timeSeconds)} on D${s.difficulty}, bench ${formatSeconds(TIME_BENCH[s.difficulty])})`,
+              )
+              .join(" · ")}
+            {" — "}every sink past 1.5× benchmark is a bail you didn&apos;t
+            take.
+          </span>
+        </p>
+      )}
+      {read.rushedWrong.length > 0 && (
+        <p className="mt-2 text-sm">
+          <span className="font-medium text-redpen">Rushed and wrong:</span>{" "}
+          <span className="text-graphite">
+            {read.rushedWrong
+              .map((s) => `Q${s.index + 1} (${formatSeconds(s.timeSeconds)})`)
+              .join(" · ")}
+            {" — "}seconds saved there were spent on the sinks.
+          </span>
+        </p>
+      )}
+      {read.sinks.length === 0 && read.rushedWrong.length === 0 && (
+        <p className="mt-3 text-sm text-ballpoint">
+          Clean pacing — no sinks, no panic answers.
+        </p>
+      )}
+    </div>
+  );
 }
 
 function StatCard({
