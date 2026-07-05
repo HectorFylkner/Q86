@@ -174,7 +174,14 @@ export default async function TodayPage() {
             </Link>
           ) : (
             <span className="text-sm text-graphite">
-              The bank is empty — run pnpm seed first.
+              The bank is empty —{" "}
+              <Link
+                href="/drill"
+                className="font-medium text-ballpoint hover:underline"
+              >
+                generate questions from Drill
+              </Link>
+              .
             </span>
           )}
         </PlanCard>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bookmark } from "lucide-react";
 import { Md } from "@/components/math";
@@ -369,7 +370,13 @@ export function TimedClient({
             </Button>
             {!enough(21) && (
               <p className="mt-2 text-xs text-graphite">
-                Needs 21 verified questions; the bank has {verifiedTotal}.
+                Needs 21 verified questions; the bank has {verifiedTotal}.{" "}
+                <Link
+                  href="/drill"
+                  className="font-medium text-ballpoint hover:underline"
+                >
+                  Generate more →
+                </Link>
               </p>
             )}
           </div>
@@ -404,7 +411,13 @@ export function TimedClient({
             </Button>
             {!enough(7) && (
               <p className="mt-2 text-xs text-graphite">
-                Needs 7 verified questions; the bank has {verifiedTotal}.
+                Needs 7 verified questions; the bank has {verifiedTotal}.{" "}
+                <Link
+                  href="/drill"
+                  className="font-medium text-ballpoint hover:underline"
+                >
+                  Generate more →
+                </Link>
               </p>
             )}
           </div>

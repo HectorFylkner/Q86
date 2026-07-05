@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { ErrorBanner } from "@/components/ui/error-banner";
 import { startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -212,9 +212,19 @@ export function QueueClient({
           )}
         </div>
         {due.length === 0 ? (
-          <p className="mt-2 text-sm text-graphite">
-            Nothing due. Generate a VOF drill or start a timed set.
-          </p>
+          <div className="mt-2">
+            <p className="text-sm text-graphite">
+              Nothing due — the queue refills as you miss questions.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <ButtonLink href="/drill" variant="secondary" size="sm">
+                Run a drill
+              </ButtonLink>
+              <ButtonLink href="/timed" variant="secondary" size="sm">
+                Start a timed set
+              </ButtonLink>
+            </div>
+          </div>
         ) : (
           <>
             <p className="mt-1 text-xs text-graphite">

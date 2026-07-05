@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { gradeDeckCard } from "@/lib/actions";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
@@ -62,15 +63,13 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
 
   if (cards.length === 0) {
     return (
-      <section className="rounded-card border border-grid bg-surface p-6 text-center shadow-ambient">
-        <p className="text-sm text-graphite">
-          Nothing due — the deck builds itself from questions you miss, and
-          cards you&apos;ve graded return when their interval comes up.
-        </p>
-        <ButtonLink href="/drill" className="mt-3">
-          Go drill →
-        </ButtonLink>
-      </section>
+      <EmptyState
+        kicker="Deck clear"
+        action={<ButtonLink href="/drill">Go drill →</ButtonLink>}
+      >
+        Nothing due — the deck builds itself from questions you miss, and
+        cards you&apos;ve graded return when their interval comes up.
+      </EmptyState>
     );
   }
 

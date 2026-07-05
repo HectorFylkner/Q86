@@ -28,6 +28,8 @@ import {
   type EditReason,
 } from "@/lib/taxonomy";
 import { cn, percent } from "@/lib/utils";
+import { ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useChartTokens } from "@/components/use-chart-tokens";
 
 export function AnalyticsClient({ data }: { data: AnalyticsData }) {
@@ -54,10 +56,17 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   if (data.attemptCount === 0) {
     return (
       <div className="space-y-4">
-        <p className="rounded-card border border-grid bg-surface p-5 text-sm text-graphite shadow-ambient">
-          No attempts logged yet. Run a drill or a timed set and the report
-          fills in.
-        </p>
+        <EmptyState
+          kicker="No marks on the paper yet"
+          action={
+            <ButtonLink href="/drill" variant="secondary" size="sm">
+              Run your first drill →
+            </ButtonLink>
+          }
+        >
+          No attempts logged yet. Run a drill or a timed set and every
+          figure on this page fills in.
+        </EmptyState>
         <Footer />
       </div>
     );

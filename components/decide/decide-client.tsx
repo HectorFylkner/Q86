@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
-import { Button, KeyHint } from "@/components/ui/button";
+import { Button, ButtonLink, KeyHint } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { saveDecisionRound } from "@/lib/actions";
 import type { DecideItem, DecideRecommendation } from "@/lib/decide";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
@@ -103,9 +104,17 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
-        No questions available — run <code>pnpm seed</code> first.
-      </p>
+      <EmptyState
+        kicker="Nothing to triage yet"
+        action={
+          <ButtonLink href="/drill" variant="secondary" size="sm">
+            Open the drill builder →
+          </ButtonLink>
+        }
+      >
+        Decision triage judges your calls against your own record — it
+        needs questions in the bank first.
+      </EmptyState>
     );
   }
 

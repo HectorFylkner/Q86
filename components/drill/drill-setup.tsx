@@ -351,8 +351,11 @@ export function DrillSetup({
             Start drill: {Math.min(count, matching)} questions
           </Button>
           <span className="text-sm text-graphite">
-            {matching} verified questions match this filter
-            {matching > 0 && matching < count && " — drill clamped to match"}
+            {matching === 0
+              ? "No verified questions match this filter — widen it, or generate ten below ↓"
+              : `${matching} verified questions match this filter${
+                  matching < count ? " — drill clamped to match" : ""
+                }`}
           </span>
         </div>
       </section>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
+import { EmptyState } from "@/components/ui/empty-state";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
@@ -55,9 +56,9 @@ export default async function LearnPage() {
       </div>
 
       {lessons.length === 0 && (
-        <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
+        <EmptyState kicker="No chapters yet">
           Chapters are being written — check back shortly.
-        </p>
+        </EmptyState>
       )}
 
       {FUNDAMENTAL_SKILLS.map((skill) => {
