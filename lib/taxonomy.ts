@@ -102,7 +102,10 @@ export type SessionMode = (typeof SESSION_MODES)[number];
 export const SESSION_FOCUS = ["focused", "casual"] as const;
 export type SessionFocus = (typeof SESSION_FOCUS)[number];
 
-export const QUESTION_SOURCES = ["seed", "generated", "twin"] as const;
+// "external" = a stub row standing in for a miss on outside material
+// (official mocks, OG). Never verified, never drilled in-app; it exists
+// so the redo ladder, deck, error log, and analytics see the miss.
+export const QUESTION_SOURCES = ["seed", "generated", "twin", "external"] as const;
 export type QuestionSource = (typeof QUESTION_SOURCES)[number];
 
 // Content QC: reasons a question can be flagged from the runner.

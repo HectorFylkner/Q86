@@ -12,7 +12,11 @@ export function checklistKey(subtopic: string): string {
 
 export type ChecklistTestState = {
   passed: boolean;
-  lastScore: string | null; // "6/8" from the most recent take
+  lastScore: string | null; // "6/7" from the most recent take
+  /** Label of the tier the next take targets ("Easy" | "Medium" | "Hard"). */
+  nextTierLabel: string;
+  /** All three tiers passed — the next take is a re-certification. */
+  ladderComplete: boolean;
 };
 
 export function DrillChecklist({
@@ -112,18 +116,24 @@ export function DrillChecklist({
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grid px-4 py-3 sm:px-5">
         <p className="text-sm">
-          {test?.passed ? (
+          {test?.ladderComplete ? (
             <span className="font-medium text-ballpoint">
-              Test passed ✓{test.lastScore ? ` · last ${test.lastScore}` : ""}
+              All three tiers passed ✓
+              {test.lastScore ? ` · last ${test.lastScore}` : ""}
+            </span>
+          ) : test?.passed ? (
+            <span className="font-medium text-ballpoint">
+              Climbing — next: {test.nextTierLabel} tier (bar 6/7).
             </span>
           ) : all ? (
             <span className="font-medium text-ballpoint">
-              All checked — prove it on the test.
+              All checked — prove it on the {test?.nextTierLabel ?? "Easy"}{" "}
+              tier.
             </span>
           ) : (
             <span className="text-graphite">
               {test?.lastScore
-                ? `Last test: ${test.lastScore} — the bar is 6/8.`
+                ? `Last test: ${test.lastScore} — the bar is 6/7.`
                 : "The drill will tell you if the ticks were honest."}
             </span>
           )}
@@ -148,7 +158,9 @@ export function DrillChecklist({
                   : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
               }
             >
-              {test.passed ? "Retake the test" : "Chapter test →"}
+              {test.ladderComplete
+                ? `Re-certify (${test.nextTierLabel}) →`
+                : `${test.nextTierLabel} tier test →`}
             </Link>
           )}
         </div>

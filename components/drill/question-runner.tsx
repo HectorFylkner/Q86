@@ -10,7 +10,14 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
-import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
+import {
+  CHAPTER_TEST_BAR,
+  CHAPTER_TIERS,
+  TIER_BAR,
+  TIER_BLENDS,
+  TIER_LABELS,
+  type ChapterTier,
+} from "@/lib/chapter-test-config";
 import { RAMP_STAGE_LABELS, type RampBudget } from "@/lib/ramp";
 import type { Question } from "@/lib/db/schema";
 import {
@@ -47,6 +54,8 @@ export function QuestionRunner({
   timing,
   focus = "focused",
   test,
+  testTier,
+  rung,
   budgets,
   onRestart,
 }: {
@@ -57,6 +66,10 @@ export function QuestionRunner({
   focus?: SessionFocus;
   /** Set when this run is a chapter test for the given subtopic. */
   test?: Subtopic | null;
+  /** The test's difficulty tier; legacy mixed tests carry none. */
+  testTier?: ChapterTier | null;
+  /** Set when this run is a mastery-ladder rung drill. */
+  rung?: { subtopic: string; difficulty: number } | null;
   /** Timed-transfer ramp target per question id; the clock tightens
    *  only where recent accuracy has earned it. */
   budgets?: Record<number, RampBudget>;
@@ -227,9 +240,29 @@ export function QuestionRunner({
     const avg =
       results.reduce((s, r) => s + r.timeSeconds, 0) /
       Math.max(1, results.length);
+    const barRatio = testTier ? TIER_BAR : CHAPTER_TEST_BAR;
     const passed =
-      test != null && correct / Math.max(1, results.length) >= CHAPTER_TEST_BAR;
-    const bar = Math.ceil(results.length * CHAPTER_TEST_BAR);
+      test != null && correct / Math.max(1, results.length) >= barRatio;
+    const bar = Math.ceil(results.length * barRatio);
+    const tierIdx = testTier ? CHAPTER_TIERS.indexOf(testTier) : -1;
+    const nextTier =
+      passed && tierIdx >= 0 && tierIdx < CHAPTER_TIERS.length - 1
+        ? CHAPTER_TIERS[tierIdx + 1]
+        : null;
+    // Failure-triggered step-down: one difficulty below the tier's floor
+    // (or the rung), plus the relevant lesson section — a rebuild set,
+    // not a bare fail verdict.
+    const tierFloor = testTier
+      ? Math.min(...TIER_BLENDS[testTier].map(([d]) => d))
+      : null;
+    const testStepDown =
+      test != null && !passed && tierFloor != null
+        ? Math.max(2, tierFloor - 1)
+        : null;
+    const rungFailed =
+      rung != null &&
+      results.length > 0 &&
+      correct / results.length < 0.5;
     return (
       <div className="space-y-4">
         {test != null && (
@@ -242,12 +275,16 @@ export function QuestionRunner({
             )}
           >
             <h2 className="font-display text-lg font-semibold">
-              {passed ? "Chapter test passed" : "Not passed yet"}
+              {passed
+                ? `Chapter test passed${testTier ? ` — ${TIER_LABELS[testTier]} tier` : ""}`
+                : "Not passed yet"}
             </h2>
             <p className="mt-1 text-sm text-graphite">
               {passed
-                ? `${correct}/${results.length} — this chapter now shows as passed on the Learn index. Keep it warm with drills; retakes can't demote you.`
-                : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
+                ? nextTier
+                  ? `${correct}/${results.length} — the ${TIER_LABELS[testTier!]} tier is yours; retakes can't demote you. The ${TIER_LABELS[nextTier]} tier is waiting.`
+                  : `${correct}/${results.length} — this chapter's ladder is fully climbed. It will ask to be re-certified when it goes stale.`
+                : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Rebuild one step down before you retake — a retake on the same shaky base just burns questions.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
@@ -256,14 +293,64 @@ export function QuestionRunner({
               >
                 Back to the chapter
               </Link>
-              {!passed && (
+              {passed && nextTier && (
                 <Link
-                  href={`/drill?test=${test}`}
+                  href={`/drill?test=${test}&tier=${nextTier}`}
                   className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
                 >
-                  Retake with fresh questions →
+                  Step up: {TIER_LABELS[nextTier]} tier →
                 </Link>
               )}
+              {!passed && testStepDown != null && (
+                <>
+                  <Link
+                    href={`/drill?sub=${test}&d=${testStepDown}`}
+                    className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  >
+                    Rebuild: 6 questions at D{testStepDown} →
+                  </Link>
+                  <Link
+                    href={`/learn/${test}#ideas`}
+                    className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                  >
+                    Reread the core ideas
+                  </Link>
+                  <Link
+                    href={`/drill?test=${test}${testTier ? `&tier=${testTier}` : ""}`}
+                    className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                  >
+                    Retake anyway →
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {rungFailed && rung && (
+          <div className="rounded-card border border-amber/50 bg-amber/5 p-5 shadow-ambient">
+            <h2 className="font-display text-lg font-semibold">
+              This rung isn&apos;t load-bearing yet
+            </h2>
+            <p className="mt-1 text-sm text-graphite">
+              {correct}/{results.length} at D{rung.difficulty}. Grinding the
+              same rung repeats the misses; rebuild one step down and come
+              back.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {rung.difficulty > 2 && (
+                <Link
+                  href={`/drill?sub=${rung.subtopic}&d=${rung.difficulty - 1}`}
+                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                >
+                  Rebuild: 6 questions at D{rung.difficulty - 1} →
+                </Link>
+              )}
+              <Link
+                href={`/learn/${rung.subtopic}#ideas`}
+                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+              >
+                Reread the core ideas
+              </Link>
             </div>
           </div>
         )}

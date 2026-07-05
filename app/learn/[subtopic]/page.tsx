@@ -16,6 +16,7 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import { TIER_LABELS } from "@/lib/chapter-test-config";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
 import { listLessons, readLesson } from "@/lib/lessons";
@@ -75,8 +76,10 @@ export default async function LessonPage({
           </span>
           <span>~{meta.minutes} min</span>
           <span>3 worked examples</span>
-          {testState?.passed && (
-            <span className="text-ballpoint">✓ test passed</span>
+          {testState?.highest && (
+            <span className="text-ballpoint">
+              ✓ {TIER_LABELS[testState.highest]} tier passed
+            </span>
           )}
         </p>
       )}
@@ -205,6 +208,9 @@ export default async function LessonPage({
               lastScore: testState
                 ? `${testState.lastCorrect}/${testState.lastTotal}`
                 : null,
+              nextTierLabel: TIER_LABELS[testState?.next ?? "easy"],
+              ladderComplete:
+                testState != null && testState.highest === "hard",
             }}
           />
         </SectionShell>

@@ -58,6 +58,8 @@ export function TimedClient({
   const [miniSkill, setMiniSkill] = useState<FundamentalSkill | "mix">("mix");
   const [showTimer, setShowTimer] = useState(false);
   const [focus, setFocus] = useState<SessionFocus>("focused");
+  const [oneShot, setOneShot] = useState(false);
+  const [roughStart, setRoughStart] = useState(false);
 
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [mode, setMode] = useState<"timed_set" | "section_sim">("section_sim");
@@ -112,6 +114,8 @@ export function TimedClient({
           selectedKind === "mini" && miniSkill !== "mix" ? miniSkill : undefined,
         showTimer,
         focus,
+        oneShot: selectedKind === "full" ? oneShot : false,
+        roughStart,
       });
       if (res.error != null || res.sessionId == null || res.mode == null) {
         setStage({ kind: "config", error: res.error ?? "Could not start." });
@@ -425,6 +429,26 @@ export function TimedClient({
             className="h-4 w-4 accent-[var(--ballpoint)]"
           />
           Show the per-question timer (hidden by default, like the real exam)
+        </label>
+        <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
+          <input
+            type="checkbox"
+            checked={oneShot}
+            onChange={(e) => setOneShot(e.target.checked)}
+            className="h-4 w-4 accent-[var(--ballpoint)]"
+          />
+          One shot — no full-section retake today; the result stands, like
+          test day
+        </label>
+        <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
+          <input
+            type="checkbox"
+            checked={roughStart}
+            onChange={(e) => setRoughStart(e.target.checked)}
+            className="h-4 w-4 accent-[var(--ballpoint)]"
+          />
+          Rough start — seed the opening with the set&apos;s hardest
+          questions (recovery training)
         </label>
         <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
           <input

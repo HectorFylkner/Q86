@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
-import { chapterTestStates } from "@/lib/chapter-tests";
+import { CHAPTER_TIERS, TIER_LABELS } from "@/lib/chapter-test-config";
+import { chapterRecerts, chapterTestStates } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
@@ -17,6 +18,9 @@ const METHOD = [
 export default async function LearnPage() {
   const lessons = listLessons();
   const tests = await chapterTestStates();
+  const recerts = new Map(
+    (await chapterRecerts()).map((r) => [r.subtopic, r.reason]),
+  );
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
 
@@ -91,14 +95,39 @@ export default async function LearnPage() {
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
                         <span>~{lesson.minutes} min</span>
-                        {tests[lesson.subtopic]?.passed ? (
-                          <span className="text-ballpoint">✓ test passed</span>
-                        ) : tests[lesson.subtopic] ? (
-                          <span className="text-amber">
-                            test {tests[lesson.subtopic]!.lastCorrect}/
-                            {tests[lesson.subtopic]!.lastTotal}
+                        {tests[lesson.subtopic] && (
+                          <span className="inline-flex items-baseline gap-1">
+                            {CHAPTER_TIERS.map((t) => (
+                              <span
+                                key={t}
+                                title={`${TIER_LABELS[t]} tier ${tests[lesson.subtopic]!.tiers[t]?.passed ? "passed" : "not passed"}`}
+                                className={
+                                  tests[lesson.subtopic]!.tiers[t]?.passed
+                                    ? "text-ballpoint"
+                                    : "text-graphite/40"
+                                }
+                              >
+                                {TIER_LABELS[t][0]}
+                              </span>
+                            ))}
                           </span>
-                        ) : null}
+                        )}
+                        {!tests[lesson.subtopic]?.passed &&
+                          tests[lesson.subtopic] && (
+                            <span className="text-amber">
+                              last {tests[lesson.subtopic]!.lastCorrect}/
+                              {tests[lesson.subtopic]!.lastTotal}
+                            </span>
+                          )}
+                        {recerts.has(lesson.subtopic) && (
+                          <span className="text-amber">
+                            re-certify (
+                            {recerts.get(lesson.subtopic) === "stale"
+                              ? "stale"
+                              : "slipping"}
+                            )
+                          </span>
+                        )}
                         <ReadBadge subtopic={lesson.subtopic} />
                       </span>
                     </span>

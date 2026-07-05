@@ -4,12 +4,18 @@ import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { db } from "@/lib/db";
 import { baselineReports, questions } from "@/lib/db/schema";
+import { TIER_LABELS } from "@/lib/chapter-test-config";
+import { chapterRecerts } from "@/lib/chapter-tests";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
 import { getSetting } from "@/lib/settings";
-import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
+import {
+  SKILL_SHORT_LABELS,
+  SKILL_LABELS,
+  SUBTOPIC_LABELS,
+} from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +47,11 @@ export default async function TodayPage() {
         .from(baselineReports)
         .get()
     )?.n ?? 0;
+  const recerts = (await chapterRecerts()).slice(0, 2);
+  // Review-before-volume: fresh drill volume compounds only on cleared
+  // errors. A meaningful redo backlog demotes the drill CTA (nudge, not
+  // lock).
+  const reviewFirst = plan.dueRedoCount >= 6;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
@@ -146,6 +157,95 @@ export default async function TodayPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PlanCard
+          title="Review first"
+          body={
+            <span>
+              {plan.dueRedoCount > 0
+                ? `${plan.dueRedoCount} redo${plan.dueRedoCount === 1 ? "" : "s"} due`
+                : "No redos due"}
+              {" · "}
+              {deckWaiting > 0
+                ? `${deckWaiting} deck card${deckWaiting === 1 ? "" : "s"} waiting`
+                : "deck clear"}
+              {recerts.length > 0 && " · re-certification due"}
+            </span>
+          }
+        >
+          <div className="flex flex-col gap-1.5">
+            {plan.dueRedoCount > 0 ? (
+              <Link
+                href="/queue?start=1"
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Redo all {plan.dueRedoCount} due →
+              </Link>
+            ) : (
+              <Link
+                href="/queue"
+                className="text-sm text-graphite hover:underline"
+              >
+                Open the queue →
+              </Link>
+            )}
+            {deckWaiting > 0 && (
+              <Link
+                href="/deck"
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
+              </Link>
+            )}
+            {recerts.map((r) => (
+              <Link
+                key={r.subtopic}
+                href={`/drill?test=${r.subtopic}`}
+                className="text-sm font-medium text-amber hover:underline"
+              >
+                Re-certify {SUBTOPIC_LABELS[r.subtopic]} (
+                {r.reason === "stale"
+                  ? `${TIER_LABELS[r.tier]} tier gone stale`
+                  : "recent drills slipping"}
+                ) →
+              </Link>
+            ))}
+          </div>
+        </PlanCard>
+
+        <PlanCard
+          title={`Weighted drill · ${plan.drill.total} questions`}
+          body={
+            <span>
+              {plan.drill.bySkill
+                .filter((s) => s.count > 0)
+                .map((s) => `${SKILL_SHORT_LABELS[s.skill]} ${s.count}`)
+                .join(" · ")}
+              {reviewFirst && (
+                <span className="mt-1 block text-amber">
+                  {plan.dueRedoCount} redos are due — clear them first;
+                  fresh volume compounds only on cleared errors.
+                </span>
+              )}
+            </span>
+          }
+        >
+          {verifiedCount > 0 ? (
+            <Link
+              href="/drill?plan=1"
+              className={cn(
+                "text-sm font-medium hover:underline",
+                reviewFirst ? "text-graphite" : "text-ballpoint",
+              )}
+            >
+              Start today&apos;s drill: {plan.drill.total} questions →
+            </Link>
+          ) : (
+            <span className="text-sm text-graphite">
+              The bank is empty — run pnpm seed first.
+            </span>
+          )}
+        </PlanCard>
+
+        <PlanCard
           title="Pattern rounds"
           body={
             <span>
@@ -167,72 +267,6 @@ export default async function TodayPage() {
                 Start round {i + 1}: {PATTERN_CATEGORY_LABELS[key]} →
               </Link>
             ))}
-          </div>
-        </PlanCard>
-
-        <PlanCard
-          title={`Weighted drill · ${plan.drill.total} questions`}
-          body={
-            <span>
-              {plan.drill.bySkill
-                .filter((s) => s.count > 0)
-                .map((s) => `${SKILL_SHORT_LABELS[s.skill]} ${s.count}`)
-                .join(" · ")}
-            </span>
-          }
-        >
-          {verifiedCount > 0 ? (
-            <Link
-              href="/drill?plan=1"
-              className="text-sm font-medium text-ballpoint hover:underline"
-            >
-              Start today&apos;s drill: {plan.drill.total} questions →
-            </Link>
-          ) : (
-            <span className="text-sm text-graphite">
-              The bank is empty — run pnpm seed first.
-            </span>
-          )}
-        </PlanCard>
-
-        <PlanCard
-          title="Review"
-          body={
-            <span>
-              {plan.dueRedoCount > 0
-                ? `${plan.dueRedoCount} redo${plan.dueRedoCount === 1 ? "" : "s"} due`
-                : "No redos due"}
-              {" · "}
-              {deckWaiting > 0
-                ? `${deckWaiting} deck card${deckWaiting === 1 ? "" : "s"} waiting`
-                : "deck clear"}
-            </span>
-          }
-        >
-          <div className="flex flex-col gap-1.5">
-            {deckWaiting > 0 && (
-              <Link
-                href="/deck"
-                className="text-sm font-medium text-ballpoint hover:underline"
-              >
-                Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
-              </Link>
-            )}
-            {plan.dueRedoCount > 0 ? (
-              <Link
-                href="/queue?start=1"
-                className="text-sm font-medium text-ballpoint hover:underline"
-              >
-                Redo all {plan.dueRedoCount} due →
-              </Link>
-            ) : (
-              <Link
-                href="/queue"
-                className="text-sm text-graphite hover:underline"
-              >
-                Open the queue →
-              </Link>
-            )}
           </div>
         </PlanCard>
 

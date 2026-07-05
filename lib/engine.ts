@@ -119,18 +119,22 @@ export async function selectQuestions(
 /**
  * Composition for a timed set: full section (21) uses a fixed exam-like
  * blend across all four skills; mini (7) proportionally. Shortfalls in one
- * skill are backfilled from the whole pool.
+ * skill are backfilled from the whole pool. roughStart seeds the opening
+ * three slots with the set's hardest questions — recovery training for
+ * the brutal-open sections the real exam deals.
  */
 export async function selectTimedSet(
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
+  roughStart = false,
 ): Promise<Question[]> {
   // Faithful to the GMAT Focus Quant section: problem solving only. Data
   // Sufficiency lives in the Data Insights section on the real exam, so
   // DS questions train through drills, never inside a section sim.
   const formats: QuestionFormat[] = ["problem_solving"];
   if (singleSkill) {
-    return selectQuestions({ skills: [singleSkill], formats }, total);
+    const picked = await selectQuestions({ skills: [singleSkill], formats }, total);
+    return roughStart ? seedRoughStart(picked) : picked;
   }
   const blend: Array<[FundamentalSkill, number]> =
     total === 21
@@ -169,5 +173,14 @@ export async function selectTimedSet(
     const j = Math.floor(Math.random() * (i + 1));
     [picked[i], picked[j]] = [picked[j], picked[i]];
   }
-  return picked;
+  return roughStart ? seedRoughStart(picked) : picked;
+}
+
+/** Move the three hardest questions to the front, rest order untouched. */
+function seedRoughStart(picked: Question[]): Question[] {
+  const hard = [...picked]
+    .sort((a, b) => b.difficulty - a.difficulty)
+    .slice(0, 3);
+  const hardIds = new Set(hard.map((q) => q.id));
+  return [...hard, ...picked.filter((q) => !hardIds.has(q.id))];
 }

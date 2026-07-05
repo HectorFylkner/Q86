@@ -7,6 +7,7 @@ import {
   startDrillWithQuestions,
   type DrillTiming,
 } from "@/lib/actions";
+import type { ChapterTier } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import type { RampBudget } from "@/lib/ramp";
 import type { SessionFocus, Subtopic } from "@/lib/taxonomy";
@@ -24,6 +25,8 @@ type Stage =
       focus: SessionFocus;
       budgets: Record<number, RampBudget>;
       test?: Subtopic;
+      testTier?: ChapterTier;
+      rung?: { subtopic: string; difficulty: number } | null;
     };
 
 export function DrillClient({
@@ -39,7 +42,7 @@ export function DrillClient({
     difficulty: number | null;
     count: number;
   } | null;
-  autoStartTest?: Subtopic | null;
+  autoStartTest?: { subtopic: Subtopic; tier: ChapterTier } | null;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
@@ -49,29 +52,37 @@ export function DrillClient({
   useEffect(() => {
     if (!autoStartRung || autoStartedRef.current) return;
     autoStartedRef.current = true;
-    void handleStart({
-      filter: {
-        subtopics: [autoStartRung.subtopic as never],
-        ...(autoStartRung.difficulty != null
-          ? {
-              difficultyMin: autoStartRung.difficulty,
-              difficultyMax: autoStartRung.difficulty,
-            }
-          : {}),
+    void handleStart(
+      {
+        filter: {
+          subtopics: [autoStartRung.subtopic as never],
+          ...(autoStartRung.difficulty != null
+            ? {
+                difficultyMin: autoStartRung.difficulty,
+                difficultyMax: autoStartRung.difficulty,
+              }
+            : {}),
+        },
+        count: autoStartRung.count,
+        timing: "soft",
+        focus: "focused",
       },
-      count: autoStartRung.count,
-      timing: "soft",
-      focus: "focused",
-    });
+      autoStartRung.difficulty != null
+        ? {
+            subtopic: autoStartRung.subtopic,
+            difficulty: autoStartRung.difficulty,
+          }
+        : null,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStartRung]);
 
-  // Chapter tests arrive as /drill?test=<subtopic>
+  // Chapter tests arrive as /drill?test=<subtopic>[&tier=…]
   useEffect(() => {
     if (!autoStartTest || autoStartedRef.current) return;
     autoStartedRef.current = true;
     setStage({ kind: "loading" });
-    startChapterTest(autoStartTest)
+    startChapterTest(autoStartTest.subtopic, autoStartTest.tier)
       .then((res) => {
         if (res.error != null || res.sessionId == null) {
           setStage({ kind: "setup", error: res.error ?? "Could not start." });
@@ -83,7 +94,8 @@ export function DrillClient({
             timing: "soft",
             focus: "focused",
             budgets: res.budgets,
-            test: autoStartTest,
+            test: autoStartTest.subtopic,
+            testTier: autoStartTest.tier,
           });
         }
       })
@@ -123,7 +135,10 @@ export function DrillClient({
       );
   }, [autoStartIds]);
 
-  async function handleStart(config: DrillConfigValue) {
+  async function handleStart(
+    config: DrillConfigValue,
+    rung: { subtopic: string; difficulty: number } | null = null,
+  ) {
     setStage({ kind: "loading" });
     try {
       const res = await startDrill(config);
@@ -138,6 +153,7 @@ export function DrillClient({
         timing: config.timing,
         focus: config.focus,
         budgets: res.budgets,
+        rung,
       });
     } catch {
       setStage({
@@ -166,6 +182,8 @@ export function DrillClient({
         timing={stage.timing}
         focus={stage.focus}
         test={stage.test}
+        testTier={stage.testTier}
+        rung={stage.rung}
         budgets={stage.budgets}
         onRestart={() => setStage({ kind: "setup", error: null })}
       />

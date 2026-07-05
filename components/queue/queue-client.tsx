@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
-import { startRedoSession } from "@/lib/actions";
+import { resolveExternalRedo, startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import type { RampBudget } from "@/lib/ramp";
 import {
@@ -35,6 +35,9 @@ export type DueRow = {
   skill: FundamentalSkill;
   subtopic: Subtopic;
   difficulty: number;
+  /** Miss on outside material — re-solved on paper, not in the runner. */
+  external: boolean;
+  sourceLabel: string | null;
 };
 
 export type LogRow = {
@@ -110,13 +113,28 @@ export function QueueClient({
     }
   }
 
+  // External items resolve on paper; only in-app questions enter a run.
+  const runnable = due.filter((d) => !d.external);
+
   useEffect(() => {
-    if (autoStart && due.length > 0 && !autoStartedRef.current) {
+    if (autoStart && runnable.length > 0 && !autoStartedRef.current) {
       autoStartedRef.current = true;
-      void startRedo(due.map((d) => d.questionId));
+      void startRedo(runnable.map((d) => d.questionId));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function resolveExternal(
+    questionId: number,
+    outcome: "cold" | "slow" | "missed",
+  ) {
+    try {
+      await resolveExternalRedo({ questionId, outcome });
+      router.refresh();
+    } catch {
+      setError("Could not save the paper redo — try again.");
+    }
+  }
 
   const filteredLog = log.filter(
     (row) =>
@@ -210,16 +228,16 @@ export function QueueClient({
           <h2 className="font-display text-sm font-semibold">
             Due now · {due.length}
           </h2>
-          {due.length > 0 && (
+          {runnable.length > 0 && (
             <button
-              onClick={() => startRedo(due.map((d) => d.questionId))}
+              onClick={() => startRedo(runnable.map((d) => d.questionId))}
               disabled={starting}
               className={cn(
                 "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
                 starting && "cursor-wait opacity-60",
               )}
             >
-              Redo all {due.length} due
+              Redo all {runnable.length} due
             </button>
           )}
         </div>
@@ -241,6 +259,7 @@ export function QueueClient({
                       {SUBTOPIC_LABELS[d.subtopic]}
                       <span className="ml-2 text-xs text-graphite">
                         {SKILL_SHORT_LABELS[d.skill]} · D{d.difficulty}
+                        {d.external && d.sourceLabel && ` · ${d.sourceLabel}`}
                       </span>
                     </td>
                     <td className="py-2 pr-3 font-mono text-xs text-graphite">
@@ -250,13 +269,41 @@ export function QueueClient({
                       due {formatDistanceToNow(new Date(d.dueAt), { addSuffix: true })}
                     </td>
                     <td className="py-2 text-right">
-                      <button
-                        onClick={() => startRedo([d.questionId])}
-                        disabled={starting}
-                        className="text-xs font-medium text-ballpoint hover:underline"
-                      >
-                        Redo this one
-                      </button>
+                      {d.external ? (
+                        <span className="inline-flex flex-wrap items-center justify-end gap-2 text-xs">
+                          <span className="text-graphite">
+                            re-solve it in the book:
+                          </span>
+                          <button
+                            onClick={() => resolveExternal(d.questionId, "cold")}
+                            className="font-medium text-ballpoint hover:underline"
+                          >
+                            Solved ≤2:30
+                          </button>
+                          <button
+                            onClick={() => resolveExternal(d.questionId, "slow")}
+                            className="font-medium text-amber hover:underline"
+                          >
+                            Solved, slow
+                          </button>
+                          <button
+                            onClick={() =>
+                              resolveExternal(d.questionId, "missed")
+                            }
+                            className="font-medium text-redpen hover:underline"
+                          >
+                            Missed again
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => startRedo([d.questionId])}
+                          disabled={starting}
+                          className="text-xs font-medium text-ballpoint hover:underline"
+                        >
+                          Redo this one
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

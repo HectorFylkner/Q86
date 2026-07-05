@@ -16,7 +16,7 @@ import {
   type Question,
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
-import { selectChapterTest } from "./chapter-tests.ts";
+import { selectChapterTest, type ChapterTier } from "./chapter-tests.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -24,7 +24,8 @@ import {
   computeCategoryStreak,
   computeDayStreak,
 } from "./pattern-stats.ts";
-import { putSetting } from "./settings.ts";
+import { dayIndex } from "./local-day.ts";
+import { appTimeZone, putSetting } from "./settings.ts";
 import type { ParsedReport } from "./ai/schemas.ts";
 import {
   selectQuestions,
@@ -36,15 +37,17 @@ import { rampBudgets } from "./ramp-server.ts";
 import type { RampBudget } from "./ramp.ts";
 import { triageVerdicts } from "./discipline-server.ts";
 import type { TriageVerdict } from "./discipline.ts";
-import type {
-  Confidence,
-  EditReason,
-  ErrorType,
-  FlagReason,
-  FundamentalSkill,
-  SessionFocus,
-  SessionMode,
-  Subtopic,
+import {
+  ALL_SUBTOPICS,
+  SKILL_BY_SUBTOPIC,
+  type Confidence,
+  type EditReason,
+  type ErrorType,
+  type FlagReason,
+  type FundamentalSkill,
+  type SessionFocus,
+  type SessionMode,
+  type Subtopic,
 } from "./taxonomy.ts";
 
 export type DrillTiming = "untimed" | "soft";
@@ -89,11 +92,13 @@ export async function startDrill(config: {
   };
 }
 
-/** Chapter test: the pass-bar gate behind a Learn chapter. */
+/** Chapter test: the pass-bar gate behind a Learn chapter, one
+ *  difficulty tier at a time. */
 export async function startChapterTest(
   subtopic: Subtopic,
+  tier: ChapterTier,
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
+  const picked = await selectChapterTest(subtopic, tier);
   if (picked.length < 4) {
     return {
       error: "Not enough verified questions in this chapter for a test.",
@@ -106,7 +111,11 @@ export async function startChapterTest(
     .insert(sessions)
     .values({
       mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
+      config: {
+        chapter_test: subtopic,
+        chapter_tier: tier,
+        count: picked.length,
+      },
     })
     .returning()
     .get();
@@ -309,9 +318,43 @@ export async function startTimedSet(config: {
   skill?: FundamentalSkill;
   showTimer: boolean;
   focus?: SessionFocus;
+  /** Self-binding: after a one-shot section today, no full-section
+   *  retake until tomorrow — the result stands. */
+  oneShot?: boolean;
+  /** Seed the opening three slots with the set's hardest questions. */
+  roughStart?: boolean;
 }): Promise<StartTimedResult> {
   const total = config.kind === "full" ? 21 : 7;
-  const picked = await selectTimedSet(total, config.skill);
+
+  if (config.kind === "full") {
+    const tz = await appTimeZone();
+    const todayIdx = dayIndex(new Date(), tz);
+    const recentSims = await db
+      .select({ config: sessions.config, endedAt: sessions.endedAt })
+      .from(sessions)
+      .where(eq(sessions.mode, "section_sim"))
+      .orderBy(desc(sessions.id))
+      .limit(20)
+      .all();
+    const oneShotToday = recentSims.some(
+      (s) =>
+        (s.config as { oneShot?: boolean }).oneShot === true &&
+        s.endedAt != null &&
+        dayIndex(s.endedAt, tz) === todayIdx,
+    );
+    if (oneShotToday) {
+      return {
+        error:
+          "You committed to one shot today, and the result stands — exactly like test day. Post-mortem it instead; the retake urge is the tell.",
+        sessionId: null,
+        questions: [],
+        budgets: {},
+        mode: null,
+      };
+    }
+  }
+
+  const picked = await selectTimedSet(total, config.skill, config.roughStart);
   if (picked.length < total) {
     return {
       error: `Not enough verified questions for a ${total}-question set (${picked.length} available). Run pnpm seed or generate more from the drill screen.`,
@@ -631,6 +674,136 @@ export async function saveDecisionRound(input: {
       },
     })
     .run();
+}
+
+// ---------------------------------------------------------------------------
+// Cross-source capture: misses on outside material (official mocks, OG)
+// ---------------------------------------------------------------------------
+
+/** Log a miss from outside the app as a stub question + attempt so it
+ *  feeds the same redo ladder, deck, error log, and analytics as an
+ *  in-app miss. The stub is never verified, so it can't enter drills. */
+export async function logExternalMiss(input: {
+  subtopic: Subtopic;
+  difficulty: number;
+  context: "pure" | "real";
+  sourceLabel: string;
+  errorType?: ErrorType | null;
+  note?: string | null;
+  /** Optional flashcard pair; both present → the miss joins the deck. */
+  cue?: string | null;
+  takeaway?: string | null;
+  /** Roughly how long the miss took; defaults to the difficulty's
+   *  benchmark, which reads as neutral in every pacing statistic. */
+  timeSeconds?: number | null;
+}): Promise<{ error: string | null }> {
+  if (!ALL_SUBTOPICS.includes(input.subtopic)) {
+    return { error: "Unknown subtopic." };
+  }
+  const difficulty = Math.round(input.difficulty);
+  if (difficulty < 1 || difficulty > 5) {
+    return { error: "Difficulty must be 1–5." };
+  }
+  const sourceLabel = input.sourceLabel.trim();
+  if (sourceLabel.length < 3) {
+    return { error: "Name the source (e.g. “OG 2024 #312”)." };
+  }
+  const cue = input.cue?.trim() || null;
+  const takeaway = input.takeaway?.trim() || null;
+
+  const skill = SKILL_BY_SUBTOPIC[input.subtopic];
+  const stem = [
+    `**Outside material** — ${sourceLabel}`,
+    input.note?.trim() ? input.note.trim() : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+  // The deck parses **Trigger cue** / **Takeaway** out of solution_md —
+  // same contract as bank questions.
+  const solutionMd =
+    cue && takeaway ? `**Trigger cue** ${cue}\n\n**Takeaway** ${takeaway}` : "";
+
+  const question = await db
+    .insert(questions)
+    .values({
+      source: "external",
+      format: "problem_solving",
+      contentDomain: skill === "equal_unequal_alg" ? "algebra" : "arithmetic",
+      context: input.context,
+      fundamentalSkill: skill,
+      subtopic: input.subtopic,
+      difficulty,
+      stemMd: stem,
+      choices: ["—", "—", "—", "—", "—"],
+      correctIndex: 0,
+      solutionMd,
+      fastestPathMd: "",
+      trapMap: {},
+      verified: false,
+    })
+    .returning()
+    .get();
+
+  const bench = [0, 85, 100, 125, 150, 170][difficulty];
+  const attempt = await db
+    .insert(attempts)
+    .values({
+      questionId: question.id,
+      sessionId: null,
+      mode: "drill",
+      focus: "focused",
+      selectedIndex: 1, // stub: index 0 is "correct", 1 records the miss
+      correct: false,
+      timeSeconds: input.timeSeconds ?? bench,
+      confidence: "lean",
+      errorType: input.errorType ?? null,
+      userNotes: input.note?.trim() || null,
+    })
+    .returning()
+    .get();
+
+  await enqueueMiss(question.id, attempt.id);
+  revalidatePath("/queue");
+  return { error: null };
+}
+
+/** Resolve an external item's redo on paper: the app can't re-present
+ *  outside material, so the student re-solves it in the book and reports
+ *  the outcome. Times are honest buckets, not stopwatch reads. */
+export async function resolveExternalRedo(input: {
+  questionId: number;
+  outcome: "cold" | "slow" | "missed";
+}): Promise<void> {
+  const q = await db
+    .select()
+    .from(questions)
+    .where(eq(questions.id, input.questionId))
+    .get();
+  if (!q || q.source !== "external") return;
+  const correct = input.outcome !== "missed";
+  // "cold" must pass the 2:30 cold-solve gate; "slow" must not.
+  const timeSeconds = input.outcome === "cold" ? 150 : 240;
+  const attempt = await db
+    .insert(attempts)
+    .values({
+      questionId: q.id,
+      sessionId: null,
+      mode: "redo",
+      focus: "focused",
+      selectedIndex: correct ? 0 : 1,
+      correct,
+      timeSeconds,
+      confidence: correct ? "lock" : "lean",
+    })
+    .returning()
+    .get();
+  const applied = await applyRedoResult(
+    q.id,
+    correct ? "solid" : "wrong",
+    timeSeconds,
+  );
+  if (!applied && !correct) await enqueueMiss(q.id, attempt.id);
+  revalidatePath("/queue");
 }
 
 // ---------------------------------------------------------------------------
