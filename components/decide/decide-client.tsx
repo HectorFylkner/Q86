@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { Button, KeyHint } from "@/components/ui/button";
 import { saveDecisionRound } from "@/lib/actions";
@@ -155,7 +156,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           <p
             className={cn(
               "font-mono text-sm font-semibold",
-              remaining <= 10 ? "text-redpen" : "text-graphite",
+              remaining <= 10 ? "text-amber" : "text-graphite",
             )}
           >
             0:{String(remaining).padStart(2, "0")}
@@ -190,7 +191,10 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           ))}
         </div>
       ) : (
-        <section
+        <motion.section
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
           className={cn(
             "rounded-card border p-4 shadow-ambient",
             lastCall?.call === item.recommendation
@@ -211,7 +215,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           <p className="mt-2 text-xs text-graphite">
             Enter for the next question
           </p>
-        </section>
+        </motion.section>
       )}
     </div>
   );

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ButtonLink } from "@/components/ui/button";
 import { gradeDeckCard } from "@/lib/actions";
@@ -101,6 +102,14 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
           flipped ? "border-ballpoint/50 bg-highlight" : "border-grid bg-surface",
         )}
       >
+        {/* One deliberate turn per face — brief, easing out, never bouncy. */}
+        <motion.span
+          key={`${card.questionId}-${flipped}`}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="block"
+        >
         <p className="font-mono text-micro uppercase tracking-wide text-graphite">
           {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
           missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
@@ -111,6 +120,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
         {!flipped && (
           <p className="mt-3 text-xs text-graphite">Enter to flip</p>
         )}
+        </motion.span>
       </button>
       {flipped ? (
         <>

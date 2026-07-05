@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ErrorBanner } from "@/components/ui/error-banner";
@@ -124,7 +125,12 @@ export function ImportClient() {
       </section>
 
       {parsed && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+        <motion.section
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
+        >
           <h2 className="font-display text-sm font-semibold">
             Parsed result — confirm before saving
           </h2>
@@ -227,7 +233,7 @@ export function ImportClient() {
               Discard the parse
             </Button>
           </div>
-        </section>
+        </motion.section>
       )}
     </div>
   );

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
@@ -293,7 +293,11 @@ export function QuestionRunner({
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
                     <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
                     <td className="px-3 py-2">
-                      <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
+                      <ResultStroke
+                        kind={r.correct ? "check" : "cross"}
+                        size={14}
+                        delay={i * 0.04}
+                      />
                     </td>
                     <td className="px-3 py-2 font-mono text-xs">
                       {formatSeconds(r.timeSeconds)}
@@ -357,51 +361,55 @@ export function QuestionRunner({
         )}
       </div>
 
-      <motion.div
-        key={question.id}
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.15 }}
-        className="rounded-card border border-grid bg-surface p-5 shadow-ambient"
-      >
-        <Md source={question.stemMd} className="text-stem" />
-        <div className="mt-5">
-          <ChoiceList
-            choices={question.choices}
-            selected={
-              revealed ? (currentResult?.selectedIndex ?? null) : selected
-            }
-            revealed={revealed}
-            correctIndex={question.correctIndex}
-            onSelect={(i) => {
-              setSelected(i);
-              setHint(null);
-            }}
-          />
-        </div>
-
-        {!revealed && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
-            <ConfidencePicker value={confidence} onChange={setConfidence} />
-            <Button size="sm" onClick={submit}>
-              Confirm answer
-              <KeyHint>↵</KeyHint>
-            </Button>
+      {/* The question turn: old paper lifts, the next sheet lands. */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={question.id}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="rounded-card border border-grid bg-surface p-5 shadow-ambient"
+        >
+          <Md source={question.stemMd} className="text-stem" />
+          <div className="mt-5">
+            <ChoiceList
+              choices={question.choices}
+              selected={
+                revealed ? (currentResult?.selectedIndex ?? null) : selected
+              }
+              revealed={revealed}
+              correctIndex={question.correctIndex}
+              onSelect={(i) => {
+                setSelected(i);
+                setHint(null);
+              }}
+            />
           </div>
-        )}
 
-        {hint && (
-          <p className="mt-2 text-sm text-amber" role="status">
-            {hint}
-          </p>
-        )}
-        {currentResult?.saveFailed && (
-          <ErrorBanner className="mt-2">
-            This attempt was not saved — check that the dev server can reach
-            ./data/q86.db.
-          </ErrorBanner>
-        )}
-      </motion.div>
+          {!revealed && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
+              <ConfidencePicker value={confidence} onChange={setConfidence} />
+              <Button size="sm" onClick={submit}>
+                Confirm answer
+                <KeyHint>↵</KeyHint>
+              </Button>
+            </div>
+          )}
+
+          {hint && (
+            <p className="mt-2 text-sm text-amber" role="status">
+              {hint}
+            </p>
+          )}
+          {currentResult?.saveFailed && (
+            <ErrorBanner className="mt-2">
+              This attempt was not saved — check that the dev server can reach
+              ./data/q86.db.
+            </ErrorBanner>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {revealed && currentResult && (
         <>

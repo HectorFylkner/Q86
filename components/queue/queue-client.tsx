@@ -377,6 +377,7 @@ export function QueueClient({
                     <ResultStroke
                       kind={r.correct ? "check" : "cross"}
                       size={13}
+                      instant
                     />
                   </td>
                   <td className="py-1.5 pr-3 font-mono text-xs">
