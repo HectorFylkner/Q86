@@ -86,7 +86,7 @@ Chained percent changes — a markup then a discount, two years of growth, a los
 - **Use 100 (or another convenient numbers) as the start.** For "what percent" questions with no dollar amount, start at $100$: $+40\%$ then to $105$ makes the second leg $\frac{105}{140} = 0.75$ on sight.
 - **Multiply factors in the friendliest order.** Since order is irrelevant, compute $250 \times 1.2$ first (clean $300$) before hitting the $0.65$.
 - **Memorize the up-down identity.** Same $p\%$ up and down nets $-\frac{p^2}{100}\%$: $p = 10$ loses $1\%$, $p = 20$ loses $4\%$ — no arithmetic needed.
-- **test the answer choices integer-$k$ chains.** Test a choice on a start of $100$: for Example 3, $k = 20$ gives $100 \to 120 \to 72$, which is $28\%$ down. Done.
+- **Test the choices on integer-$k$ chains.** Test a choice on a start of $100$: for Example 3, $k = 20$ gives $100 \to 120 \to 72$, which is $28\%$ down. Done.
 - **Estimate direction first.** A big change followed by a small opposite one keeps the big one's sign; kill half the choices before computing.
 - **Convert "off" language instantly.** "$30\%$ off, then another $10\%$ off" is $0.7 \times 0.9 = 0.63$ — a $37\%$ total discount, never $40\%$.
 

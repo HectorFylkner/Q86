@@ -86,7 +86,7 @@ Every hard divisibility, LCM/GCD, perfect-square, and factorial question on the 
 - **Divide out a divisor condition.** Divisors of $2700 = 2^2 \cdot 3^3 \cdot 5^2$ that are multiples of $15$: count divisors of $2700/15 = 180 = 2^2 \cdot 3^2 \cdot 5$, which is $3 \cdot 3 \cdot 2 = 18$.
 - **Cube-root anchor for near-consecutive products.** If $c(c+2)(c+4) = 7920$, then $\sqrt[3]{7920} \approx 19.9$, so test a middle value of $20$: $18 \cdot 20 \cdot 22 = 7920$. Done.
 - **Round exponents, don't search.** Greatest perfect-square divisor of $360 = 2^3 \cdot 3^2 \cdot 5$: round each exponent *down* to even, giving $2^2 \cdot 3^2 = 36$.
-- **test the answer choices divisor-window questions.** With choices on screen, test which choice divides the total ($875$ splits by $25$, since $875 = 5^3 \cdot 7$); one division beats a full factor list.
+- **Test the choices by divisibility.** With choices on screen, test which choice divides the total ($875$ splits by $25$, since $875 = 5^3 \cdot 7$); one division beats a full factor list.
 
 ## Before you drill
 

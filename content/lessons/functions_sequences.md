@@ -81,7 +81,7 @@ The GMAT Focus Edition does not test sequence theory — it tests whether you ca
 - **Collapse repeated doubling.** Doubling four times is one multiplication by $2^4 = 16$; undo it with a single division by $16$.
 - **Just count small iterations.** "Least number of rounds": start at $25$, rule $x \mapsto 2x - 10$, bound $300$ — listing $40, 70, 130, 250, 490$ shows round $5$ is first past $300$.
 - **Trust the zero-sum cycle.** In a sum question over a periodic rule, total one cycle first — if it is $0$, a $100$-term sum reduces to a few leftover terms.
-- **test the answer choices recurrences from the choices.** When the choices are starting values, push the middle choice through the rule; the direction of the miss tells you where to move.
+- **Push the choices through the recurrence.** When the choices are starting values, push the middle choice through the rule; the direction of the miss tells you where to move.
 
 ## Before you drill
 

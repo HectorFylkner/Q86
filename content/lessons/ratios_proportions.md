@@ -83,10 +83,10 @@ Ratio questions on the GMAT Focus Edition run the full difficulty range: quick o
 ## Speed moves
 
 - **Divide the total by the sum of parts.** Ratio $4 : 9$, total $91$: compute $91 \div 13 = 7$ once, then multiply — no equations needed.
-- **convenient numbers when the ratio is all you have.** For "$x : y = 8 : 3$; $x$ rises $25\%$, $y$ falls $20\%$," just set $x = 8$, $y = 3$ and compute $\dfrac{10}{2.4} = \dfrac{25}{6}$; the multiplier cancels.
+- **Pick convenient numbers when the ratio is all you have.** For "$x : y = 8 : 3$; $x$ rises $25\%$, $y$ falls $20\%$," just set $x = 8$, $y = 3$ and compute $\dfrac{10}{2.4} = \dfrac{25}{6}$; the multiplier cancels.
 - **LCM plug for equal products.** For $3x = 4y = 6z$, set the common value to $12$ and instantly get $x = 4$, $y = 3$, $z = 2$.
 - **Skip the constant in proportion problems.** Inverse-square with $x$ going from $3$ to $6$: $y$ is divided by $2^2 = 4$, so $y = 32$ becomes $8$ — no need to compute $k = 288$.
-- **test the answer choices shifted-ratio questions.** "Red to black pens $7 : 3$; after $8$ black pens are added the ratio is $7 : 5$" — test the answer choice red $= 28$: black was $12$, becomes $20$, and $28 : 20 = 7 : 5$. Done.
+- **Test the choices on shifted-ratio questions.** "Red to black pens $7 : 3$; after $8$ black pens are added the ratio is $7 : 5$" — test the answer choice red $= 28$: black was $12$, becomes $20$, and $28 : 20 = 7 : 5$. Done.
 - **Use divisibility on the answer choices.** If three quantities are $6k$, $15k$, $20k$, their total must be a multiple of $41$ — eliminate any choice that is not.
 
 ## Before you drill

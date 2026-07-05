@@ -1,21 +1,51 @@
 import Link from "next/link";
+import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const METHOD = [
+  { step: "Read", detail: "the core ideas and cues" },
+  { step: "Attempt", detail: "each example before revealing" },
+  { step: "Tick", detail: "the pre-drill checklist honestly" },
+  { step: "Drill", detail: "the same subtopic while it's warm" },
+];
+
 export default function LearnPage() {
   const lessons = listLessons();
+  let chapterNo = 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="font-display text-xl font-semibold">Learn</h1>
-        <p className="text-xs text-graphite">
-          {lessons.length} concept chapters — read, then drill the same
-          subtopic while it&apos;s warm.
-        </p>
+    <div className="space-y-5">
+      <div>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="font-display text-xl font-semibold">Learn</h1>
+          <p className="text-xs text-graphite">
+            {lessons.length} concept chapters, one per drillable subtopic.
+          </p>
+        </div>
+        <div className="mt-1">
+          <LearnPrepared subtopics={lessons.map((l) => l.subtopic)} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {METHOD.map((m, i) => (
+          <div
+            key={m.step}
+            className="rounded-card border border-grid bg-surface px-3.5 py-3 shadow-ambient"
+          >
+            <p className="font-mono text-[10px] text-ballpoint">
+              {String(i + 1).padStart(2, "0")}
+            </p>
+            <p className="mt-0.5 text-sm font-medium">{m.step}</p>
+            <p className="mt-0.5 text-xs leading-snug text-graphite">
+              {m.detail}
+            </p>
+          </div>
+        ))}
       </div>
 
       {lessons.length === 0 && (
@@ -28,28 +58,45 @@ export default function LearnPage() {
         const group = lessons.filter((l) => l.skill === skill);
         if (group.length === 0) return null;
         return (
-          <section
-            key={skill}
-            className="rounded-card border border-grid bg-surface p-5 shadow-ambient"
-          >
-            <h2 className="font-display text-sm font-semibold">
-              {SKILL_LABELS[skill]}
-            </h2>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {group.map((lesson) => (
-                <Link
-                  key={lesson.subtopic}
-                  href={`/learn/${lesson.subtopic}`}
-                  className="group rounded-control border border-grid px-4 py-3 transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
-                >
-                  <span className="block text-sm font-medium group-hover:text-ballpoint">
-                    {lesson.title}
-                  </span>
-                  <span className="mt-0.5 block font-mono text-[11px] text-graphite">
-                    ~{lesson.minutes} min read
-                  </span>
-                </Link>
-              ))}
+          <section key={skill}>
+            <div className="mb-2 flex items-baseline gap-2">
+              <h2 className="font-display text-sm font-semibold">
+                {SKILL_LABELS[skill]}
+              </h2>
+              <span className="font-mono text-[11px] text-graphite">
+                {group.length} chapters
+              </span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {group.map((lesson) => {
+                chapterNo++;
+                return (
+                  <Link
+                    key={lesson.subtopic}
+                    href={`/learn/${lesson.subtopic}`}
+                    className="group flex items-start gap-3 rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
+                  >
+                    <span className="mt-0.5 font-mono text-[11px] text-graphite/70 transition-colors group-hover:text-ballpoint">
+                      {String(chapterNo).padStart(2, "0")}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium transition-colors group-hover:text-ballpoint">
+                        {lesson.title}
+                      </span>
+                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
+                        <span>~{lesson.minutes} min</span>
+                        <ReadBadge subtopic={lesson.subtopic} />
+                      </span>
+                    </span>
+                    <span
+                      className="mt-0.5 text-graphite/50 opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </section>
         );

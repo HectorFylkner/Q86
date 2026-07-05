@@ -1,7 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Md } from "@/components/math";
-import { readLesson } from "@/lib/lessons";
+import { DrillChecklist } from "@/components/lesson/drill-checklist";
+import { ExampleCard } from "@/components/lesson/example-card";
+import { LessonRail, type RailItem } from "@/components/lesson/lesson-rail";
+import {
+  CoreIdeas,
+  CueGrid,
+  SectionShell,
+  SpeedMoves,
+  TrapGallery,
+  WhyLede,
+} from "@/components/lesson/sections";
+import { parseLesson } from "@/lib/lesson-parse";
+import { listLessons, readLesson } from "@/lib/lessons";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
@@ -11,6 +23,16 @@ import {
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const RAIL: RailItem[] = [
+  { id: "why", label: "Why this matters" },
+  { id: "ideas", label: "The core ideas" },
+  { id: "examples", label: "Worked examples" },
+  { id: "cues", label: "Trigger cues" },
+  { id: "traps", label: "Trap gallery" },
+  { id: "speed", label: "Speed moves" },
+  { id: "checklist", label: "Before you drill" },
+];
 
 export default async function LessonPage({
   params,
@@ -22,38 +44,160 @@ export default async function LessonPage({
   const lesson = readLesson(subtopic as Subtopic);
   if (!lesson) notFound();
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <div>
-        <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
-          <Link href="/learn" className="hover:text-ink">
-            Learn
-          </Link>{" "}
-          · {SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
+  const parsed = parseLesson(lesson.body);
+  const chapters = listLessons();
+  const at = chapters.findIndex((c) => c.subtopic === subtopic);
+  const meta = at >= 0 ? chapters[at] : null;
+  const prev = at > 0 ? chapters[at - 1] : null;
+  const next = at >= 0 && at < chapters.length - 1 ? chapters[at + 1] : null;
+
+  const header = (
+    <div>
+      <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
+        <Link href="/learn" className="hover:text-ink">
+          Learn
+        </Link>{" "}
+        · {SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
+      </p>
+      <h1 className="mt-1 font-display text-2xl font-semibold">
+        {lesson.title}
+      </h1>
+      {meta && (
+        <p className="mt-1.5 flex flex-wrap gap-x-3 font-mono text-[11px] text-graphite">
+          <span>
+            Chapter {at + 1} of {chapters.length}
+          </span>
+          <span>~{meta.minutes} min</span>
+          <span>3 worked examples</span>
         </p>
-        <h1 className="mt-1 font-display text-2xl font-semibold">
-          {lesson.title}
-        </h1>
+      )}
+    </div>
+  );
+
+  const footer = (prev || next) && (
+    <div className="grid gap-2 border-t border-grid pt-4 sm:grid-cols-2">
+      {prev ? (
+        <Link
+          href={`/learn/${prev.subtopic}`}
+          className="group rounded-card border border-grid bg-surface p-4 shadow-ambient transition-colors hover:border-ballpoint/50"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+            ← Previous chapter
+          </span>
+          <span className="mt-1 block text-sm font-medium group-hover:text-ballpoint">
+            {prev.title}
+          </span>
+        </Link>
+      ) : (
+        <span className="hidden sm:block" />
+      )}
+      {next && (
+        <Link
+          href={`/learn/${next.subtopic}`}
+          className="group rounded-card border border-grid bg-surface p-4 text-right shadow-ambient transition-colors hover:border-ballpoint/50"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+            Next chapter →
+          </span>
+          <span className="mt-1 block text-sm font-medium group-hover:text-ballpoint">
+            {next.title}
+          </span>
+        </Link>
+      )}
+    </div>
+  );
+
+  // A chapter that ever deviates from the template still renders in full
+  // through the generic markdown path.
+  if (!parsed) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4">
+        {header}
+        <article className="rounded-card border border-grid bg-surface p-6 shadow-ambient sm:p-8">
+          <Md source={lesson.body} className="text-[15px]" />
+        </article>
+        {footer}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl lg:grid lg:grid-cols-[minmax(0,1fr)_190px] lg:gap-10">
+      <div className="min-w-0 space-y-9 lg:max-w-3xl">
+        {header}
+
+        <SectionShell id="why" index={1} title="Why this matters">
+          <WhyLede source={parsed.why} />
+        </SectionShell>
+
+        <SectionShell
+          id="ideas"
+          index={2}
+          title="The core ideas"
+          tagline="the complete toolkit"
+        >
+          <CoreIdeas intro={parsed.ideasIntro} ideas={parsed.ideas} />
+        </SectionShell>
+
+        <SectionShell
+          id="examples"
+          index={3}
+          title="Worked examples"
+          tagline="easy → exam-hard, try before revealing"
+        >
+          <div className="space-y-3">
+            {parsed.examples.map((ex, i) => (
+              <ExampleCard
+                key={ex.n}
+                n={ex.n}
+                level={Math.min(i, 2) as 0 | 1 | 2}
+                question={ex.question}
+                work={ex.work}
+                answer={ex.answer}
+              />
+            ))}
+          </div>
+        </SectionShell>
+
+        <SectionShell
+          id="cues"
+          index={4}
+          title="Trigger cues"
+          tagline="phrase → method, memorize these"
+        >
+          <CueGrid cues={parsed.cues} />
+        </SectionShell>
+
+        <SectionShell
+          id="traps"
+          index={5}
+          title="Trap gallery"
+          tagline="the classic wrong turns"
+        >
+          <TrapGallery traps={parsed.traps} />
+        </SectionShell>
+
+        <SectionShell
+          id="speed"
+          index={6}
+          title="Speed moves"
+          tagline="legitimate shortcuts"
+        >
+          <SpeedMoves moves={parsed.speed} />
+        </SectionShell>
+
+        <SectionShell id="checklist" index={7} title="Before you drill">
+          <DrillChecklist subtopic={subtopic} items={parsed.checklist} />
+        </SectionShell>
+
+        {footer}
       </div>
 
-      <article className="rounded-card border border-grid bg-surface p-6 shadow-ambient sm:p-8">
-        <Md source={lesson.body} className="text-[15px]" />
-      </article>
-
-      <div className="flex flex-wrap gap-2 pb-4">
-        <Link
-          href={`/drill?sub=${subtopic}&d=3`}
-          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-        >
-          Drill this now →
-        </Link>
-        <Link
-          href="/mastery"
-          className="rounded-control border border-grid px-4 py-2 text-sm text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
-        >
-          See your ladder
-        </Link>
-      </div>
+      <aside className="hidden lg:block">
+        <div className="sticky top-20">
+          <LessonRail items={RAIL} />
+        </div>
+      </aside>
     </div>
   );
 }

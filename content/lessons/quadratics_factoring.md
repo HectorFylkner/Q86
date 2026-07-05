@@ -72,7 +72,7 @@ The GMAT Focus Edition tests quadratics as pattern recognition, not "solve for $
 
 ## Speed moves
 
-- **test the answer choices from the answer choices.** For $x^2 + 3x - 40 = 0$, plugging the choice $x = 5$ gives $25 + 15 - 40 = 0$ — done, no factoring required.
+- **Work backward from the answer choices.** For $x^2 + 3x - 40 = 0$, plugging the choice $x = 5$ gives $25 + 15 - 40 = 0$ — done, no factoring required.
 - **Factor-pair scan for word problems.** "Area $84$, sides differ by $5$" → scan factor pairs of $84$ ($6 \times 14$, $7 \times 12$, …) and grab the pair with the right gap: $7 \times 12$.
 - **Prime difference of squares.** If $x^2 - y^2 = 13$ (prime) with $x, y$ positive integers, then $x - y = 1$ and $x + y = 13$ are forced: $x = 7$, $y = 6$ instantly.
 - **Shift roots without solving.** If $x^2 - 9x + 14 = 0$ has roots $2$ and $7$, the equation with roots $3$ larger has sum $15$ and product $50$: $x^2 - 15x + 50 = 0$. Vieta builds it directly.

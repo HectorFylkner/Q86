@@ -56,7 +56,7 @@ Linear systems are the workhorse algebra of GMAT Quant: they appear directly (so
 ## Speed moves
 - **Add-first reflex:** on symmetric-looking systems, add immediately — $5x + 2y$ and $2x + 5y$ sum to $7(x + y)$.
 - **Difference for the rate:** a $5$-mile ride costs $\$14$ and a $9$-mile ride $\$22$, so the rate is $\frac{8}{4} = \$2$ per mile, the fee $\$4$, and $15$ miles cost $\$34$ — no system written.
-- **test the answer choices from the choices:** a machine holds $40$ bottles at $\$2$ and $\$1.25$ totaling $\$62$; test the middle choice $j = 16$: $16 + 24 = 40$ and $32 + 30 = 62$ — done.
+- **Work backward from the choices:** a machine holds $40$ bottles at $\$2$ and $\$1.25$ totaling $\$62$; test the middle choice $j = 16$: $16 + 24 = 40$ and $32 + 30 = 62$ — done.
 - **Scale to match, don't solve:** to get $x + y + z$ from two 3-variable equations, look at coefficient *gaps* (Example 2's gaps were all $3$) rather than isolating anything.
 - **Determinant glance:** for "exactly one solution?", compute $a_1b_2 - a_2b_1$ mentally; nonzero settles DS sufficiency without solving.
 

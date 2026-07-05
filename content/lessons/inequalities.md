@@ -72,8 +72,8 @@ Inequalities appear on the GMAT Focus Edition in every costume: bare algebra, th
 ## Speed moves
 
 - **Endpoint grid:** for product or quotient ranges, jot the four corner values and circle the extreme — twenty seconds, no theory.
-- **test the answer choices the boundary:** for threshold word problems, plug the middle answer choice into the expression; one comparison tells you which way to move.
-- **convenient numbers at extremes:** for must-be-true questions, test values hugging the boundary (like $a$ just below $\sqrt{k}$) — counterexamples live at the edges.
+- **Test choices at the boundary:** for threshold word problems, plug the middle answer choice into the expression; one comparison tells you which way to move.
+- **Convenient numbers at extremes:** for must-be-true questions, test values hugging the boundary (like $a$ just below $\sqrt{k}$) — counterexamples live at the edges.
 - **Transform, then count:** $-7 \le 2n + 3 < 11$ becomes $-5 \le n < 4$, so $n \in \{-5, \dots, 3\}$: that is $3 - (-5) + 1 = 9$ integers, no listing needed.
 - **Instant square completion:** halve the linear coefficient, square it: $x^2 - 8x$ needs $+16$, $y^2 + 2y$ needs $+1$. Do it mentally before touching the constant.
 

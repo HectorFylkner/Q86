@@ -77,7 +77,7 @@ Exponent and root questions on the GMAT Focus Edition are rarely about raw compu
 - **Prime-ize on sight:** the instant you see mixed bases, rewrite in primes; Example 1 becomes pure exponent arithmetic $8 + 9 - 6 = 11$ with no large numbers ever computed.
 - **Work in exponents, not amounts:** on a scale where each unit multiplies energy by $9$, a reading gap of $1.5$ means a ratio of $9^{1.5} = 9 \cdot 3 = 27$ — three seconds, no calculator.
 - **Benchmark values for orderings:** test $x = \dfrac{1}{4}$ and $x = 4$; between them they expose how $x$, $x^{2}$, and $\sqrt{x}$ rank in each region.
-- **test the answer choices small exponents:** GMAT exponent answers are almost always small integers, so plugging $x = 1, 2, 3$ into something like $4^{x} - 10 \cdot 2^{x} + 16 = 0$ can beat formal factoring.
+- **Test small exponents from the choices:** GMAT exponent answers are almost always small integers, so plugging $x = 1, 2, 3$ into something like $4^{x} - 10 \cdot 2^{x} + 16 = 0$ can beat formal factoring.
 - **Use the memorized ladder as a decoder:** seeing $729$, jump straight to $3^{6}$ and read off representations like $9^{3}$ and $27^{2}$ from the factor pairs of $6$.
 
 ## Before you drill

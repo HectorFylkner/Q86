@@ -64,7 +64,7 @@ Every rate problem on the GMAT Focus Edition — machines filling orders, pumps 
 ## Speed moves
 
 - **Product over sum.** Two solo times $a, b$ → together time $\frac{ab}{a+b}$ instantly: $6$ and $12$ give $\frac{72}{18} = 4$.
-- **convenient numbers the job.** Set the tank to the LCM of the solo times: solo times $6$ and $12$ → tank $= 12$ units, rates $2$ and $1$ units/hour — all fractions vanish.
+- **Give the job a convenient size.** Set the tank to the LCM of the solo times: solo times $6$ and $12$ → tank $= 12$ units, rates $2$ and $1$ units/hour — all fractions vanish.
 - **Round-trip template.** Equal distances → write $\frac{2ab}{a+b}$ without deriving it; or pick a distance like $120$ km each way and divide $240$ by total hours.
 - **Relative-speed collapse.** Freeze one mover and give the other the combined (or differenced) speed; a two-body chase becomes one division.
 - **Bound before you compute.** The together time for two workers always sits between half the faster solo time and the full faster solo time — often that eliminates three answer choices before any algebra.

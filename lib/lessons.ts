@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  ALL_SUBTOPICS,
-  SKILL_BY_SUBTOPIC,
+  FUNDAMENTAL_SKILLS,
+  SUBTOPICS_BY_SKILL,
   SUBTOPIC_LABELS,
   type FundamentalSkill,
   type Subtopic,
@@ -34,18 +34,22 @@ export function readLesson(
   return { title, body: lines.slice(1).join("\n").trim() };
 }
 
+/** Chapters in display order (grouped by skill, as on the index page), so
+ *  chapter numbers and prev/next navigation match what the reader sees. */
 export function listLessons(): LessonMeta[] {
   const out: LessonMeta[] = [];
-  for (const subtopic of ALL_SUBTOPICS) {
-    const lesson = readLesson(subtopic);
-    if (!lesson) continue;
-    const words = lesson.body.split(/\s+/).length;
-    out.push({
-      subtopic,
-      skill: SKILL_BY_SUBTOPIC[subtopic],
-      title: lesson.title,
-      minutes: Math.max(3, Math.round(words / 200)),
-    });
+  for (const skill of FUNDAMENTAL_SKILLS) {
+    for (const subtopic of SUBTOPICS_BY_SKILL[skill]) {
+      const lesson = readLesson(subtopic);
+      if (!lesson) continue;
+      const words = lesson.body.split(/\s+/).length;
+      out.push({
+        subtopic,
+        skill,
+        title: lesson.title,
+        minutes: Math.max(3, Math.round(words / 200)),
+      });
+    }
   }
   return out;
 }

@@ -76,7 +76,7 @@ Nearly every word problem on the GMAT Focus Edition lives or dies at the transla
 - **Trusting your equation over the words.** Verifying a solution against your own (possibly mistranslated) equation; plug it back into the original sentence instead.
 
 ## Speed moves
-- **test the answer choices linked quantities.** "Sum is $40$; the larger is $8$ more than three times the smaller": test a candidate larger value — $32$ gives smaller $8$, and $3(8) + 8 = 32$ works. Done without setup.
+- **Test the choices on linked quantities.** "Sum is $40$; the larger is $8$ more than three times the smaller": test a candidate larger value — $32$ gives smaller $8$, and $3(8) + 8 = 32$ works. Done without setup.
 - **Half-sum, half-difference.** Sum $50$, difference $8$: the numbers are $29$ and $21$ instantly — no system needed.
 - **Add-all for pairwise sums.** $a+b = 11$, $a+c = 14$, $b+c = 17$: total is $\frac{42}{2} = 21$, so $c = 21 - 11 = 10$ in one subtraction.
 - **Mod scan for Diophantine.** In $3a + 8p = 37$, work mod $3$: $8p \equiv 1 \pmod 3$ forces $p \equiv 2 \pmod 3$, so only $p = 2$ needs checking under the bound $8p < 37$.

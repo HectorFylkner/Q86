@@ -79,7 +79,7 @@ The GMAT Focus Edition uses sequences as a stress test of structure recognition:
 - **Doubling sums collapse.** When $r = 2$, the sum equals (next term) $-$ (first term): $3 + 6 + 12 + 24 + 48 = 96 - 3 = 93$.
 - **Crank small indexes by hand.** For $a_5$ or $a_7$ from a recursion, four to six arithmetic steps are faster and safer than deriving a formula.
 - **Cycle-and-remainder in one line.** Pattern of period 5 containing 3 silver items, $78$ total: $78 = 15 \cdot 5 + 3$, so $15 \cdot 3 = 45$ silver from full cycles plus however many silvers sit in the first 3 positions.
-- **test the answer choices thresholds.** If the choices for "which week" run 4 through 8, plug the middle choice into the cumulative formula and adjust once.
+- **Test the choices against the threshold.** If the choices for "which week" run 4 through 8, plug the middle choice into the cumulative formula and adjust once.
 - **Telescope before you compute.** Write the first two and last one terms of a telescoping sum, cancel visually, and read off $1 - \dfrac{1}{N+1}$.
 
 ## Before you drill

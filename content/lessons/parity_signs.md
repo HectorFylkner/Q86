@@ -81,7 +81,7 @@ The GMAT Focus Edition uses parity and sign questions to test whether you can re
 
 - **Sign-only bookkeeping.** Replace factors with $+$ or $-$: in $ab^2c^3 < 0$ with $b < 0$, replace $b^2$ with $+$ and the condition becomes $ac^3 < 0$.
 - **Parity-only bookkeeping.** Replace numbers with $E$/$O$: $3^n$ is always odd, so $3^n + n^3$ is even iff $n$ is odd — $25$ values from $1$ to $50$, no computation.
-- **convenient numbers respecting constraints.** For $a < b < 0$, set $a = -3$, $b = -1$ and evaluate all five choices in seconds.
+- **Pick convenient numbers that respect the constraints.** For $a < b < 0$, set $a = -3$, $b = -1$ and evaluate all five choices in seconds.
 - **Period-2 counting.** Parity patterns repeat every $2$ integers, so counts over $1$ to $N$ come from halving, as in Example 1.
 - **Complement counting.** "At least one odd" is total minus "all even," as in Example 3 — one subtraction beats three additions.
 - **The plus-one identity.** On seeing $xy + x + y$, jump to $(x+1)(y+1) - 1$ and reason about a plain product.

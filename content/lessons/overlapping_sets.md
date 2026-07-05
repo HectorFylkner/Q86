@@ -79,9 +79,9 @@ Overlapping-sets questions are a fixture of GMAT Focus Quant, and at the Q86 lev
 
 - **Grid before algebra:** in matrix problems, fill every cell you can by pure subtraction before introducing a variable — often only one cell needs algebra, as in Example 2 where a single equation in $d$ finished the problem.
 - **One-line two-set solve:** compute $\text{both} = |A| + |B| + \text{neither} - T$ in a single pass; for Example 1 that is $41 + 33 + 11 - 72 = 13$.
-- **convenient numbers 100 for percents:** given $50\%$ have $P$, $35\%$ have $Q$, $30\%$ have neither, take $T = 100$: both $= 50 + 35 - 70 = 15$, so $15/50 = 3/10$ of the $P$ group also has $Q$.
+- **Set the total to $100$ for percents:** given $50\%$ have $P$, $35\%$ have $Q$, $30\%$ have neither, take $T = 100$: both $= 50 + 35 - 70 = 15$, so $15/50 = 3/10$ of the $P$ group also has $Q$.
 - **Min overlap by arithmetic, not diagrams:** with $|A| = 70$, $|B| = 55$ in a total of $100$, the least possible overlap is $70 + 55 - 100 = 25$ — no picture required.
-- **test the answer choices "all three":** answer choices for $e_3$ are small integers; plug one into $T = \text{sum} - e_2 - 2e_3$ and adjust by parity in one step.
+- **Test the choices for "all three":** answer choices for $e_3$ are small integers; plug one into $T = \text{sum} - e_2 - 2e_3$ and adjust by parity in one step.
 - **Region audit as a checkpoint:** the exact regions must sum to the total ($e_1 + e_2 + e_3 = $ at least one, plus neither $= T$); a ten-second audit catches most translation slips.
 
 ## Before you drill

@@ -74,7 +74,7 @@ Evenly spaced sets hide inside sums of consecutive integers, house numbers, stre
 - **Median first, always.** One division recovers the center; every other term is a fixed number of steps away. Sum of $9$ terms $= 171$ → median $19$ instantly.
 - **Pair-and-shift for sum differences.** To compute $(61 + 62 + \dots + 110) - (1 + 2 + \dots + 50)$, pair terms: each of the $50$ terms is exactly $60$ larger, so the difference is $50 \times 60 = 3000$. No summation formulas.
 - **Divisibility by structure, not cases.** Sum of $4$ consecutive even integers $= 4a + 12 = 4(a + 3)$; since $a$ is even, $a + 3$ is odd — divisible by $4$, never by $8$. One line of algebra beats testing sets.
-- **test the answer choices counts.** Posts every $40$ feet along a $1{,}200$-foot fence with one at each end: $\frac{1200}{40} + 1 = 31$. Sanity-check with a tiny case ($80$ feet, every $40$ → $3$ posts) if the $+1$ feels doubtful.
+- **Compute the count, then check a tiny case.** Posts every $40$ feet along a $1{,}200$-foot fence with one at each end: $\frac{1200}{40} + 1 = 31$. Sanity-check with a tiny case ($80$ feet, every $40$ → $3$ posts) if the $+1$ feels doubtful.
 - **Removal without re-summing.** $25$ consecutive integers sum to $1{,}050$ → median $42$, so the set runs $30$ to $54$; drop the $54$ and the new average is $\frac{1050 - 54}{24} = 41.5$.
 
 ## Before you drill

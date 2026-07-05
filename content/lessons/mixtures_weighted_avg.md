@@ -75,7 +75,7 @@ Mixtures and weighted averages appear from mid-level right up to the hardest Qua
 
 - **Lever rule for instant ratios.** Mixing $10\%$ and $40\%$ to hit $34\%$: distances $24$ and $6$ give a $6:24 = 1:4$ volume ratio in five seconds, no equations.
 - **One-line solute ledger.** Write pure-amount-before $=$ pure-amount-after and nothing else; most mixture problems are one such line.
-- **test the answer choices replacement volumes.** Answer choices for drained liters are usually small integers; plug the middle choice into the retention factor and adjust once.
+- **Test the choices as replacement volumes.** Answer choices for drained liters are usually small integers; plug the middle choice into the retention factor and adjust once.
 - **Smart total of $100$.** When only percents and ratios appear (no absolute volumes), set the batch to $100$ units so percents become counts.
 - **Position estimation.** Note which group is heavier; the answer must land on that side of the midpoint — often enough to kill three choices.
 - **Perfect-square scan.** In two-cycle replacement, the concentration ratio is a squared fraction: seeing $\dfrac{27}{48} = \dfrac{9}{16}$ hands you the retention factor $\dfrac{3}{4}$ immediately.
