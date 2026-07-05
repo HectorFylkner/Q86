@@ -115,6 +115,28 @@ body {
   padding: 2px 0;
 }
 
+/* KaTeX's 1.21em default towers over Inter's x-height and makes line
+   boxes wobble; pull inline math close to the prose size, keep display
+   math a touch larger. */
+.katex {
+  font-size: 1.05em;
+}
+.katex-display .katex {
+  font-size: 1.15em;
+}
+
+/* Night desk lifts --ballpoint for contrast AS TEXT, which leaves white
+   labels on ballpoint fills at ~2.5:1. On dark, every ballpoint-filled
+   control carries paper-dark text instead. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .bg-ballpoint.text-white {
+    color: var(--paper);
+  }
+}
+:root[data-theme="dark"] .bg-ballpoint.text-white {
+  color: var(--paper);
+}
+
 /* Loading skeleton shimmer (opacity only — safe under reduced motion). */
 @keyframes q86-skeleton {
   0%,

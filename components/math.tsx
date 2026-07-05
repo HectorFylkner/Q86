@@ -38,16 +38,27 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
     const idx = m.index ?? 0;
     if (idx > last) nodes.push(plain(text.slice(last, idx)));
     const token = m[0];
+    let consumed = token.length;
     const key = `${keyBase}-${i++}`;
     if (m[1]) {
       nodes.push("$");
     } else if (m[2]) {
-      nodes.push(
-        <span
-          key={key}
-          dangerouslySetInnerHTML={{ __html: tex(token.slice(1, -1), false) }}
-        />,
-      );
+      const html = { __html: tex(token.slice(1, -1), false) };
+      // KaTeX's inline-block spans allow a line break between a formula
+      // and punctuation glued to it in the source ("$k$?"); keep them on
+      // one line by wrapping the pair as an unbreakable unit.
+      const punct = text.slice(idx + token.length).match(/^[.,;:?!)%]+/)?.[0];
+      if (punct) {
+        consumed += punct.length;
+        nodes.push(
+          <span key={key} className="whitespace-nowrap">
+            <span dangerouslySetInnerHTML={html} />
+            {punct}
+          </span>,
+        );
+      } else {
+        nodes.push(<span key={key} dangerouslySetInnerHTML={html} />);
+      }
     } else if (m[3]) {
       nodes.push(
         <strong key={key} className="font-semibold">
@@ -66,7 +77,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
         </code>,
       );
     }
-    last = idx + token.length;
+    last = idx + consumed;
   }
   if (last < text.length) nodes.push(plain(text.slice(last)));
   return nodes;
@@ -142,7 +153,14 @@ export function Md({
 }) {
   const blocks = parseBlocks(source);
   return (
-    <div className={cn("space-y-2.5 leading-relaxed", className)}>
+    <div
+      className={cn(
+        "space-y-2.5",
+        // A caller-supplied leading-* must win; cn() does not dedupe.
+        !className?.includes("leading-") && "leading-relaxed",
+        className,
+      )}
+    >
       {blocks.map((block, bi) => {
         const key = `b${bi}`;
         switch (block.kind) {

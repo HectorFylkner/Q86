@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import { Md } from "@/components/math";
 import { DrillChecklist } from "@/components/lesson/drill-checklist";
 import { ExampleCard } from "@/components/lesson/example-card";
-import { LessonRail, type RailItem } from "@/components/lesson/lesson-rail";
+import {
+  LessonRail,
+  ReadingProgress,
+  type RailItem,
+} from "@/components/lesson/lesson-rail";
 import {
   CoreIdeas,
   CueGrid,
@@ -79,7 +83,7 @@ export default async function LessonPage({
       {prev ? (
         <Link
           href={`/learn/${prev.subtopic}`}
-          className="group rounded-card border border-grid bg-surface p-4 shadow-ambient transition-colors hover:border-ballpoint/50"
+          className="group rounded-card border border-grid bg-surface p-4 shadow-ambient transition-colors hover:border-ballpoint/50 sm:px-5"
         >
           <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
             ← Previous chapter
@@ -94,7 +98,7 @@ export default async function LessonPage({
       {next && (
         <Link
           href={`/learn/${next.subtopic}`}
-          className="group rounded-card border border-grid bg-surface p-4 text-right shadow-ambient transition-colors hover:border-ballpoint/50"
+          className="group rounded-card border border-grid bg-surface p-4 text-right shadow-ambient transition-colors hover:border-ballpoint/50 sm:px-5"
         >
           <span className="font-mono text-[10px] uppercase tracking-wider text-graphite">
             Next chapter →
@@ -123,6 +127,7 @@ export default async function LessonPage({
 
   return (
     <div className="mx-auto max-w-5xl lg:grid lg:grid-cols-[minmax(0,1fr)_190px] lg:gap-10">
+      <ReadingProgress />
       <div className="min-w-0 space-y-9 lg:max-w-3xl">
         {header}
 

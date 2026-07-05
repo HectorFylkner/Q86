@@ -76,7 +76,7 @@ export default function LearnPage() {
                     href={`/learn/${lesson.subtopic}`}
                     className="group flex items-start gap-3 rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
                   >
-                    <span className="mt-0.5 font-mono text-[11px] text-graphite/70 transition-colors group-hover:text-ballpoint">
+                    <span className="mt-0.5 font-mono text-[11px] text-graphite transition-colors group-hover:text-ballpoint">
                       {String(chapterNo).padStart(2, "0")}
                     </span>
                     <span className="min-w-0 flex-1">

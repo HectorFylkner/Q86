@@ -73,7 +73,7 @@ export function DrillChecklist({
       <ul className="divide-y divide-grid">
         {items.map((item, i) => (
           <li key={i}>
-            <label className="flex cursor-pointer items-start gap-3 px-4 py-2.5 transition-colors hover:bg-highlight/30 sm:px-5">
+            <label className="flex cursor-pointer items-start gap-3 px-4 py-2.5 transition-colors hover:bg-ballpoint/10 sm:px-5">
               <input
                 type="checkbox"
                 checked={checked[i]}
@@ -85,7 +85,7 @@ export function DrillChecklist({
                 className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border text-[11px] leading-none text-white transition-colors peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ballpoint ${
                   checked[i]
                     ? "border-ballpoint bg-ballpoint"
-                    : "border-graphite/40 bg-paper"
+                    : "border-graphite/70 bg-paper"
                 }`}
               >
                 {checked[i] ? "✓" : ""}
@@ -115,7 +115,7 @@ export function DrillChecklist({
         </p>
         <Link
           href={`/drill?sub=${subtopic}&d=3`}
-          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+          className="inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
         >
           Drill this now →
         </Link>

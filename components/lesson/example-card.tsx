@@ -6,11 +6,13 @@ import { Md } from "@/components/math";
 const TAGS = [
   { label: "Warm-up", cls: "bg-highlight text-graphite" },
   { label: "Core", cls: "bg-ballpoint/10 text-ballpoint" },
-  { label: "Exam-level", cls: "bg-redpen/10 text-redpen" },
+  { label: "Exam-level", cls: "bg-redpen/5 text-redpen" },
 ] as const;
 
 /** A worked example that asks to be attempted before it teaches: the
- *  question is always visible, the solution is behind a reveal. */
+ *  question is always visible, the solution sits behind one persistent
+ *  disclosure button (label and aria-expanded flip in place, so focus
+ *  and screen-reader state survive the toggle). */
 export function ExampleCard({
   n,
   level,
@@ -26,6 +28,7 @@ export function ExampleCard({
 }) {
   const [open, setOpen] = useState(false);
   const tag = TAGS[level];
+  const solutionId = `example-${n}-solution`;
   return (
     <div className="overflow-hidden rounded-card border border-grid bg-surface shadow-ambient">
       <div className="flex items-center justify-between gap-2 border-b border-grid px-4 py-2.5 sm:px-5">
@@ -43,8 +46,8 @@ export function ExampleCard({
         <Md source={question} className="text-[15px]" />
       </div>
 
-      {open ? (
-        <div className="border-t border-grid px-4 py-4 sm:px-5">
+      {open && (
+        <div id={solutionId} className="border-t border-grid px-4 py-4 sm:px-5">
           <Md source={work} className="text-sm" />
           <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-control border border-ballpoint/30 bg-ballpoint/10 px-3 py-2">
             <span className="font-mono text-[10px] uppercase tracking-wider text-ballpoint">
@@ -52,25 +55,20 @@ export function ExampleCard({
             </span>
             <Md source={answer} className="text-sm font-medium" />
           </div>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-expanded={open}
-            className="mt-3 text-xs text-graphite transition-colors hover:text-ink"
-          >
-            Hide solution
-          </button>
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-expanded={open}
-          className="block w-full border-t border-grid px-4 py-3 text-left text-sm font-medium text-ballpoint transition-colors hover:bg-highlight/40 sm:px-5"
-        >
-          Try it on paper first — then reveal the solution
-        </button>
       )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls={solutionId}
+        className="block w-full border-t border-grid px-4 py-3 text-left text-sm font-medium text-ballpoint transition-colors hover:bg-ballpoint/10 focus-visible:outline-offset-[-2px] sm:px-5"
+      >
+        {open
+          ? "Hide the solution"
+          : "Try it on paper first — then reveal the solution"}
+      </button>
     </div>
   );
 }

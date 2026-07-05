@@ -103,6 +103,14 @@ function stripItalicWrapper(p: string): string {
   return isItalicPara(p) ? p.slice(1, -1).trim() : p;
 }
 
+/** Authors separate listed answer choices ("A) …  B) …") and roman-numeral
+ *  statements with double spaces, which HTML collapses into ordinary word
+ *  spacing. Stack them one per line, GMAT-style. */
+function splitChoiceRuns(p: string): string {
+  const parts = p.split(/\s{2,}(?=(?:[A-E]\)|(?:I{1,3}|IV|V)\.)\s)/);
+  return parts.length >= 3 ? parts.map((s) => s.trim()).join("\n") : p;
+}
+
 function parseExamples(text: string): WorkedExample[] {
   // Markers appear as "**Example 1**" alone on a line, or with the
   // question on the same line (optionally after an em-dash).
@@ -134,7 +142,11 @@ function parseExamples(text: string): WorkedExample[] {
     if (paras.length < 2) return [];
     let qEnd = 1;
     while (qEnd < paras.length - 1 && isItalicPara(paras[qEnd])) qEnd++;
-    const question = paras.slice(0, qEnd).map(stripItalicWrapper).join("\n\n");
+    const question = paras
+      .slice(0, qEnd)
+      .map(stripItalicWrapper)
+      .map(splitChoiceRuns)
+      .join("\n\n");
     const work = [paras.slice(qEnd).join("\n\n"), after]
       .filter(Boolean)
       .join("\n\n")

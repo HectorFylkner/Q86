@@ -36,7 +36,7 @@ export function SectionShell({
 export function WhyLede({ source }: { source: string }) {
   return (
     <div className="border-l-2 border-ballpoint pl-4 sm:pl-5">
-      <Md source={source} className="text-[16px] leading-7" />
+      <Md source={source} className="max-w-[70ch] text-[16px] leading-7" />
     </div>
   );
 }
@@ -55,12 +55,12 @@ export function CoreIdeas({
       {ideas.map((idea, i) => (
         <div
           key={i}
-          className="flex gap-3.5 rounded-card border border-grid bg-surface p-4 shadow-ambient"
+          className="flex gap-3.5 rounded-card border border-grid bg-surface p-4 shadow-ambient sm:px-5"
         >
-          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ballpoint/10 font-mono text-[11px] font-medium text-ballpoint">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ballpoint/10 font-mono text-[11px] font-medium text-ballpoint">
             {i + 1}
           </span>
-          <Md source={idea} className="min-w-0 flex-1 text-[14.5px]" />
+          <Md source={idea} className="min-w-0 max-w-[70ch] flex-1 text-[14.5px]" />
         </div>
       ))}
     </div>
@@ -74,7 +74,7 @@ export function CueGrid({ cues }: { cues: Cue[] }) {
       {cues.map((cue, i) => (
         <div
           key={i}
-          className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient"
+          className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient sm:px-5"
         >
           <p className="font-mono text-[10px] uppercase tracking-wider text-graphite">
             When you see
@@ -108,7 +108,7 @@ function TitledCard({
     accent === "redpen" ? "border-l-redpen/70" : "border-l-amber/70";
   return (
     <div
-      className={`rounded-card border border-grid border-l-2 ${accentBorder} bg-surface p-4 shadow-ambient`}
+      className={`rounded-card border border-grid border-l-2 ${accentBorder} bg-surface p-4 shadow-ambient sm:px-5`}
     >
       <div className="flex gap-2.5">
         <span

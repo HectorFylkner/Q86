@@ -43,7 +43,10 @@ export function Nav() {
             the target is the name
           </span>
         </Link>
-        <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
+        <nav
+          aria-label="Primary"
+          className="flex flex-1 items-center gap-1 overflow-x-auto"
+        >
           {LINKS.map((link) => {
             const active =
               link.href === "/"
@@ -77,7 +80,10 @@ export function Nav() {
 export function BottomTabs() {
   const pathname = usePathname();
   return (
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden">
+      <nav
+        aria-label="Quick access"
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
+      >
         {TAB_LINKS.map((link) => {
           const active =
             link.href === "/"
