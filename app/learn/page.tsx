@@ -4,12 +4,17 @@ import { chapterTestStates } from "@/lib/chapter-tests";
 import { qualifiesForTestOut, weaknessScore } from "@/lib/curriculum";
 import {
   EXAMPLES_PER_CHAPTER,
+  exampleAttemptCounts,
   isPrepared,
   lessonProgressBySubtopic,
 } from "@/lib/lesson-progress";
 import { listLessons } from "@/lib/lessons";
 import { gatherCurriculumRows } from "@/lib/plan-server";
-import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
+import {
+  FUNDAMENTAL_SKILLS,
+  SKILL_LABELS,
+  type Subtopic,
+} from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,15 +30,15 @@ export default async function LearnPage() {
   const lessons = listLessons();
   const tests = await chapterTestStates();
   const progress = await lessonProgressBySubtopic();
+  const exampleCounts = await exampleAttemptCounts();
   const rows = new Map(
     (await gatherCurriculumRows()).map((r) => [r.subtopic, r]),
   );
-  const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
+  const passedCount = lessons.filter(
+    (l) => l.skill !== "strategy" && tests[l.subtopic as Subtopic]?.passed,
+  ).length;
   const preparedCount = lessons.filter((l) =>
-    isPrepared(
-      progress.get(l.subtopic),
-      rows.get(l.subtopic)?.examplesAttempted ?? 0,
-    ),
+    isPrepared(progress.get(l.subtopic), exampleCounts.get(l.subtopic) ?? 0),
   ).length;
   // Chapter numbers stay pinned to the canonical order even though the
   // display order below adapts to the evidence.
@@ -87,12 +92,74 @@ export default async function LearnPage() {
         </p>
       )}
 
+      {(() => {
+        const strategy = lessons.filter((l) => l.skill === "strategy");
+        if (strategy.length === 0) return null;
+        return (
+          <section>
+            <div className="mb-2 flex items-baseline gap-2">
+              <h2 className="font-display text-sm font-semibold">Strategy</h2>
+              <span className="font-mono text-[11px] text-graphite">
+                cross-cutting method — no chapter test, the mixed drills are
+                the test
+              </span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {strategy.map((lesson, i) => {
+                const p = progress.get(lesson.subtopic);
+                const examplesDone =
+                  exampleCounts.get(lesson.subtopic) ?? 0;
+                const prepared = isPrepared(p, examplesDone);
+                return (
+                  <Link
+                    key={lesson.subtopic}
+                    href={`/learn/${lesson.subtopic}`}
+                    className="group flex items-start gap-3 rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
+                  >
+                    <span className="mt-0.5 font-mono text-[11px] text-graphite transition-colors group-hover:text-ballpoint">
+                      S{i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium transition-colors group-hover:text-ballpoint">
+                        {lesson.title}
+                      </span>
+                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
+                        <span>~{lesson.minutes} min</span>
+                        {prepared ? (
+                          <span className="text-ballpoint">✓ prepared</span>
+                        ) : examplesDone > 0 ||
+                          (p && p.checklist.length > 0) ? (
+                          <span>
+                            {examplesDone}/{EXAMPLES_PER_CHAPTER} examples
+                            {p && p.checklist.length > 0
+                              ? ` · ${p.checklist.length}/${p.checklistTotal} checks`
+                              : ""}
+                          </span>
+                        ) : p?.readAt != null ? (
+                          <span>started</span>
+                        ) : null}
+                      </span>
+                    </span>
+                    <span
+                      className="mt-0.5 text-graphite/50 opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })()}
+
       {FUNDAMENTAL_SKILLS.map((skill) => {
         const group = lessons
           .filter((l) => l.skill === skill)
           .sort((a, b) => {
-            const ra = rows.get(a.subtopic);
-            const rb = rows.get(b.subtopic);
+            const ra = rows.get(a.subtopic as Subtopic);
+            const rb = rows.get(b.subtopic as Subtopic);
             const pa = ra?.testPassed ? 1 : 0;
             const pb = rb?.testPassed ? 1 : 0;
             if (pa !== pb) return pa - pb;
@@ -113,9 +180,10 @@ export default async function LearnPage() {
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               {group.map((lesson) => {
-                const row = rows.get(lesson.subtopic);
-                const p = progress.get(lesson.subtopic);
-                const test = tests[lesson.subtopic];
+                const subtopic = lesson.subtopic as Subtopic;
+                const row = rows.get(subtopic);
+                const p = progress.get(subtopic);
+                const test = tests[subtopic];
                 const testOut = row ? qualifiesForTestOut(row) : false;
                 const examplesDone = row?.examplesAttempted ?? 0;
                 const prepared = isPrepared(p, examplesDone);

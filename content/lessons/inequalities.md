@@ -14,6 +14,7 @@ Inequalities appear on the GMAT Focus Edition in every costume: bare algebra, th
 6. **Extremes of $xy$ and $\frac{x}{y}$ come from the four endpoint pairs.** With $x$ fixed, $xy$ is linear in $y$, so extremes sit at endpoints; test all four pairs. For $\frac{x}{y}$, the $y$-interval must exclude $0$.
 7. **Reciprocals flip order within one sign.** If $0 < a < b$ or $a < b < 0$, then $\frac{1}{a} > \frac{1}{b}$. If an interval straddles $0$, its reciprocal image is *two rays*, one from each side.
 8. **Rational and factored inequalities: sign chart.** For $\frac{x-5}{x+1} < 0$, mark $x = 5$ (zero) and $x = -1$ (undefined), then read signs on each piece: negative exactly on $-1 < x < 5$. Signs alternate across simple roots.
+::number-line min=-4 max=8 points="-1:open:,5:open:" zones="-1..5:negative here"
 9. **Squares are never negative:** $t^2 \ge 0$, equality only at $t = 0$. Completing the square, $x^2 + bx = \left(x + \frac{b}{2}\right)^2 - \frac{b^2}{4}$, turns a quadratic condition into a bounded region.
 10. **AM–GM:** for $a, b > 0$, $a + b \ge 2\sqrt{ab}$, equality iff $a = b$ — it is $(\sqrt{a} - \sqrt{b})^2 \ge 0$ rearranged. Corollary: if $0 < a < b$ and $ab = k$, then $a < \sqrt{k} < b$.
 11. **Counting integers:** if the solved range is $a \le n \le b$ with integer endpoints, the count is $b - a + 1$. Isolate $n$ before counting.

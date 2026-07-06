@@ -8,6 +8,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type {
+  ChapterKey,
   Confidence,
   ContentDomain,
   Context,
@@ -217,7 +218,7 @@ export const deckReviews = sqliteTable(
 // (Chapter keys are taxonomy subtopics — the lesson filename, the route
 // param, and this column are the same string.)
 export const lessonProgress = sqliteTable("lesson_progress", {
-  subtopic: text("subtopic").$type<Subtopic>().primaryKey(),
+  subtopic: text("subtopic").$type<ChapterKey>().primaryKey(),
   readAt: integer("read_at", { mode: "timestamp_ms" }),
   // Checked item indexes into the chapter's "Before you drill" list.
   checklist: text("checklist", { mode: "json" })
@@ -239,7 +240,7 @@ export const lessonExampleAttempts = sqliteTable(
   "lesson_example_attempts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    subtopic: text("subtopic").$type<Subtopic>().notNull(),
+    subtopic: text("subtopic").$type<ChapterKey>().notNull(),
     exampleN: integer("example_n").notNull(),
     strategy: text("strategy").$type<Strategy>().notNull(),
     answer: text("answer").notNull(),
@@ -261,7 +262,7 @@ export const lessonReviews = sqliteTable(
   "lesson_reviews",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    subtopic: text("subtopic").$type<Subtopic>().notNull(),
+    subtopic: text("subtopic").$type<ChapterKey>().notNull(),
     kind: text("kind").$type<"cue" | "trap">().notNull(),
     // Position in the chapter's parsed cue/trap list at enrollment,
     // the stable identity for idempotent re-enrollment.

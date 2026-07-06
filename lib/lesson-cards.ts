@@ -3,7 +3,7 @@ import { db } from "./db/index.ts";
 import { lessonReviews } from "./db/schema.ts";
 import { parseLesson, type ParsedLesson } from "./lesson-parse.ts";
 import { readLesson } from "./lessons.ts";
-import type { Subtopic } from "./taxonomy.ts";
+import type { ChapterKey } from "./taxonomy.ts";
 
 /**
  * Concept-level retrieval cards, cut from a chapter's trigger cues and
@@ -58,7 +58,7 @@ export function buildLessonCards(parsed: ParsedLesson): LessonCardSeed[] {
  *  survives re-enrollment — only the card text refreshes — and cards
  *  whose source bullet left the chapter retire rather than delete. New
  *  cards enter due immediately; the deck's daily cap paces them out. */
-export async function enrollLessonCards(subtopic: Subtopic): Promise<number> {
+export async function enrollLessonCards(subtopic: ChapterKey): Promise<number> {
   const lesson = readLesson(subtopic);
   if (!lesson) return 0;
   const parsed = parseLesson(lesson.body);

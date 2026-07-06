@@ -1,5 +1,12 @@
 import katex from "katex";
 import type { ReactNode } from "react";
+import { renderDirective } from "@/components/directives";
+import {
+  parseDirectiveLine,
+  validateDirective,
+  type DirectiveName,
+  type ParsedDirective,
+} from "@/lib/directives";
 import { cn } from "@/lib/utils";
 
 /**
@@ -7,9 +14,13 @@ import { cn } from "@/lib/utils";
  *
  * Supported: $...$ inline math, $$...$$ block math (KaTeX,
  * throwOnError: false), \$ as a literal dollar sign, **bold**, *italic*,
- * `code`, paragraphs (blank line), unordered (- ) and ordered (1. ) lists.
- * Anything else renders as plain text — there is deliberately no HTML
- * passthrough; the only injected HTML is KaTeX's own sanitized output.
+ * `code`, paragraphs (blank line), unordered (- ) and ordered (1. )
+ * lists, and a fixed set of named visual directives ("::set-matrix …",
+ * "::number-line …", "::rate-timeline …" alone on a line — see
+ * components/directives.tsx). Anything else renders as plain text —
+ * there is deliberately no HTML passthrough; the only injected HTML is
+ * KaTeX's own sanitized output. Unknown or malformed directives fall
+ * back to their literal text.
  */
 
 function tex(source: string, displayMode: boolean): string {
@@ -89,7 +100,8 @@ type Block =
   | { kind: "h3"; text: string }
   | { kind: "ul"; items: string[] }
   | { kind: "ol"; items: string[] }
-  | { kind: "p"; lines: string[] };
+  | { kind: "p"; lines: string[] }
+  | { kind: "directive"; directive: ParsedDirective };
 
 function parseBlocks(source: string): Block[] {
   const blocks: Block[] = [];
@@ -101,11 +113,26 @@ function parseBlocks(source: string): Block[] {
       continue;
     }
     for (const para of parts[i].split(/\n\s*\n/)) {
-      const lines = para
+      const allLines = para
         .split("\n")
         .map((l) => l.trim())
         .filter(Boolean);
-      if (lines.length === 0) continue;
+      // Visual directives claim their line wherever they appear —
+      // standalone or embedded in a paragraph.
+      const lines: string[] = [];
+      const trailing: Block[] = [];
+      for (const line of allLines) {
+        const directive = line.startsWith("::")
+          ? parseDirectiveLine(line)
+          : null;
+        if (directive) trailing.push({ kind: "directive", directive });
+        else lines.push(line);
+      }
+      const flushDirectives = () => blocks.push(...trailing.splice(0));
+      if (lines.length === 0) {
+        flushDirectives();
+        continue;
+      }
       // Headings (## / ###) may share a paragraph block with body lines.
       if (lines.some((l) => /^#{2,3}\s+/.test(l))) {
         for (const line of lines) {
@@ -116,6 +143,7 @@ function parseBlocks(source: string): Block[] {
             blocks.push({ kind: "p", lines: [line] });
           }
         }
+        flushDirectives();
         continue;
       }
       if (lines.every((l) => /^[-*]\s+/.test(l))) {
@@ -131,6 +159,7 @@ function parseBlocks(source: string): Block[] {
       } else {
         blocks.push({ kind: "p", lines });
       }
+      flushDirectives();
     }
   }
   // Blank-line-separated "1." items arrive as single-item lists; merge
@@ -186,6 +215,19 @@ export function Md({
                 dangerouslySetInnerHTML={{ __html: tex(block.body, true) }}
               />
             );
+          case "directive": {
+            // Only registered, well-formed directives render as
+            // components; anything else degrades to its literal text.
+            const d = block.directive;
+            if (validateDirective(d) != null) {
+              return <p key={key}>{plain(d.raw)}</p>;
+            }
+            return (
+              <div key={key} className="!my-3">
+                {renderDirective(d.name as DirectiveName, d.params)}
+              </div>
+            );
+          }
           case "ul":
             return (
               <ul key={key} className="list-disc space-y-1 pl-5">
