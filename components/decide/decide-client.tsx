@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Md } from "@/components/math";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { saveDecisionRound } from "@/lib/actions";
 import type { DecideItem, DecideRecommendation } from "@/lib/decide";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
@@ -101,15 +103,15 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
+      <Card className="p-6 text-sm text-graphite">
         No questions available — run <code>pnpm seed</code> first.
-      </p>
+      </Card>
     );
   }
 
   if (phase === "intro") {
     return (
-      <section className="mx-auto max-w-2xl rounded-card border border-grid bg-surface p-6 shadow-ambient">
+      <Card className="mx-auto max-w-2xl p-6">
         <h2 className="font-display text-base font-semibold">
           {items.length} questions · 45 seconds each
         </h2>
@@ -121,19 +123,16 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           — pick anything and bank the time. Letting the clock run out counts
           as an unforced &quot;solve&quot;.
         </p>
-        <button
-          onClick={() => setPhase("running")}
-          className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-        >
+        <Button onClick={() => setPhase("running")} className="mt-4">
           Start · Enter
-        </button>
-      </section>
+        </Button>
+      </Card>
     );
   }
 
   if (phase === "done") {
     return (
-      <section className="mx-auto max-w-2xl rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
+      <Card className="mx-auto max-w-2xl border-ballpoint/40 bg-ballpoint/5 p-6 text-center">
         <p className="font-display text-lg font-semibold">
           {aligned} / {items.length} calls aligned with your record
         </p>
@@ -141,7 +140,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           Alignment isn&apos;t obedience — a deliberate stretch is fine. The
           habit that matters: decide in 45 seconds and never grind by inertia.
         </p>
-      </section>
+      </Card>
     );
   }
 
@@ -165,7 +164,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         )}
       </div>
 
-      <section className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
+      <Card className="p-6">
         <Md source={item.question.stemMd} />
         <ol className="mt-4 space-y-1.5">
           {item.question.choices.map((c, i) => (
@@ -177,27 +176,27 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
             </li>
           ))}
         </ol>
-      </section>
+      </Card>
 
       {phase === "running" ? (
         <div className="flex flex-wrap gap-2">
           {(["solve", "guess", "bail"] as const).map((call) => (
-            <button
+            <Button
               key={call}
+              variant="outline"
               onClick={() => commit(call)}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              {CALL_LABELS[call]}{" "}
+              {CALL_LABELS[call]}
               <span className="font-mono text-xs text-graphite">
                 {call[0].toUpperCase()}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
       ) : (
-        <section
+        <Card
           className={cn(
-            "rounded-card border p-4 shadow-ambient",
+            "p-4",
             lastCall?.call === item.recommendation
               ? "border-ballpoint/50 bg-ballpoint/5"
               : "border-amber/50 bg-amber/5",
@@ -216,7 +215,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           <p className="mt-2 text-xs text-graphite">
             Enter for the next question
           </p>
-        </section>
+        </Card>
       )}
     </div>
   );

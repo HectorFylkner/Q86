@@ -20,6 +20,9 @@ import {
   type PatternItem,
 } from "@/lib/generators";
 import { mulberry32 } from "@/lib/generators/rng";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { StatTile } from "@/components/ui/stat";
 import { cn } from "@/lib/utils";
 
 const ROUND_SECONDS = 90;
@@ -281,12 +284,12 @@ export function PatternsClient({
           ))}
         </div>
 
-        <button
+        <Button
           onClick={startRound}
           disabled={isSaving}
+          size="lg"
           className={cn(
-            "rounded-control bg-ballpoint px-5 py-2.5 text-sm font-medium text-white hover:bg-ballpoint/90",
-            isSaving && "cursor-wait opacity-60",
+            isSaving && "disabled:cursor-wait disabled:opacity-60",
           )}
         >
           {isSaving
@@ -296,7 +299,7 @@ export function PatternsClient({
                   ? "Mixed"
                   : PATTERN_CATEGORY_LABELS[selection]
               }`}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -322,16 +325,23 @@ export function PatternsClient({
           </motion.p>
         )}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatTile label="Score" text={String(score)} />
-          <StatTile
-            label="Accuracy"
-            text={`${answered > 0 ? Math.round((score / answered) * 100) : 0}%`}
-          />
-          <StatTile label="Avg time" text={`${(avgMs / 1000).toFixed(1)}s`} />
-          <StatTile label="Day streak" text={String(result.dayStreak)} />
+          <StatTile label="Score">
+            <Odometer text={String(score)} />
+          </StatTile>
+          <StatTile label="Accuracy">
+            <Odometer
+              text={`${answered > 0 ? Math.round((score / answered) * 100) : 0}%`}
+            />
+          </StatTile>
+          <StatTile label="Avg time">
+            <Odometer text={`${(avgMs / 1000).toFixed(1)}s`} />
+          </StatTile>
+          <StatTile label="Day streak">
+            <Odometer text={String(result.dayStreak)} />
+          </StatTile>
         </div>
 
-        <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+        <Card className="p-4">
           <h3 className="font-display text-sm font-semibold">Rating changes</h3>
           <ul className="mt-2 space-y-2">
             {Object.keys(result.newRatings).map((category) => {
@@ -368,21 +378,16 @@ export function PatternsClient({
               );
             })}
           </ul>
-        </div>
+        </Card>
 
         <div className="flex gap-3">
-          <button
-            onClick={startRound}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-          >
-            Another round
-          </button>
-          <button
+          <Button onClick={startRound}>Another round</Button>
+          <Button
+            variant="outline"
             onClick={() => setStage({ kind: "setup", error: null })}
-            className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
           >
             Change category
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -409,7 +414,7 @@ export function PatternsClient({
       </div>
 
       {active && (
-        <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
+        <Card className="p-6">
           <div className="text-xs text-graphite">
             {PATTERN_CATEGORY_LABELS[active.category]}
           </div>
@@ -460,16 +465,12 @@ export function PatternsClient({
                 placeholder="Type the number"
                 className="w-44 rounded-control border border-grid bg-surface px-3 py-2 font-mono text-lg"
               />
-              <button
-                type="submit"
-                className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-              >
+              <Button type="submit" keyHint="↵">
                 Answer
-                <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
-              </button>
+              </Button>
             </form>
           )}
-        </div>
+        </Card>
       )}
       <p className="text-center text-[11px] text-graphite/80">
         {active?.item.options
@@ -491,13 +492,4 @@ function answersMatch(user: string, canonical: string): boolean {
     return Math.abs(un - cn) < 1e-9;
   }
   return false;
-}
-
-function StatTile({ label, text }: { label: string; text: string }) {
-  return (
-    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] text-graphite">{label}</div>
-      <Odometer text={text} className="mt-1 font-mono text-xl font-medium" />
-    </div>
-  );
 }

@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ScratchCapture } from "@/components/postmortem/capture";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { Card, SectionCard } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
 import { tagAttempt } from "@/lib/actions";
 import type { CoachResponse } from "@/lib/ai/schemas";
 import type { Attempt, Question } from "@/lib/db/schema";
@@ -184,10 +187,7 @@ export function PostmortemClient({
         </div>
       </details>
 
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
-          Scratch work
-        </h2>
+      <SectionCard title="Scratch work">
         <p className="mb-3 mt-1 text-sm text-graphite">
           Photograph exactly what you wrote — the coach finds the line where
           the work left the rails.
@@ -198,19 +198,15 @@ export function PostmortemClient({
           disabled={coachState.kind === "running"}
         />
         <div className="mt-3 flex items-center gap-3">
-          <button
+          <Button
             onClick={runCoach}
             disabled={images.length === 0 || coachState.kind === "running"}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-              (images.length === 0 || coachState.kind === "running") &&
-                "cursor-not-allowed opacity-50",
-            )}
+            className="disabled:opacity-50"
           >
             {coach || attempt.aiFeedbackMd
               ? "Re-run the post-mortem"
               : "Run the post-mortem"}
-          </button>
+          </Button>
           {coachState.kind === "running" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
@@ -221,24 +217,21 @@ export function PostmortemClient({
             <span className="text-sm text-redpen">{coachState.message}</span>
           )}
         </div>
-      </section>
+      </SectionCard>
 
       {coachState.kind === "running" && (
-        <div className="space-y-2 rounded-card border border-grid bg-surface p-4 shadow-ambient">
+        <Card className="space-y-2 p-4">
           <div className="skeleton h-4 w-1/3" />
           <div className="skeleton h-3 w-full" />
           <div className="skeleton h-3 w-5/6" />
           <div className="skeleton h-3 w-2/3" />
-        </div>
+        </Card>
       )}
 
       {!coach && attempt.aiFeedbackMd && coachState.kind !== "running" && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="mb-2 font-display text-sm font-semibold">
-            Saved post-mortem
-          </h2>
-          <Md source={attempt.aiFeedbackMd} className="text-[15px]" />
-        </section>
+        <SectionCard title="Saved post-mortem">
+          <Md source={attempt.aiFeedbackMd} className="mt-2 text-[15px]" />
+        </SectionCard>
       )}
 
       {coach && (
@@ -334,17 +327,14 @@ export function PostmortemClient({
             className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
           />
           <div className="mt-3 flex items-center gap-3">
-            <button
+            <Button
               onClick={confirmClassification}
               disabled={errorType == null || confirmState === "saving"}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
-                (errorType == null || confirmState === "saving") &&
-                  "opacity-50",
-              )}
+              size="sm"
+              className="px-4 disabled:opacity-50"
             >
               Confirm classification
-            </button>
+            </Button>
             {confirmState === "saved" && (
               <span className="text-sm text-ballpoint">Logged.</span>
             )}
@@ -358,8 +348,7 @@ export function PostmortemClient({
       )}
 
       {(coach || attempt.aiFeedbackMd) && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">Twin drills</h2>
+        <SectionCard title="Twin drills">
           <p className="mt-1 text-sm text-graphite">
             Two fresh twins of this question — same math skeleton, opposite
             context ({question.context === "pure" ? "real" : "pure"}). Both
@@ -403,7 +392,7 @@ export function PostmortemClient({
                 {twinState.ids.length > 0 && (
                   <Link
                     href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+                    className={buttonClasses("ballpoint", "sm", "px-4")}
                   >
                     Drill the twins now
                   </Link>
@@ -411,32 +400,9 @@ export function PostmortemClient({
               </>
             )}
           </div>
-        </section>
+        </SectionCard>
       )}
     </div>
-  );
-}
-
-function Chip({
-  children,
-  tone,
-}: {
-  children: React.ReactNode;
-  tone?: "red" | "blue";
-}) {
-  return (
-    <span
-      className={cn(
-        "rounded-control border px-1.5 py-0.5 text-[11px]",
-        tone === "red"
-          ? "border-redpen/50 text-redpen"
-          : tone === "blue"
-            ? "border-ballpoint/50 text-ballpoint"
-            : "border-grid bg-surface",
-      )}
-    >
-      {children}
-    </span>
   );
 }
 

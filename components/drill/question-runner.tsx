@@ -9,6 +9,10 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
+import { Stat } from "@/components/ui/stat";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
@@ -228,9 +232,9 @@ export function QuestionRunner({
     return (
       <div className="space-y-4">
         {test != null && (
-          <div
+          <Card
             className={cn(
-              "rounded-card border p-5 shadow-ambient",
+              "p-5",
               passed
                 ? "border-ballpoint/50 bg-ballpoint/5"
                 : "border-amber/50 bg-amber/5",
@@ -247,22 +251,22 @@ export function QuestionRunner({
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
                 href={`/learn/${test}`}
-                className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
+                className={buttonClasses("outline")}
               >
                 Back to the chapter
               </Link>
               {!passed && (
                 <Link
                   href={`/drill?test=${test}`}
-                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                  className={buttonClasses()}
                 >
                   Retake with fresh questions →
                 </Link>
               )}
             </div>
-          </div>
+          </Card>
         )}
-        <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
+        <Card className="p-5">
           <h2 className="font-display text-lg font-semibold">
             {test != null
               ? "The paper trail"
@@ -275,8 +279,8 @@ export function QuestionRunner({
             <Stat label="Correct" value={`${correct}/${results.length}`} />
             <Stat label="Avg time" value={formatSeconds(avg)} />
           </div>
-        </div>
-        <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
+        </Card>
+        <Card className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-grid text-left text-xs text-graphite">
@@ -319,20 +323,14 @@ export function QuestionRunner({
               })}
             </tbody>
           </table>
-        </div>
+        </Card>
         <div className="flex gap-3">
           {onRestart && (
-            <button
-              onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
-            >
+            <Button variant="outline" onClick={onRestart}>
               Set up another drill
-            </button>
+            </Button>
           )}
-          <Link
-            href="/"
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-          >
+          <Link href="/" className={buttonClasses()}>
             Back to today
           </Link>
         </div>
@@ -394,13 +392,9 @@ export function QuestionRunner({
         {!revealed && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
             <ConfidencePicker value={confidence} onChange={setConfidence} />
-            <button
-              onClick={submit}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
-            >
+            <Button size="sm" className="px-4" onClick={submit} keyHint="↵">
               Confirm answer
-              <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
-            </button>
+            </Button>
           </div>
         )}
 
@@ -446,24 +440,19 @@ export function QuestionRunner({
             selectedIndex={currentResult.selectedIndex}
           />
           <div className="flex items-center justify-between">
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={gotoPostmortem}
               disabled={currentResult.attemptId == null}
-              className={cn(
-                "rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50",
-                currentResult.attemptId == null && "opacity-50",
-              )}
+              className="disabled:opacity-50"
             >
               Send to post-mortem
-              <span className="ml-2 font-mono text-[10px] text-graphite">P</span>
-            </button>
-            <button
-              onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
-            >
+              <span className="font-mono text-[10px] text-graphite">P</span>
+            </Button>
+            <Button size="sm" className="px-4" onClick={next} keyHint="N">
               {index + 1 < questions.length ? "Next question" : "Finish"}
-              <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -471,23 +460,6 @@ export function QuestionRunner({
       <p className="text-center text-[11px] text-graphite/80">
         1–5 or A–E select · G/L/K confidence · Enter confirm · N next
       </p>
-    </div>
-  );
-}
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-[11px]">
-      {children}
-    </span>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="text-xs text-graphite">{label}</div>
-      <div className="font-mono text-2xl font-medium">{value}</div>
     </div>
   );
 }

@@ -17,6 +17,9 @@
   --redpen: #c63b2f;
   --amber: #b7791f;
   --highlight: #f5efd9;
+  /* Text/icon color on ballpoint-filled controls. Night desk lifts
+     --ballpoint for contrast as text, so the on-color flips dark. */
+  --on-ballpoint: #ffffff;
 }
 
 /* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
@@ -31,6 +34,7 @@
     --redpen: #e0705f;
     --amber: #d9a050;
     --highlight: #2b2820;
+    --on-ballpoint: #141519;
   }
 }
 :root[data-theme="dark"] {
@@ -43,6 +47,7 @@
   --redpen: #e0705f;
   --amber: #d9a050;
   --highlight: #2b2820;
+  --on-ballpoint: #141519;
 }
 
 /* KaTeX inherits currentColor, but its rules/fraction bars use borders that
@@ -58,6 +63,7 @@
   --color-redpen: var(--redpen);
   --color-amber: var(--amber);
   --color-highlight: var(--highlight);
+  --color-on-ballpoint: var(--on-ballpoint);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
@@ -98,16 +104,6 @@ body {
     );
 }
 
-/* Visible keyboard focus, always. */
-:focus-visible {
-  outline: 2px solid var(--ballpoint);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: var(--highlight);
-}
-
 /* KaTeX display math should scroll, never overflow the card. */
 .katex-display {
   overflow-x: auto;
@@ -123,18 +119,6 @@ body {
 }
 .katex-display .katex {
   font-size: 1.15em;
-}
-
-/* Night desk lifts --ballpoint for contrast AS TEXT, which leaves white
-   labels on ballpoint fills at ~2.5:1. On dark, every ballpoint-filled
-   control carries paper-dark text instead. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .bg-ballpoint.text-white {
-    color: var(--paper);
-  }
-}
-:root[data-theme="dark"] .bg-ballpoint.text-white {
-  color: var(--paper);
 }
 
 /* Loading skeleton shimmer (opacity only — safe under reduced motion). */

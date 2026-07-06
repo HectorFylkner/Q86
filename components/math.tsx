@@ -154,12 +154,7 @@ export function Md({
   const blocks = parseBlocks(source);
   return (
     <div
-      className={cn(
-        "space-y-2.5",
-        // A caller-supplied leading-* must win; cn() does not dedupe.
-        !className?.includes("leading-") && "leading-relaxed",
-        className,
-      )}
+      className={cn("space-y-2.5 leading-relaxed", className)}
     >
       {blocks.map((block, bi) => {
         const key = `b${bi}`;

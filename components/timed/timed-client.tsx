@@ -9,6 +9,8 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { TimeInkBar, type Checkpoint } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
 import { MarkingSummary } from "@/components/timed/marking-summary";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   saveTimedSession,
   startTimedSet,
@@ -353,7 +355,7 @@ export function TimedClient({
           </p>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
+          <Card className="flex flex-col p-5">
             <h2 className="font-display text-base font-semibold">
               Full section
             </h2>
@@ -362,23 +364,20 @@ export function TimedClient({
               Faithful mechanics: answer to advance, B bookmarks, review
               screen with up to 3 edits if time remains.
             </p>
-            <button
+            <Button
               onClick={() => handleStart("full")}
               disabled={!enough(21)}
-              className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-                !enough(21) && "cursor-not-allowed opacity-50",
-              )}
+              className="mt-4 disabled:opacity-50"
             >
               Start 21-question section
-            </button>
+            </Button>
             {!enough(21) && (
               <p className="mt-2 text-xs text-graphite">
                 Needs 21 verified questions; the bank has {verifiedTotal}.
               </p>
             )}
-          </div>
-          <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
+          </Card>
+          <Card className="flex flex-col p-5">
             <h2 className="font-display text-base font-semibold">Mini set</h2>
             <p className="mt-1 text-sm text-graphite">
               7 questions, 15:00. Mixed or single-skill.
@@ -400,22 +399,19 @@ export function TimedClient({
               ))}
             </div>
             <div className="flex-1" />
-            <button
+            <Button
               onClick={() => handleStart("mini")}
               disabled={!enough(7)}
-              className={cn(
-                "mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-                !enough(7) && "cursor-not-allowed opacity-50",
-              )}
+              className="mt-4 disabled:opacity-50"
             >
               Start 7-question mini
-            </button>
+            </Button>
             {!enough(7) && (
               <p className="mt-2 text-xs text-graphite">
                 Needs 7 verified questions; the bank has {verifiedTotal}.
               </p>
             )}
-          </div>
+          </Card>
         </div>
         <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
           <input
@@ -487,15 +483,12 @@ export function TimedClient({
 
   if (stage.kind === "error") {
     return (
-      <div className="mx-auto max-w-xl space-y-3 rounded-card border border-redpen/40 bg-surface p-5 shadow-ambient">
+      <Card className="mx-auto max-w-xl space-y-3 border-redpen/40 p-5">
         <p className="text-sm text-redpen">{stage.message}</p>
-        <button
-          onClick={() => finalize(answers, editRecords, bookmarks)}
-          className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-        >
+        <Button onClick={() => finalize(answers, editRecords, bookmarks)}>
           Retry saving the session
-        </button>
-      </div>
+        </Button>
+      </Card>
     );
   }
 
@@ -594,7 +587,7 @@ export function TimedClient({
           </span>
         </div>
 
-        <div className="relative rounded-card border border-grid bg-surface p-5 shadow-ambient">
+        <Card className="relative p-5">
           {violatedCurrent && (
             <div
               aria-hidden
@@ -617,22 +610,18 @@ export function TimedClient({
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-grid pt-3">
             <ConfidencePicker value={confidence} onChange={setConfidence} />
-            <button
-              onClick={confirmAnswer}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
-            >
+            <Button onClick={confirmAnswer} className="py-1.5" keyHint="↵">
               {currentIndex + 1 < questions.length
                 ? "Confirm and advance"
                 : "Confirm final answer"}
-              <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
-            </button>
+            </Button>
           </div>
           {hint && (
             <p className="mt-2 text-sm text-amber" role="status">
               {hint}
             </p>
           )}
-        </div>
+        </Card>
         <p className="text-center text-[11px] text-graphite/80">
           1–5 or A/C/D/E select · B bookmark · G/L/K confidence · Enter
           confirm — you cannot return until the review screen

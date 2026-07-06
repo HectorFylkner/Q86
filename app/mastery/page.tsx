@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
+import { SectionCard } from "@/components/ui/card";
 import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
@@ -28,13 +29,7 @@ export default async function MasteryPage() {
       </div>
 
       {FUNDAMENTAL_SKILLS.map((skill) => (
-        <section
-          key={skill}
-          className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
-        >
-          <h2 className="font-display text-sm font-semibold">
-            {SKILL_LABELS[skill]}
-          </h2>
+        <SectionCard key={skill} title={SKILL_LABELS[skill]}>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ladders
               .filter((l) => l.skill === skill)
@@ -70,7 +65,7 @@ export default async function MasteryPage() {
                           className={cn(
                             "rounded-[4px] border text-center font-mono text-[11px] leading-6",
                             rung.state === "mastered" &&
-                              "border-ballpoint bg-ballpoint text-white",
+                              "border-ballpoint bg-ballpoint text-on-ballpoint",
                             rung.state === "working" &&
                               "border-amber bg-amber/10 text-amber",
                             rung.state === "untouched" &&
@@ -96,7 +91,7 @@ export default async function MasteryPage() {
                 </div>
               ))}
           </div>
-        </section>
+        </SectionCard>
       ))}
     </div>
   );

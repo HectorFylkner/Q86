@@ -7,6 +7,8 @@ import { Md } from "@/components/math";
 import { gradeDeckCard } from "@/lib/actions";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
+import { buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const GRADE_KEYS: Record<string, ReviewGrade> = {
@@ -60,18 +62,15 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
 
   if (cards.length === 0) {
     return (
-      <section className="rounded-card border border-grid bg-surface p-6 text-center shadow-ambient">
+      <Card className="p-6 text-center">
         <p className="text-sm text-graphite">
           Nothing due — the deck builds itself from questions you miss, and
           cards you&apos;ve graded return when their interval comes up.
         </p>
-        <Link
-          href="/drill"
-          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-        >
+        <Link href="/drill" className={buttonClasses("ballpoint", "md", "mt-3")}>
           Go drill →
         </Link>
-      </section>
+      </Card>
     );
   }
 

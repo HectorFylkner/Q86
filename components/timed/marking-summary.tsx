@@ -7,6 +7,9 @@ import { Md } from "@/components/math";
 import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import type { AnswerRecord } from "@/components/timed/timed-client";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { StatTile } from "@/components/ui/stat";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
@@ -66,7 +69,7 @@ export function MarkingSummary({
     <div className="space-y-5">
       <h2 className="font-display text-lg font-semibold">Section marked</h2>
 
-      <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-grid text-left text-xs text-graphite">
@@ -147,7 +150,7 @@ export function MarkingSummary({
             })}
           </tbody>
         </table>
-      </div>
+      </Card>
 
       {showStats && (
         <motion.div
@@ -157,27 +160,26 @@ export function MarkingSummary({
           className="space-y-5"
         >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard
-              label="Section accuracy"
-              value={`${percent(correctCount, questions.length)}%`}
-            />
-            <StatCard
-              label="Correct"
-              value={`${correctCount}/${questions.length}`}
-            />
-            <StatCard
+            <StatTile label="Section accuracy">
+              <Odometer text={`${percent(correctCount, questions.length)}%`} />
+            </StatTile>
+            <StatTile label="Correct">
+              <Odometer text={`${correctCount}/${questions.length}`} />
+            </StatTile>
+            <StatTile
               label="Time violations (>2:45)"
-              value={String(violations)}
               tone={violations > 0 ? "amber" : undefined}
-            />
-            <StatCard
+            >
+              <Odometer text={String(violations)} />
+            </StatTile>
+            <StatTile
               label="Sub-60s wrong"
-              value={String(sub60Wrong)}
               tone={sub60Wrong > 0 ? "red" : undefined}
-            />
-            <StatCard
+            >
+              <Odometer text={String(sub60Wrong)} />
+            </StatTile>
+            <StatTile
               label="Edit net (this session)"
-              value={signed(saved.sessionEditNet)}
               tone={
                 saved.sessionEditNet < 0
                   ? "red"
@@ -185,10 +187,11 @@ export function MarkingSummary({
                     ? "blue"
                     : undefined
               }
-            />
-            <StatCard
+            >
+              <Odometer text={signed(saved.sessionEditNet)} />
+            </StatTile>
+            <StatTile
               label="Edit net (lifetime)"
-              value={signed(saved.lifetimeEditNet)}
               tone={
                 saved.lifetimeEditNet < 0
                   ? "red"
@@ -196,7 +199,9 @@ export function MarkingSummary({
                     ? "blue"
                     : undefined
               }
-            />
+            >
+              <Odometer text={signed(saved.lifetimeEditNet)} />
+            </StatTile>
           </div>
 
           {notReached > 0 && (
@@ -210,7 +215,7 @@ export function MarkingSummary({
 
 
           {edits.length > 0 && (
-            <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+            <Card className="p-4">
               <h3 className="font-display text-sm font-semibold">
                 Edits this session
               </h3>
@@ -249,20 +254,14 @@ export function MarkingSummary({
                   );
                 })}
               </ul>
-            </div>
+            </Card>
           )}
 
           <div className="flex gap-3">
-            <button
-              onClick={onRestart}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
-            >
+            <Button variant="outline" onClick={onRestart}>
               Set up another timed set
-            </button>
-            <Link
-              href="/"
-              className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-            >
+            </Button>
+            <Link href="/" className={buttonClasses()}>
               Back to today
             </Link>
           </div>
@@ -334,7 +333,7 @@ function PacingCard({
   const read = pacingRead(items);
 
   return (
-    <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+    <Card className="p-4">
       <h3 className="font-display text-sm font-semibold">Pacing read</h3>
       <p className="mt-0.5 text-xs text-graphite">
         Benchmarks by difficulty — harder questions earn more of the
@@ -391,31 +390,6 @@ function PacingCard({
           Clean pacing — no sinks, no panic answers.
         </p>
       )}
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "red" | "amber" | "blue";
-}) {
-  return (
-    <div className="rounded-card border border-grid bg-surface p-3 shadow-ambient">
-      <div className="text-[11px] leading-tight text-graphite">{label}</div>
-      <Odometer
-        text={value}
-        className={cn(
-          "mt-1 font-mono text-xl font-medium",
-          tone === "red" && "text-redpen",
-          tone === "amber" && "text-amber",
-          tone === "blue" && "text-ballpoint",
-        )}
-      />
-    </div>
+    </Card>
   );
 }

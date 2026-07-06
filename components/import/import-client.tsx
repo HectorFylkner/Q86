@@ -9,7 +9,8 @@ import {
   DOMAIN_LABELS,
   SKILL_LABELS,
 } from "@/lib/taxonomy";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { SectionCard } from "@/components/ui/card";
 
 type Stage =
   | { kind: "editing" }
@@ -77,15 +78,10 @@ export function ImportClient() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
-          Paste the score report text
-        </h2>
-        <p className="mt-1 text-xs text-graphite">
-          Copy everything from the official report page — scores, percentile
-          tables, per-question timing if you have it. The parsed result is
-          shown for confirmation before anything is saved.
-        </p>
+      <SectionCard
+        title="Paste the score report text"
+        subtitle="Copy everything from the official report page — scores, percentile tables, per-question timing if you have it. The parsed result is shown for confirmation before anything is saved."
+      >
         <textarea
           value={rawText}
           onChange={(e) => {
@@ -98,17 +94,13 @@ export function ImportClient() {
           className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
         />
         <div className="mt-3 flex items-center gap-3">
-          <button
+          <Button
             onClick={parse}
             disabled={rawText.trim().length < 40 || stage.kind === "parsing"}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-              (rawText.trim().length < 40 || stage.kind === "parsing") &&
-                "cursor-not-allowed opacity-50",
-            )}
+            className="disabled:opacity-50"
           >
             Parse the report
-          </button>
+          </Button>
           {stage.kind === "parsing" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
@@ -124,14 +116,10 @@ export function ImportClient() {
             <span className="text-sm text-redpen">{stage.message}</span>
           )}
         </div>
-      </section>
+      </SectionCard>
 
       {parsed && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">
-            Parsed result — confirm before saving
-          </h2>
-
+        <SectionCard title="Parsed result — confirm before saving">
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div>
               <h3 className="text-xs font-medium text-graphite">Sections</h3>
@@ -215,26 +203,23 @@ export function ImportClient() {
           </div>
 
           <div className="mt-4 flex gap-3 border-t border-grid pt-3">
-            <button
+            <Button
               onClick={() => confirmSave(parsed)}
               disabled={stage.kind === "saving"}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-                stage.kind === "saving" && "cursor-wait opacity-60",
-              )}
+              className="disabled:cursor-wait disabled:opacity-60"
             >
               {stage.kind === "saving"
                 ? "Saving…"
                 : "Confirm and save as baseline"}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setStage({ kind: "editing" })}
-              className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
               Discard the parse
-            </button>
+            </Button>
           </div>
-        </section>
+        </SectionCard>
       )}
     </div>
   );

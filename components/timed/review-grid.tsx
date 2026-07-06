@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Bookmark, Pencil } from "lucide-react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -70,18 +72,15 @@ export function ReviewGrid({
     return (
       <div className="mx-auto mt-4 max-w-3xl space-y-4">
         <div className="flex items-center justify-between text-xs text-graphite">
-          <button
-            onClick={() => setOpenIndex(null)}
-            className="rounded-control border border-grid bg-surface px-2.5 py-1 hover:border-graphite/50"
-          >
+          <Button variant="outline" size="xs" onClick={() => setOpenIndex(null)}>
             ← Back to review grid
-          </button>
+          </Button>
           <span className="font-mono">
             Question {openIndex + 1} · edits used {editsUsed}/{MAX_EDITS}
           </span>
         </div>
 
-        <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
+        <Card className="p-5">
           <Md source={q.stemMd} className="text-[16px]" />
           <div className="mt-5">
             <ChoiceList
@@ -162,16 +161,18 @@ export function ReviewGrid({
                 >
                   Commit the change
                 </button>
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="px-4"
                   onClick={() => {
                     setPendingIndex(null);
                     setReason(null);
                     setJustification("");
                   }}
-                  className="rounded-control border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
                 >
                   Keep the original answer
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -195,14 +196,14 @@ export function ReviewGrid({
               </span>
             )}
           </div>
-        </div>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="mx-auto mt-4 max-w-3xl space-y-4">
-      <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
+      <Card className="p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">
             Review &amp; edit
@@ -248,14 +249,11 @@ export function ReviewGrid({
           ))}
         </div>
         <div className="mt-5 flex justify-end border-t border-grid pt-4">
-          <button
-            onClick={onSubmit}
-            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-          >
+          <Button onClick={onSubmit}>
             Submit section and see the marking
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

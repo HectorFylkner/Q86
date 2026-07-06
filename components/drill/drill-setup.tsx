@@ -15,6 +15,8 @@ import {
   type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export type CountRow = {
@@ -147,7 +149,7 @@ export function DrillSetup({
         </p>
       )}
 
-      <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
+      <Card className="p-5">
         <h2 className="font-display text-base font-semibold">Skill</h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {(["all", ...FUNDAMENTAL_SKILLS] as const).map((s) => (
@@ -339,7 +341,7 @@ export function DrillSetup({
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-grid pt-4">
-          <button
+          <Button
             onClick={() =>
               onStart({
                 filter: buildFilter(),
@@ -349,21 +351,18 @@ export function DrillSetup({
               })
             }
             disabled={matching === 0}
-            className={cn(
-              "rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90",
-              matching === 0 && "cursor-not-allowed opacity-50",
-            )}
+            className="disabled:opacity-50"
           >
             Start drill: {Math.min(count, matching)} questions
-          </button>
+          </Button>
           <span className="text-sm text-graphite">
             {matching} verified questions match this filter
             {matching > 0 && matching < count && " — drill clamped to match"}
           </span>
         </div>
-      </section>
+      </Card>
 
-      <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
+      <Card className="p-5">
         <h2 className="font-display text-base font-semibold">
           Generate more questions
         </h2>
@@ -405,7 +404,7 @@ export function DrillSetup({
             <span className="text-sm text-redpen">{genState.message}</span>
           )}
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

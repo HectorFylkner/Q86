@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage({
@@ -9,7 +12,7 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto mt-16 max-w-sm">
-      <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
+      <Card className="p-6">
         <h1 className="font-display text-lg font-semibold">Q86</h1>
         <p className="mt-1 text-sm text-graphite">
           This instance is private. Enter the site password to train.
@@ -29,14 +32,11 @@ export default async function LoginPage({
               That password is not right — try again.
             </p>
           )}
-          <button
-            type="submit"
-            className="w-full rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-          >
+          <Button type="submit" className="w-full">
             Enter
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,7 +1,11 @@
+import { twMerge } from "tailwind-merge";
+
+/** Joins class fragments and resolves Tailwind conflicts (later wins),
+ *  so callers can override primitive defaults without !important. */
 export function cn(
   ...parts: Array<string | false | null | undefined>
 ): string {
-  return parts.filter(Boolean).join(" ");
+  return twMerge(parts.filter(Boolean).join(" "));
 }
 
 /** 137 → "2:17"; 3661 → "61:01" (minutes never roll into hours). */

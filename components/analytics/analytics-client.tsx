@@ -27,6 +27,7 @@ import {
   type EditReason,
 } from "@/lib/taxonomy";
 import { cn, percent } from "@/lib/utils";
+import { Card, SectionCard } from "@/components/ui/card";
 import { useChartTokens } from "@/components/use-chart-tokens";
 
 export function AnalyticsClient({ data }: { data: AnalyticsData }) {
@@ -50,10 +51,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   if (data.attemptCount === 0) {
     return (
       <div className="space-y-4">
-        <p className="rounded-card border border-grid bg-surface p-5 text-sm text-graphite shadow-ambient">
+        <Card className="p-5 text-sm text-graphite">
           No attempts logged yet. Run a drill or a timed set and the report
           fills in.
-        </p>
+        </Card>
         <Footer />
       </div>
     );
@@ -62,7 +63,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   return (
     <div className="space-y-6">
       {/* 1 — score-report mirror */}
-      <Section
+      <SectionCard
         title="Score-report mirror"
         subtitle={`Accuracy by domain, context, and fundamental skill — same cuts as the official report. ${data.attemptCount} attempts.`}
       >
@@ -71,10 +72,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           <MirrorGroup title="Context" bars={data.mirror.contexts} />
           <MirrorGroup title="Fundamental skill" bars={data.mirror.skills} />
         </div>
-      </Section>
+      </SectionCard>
 
       {/* 2 — heatmap */}
-      <Section
+      <SectionCard
         title="Miss heatmap"
         subtitle="Classified wrong answers: subtopic × error type."
       >
@@ -113,6 +114,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                         data.heatmap.max > 0 ? count / data.heatmap.max : 0;
                       return (
                         <td key={et} className="p-0.5">
+                          {/* DOM cells (not SVG) take CSS variables directly:
+                              mixing toward --surface keeps night-desk cells
+                              dark, and high-intensity text flips to --surface
+                              for contrast against the mostly-redpen fill. */}
                           <div
                             title={`${SUBTOPIC_LABELS[row.subtopic]} × ${ERROR_TYPE_LABELS[et]}: ${count}`}
                             className="flex h-8 w-16 items-center justify-center rounded-[4px] border border-grid font-mono text-xs"
@@ -120,10 +125,13 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                               backgroundColor:
                                 count === 0
                                   ? "transparent"
-                                  : `color-mix(in srgb, ${REDPEN} ${Math.round(
+                                  : `color-mix(in srgb, var(--redpen) ${Math.round(
                                       12 + intensity * 68,
-                                    )}%, white)`,
-                              color: intensity > 0.55 ? "white" : INK,
+                                    )}%, var(--surface))`,
+                              color:
+                                intensity > 0.55
+                                  ? "var(--surface)"
+                                  : "var(--ink)",
                             }}
                           >
                             {count > 0 ? count : ""}
@@ -137,10 +145,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </table>
           </div>
         )}
-      </Section>
+      </SectionCard>
 
       {/* 2b — accuracy × difficulty matrix */}
-      <Section
+      <SectionCard
         title="Accuracy by difficulty"
         subtitle="Where exactly each subtopic breaks: accuracy per difficulty tier, focused attempts only."
       >
@@ -201,40 +209,22 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </table>
           </div>
         )}
-      </Section>
+      </SectionCard>
 
       {/* 2c — training volume calendar */}
-      <Section
+      <SectionCard
         title="Training volume"
         subtitle="Focused attempts per day, last 12 weeks. Consistency beats intensity."
       >
-        <div className="flex flex-wrap items-end gap-[3px]">
-          {data.volume.map((day) => {
-            const level =
-              day.count === 0
-                ? "bg-grid/60"
-                : day.count < 10
-                  ? "bg-ballpoint/25"
-                  : day.count < 25
-                    ? "bg-ballpoint/55"
-                    : "bg-ballpoint";
-            return (
-              <div
-                key={day.date}
-                title={`${day.date}: ${day.count} attempt${day.count === 1 ? "" : "s"}`}
-                className={cn("h-4 w-4 rounded-[3px]", level)}
-              />
-            );
-          })}
-        </div>
+        <VolumeCalendar volume={data.volume} />
         <p className="mt-2 text-[11px] text-graphite">
           Each square is a day: blank → none, light → under 10, mid → under 25,
           full → 25+.
         </p>
-      </Section>
+      </SectionCard>
 
       {/* 3 — time vs accuracy scatter */}
-      <Section
+      <SectionCard
         title="Time vs. accuracy"
         subtitle="Every attempt is a dot. The shaded zones are the two documented failure modes."
       >
@@ -331,10 +321,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             />
           </ScatterChart>
         </ResponsiveContainer>
-      </Section>
+      </SectionCard>
 
       {/* 4 — edit ledger */}
-      <Section
+      <SectionCard
         title="Edit ledger"
         subtitle="Every Review & Edit answer change, lifetime."
       >
@@ -416,10 +406,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </table>
           </div>
         )}
-      </Section>
+      </SectionCard>
 
       {/* 5 — calibration */}
-      <Section
+      <SectionCard
         title="Calibration"
         subtitle="Accuracy by pre-answer confidence: expected vs. actual."
       >
@@ -475,10 +465,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             />
           </BarChart>
         </ResponsiveContainer>
-      </Section>
+      </SectionCard>
 
       {/* 6 — rolling trend */}
-      <Section
+      <SectionCard
         title="Rolling 7-day accuracy by skill"
         subtitle="Each point is the trailing 7-day accuracy on that day; gaps mean no attempts in the window."
       >
@@ -547,11 +537,11 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             />
           </LineChart>
         </ResponsiveContainer>
-      </Section>
+      </SectionCard>
 
       {/* 7 — redo compliance + pattern ELO */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Section
+        <SectionCard
           title="Redo-queue compliance"
           subtitle="Spaced redos: what's open, overdue, and cleared."
         >
@@ -568,9 +558,9 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               tone="blue"
             />
           </div>
-        </Section>
+        </SectionCard>
 
-        <Section
+        <SectionCard
           title="Pattern-trainer ELO"
           subtitle="Per-category rating; the line marks the 1200 start."
         >
@@ -612,31 +602,11 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               />
             </BarChart>
           </ResponsiveContainer>
-        </Section>
+        </SectionCard>
       </div>
 
       <Footer />
     </div>
-  );
-}
-
-
-
-function Section({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-      <h2 className="font-display text-sm font-semibold">{title}</h2>
-      <p className="mb-3 mt-0.5 text-xs text-graphite">{subtitle}</p>
-      {children}
-    </section>
   );
 }
 
@@ -668,6 +638,80 @@ function MirrorGroup({ title, bars }: { title: string; bars: MirrorBar[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function volumeTone(count: number): string {
+  if (count === 0) return "bg-grid/60";
+  if (count < 10) return "bg-ballpoint/25";
+  if (count < 25) return "bg-ballpoint/55";
+  return "bg-ballpoint";
+}
+
+/** Week-aligned ink calendar: columns are Monday-start weeks, so the
+ *  consistency story actually reads as weeks instead of a wrapped strip. */
+function VolumeCalendar({
+  volume,
+}: {
+  volume: { date: string; count: number }[];
+}) {
+  if (volume.length === 0) return null;
+
+  const first = new Date(`${volume[0].date}T00:00:00`);
+  const lead = (first.getDay() + 6) % 7; // Monday = 0
+  const cells: ({ date: string; count: number } | null)[] = [
+    ...Array<null>(lead).fill(null),
+    ...volume,
+  ];
+  const weeks: (typeof cells)[] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  const monthOf = (week: (typeof cells)[number][]) =>
+    week.find(Boolean)?.date.slice(0, 7) ?? null;
+
+  return (
+    <div className="flex gap-[3px] overflow-x-auto pb-1">
+      <div className="mr-1 flex flex-col gap-[3px]">
+        <div className="h-3.5" />
+        {["Mon", "", "Wed", "", "Fri", "", ""].map((label, i) => (
+          <div
+            key={i}
+            className="flex h-4 items-center font-mono text-[9px] text-graphite"
+          >
+            {label}
+          </div>
+        ))}
+      </div>
+      {weeks.map((week, w) => {
+        const month = monthOf(week);
+        const newMonth = w === 0 || month !== monthOf(weeks[w - 1]);
+        return (
+          <div key={w} className="flex flex-col gap-[3px]">
+            <div className="h-3.5 whitespace-nowrap font-mono text-[9px] text-graphite">
+              {newMonth && month
+                ? new Date(`${month}-01T00:00:00`).toLocaleString("en", {
+                    month: "short",
+                  })
+                : ""}
+            </div>
+            {Array.from({ length: 7 }, (_, d) => {
+              const day = week[d];
+              if (!day) return <div key={d} className="h-4 w-4" />;
+              return (
+                <div
+                  key={d}
+                  title={`${new Date(`${day.date}T00:00:00`).toLocaleDateString(
+                    "en",
+                    { weekday: "short", day: "numeric", month: "short" },
+                  )}: ${day.count} attempt${day.count === 1 ? "" : "s"}`}
+                  className={cn("h-4 w-4 rounded-[3px]", volumeTone(day.count))}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }

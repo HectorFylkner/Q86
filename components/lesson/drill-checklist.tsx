@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+/** Footer action links: primary (ballpoint) vs secondary (quiet outline
+ *  that inks up on hover). min-h keeps the 44px touch target. */
+const primaryLinkClasses = buttonClasses("ballpoint", "md", "min-h-[44px]");
+const secondaryLinkClasses = buttonClasses(
+  "outline",
+  "md",
+  "min-h-[44px] font-medium hover:border-ballpoint/50 hover:text-ballpoint",
+);
 
 /** localStorage key per chapter; value {c: checked indexes, t: item count}.
  *  The Learn index reads the same keys to show readiness badges. */
@@ -63,7 +74,7 @@ export function DrillChecklist({
   const all = done === items.length && items.length > 0;
 
   return (
-    <div className="rounded-card border border-grid bg-surface shadow-ambient">
+    <Card>
       <div className="flex items-center justify-between gap-3 border-b border-grid px-4 py-3 sm:px-5">
         <p className="text-sm text-graphite">
           Tick each one honestly — then go prove it.
@@ -91,7 +102,7 @@ export function DrillChecklist({
               />
               <span
                 aria-hidden
-                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border text-[11px] leading-none text-white transition-colors peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ballpoint ${
+                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border text-[11px] leading-none text-on-ballpoint transition-colors peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ballpoint ${
                   checked[i]
                     ? "border-ballpoint bg-ballpoint"
                     : "border-graphite/70 bg-paper"
@@ -131,28 +142,20 @@ export function DrillChecklist({
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/drill?sub=${subtopic}&d=3`}
-            className={
-              all && test
-                ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-                : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-            }
+            className={all && test ? secondaryLinkClasses : primaryLinkClasses}
           >
             Drill this now →
           </Link>
           {test && (
             <Link
               href={`/drill?test=${subtopic}`}
-              className={
-                all
-                  ? "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-                  : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-              }
+              className={all ? primaryLinkClasses : secondaryLinkClasses}
             >
               {test.passed ? "Retake the test" : "Chapter test →"}
             </Link>
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

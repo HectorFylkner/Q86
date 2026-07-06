@@ -7,6 +7,8 @@ import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { startRedoSession } from "@/lib/actions";
+import { Button } from "@/components/ui/button";
+import { Card, SectionCard } from "@/components/ui/card";
 import type { Question } from "@/lib/db/schema";
 import {
   CONFIDENCE_LABELS,
@@ -24,7 +26,7 @@ import {
   type SessionMode,
   type Subtopic,
 } from "@/lib/taxonomy";
-import { cn, formatSeconds } from "@/lib/utils";
+import { formatSeconds } from "@/lib/utils";
 
 export type DueRow = {
   id: number;
@@ -198,22 +200,20 @@ export function QueueClient({
         </p>
       )}
 
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
             Due now · {due.length}
           </h2>
           {due.length > 0 && (
-            <button
+            <Button
               onClick={() => startRedo(due.map((d) => d.questionId))}
               disabled={starting}
-              className={cn(
-                "rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90",
-                starting && "cursor-wait opacity-60",
-              )}
+              size="sm"
+              className="px-4 disabled:cursor-wait disabled:opacity-60"
             >
               Redo all {due.length} due
-            </button>
+            </Button>
           )}
         </div>
         {due.length === 0 ? (
@@ -257,13 +257,10 @@ export function QueueClient({
             </table>
           </>
         )}
-      </section>
+      </Card>
 
       {upcoming.length > 0 && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">
-            Scheduled · {upcoming.length}
-          </h2>
+        <SectionCard title={`Scheduled · ${upcoming.length}`}>
           <ul className="mt-2 space-y-1">
             {upcoming.map((d) => (
               <li key={d.id} className="flex justify-between text-sm">
@@ -279,10 +276,10 @@ export function QueueClient({
               </li>
             ))}
           </ul>
-        </section>
+        </SectionCard>
       )}
 
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
             Error log
@@ -290,13 +287,15 @@ export function QueueClient({
               {filteredLog.length} of {log.length} attempts
             </span>
           </h2>
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={exportCsv}
-            className="flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-xs hover:border-graphite/50"
+            className="gap-1.5 text-xs"
           >
             <Download size={13} />
             Export CSV ({filteredLog.length} rows)
-          </button>
+          </Button>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
@@ -417,7 +416,7 @@ export function QueueClient({
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }
