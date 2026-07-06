@@ -56,6 +56,42 @@ export type CurriculumPlan = {
 export const TEST_OUT_MIN_ATTEMPTS = 8;
 export const TEST_OUT_ACCURACY = 0.8;
 
+/** A subtopic has exited first acquisition — and belongs in mixed,
+ *  interleaved review instead of blocked drilling — once its chapter
+ *  test is passed or it has real drill history. */
+export const ACQUISITION_ATTEMPTS = 10;
+export function isStudied(row: CurriculumRow): boolean {
+  return row.testPassed || row.attempts >= ACQUISITION_ATTEMPTS;
+}
+
+/** The plan's drill block interleaves only when enough subtopics are
+ *  past acquisition to make mixing meaningful. */
+export const INTERLEAVE_MIN_STUDIED = 4;
+
+/** Concept pairs the exam loves to blur into each other. When mixed
+ *  review schedules one member and the partner is also studied, the
+ *  partner is co-scheduled so the discrimination itself gets practiced
+ *  — interleaving's whole advantage over blocking. Hand-authored. */
+export const CONFUSABLE_PAIRS: Array<[Subtopic, Subtopic]> = [
+  ["combinatorics", "probability"],
+  ["rates_speed_work", "ratios_proportions"],
+  ["percent_change_chains", "interest_profit_discount"],
+  ["mixtures_weighted_avg", "statistics_mean_median_sd"],
+  ["divisibility_gcf_lcm", "prime_factorization"],
+  ["remainders_units_digits", "exponents_roots_properties"],
+  ["inequalities", "abs_value_number_line_decimals"],
+  ["linear_systems", "quadratics_factoring"],
+  ["consecutive_evenly_spaced", "series_patterns"],
+];
+
+export function confusablePartner(subtopic: Subtopic): Subtopic | null {
+  for (const [a, b] of CONFUSABLE_PAIRS) {
+    if (a === subtopic) return b;
+    if (b === subtopic) return a;
+  }
+  return null;
+}
+
 /** Shrinkage prior for drill weakness: with few attempts the estimate
  *  regresses toward neutral 0.5 instead of swinging on 2-3 questions. */
 const PRIOR_WEIGHT = 6;

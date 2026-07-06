@@ -162,14 +162,26 @@ export default async function TodayPage() {
         </PlanCard>
 
         <PlanCard
-          title={`Weighted drill · ${plan.drill.total} questions`}
+          title={
+            plan.drill.mode === "interleaved"
+              ? `Mixed review · ${plan.drill.total} questions`
+              : `Weighted drill · ${plan.drill.total} questions`
+          }
           body={
-            <span>
-              {plan.drill.bySkill
-                .filter((s) => s.count > 0)
-                .map((s) => `${SKILL_SHORT_LABELS[s.skill]} ${s.count}`)
-                .join(" · ")}
-            </span>
+            plan.drill.mode === "interleaved" ? (
+              <span>
+                Interleaved across your {plan.drill.studiedCount} studied
+                subtopics — staleness and weakness pick the mix, difficulty
+                follows each ladder.
+              </span>
+            ) : (
+              <span>
+                {plan.drill.bySkill
+                  .filter((s) => s.count > 0)
+                  .map((s) => `${SKILL_SHORT_LABELS[s.skill]} ${s.count}`)
+                  .join(" · ")}
+              </span>
+            )
           }
         >
           {verifiedCount > 0 ? (

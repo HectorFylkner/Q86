@@ -4,6 +4,8 @@ import {
 } from "./taxonomy.ts";
 import {
   computeCurriculum,
+  isStudied,
+  INTERLEAVE_MIN_STUDIED,
   type CurriculumPlan,
   type CurriculumRow,
 } from "./curriculum.ts";
@@ -88,6 +90,10 @@ export type DailyPlan = {
   drill: {
     total: number;
     bySkill: Array<{ skill: FundamentalSkill; count: number }>;
+    /** Interleaved mixed review across studied subtopics once enough
+     *  chapters are past acquisition; skill-blocked before that. */
+    mode: "interleaved" | "by_skill";
+    studiedCount: number;
   };
   weights: Record<FundamentalSkill, number>;
   dueRedoCount: number;
@@ -219,6 +225,11 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     drill: {
       total,
       bySkill: bySkill.map(({ skill, count }) => ({ skill, count })),
+      mode:
+        inputs.curriculum.filter(isStudied).length >= INTERLEAVE_MIN_STUDIED
+          ? "interleaved"
+          : "by_skill",
+      studiedCount: inputs.curriculum.filter(isStudied).length,
     },
     weights,
     dueRedoCount: inputs.dueRedoCount,

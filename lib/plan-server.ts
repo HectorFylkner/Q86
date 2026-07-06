@@ -7,7 +7,12 @@ import {
   redoQueue,
 } from "./db/schema.ts";
 import { chapterTestStates } from "./chapter-tests.ts";
-import type { CurriculumRow } from "./curriculum.ts";
+import {
+  confusablePartner,
+  isStudied,
+  weaknessScore,
+  type CurriculumRow,
+} from "./curriculum.ts";
 import { ELO_START } from "./elo.ts";
 import { selectQuestions } from "./engine.ts";
 import {
@@ -187,16 +192,149 @@ export async function todaysPlan(): Promise<DailyPlan> {
   return computeDailyPlan(await gatherPlanInputs());
 }
 
-/** Pick the concrete questions for today's weighted drill block. */
+/** Staleness saturates: three weeks without touching a subtopic is as
+ *  stale as it gets. */
+const STALENESS_CAP_DAYS = 21;
+/** No subtopic dominates a mixed set — high per-set variety is the
+ *  point of interleaving. */
+const MAX_PER_SUBTOPIC = 3;
+
+/** Pick the concrete questions for today's drill block.
+ *
+ *  Once enough subtopics are past first acquisition the block is mixed,
+ *  interleaved review: slots are apportioned by staleness × weakness
+ *  across all studied subtopics, difficulty centers on each ladder's
+ *  current rung (dropping the +1 reach when the subtopic has gone
+ *  stale, aiming mixed-review success at roughly 70–85%), and
+ *  confusable pairs co-schedule so the discrimination gets practiced.
+ *  Before that, the original skill-weighted blocks fill the day. */
 export async function selectPlanDrillIds(plan: DailyPlan): Promise<number[]> {
+  if (plan.drill.mode !== "interleaved") {
+    const ids: number[] = [];
+    for (const { skill, count } of plan.drill.bySkill) {
+      if (count <= 0) continue;
+      const picked = await selectQuestions(
+        { skills: [skill], excludeIds: ids },
+        count,
+      );
+      ids.push(...picked.map((q) => q.id));
+    }
+    return ids;
+  }
+
+  const rows = (await gatherCurriculumRows()).filter(isStudied);
+  const ladders = new Map(
+    (await computeLadders()).map((l) => [l.subtopic, l]),
+  );
+
+  // Days since the last focused attempt per subtopic, for staleness.
+  const lastSeen = new Map<Subtopic, number>();
+  const recent = await db
+    .select({ subtopic: questions.subtopic, createdAt: attempts.createdAt })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.focus, "focused"))
+    .orderBy(desc(attempts.id))
+    .limit(5000)
+    .all();
+  for (const r of recent) {
+    if (!lastSeen.has(r.subtopic)) {
+      lastSeen.set(r.subtopic, r.createdAt.getTime());
+    }
+  }
+  const now = Date.now();
+  const stalenessOf = (subtopic: Subtopic): number => {
+    const seen = lastSeen.get(subtopic);
+    const days =
+      seen == null ? STALENESS_CAP_DAYS : (now - seen) / 86_400_000;
+    return Math.min(days, STALENESS_CAP_DAYS) / STALENESS_CAP_DAYS;
+  };
+
+  // Staleness × weakness, floored so nothing studied fully drops out.
+  const weighted = rows.map((row) => ({
+    row,
+    staleness: stalenessOf(row.subtopic),
+    weight:
+      Math.max(0.15, stalenessOf(row.subtopic)) *
+      Math.max(0.1, weaknessScore(row)),
+  }));
+
+  // Largest-remainder apportionment under the per-subtopic cap.
+  const total = plan.drill.total;
+  const weightSum = weighted.reduce((s, w) => s + w.weight, 0);
+  const slots = new Map<Subtopic, number>();
+  const remainders = weighted
+    .map((w) => {
+      const exact = (w.weight / weightSum) * total;
+      const base = Math.min(Math.floor(exact), MAX_PER_SUBTOPIC);
+      slots.set(w.row.subtopic, base);
+      return { subtopic: w.row.subtopic, remainder: exact - base };
+    })
+    .sort((a, b) => b.remainder - a.remainder);
+  let assigned = [...slots.values()].reduce((s, n) => s + n, 0);
+  for (let i = 0; assigned < total && i < remainders.length * 4; i++) {
+    const { subtopic } = remainders[i % remainders.length];
+    if ((slots.get(subtopic) ?? 0) < MAX_PER_SUBTOPIC) {
+      slots.set(subtopic, (slots.get(subtopic) ?? 0) + 1);
+      assigned++;
+    }
+  }
+
+  // Confusable co-scheduling: a scheduled subtopic pulls its studied
+  // partner in with one question, stolen from the largest allocation.
+  const studiedSet = new Set(rows.map((r) => r.subtopic));
+  for (const [subtopic, n] of [...slots.entries()]) {
+    if (n <= 0) continue;
+    const partner = confusablePartner(subtopic);
+    if (
+      partner == null ||
+      !studiedSet.has(partner) ||
+      (slots.get(partner) ?? 0) > 0
+    )
+      continue;
+    const donor = [...slots.entries()]
+      .filter(([s]) => s !== subtopic)
+      .sort((a, b) => b[1] - a[1])[0];
+    if (donor == null || donor[1] <= 1) continue;
+    slots.set(donor[0], donor[1] - 1);
+    slots.set(partner, 1);
+  }
+
+  // Fill each subtopic centered on its ladder rung; stale subtopics
+  // drop the +1 reach so re-entry lands in the 70–85% success band.
   const ids: number[] = [];
-  for (const { skill, count } of plan.drill.bySkill) {
-    if (count <= 0) continue;
-    const picked = await selectQuestions(
-      { skills: [skill], excludeIds: ids },
-      count,
+  for (const { row, staleness } of weighted) {
+    const n = slots.get(row.subtopic) ?? 0;
+    if (n <= 0) continue;
+    const rung = ladders.get(row.subtopic)?.currentRung ?? 5;
+    const dMin = Math.max(2, rung - 1);
+    const dMax = staleness > 0.6 ? rung : Math.min(5, rung + 1);
+    let picked = await selectQuestions(
+      {
+        subtopics: [row.subtopic],
+        difficultyMin: dMin,
+        difficultyMax: Math.max(dMin, dMax),
+        excludeIds: ids,
+      },
+      n,
     );
+    if (picked.length < n) {
+      picked = picked.concat(
+        await selectQuestions(
+          {
+            subtopics: [row.subtopic],
+            excludeIds: [...ids, ...picked.map((q) => q.id)],
+          },
+          n - picked.length,
+        ),
+      );
+    }
     ids.push(...picked.map((q) => q.id));
+  }
+  // Interleave: shuffle so consecutive questions change subtopic.
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
   }
   return ids;
 }
