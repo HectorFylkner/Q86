@@ -74,7 +74,12 @@ export default async function LessonPage({
             Chapter {at + 1} of {chapters.length}
           </span>
           <span>~{meta.minutes} min</span>
-          <span>3 worked examples</span>
+          {parsed && (
+            <span>
+              {parsed.examples.length} worked example
+              {parsed.examples.length === 1 ? "" : "s"}
+            </span>
+          )}
           {testState?.passed && (
             <span className="text-ballpoint">✓ test passed</span>
           )}

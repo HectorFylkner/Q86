@@ -83,3 +83,20 @@ Avoid `pnpm seed --api` (LLM generation): its verification is an LLM
 cross-solve plus numeric spot-check, and a brute-force audit found that
 gate had passed 22 defective questions out of 43. If you do generate,
 re-verify every new question through the authoring gate.
+
+## Extending the lessons
+
+Chapters in `content/lessons/` are written against a strict dialect
+(seven `##` sections, exactly 3 worked examples, arrow-split trigger
+cues — see `lib/lesson-parse.ts`); a chapter that deviates falls back to
+a generic markdown render and loses its structured layout. The lesson
+counterpart to `verify-bank.ts` is
+
+```sh
+node --experimental-strip-types scripts/validate-lessons.ts
+```
+
+which parses every chapter, re-asserts the section minimums, prints
+per-file diagnostics, and exits non-zero on any failure. Run it after
+touching any lesson file, exactly as `verify-bank.ts` runs after any
+bank change.
