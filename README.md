@@ -89,14 +89,24 @@ re-verify every new question through the authoring gate.
 Chapters in `content/lessons/` are written against a strict dialect
 (seven `##` sections, exactly 3 worked examples, arrow-split trigger
 cues — see `lib/lesson-parse.ts`); a chapter that deviates falls back to
-a generic markdown render and loses its structured layout. The lesson
-counterpart to `verify-bank.ts` is
+a generic markdown render and loses its structured layout, its example
+commitments, and its cue/trap retrieval cards. The lesson counterpart
+to `verify-bank.ts` is
 
 ```sh
 node --experimental-strip-types scripts/validate-lessons.ts
 ```
 
-which parses every chapter, re-asserts the section minimums, prints
-per-file diagnostics, and exits non-zero on any failure. Run it after
-touching any lesson file, exactly as `verify-bank.ts` runs after any
-bank change.
+which parses every chapter, re-asserts the section minimums, checks
+visual directives, prints per-file diagnostics, and exits non-zero on
+any failure. Run it after touching any lesson file, exactly as
+`verify-bank.ts` runs after any bank change.
+
+Chapters are keyed by taxonomy subtopic (filename = route param =
+progress key); the two strategy chapters
+(`data_sufficiency_discipline`, `choosing_fastest_path`) extend that
+chapter namespace without touching the question taxonomy. Where a
+picture is the method, the dialect offers three named directives —
+`::set-matrix`, `::number-line`, `::rate-timeline` on their own line
+(grammar in `lib/directives.ts`) — anything malformed degrades to
+literal text. No general HTML or images, ever.
