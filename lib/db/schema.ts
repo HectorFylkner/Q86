@@ -5,6 +5,7 @@ import {
   real,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type {
   Confidence,
@@ -228,6 +229,41 @@ export const lessonProgress = sqliteTable("lesson_progress", {
     .default(sql`(unixepoch() * 1000)`),
 });
 
+// Concept-level spaced retrieval: a chapter's trigger cues and trap
+// gallery become retrieval-first cards when its test is passed, merged
+// into the daily deck (question-derived cards keep priority) and
+// scheduled by the same SM-2-lite ladder (lib/srs.ts). Rows are never
+// deleted — cards whose source bullet left the chapter retire.
+export const lessonReviews = sqliteTable(
+  "lesson_reviews",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    subtopic: text("subtopic").$type<Subtopic>().notNull(),
+    kind: text("kind").$type<"cue" | "trap">().notNull(),
+    // Position in the chapter's parsed cue/trap list at enrollment,
+    // the stable identity for idempotent re-enrollment.
+    ordinal: integer("ordinal").notNull(),
+    front: text("front").notNull(),
+    back: text("back").notNull(),
+    ease: real("ease").notNull().default(2.5),
+    intervalDays: integer("interval_days").notNull().default(0),
+    reps: integer("reps").notNull().default(0),
+    lapses: integer("lapses").notNull().default(0),
+    dueAt: integer("due_at", { mode: "timestamp_ms" }).notNull(),
+    retired: integer("retired", { mode: "boolean" }).notNull().default(false),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("lesson_reviews_due_idx").on(t.retired, t.dueAt),
+    uniqueIndex("lesson_reviews_card_idx").on(t.subtopic, t.kind, t.ordinal),
+  ],
+);
+
 // Content QC: questions the user flags mid-review. Resolving may retire
 // the question (verified = false) — rows are never deleted.
 export const questionFlags = sqliteTable(
@@ -261,3 +297,4 @@ export type BaselineReport = typeof baselineReports.$inferSelect;
 export type DeckReview = typeof deckReviews.$inferSelect;
 export type QuestionFlag = typeof questionFlags.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
+export type LessonReview = typeof lessonReviews.$inferSelect;

@@ -10,6 +10,7 @@ import {
   edits,
   eloRatings,
   lessonProgress,
+  lessonReviews,
   patternAttempts,
   questionFlags,
   questions,
@@ -18,6 +19,8 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { CHAPTER_TEST_BAR } from "./chapter-test-config.ts";
+import { enrollLessonCards } from "./lesson-cards.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -230,6 +233,31 @@ export async function finishSession(
     .set({ endedAt: new Date(), summary })
     .where(eq(sessions.id, sessionId))
     .run();
+
+  // A passed chapter test enrolls that chapter's trigger cues and trap
+  // gallery as spaced retrieval cards — retention is scheduled, never
+  // left to discipline. Recomputed from the attempts rows, not the
+  // client summary.
+  const session = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .get();
+  const sub = (session?.config as { chapter_test?: string } | undefined)
+    ?.chapter_test;
+  if (sub && ALL_SUBTOPICS.includes(sub as Subtopic)) {
+    const rows = await db
+      .select({ correct: attempts.correct })
+      .from(attempts)
+      .where(eq(attempts.sessionId, sessionId))
+      .all();
+    if (
+      rows.length > 0 &&
+      rows.filter((r) => r.correct).length / rows.length >= CHAPTER_TEST_BAR
+    ) {
+      await enrollLessonCards(sub as Subtopic);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -658,6 +686,27 @@ export async function gradeDeckCard(
   } else {
     await db.insert(deckReviews).values({ questionId, ...next, dueAt }).run();
   }
+}
+
+/** Grade a concept card (chapter cue/trap) — same SM-2-lite ladder as
+ *  the question-derived deck cards. */
+export async function gradeLessonCard(
+  id: number,
+  grade: ReviewGrade,
+): Promise<void> {
+  const existing = await db
+    .select()
+    .from(lessonReviews)
+    .where(eq(lessonReviews.id, id))
+    .get();
+  if (!existing) return;
+  const next = nextReview(existing, grade);
+  const dueAt = new Date(Date.now() + next.intervalDays * 86_400_000);
+  await db
+    .update(lessonReviews)
+    .set({ ...next, dueAt, updatedAt: new Date() })
+    .where(eq(lessonReviews.id, id))
+    .run();
 }
 
 export async function flagQuestion(input: {
