@@ -22,6 +22,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { parseDirectiveLine, validateDirective } from "../lib/directives.ts";
 import { parseLesson } from "../lib/lesson-parse.ts";
 import { ALL_SUBTOPICS } from "../lib/taxonomy.ts";
 
@@ -123,6 +124,18 @@ for (const file of files) {
       file,
       `checklist: ${parsed.checklist.length} items (minimum 5, chapters ship with 7)`,
     );
+
+  // Visual directives must be well-formed — a malformed one silently
+  // degrades to literal text in the renderer, which is a content bug.
+  for (const line of body.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("::")) continue;
+    const directive = parseDirectiveLine(trimmed);
+    const problem = directive
+      ? validateDirective(directive)
+      : "unparseable directive line";
+    if (problem) fail(file, `${problem}: ${trimmed.slice(0, 60)}`);
+  }
 
   if (failures === before) {
     console.log(

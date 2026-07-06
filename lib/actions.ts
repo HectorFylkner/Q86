@@ -44,8 +44,10 @@ import {
 } from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
 import {
+  ALL_CHAPTER_KEYS,
   ALL_SUBTOPICS,
   STRATEGIES,
+  STRATEGY_CHAPTERS,
   type Confidence,
   type EditReason,
   type ErrorType,
@@ -54,6 +56,8 @@ import {
   type SessionFocus,
   type SessionMode,
   type Strategy,
+  type StrategyChapter,
+  type ChapterKey,
   type Subtopic,
 } from "./taxonomy.ts";
 
@@ -642,8 +646,8 @@ export async function saveBaselineReport(input: {
 
 /** Record that a chapter was opened. Idempotent: the first open wins,
  *  so read_at means "first read", not "last visited". */
-export async function markLessonRead(subtopic: Subtopic): Promise<void> {
-  if (!ALL_SUBTOPICS.includes(subtopic)) return;
+export async function markLessonRead(subtopic: ChapterKey): Promise<void> {
+  if (!ALL_CHAPTER_KEYS.includes(subtopic)) return;
   await db
     .insert(lessonProgress)
     .values({ subtopic, readAt: new Date(), updatedAt: new Date() })
@@ -666,11 +670,11 @@ export async function markLessonRead(subtopic: Subtopic): Promise<void> {
 /** Persist the chapter's pre-drill checklist ticks (also the migration
  *  target for pre-server progress that lived in localStorage). */
 export async function saveLessonChecklist(
-  subtopic: Subtopic,
+  subtopic: ChapterKey,
   checked: number[],
   total: number,
 ): Promise<void> {
-  if (!ALL_SUBTOPICS.includes(subtopic)) return;
+  if (!ALL_CHAPTER_KEYS.includes(subtopic)) return;
   const clean = [...new Set(checked)]
     .filter((i) => Number.isInteger(i) && i >= 0 && i < total)
     .sort((a, b) => a - b);
@@ -688,6 +692,36 @@ export async function saveLessonChecklist(
       set: { checklist: clean, checklistTotal: total, updatedAt: new Date() },
     })
     .run();
+  await maybeEnrollStrategyChapter(subtopic);
+}
+
+/** Strategy chapters have no question pool and so no chapter test;
+ *  their cue/trap cards enroll when the chapter becomes prepared
+ *  (checklist ticked, all three examples committed) instead. Idempotent
+ *  — repeated calls refresh text, never scheduling. */
+async function maybeEnrollStrategyChapter(
+  subtopic: ChapterKey,
+): Promise<void> {
+  if (!STRATEGY_CHAPTERS.includes(subtopic as StrategyChapter)) return;
+  const row = await db
+    .select()
+    .from(lessonProgress)
+    .where(eq(lessonProgress.subtopic, subtopic))
+    .get();
+  if (
+    !row ||
+    row.checklistTotal === 0 ||
+    row.checklist.length < row.checklistTotal
+  ) {
+    return;
+  }
+  const examples = await db
+    .select({ exampleN: lessonExampleAttempts.exampleN })
+    .from(lessonExampleAttempts)
+    .where(eq(lessonExampleAttempts.subtopic, subtopic))
+    .all();
+  if (new Set(examples.map((e) => e.exampleN)).size < 3) return;
+  await enrollLessonCards(subtopic);
 }
 
 export type LogExampleResult = {
@@ -702,13 +736,13 @@ export type LogExampleResult = {
  *  before the solution reveals. Graded server-side against the
  *  chapter's own answer line. */
 export async function logExampleAttempt(input: {
-  subtopic: Subtopic;
+  subtopic: ChapterKey;
   exampleN: number;
   strategy: Strategy;
   answer: string;
   timeSeconds: number;
 }): Promise<LogExampleResult> {
-  if (!ALL_SUBTOPICS.includes(input.subtopic)) {
+  if (!ALL_CHAPTER_KEYS.includes(input.subtopic)) {
     return { error: "Unknown chapter.", id: null, correct: null };
   }
   if (!STRATEGIES.includes(input.strategy) || !input.answer.trim()) {
@@ -733,6 +767,7 @@ export async function logExampleAttempt(input: {
     })
     .returning()
     .get();
+  await maybeEnrollStrategyChapter(input.subtopic);
   return { error: null, id: row.id, correct };
 }
 

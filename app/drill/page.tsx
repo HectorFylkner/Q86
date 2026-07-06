@@ -17,10 +17,11 @@ export default async function DrillPage({
     sub?: string;
     d?: string;
     n?: string;
+    fmt?: string;
     test?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, n, test } = await searchParams;
+  const { qids, plan, sub, d, n, fmt, test } = await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -31,6 +32,23 @@ export default async function DrillPage({
   if (!autoStartIds?.length && plan === "1") {
     const { todaysPlan, selectPlanDrillIds } = await import("@/lib/plan-server");
     autoStartIds = await selectPlanDrillIds(await todaysPlan());
+  }
+
+  // Format drill deep link (the DS strategy chapter's "drill this now"):
+  // /drill?fmt=data_sufficiency&n=8
+  if (
+    !autoStartIds?.length &&
+    (fmt === "problem_solving" || fmt === "data_sufficiency")
+  ) {
+    const { selectQuestions } = await import("@/lib/engine");
+    const requested = Number(n);
+    const count =
+      Number.isInteger(requested) && requested >= 1 && requested <= 21
+        ? requested
+        : 8;
+    autoStartIds = (await selectQuestions({ formats: [fmt] }, count)).map(
+      (q) => q.id,
+    );
   }
 
   const rows = (await db

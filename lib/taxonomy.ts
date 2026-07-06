@@ -70,6 +70,21 @@ export const SKILL_BY_SUBTOPIC: Record<Subtopic, FundamentalSkill> =
     ).flatMap(([skill, subs]) => subs.map((s) => [s, skill])),
   ) as Record<Subtopic, FundamentalSkill>;
 
+// Strategy chapters live on the Learn index beside the subtopic
+// chapters but teach cross-cutting method, so they have no question
+// pool and no chapter test. They extend the chapter namespace (lesson
+// filename = route param = progress key), never the question taxonomy
+// — questions always carry a real subtopic.
+export const STRATEGY_CHAPTERS = [
+  "data_sufficiency_discipline",
+  "choosing_fastest_path",
+] as const;
+export type StrategyChapter = (typeof STRATEGY_CHAPTERS)[number];
+
+/** Anything a lesson file, learn route, or lesson-progress row can be
+ *  keyed by: a drillable subtopic or a strategy chapter. */
+export type ChapterKey = Subtopic | StrategyChapter;
+
 export const ERROR_TYPES = [
   "content_gap",
   "setup_error",
@@ -167,6 +182,21 @@ export const SUBTOPIC_LABELS: Record<Subtopic, string> = {
   probability: "Probability",
   statistics_mean_median_sd: "Statistics: mean, median & SD",
   series_patterns: "Series & patterns",
+};
+
+export const STRATEGY_CHAPTER_LABELS: Record<StrategyChapter, string> = {
+  data_sufficiency_discipline: "Data Sufficiency decision discipline",
+  choosing_fastest_path: "Choosing the fastest path",
+};
+
+export const ALL_CHAPTER_KEYS: ChapterKey[] = [
+  ...ALL_SUBTOPICS,
+  ...STRATEGY_CHAPTERS,
+];
+
+export const CHAPTER_LABELS: Record<ChapterKey, string> = {
+  ...SUBTOPIC_LABELS,
+  ...STRATEGY_CHAPTER_LABELS,
 };
 
 export const CONTEXT_LABELS: Record<Context, string> = {

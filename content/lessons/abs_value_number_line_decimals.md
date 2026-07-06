@@ -7,8 +7,10 @@ The GMAT Focus tests absolute value less as algebra and more as geometry: $|x - 
 1. Definition: $|x| = x$ if $x \ge 0$ and $|x| = -x$ if $x < 0$. It is never negative, because negating a negative number produces a positive one.
 2. Distance reading: $|a - b|$ is the distance between $a$ and $b$ on the number line. This is the single most useful translation in the topic — order inside the bars does not matter.
 3. Two-point equation: $|x - a| = d$ (with $d > 0$) means $x = a - d$ or $x = a + d$. The two solutions sit symmetrically around $a$, so their sum is $2a$ automatically.
-4. Bounded band: $|x - a| \le d \iff a - d \le x \le a + d$ — an interval centered at $a$ with radius $d$ and total length $2d$. Strict $<$ gives the same interval with open endpoints.
-5. Outside the band: $|x - a| > d \iff x < a - d$ or $x > a + d$ — two rays, never one interval.
+4. Bounded band: $|x - a| \le d \iff a - d \le x \le a + d$ — an interval centered at $a$ with radius $d$ and total length $2d$. Strict $<$ gives the same interval with open endpoints. The picture for $|x - 3| \le 2$:
+::number-line min=-1 max=7 points="1:closed:,3:closed:,5:closed:" zones="1..5:radius 2 each side of 3"
+5. Outside the band: $|x - a| > d \iff x < a - d$ or $x > a + d$ — two rays, never one interval. For $|x - 3| > 2$:
+::number-line min=-1 max=7 points="1:open:,5:open:" zones="-1..1:x < 1,5..7:x > 5"
 6. Magnitude comparison: $|x| > |y| \iff x^2 > y^2$, because squaring erases sign but preserves distance from $0$. Note that $x > y$ alone says nothing about magnitudes.
 7. Rounding range: if a value rounds to the nearest tenth as $r$, the true value $w$ satisfies $r - 0.05 \le w < r + 0.05$. The interval is half-open: exactly $r + 0.05$ rounds up to the next display.
 8. Closer-to test: $x$ is closer to $a$ than to $b$ exactly when $x$ lies on $a$'s side of the midpoint $\frac{a+b}{2}$. Example: closer to $10$ than to $2$ means $x > 6$.
@@ -26,6 +28,8 @@ The GMAT Focus tests absolute value less as algebra and more as geometry: $|x - 
 1. "Distance between $y$ and $-3.2$ is $5.6$" translates directly to $|y - (-3.2)| = 5.6$, i.e. $|y + 3.2| = 5.6$.
 2. The two solutions sit $5.6$ on either side of the center $-3.2$: $y = -3.2 + 5.6 = 2.4$ or $y = -3.2 - 5.6 = -8.8$.
 3. Sum: $2.4 + (-8.8) = -6.4$. Faster: solutions symmetric about $-3.2$ must sum to $2(-3.2) = -6.4$ — no solving needed.
+
+::number-line min=-10 max=4 points="-8.8:closed:-8.8,2.4:closed:2.4" zones="-8.8..-3.2:5.6,-3.2..2.4:5.6"
 
 **Answer: $-6.4$**
 

@@ -7,8 +7,8 @@ import { detectCommitMode } from "@/lib/example-grade";
 import {
   STRATEGIES,
   STRATEGY_LABELS,
+  type ChapterKey,
   type Strategy,
-  type Subtopic,
 } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,7 @@ export function ExampleCard({
   work,
   answer,
 }: {
-  subtopic: Subtopic;
+  subtopic: ChapterKey;
   n: number;
   level: 0 | 1 | 2;
   question: string;

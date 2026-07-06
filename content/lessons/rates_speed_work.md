@@ -40,6 +40,10 @@ Every rate problem on the GMAT Focus Edition — machines filling orders, pumps 
 4. Remaining work: $1 - \frac{7}{15} = \frac{8}{15}$, done together at $\frac{1}{6}$ per hour: $t = \frac{8/15}{1/6} = \frac{48}{15} = \frac{16}{5}$ hours $= 3$ hours $12$ minutes.
 5. Finish time: 1:00 p.m. $+$ 3 h 12 min $=$ 4:12 p.m.
 
+The stages on a clock line (hours after 9:00 a.m.) — draw this before writing any equation:
+
+::rate-timeline max=8 unit="h" rows="Both:0..2,Sam alone:2..4,Both again:4..7.2"
+
 **Answer: 4:12 p.m.**
 
 ## Trigger cues

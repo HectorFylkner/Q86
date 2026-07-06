@@ -7,7 +7,7 @@ import {
   questions,
 } from "./db/schema.ts";
 import { previewIntervals, type ReviewGrade } from "./srs.ts";
-import { SUBTOPIC_LABELS, type Subtopic } from "./taxonomy.ts";
+import { CHAPTER_LABELS, SUBTOPIC_LABELS, type ChapterKey, type Subtopic } from "./taxonomy.ts";
 
 /**
  * The takeaway deck: every missed question's one-line Takeaway becomes a
@@ -23,7 +23,7 @@ export type DeckCard = {
   source: "question" | "cue" | "trap";
   /** questions.id for question cards; lesson_reviews.id otherwise. */
   id: number;
-  subtopic: Subtopic;
+  subtopic: ChapterKey;
   subtopicLabel: string;
   front: string;
   back: string;
@@ -122,7 +122,7 @@ export async function todaysDeck(): Promise<{
     source: r.kind,
     id: r.id,
     subtopic: r.subtopic,
-    subtopicLabel: SUBTOPIC_LABELS[r.subtopic],
+    subtopicLabel: CHAPTER_LABELS[r.subtopic],
     front: r.front,
     back: r.back,
     missedAgo: null,

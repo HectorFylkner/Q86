@@ -22,9 +22,12 @@ import { parseLesson } from "@/lib/lesson-parse";
 import { lessonProgressBySubtopic } from "@/lib/lesson-progress";
 import { listLessons, readLesson } from "@/lib/lessons";
 import {
-  ALL_SUBTOPICS,
+  ALL_CHAPTER_KEYS,
   SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  STRATEGY_CHAPTERS,
+  type ChapterKey,
+  type StrategyChapter,
   type Subtopic,
 } from "@/lib/taxonomy";
 
@@ -47,14 +50,19 @@ export default async function LessonPage({
   params: Promise<{ subtopic: string }>;
 }) {
   const { subtopic } = await params;
-  if (!ALL_SUBTOPICS.includes(subtopic as Subtopic)) notFound();
-  const lesson = readLesson(subtopic as Subtopic);
+  if (!ALL_CHAPTER_KEYS.includes(subtopic as ChapterKey)) notFound();
+  const lesson = readLesson(subtopic as ChapterKey);
   if (!lesson) notFound();
 
+  // Strategy chapters teach cross-cutting method: no question pool, no
+  // chapter test — progress and example commitments still track.
+  const isStrategy = STRATEGY_CHAPTERS.includes(subtopic as StrategyChapter);
   const parsed = parseLesson(lesson.body);
-  const testState = (await chapterTestStates())[subtopic as Subtopic];
+  const testState = isStrategy
+    ? undefined
+    : (await chapterTestStates())[subtopic as Subtopic];
   const progress = (await lessonProgressBySubtopic()).get(
-    subtopic as Subtopic,
+    subtopic as ChapterKey,
   );
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
@@ -65,14 +73,17 @@ export default async function LessonPage({
   const header = (
     <div>
       <MarkLessonRead
-        subtopic={subtopic as Subtopic}
+        subtopic={subtopic as ChapterKey}
         alreadyRead={progress?.readAt != null}
       />
       <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
         <Link href="/learn" className="hover:text-ink">
           Learn
         </Link>{" "}
-        · {SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
+        ·{" "}
+        {isStrategy
+          ? "Strategy"
+          : SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
       </p>
       <h1 className="mt-1 font-display text-2xl font-semibold">
         {lesson.title}
@@ -176,7 +187,7 @@ export default async function LessonPage({
             {parsed.examples.map((ex, i) => (
               <ExampleCard
                 key={ex.n}
-                subtopic={subtopic as Subtopic}
+                subtopic={subtopic as ChapterKey}
                 n={ex.n}
                 level={Math.min(i, 2) as 0 | 1 | 2}
                 question={ex.question}
@@ -220,12 +231,23 @@ export default async function LessonPage({
             items={parsed.checklist}
             initialChecked={progress?.checklist ?? []}
             serverHasRow={progress != null}
-            test={{
-              passed: testState?.passed ?? false,
-              lastScore: testState
-                ? `${testState.lastCorrect}/${testState.lastTotal}`
-                : null,
-            }}
+            drillHref={
+              subtopic === "data_sufficiency_discipline"
+                ? "/drill?fmt=data_sufficiency&n=8"
+                : subtopic === "choosing_fastest_path"
+                  ? "/drill?plan=1"
+                  : undefined
+            }
+            test={
+              isStrategy
+                ? undefined
+                : {
+                    passed: testState?.passed ?? false,
+                    lastScore: testState
+                      ? `${testState.lastCorrect}/${testState.lastTotal}`
+                      : null,
+                  }
+            }
           />
         </SectionShell>
 
