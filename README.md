@@ -86,3 +86,20 @@ spot-check admitted 22 defective questions among 43 candidates in a
 brute-force audit. Generate model-checked candidates from Drill or a
 post-mortem instead; they stay quarantined until explicit human approval.
 Programmatically verified additions still go through `scripts/author/`.
+
+## Extending the lessons
+
+Chapters in `content/lessons/` are written against a strict dialect
+(seven `##` sections, exactly 3 worked examples, arrow-split trigger
+cues — see `lib/lesson-parse.ts`); a chapter that deviates falls back to
+a generic markdown render and loses its structured layout. The lesson
+counterpart to `verify-bank.ts` is
+
+```sh
+node --experimental-strip-types scripts/validate-lessons.ts
+```
+
+which parses every chapter, re-asserts the section minimums, prints
+per-file diagnostics, and exits non-zero on any failure. Run it after
+touching any lesson file, exactly as `verify-bank.ts` runs after any
+bank change.
