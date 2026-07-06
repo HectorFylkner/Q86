@@ -14,6 +14,11 @@ import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Stat } from "@/components/ui/stat";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
+import {
+  clearDrillSnapshot,
+  writeDrillSnapshot,
+  type DrillSnapshot,
+} from "@/lib/inflight";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import {
@@ -43,6 +48,14 @@ type Result = {
   errorType: ErrorType | null;
 };
 
+/** Mid-run state restored from an in-flight snapshot. */
+export type RunnerResumeState = {
+  index: number;
+  phase: "answering" | "revealed";
+  results: Result[];
+  questionStartedAt: number;
+};
+
 export function QuestionRunner({
   sessionId,
   mode,
@@ -50,6 +63,7 @@ export function QuestionRunner({
   timing,
   focus = "focused",
   test,
+  resumeState,
   onRestart,
 }: {
   sessionId: number;
@@ -59,22 +73,53 @@ export function QuestionRunner({
   focus?: SessionFocus;
   /** Set when this run is a chapter test for the given subtopic. */
   test?: Subtopic | null;
+  resumeState?: RunnerResumeState | null;
   onRestart?: () => void;
 }) {
   const router = useRouter();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(resumeState?.index ?? 0);
   const [phase, setPhase] = useState<"answering" | "revealed" | "done">(
-    "answering",
+    resumeState?.phase ?? "answering",
   );
-  const [selected, setSelected] = useState<number | null>(null);
-  const [confidence, setConfidence] = useState<Confidence | null>(null);
+  const resumedResult =
+    resumeState?.phase === "revealed"
+      ? resumeState.results[resumeState.index]
+      : undefined;
+  const [selected, setSelected] = useState<number | null>(
+    resumedResult?.selectedIndex ?? null,
+  );
+  const [confidence, setConfidence] = useState<Confidence | null>(
+    resumedResult?.confidence ?? null,
+  );
   const [hint, setHint] = useState<string | null>(null);
-  const [results, setResults] = useState<Result[]>([]);
+  const [results, setResults] = useState<Result[]>(resumeState?.results ?? []);
   const [elapsed, setElapsed] = useState(0);
-  const startRef = useRef(Date.now());
+  const startRef = useRef(resumeState?.questionStartedAt ?? Date.now());
 
   const question = questions[index];
   const currentResult = results[index];
+
+  // Checkpoint on every reveal/advance so a refresh resumes in place.
+  // Attempts are already logged server-side as they land; the snapshot
+  // preserves the UI run (position, phase, local results).
+  useEffect(() => {
+    if (phase === "done") return;
+    const snapshot: DrillSnapshot = {
+      v: 1,
+      sessionId,
+      mode,
+      timing,
+      focus,
+      test: test ?? null,
+      questionIds: questions.map((q) => q.id),
+      results,
+      index,
+      phase,
+      questionStartedAt: startRef.current,
+      savedAt: Date.now(),
+    };
+    writeDrillSnapshot(snapshot);
+  }, [sessionId, mode, timing, focus, test, questions, results, index, phase]);
 
   useEffect(() => {
     if (phase !== "answering" || timing !== "soft") return;
@@ -152,6 +197,7 @@ export function QuestionRunner({
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
       };
+      clearDrillSnapshot();
       finishSession(sessionId, summary).catch(() => {});
       setPhase("done");
     }

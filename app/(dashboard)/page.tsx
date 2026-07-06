@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
+import { ResumeRibbon } from "@/components/dashboard/resume-ribbon";
 import { SettingsForm } from "@/components/dashboard/settings-form";
+import { sweepAbandonedSessions } from "@/lib/actions";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
@@ -16,6 +18,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function TodayPage() {
+  // Opportunistic hygiene: close out sessions that were started but never
+  // finished and are past any client's resume window.
+  await sweepAbandonedSessions();
   const inputs = await gatherPlanInputs();
   const plan = computeDailyPlan(inputs);
   const days = await daysToTest();
@@ -59,6 +64,8 @@ export default async function TodayPage() {
         </div>
         <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
       </div>
+
+      <ResumeRibbon />
 
       {firstRun && (
         <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-5 shadow-ambient">

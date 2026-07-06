@@ -12,12 +12,21 @@ import { MarkingSummary } from "@/components/timed/marking-summary";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  abandonSession,
+  fetchQuestionsByIds,
+  isSessionOpen,
   saveTimedSession,
   startTimedSet,
   type SaveTimedResponse,
   type TimedEditInput,
   type TimedKind,
 } from "@/lib/actions";
+import {
+  clearTimedSnapshot,
+  readTimedSnapshot,
+  writeTimedSnapshot,
+  type TimedSnapshot,
+} from "@/lib/inflight";
 import type { Question } from "@/lib/db/schema";
 import {
   FUNDAMENTAL_SKILLS,
@@ -50,11 +59,14 @@ type Stage =
 export function TimedClient({
   verifiedTotal,
   autoStart,
+  autoResume,
 }: {
   verifiedTotal: number;
   autoStart?: TimedKind | null;
+  autoResume?: boolean;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "config", error: null });
+  const [resumeOffer, setResumeOffer] = useState<TimedSnapshot | null>(null);
   const autoStartedRef = useRef(false);
   const [kind, setKind] = useState<TimedKind>("full");
   const [miniSkill, setMiniSkill] = useState<FundamentalSkill | "mix">("mix");
@@ -103,8 +115,92 @@ export function TimedClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A snapshot on the desk: confirm the session is still open, then offer
+  // it in the config stage (or resume straight away from /timed?resume=1).
+  useEffect(() => {
+    if (autoStartedRef.current) return;
+    const snap = readTimedSnapshot();
+    if (!snap) return;
+    let cancelled = false;
+    isSessionOpen(snap.sessionId)
+      .then((open) => {
+        if (cancelled) return;
+        if (!open) {
+          clearTimedSnapshot();
+          return;
+        }
+        if (autoResume) void resumeFrom(snap);
+        else setResumeOffer(snap);
+      })
+      .catch(() => {
+        // Server unreachable — still offer the local snapshot.
+        if (!cancelled) setResumeOffer(snap);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ----------------------------------------------------------------- resume
+  async function resumeFrom(snap: TimedSnapshot) {
+    setStage({ kind: "loading" });
+    try {
+      const qs = await fetchQuestionsByIds(snap.questionIds);
+      if (qs.length !== snap.questionIds.length) {
+        clearTimedSnapshot();
+        setResumeOffer(null);
+        setStage({
+          kind: "config",
+          error: "That section can't be resumed — its questions are gone.",
+        });
+        return;
+      }
+      finalizedRef.current = false;
+      setKind(snap.kind);
+      setMode(snap.mode);
+      setFocus(snap.focus);
+      setShowTimer(snap.showTimer);
+      setSessionId(snap.sessionId);
+      setQuestions(qs);
+      setAnswers(snap.answers);
+      setBookmarks(snap.bookmarks);
+      setEditRecords(snap.editRecords);
+      setCurrentIndex(snap.currentIndex);
+      setSelected(null);
+      setConfidence(null);
+      setHint(null);
+      // Wall-clock state carries over: the section clock (and the current
+      // question's timer) kept running while the page was away.
+      endsAtRef.current = snap.endsAt;
+      questionStartRef.current = snap.questionStartedAt;
+      setRemaining(Math.max(0, (snap.endsAt - Date.now()) / 1000));
+      const elapsed = (Date.now() - snap.questionStartedAt) / 1000;
+      violatedRef.current = elapsed > PULSE_THRESHOLD_SECONDS;
+      setViolatedCurrent(violatedRef.current);
+      setPulseKey(0);
+      setResumeOffer(null);
+      // An expired clock finalizes on the first tick of the clock effect.
+      setStage({ kind: snap.stage === "review" ? "review" : "running" });
+    } catch {
+      setStage({
+        kind: "config",
+        error: "Could not resume — the server did not respond.",
+      });
+    }
+  }
+
+  function tearUp(snap: TimedSnapshot) {
+    clearTimedSnapshot();
+    setResumeOffer(null);
+    void abandonSession(snap.sessionId);
+  }
+
   // ------------------------------------------------------------------ start
   async function handleStart(selectedKind: TimedKind) {
+    // Starting fresh supersedes anything left on the desk.
+    clearTimedSnapshot();
+    setResumeOffer(null);
     setKind(selectedKind);
     setStage({ kind: "loading" });
     try {
@@ -222,7 +318,10 @@ export function TimedClient({
         notReachedCount,
         focus,
       })
-        .then((saved) => setStage({ kind: "summary", saved }))
+        .then((saved) => {
+          clearTimedSnapshot();
+          setStage({ kind: "summary", saved });
+        })
         .catch((e) => {
           finalizedRef.current = false; // allow the retry button to re-save
           setStage({
@@ -248,6 +347,42 @@ export function TimedClient({
     finalizeRef.current = () =>
       finalize(answersRef.current, editsRef.current, bookmarksRef.current);
   }, [finalize]);
+
+  // Checkpoint the run on every answer, bookmark, edit, or stage change —
+  // not on clock ticks — so a refresh can always pick the paper back up.
+  useEffect(() => {
+    if (stage.kind !== "running" && stage.kind !== "review") return;
+    if (sessionId == null || endsAtRef.current == null) return;
+    writeTimedSnapshot({
+      v: 1,
+      sessionId,
+      kind,
+      mode,
+      focus,
+      showTimer,
+      questionIds: questions.map((q) => q.id),
+      answers,
+      bookmarks,
+      editRecords,
+      currentIndex,
+      stage: stage.kind,
+      endsAt: endsAtRef.current,
+      questionStartedAt: questionStartRef.current,
+      savedAt: Date.now(),
+    });
+  }, [
+    stage.kind,
+    sessionId,
+    kind,
+    mode,
+    focus,
+    showTimer,
+    questions,
+    answers,
+    bookmarks,
+    editRecords,
+    currentIndex,
+  ]);
 
   // ----------------------------------------------------------------- submit
   const confirmAnswer = useCallback(() => {
@@ -347,12 +482,39 @@ export function TimedClient({
   // ------------------------------------------------------------------ views
   if (stage.kind === "config") {
     const enough = (n: number) => verifiedTotal >= n;
+    const offerRemaining = resumeOffer
+      ? Math.max(0, (resumeOffer.endsAt - Date.now()) / 1000)
+      : 0;
+    const offerAnswered = resumeOffer
+      ? resumeOffer.answers.filter(Boolean).length
+      : 0;
     return (
       <div className="space-y-5">
         {stage.error && (
           <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
             {stage.error}
           </p>
+        )}
+        {resumeOffer && (
+          <Card className="border-ballpoint/40 p-5">
+            <h2 className="font-display text-base font-semibold">
+              A section is still on the desk
+            </h2>
+            <p className="mt-1 text-sm text-graphite">
+              {offerAnswered} of {resumeOffer.questionIds.length} answered.{" "}
+              {offerRemaining > 0
+                ? `The clock kept running — ${formatSeconds(offerRemaining)} remain.`
+                : "The clock ran out while you were away; picking it up marks the paper as it lies."}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button onClick={() => resumeFrom(resumeOffer)}>
+                {offerRemaining > 0 ? "Pick up the pen" : "Mark the paper"}
+              </Button>
+              <Button variant="redpen" onClick={() => tearUp(resumeOffer)}>
+                Tear it up
+              </Button>
+            </div>
+          </Card>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
           <Card className="flex flex-col p-5">

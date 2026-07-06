@@ -17,9 +17,10 @@ export default async function DrillPage({
     sub?: string;
     d?: string;
     test?: string;
+    resume?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, test } = await searchParams;
+  const { qids, plan, sub, d, test, resume } = await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -67,6 +68,7 @@ export default async function DrillPage({
         autoStartIds={autoStartIds?.length ? autoStartIds : null}
         autoStartRung={autoStartRung}
         autoStartTest={autoStartTest}
+        autoResume={resume === "1"}
       />
     </div>
   );

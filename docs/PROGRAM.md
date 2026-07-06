@@ -33,6 +33,19 @@ Workstream 1 — Trust and foundations.
 
 ## In flight
 
+- M5 (session persistence) DONE: lib/inflight.ts snapshots every answer
+  in both runners to localStorage (48h validity, versioned, validated —
+  tests in tests/inflight.test.ts); resume offers render in drill/timed
+  setup stages and as the Today ribbon ("Pick up the pen" / "Tear it
+  up"); /drill?resume=1 and /timed?resume=1 deep-link straight back in;
+  the timed clock is wall-time so resumed sims keep the time that passed
+  (expired clock → auto-finalize on first tick, "Mark the paper");
+  tear-up closes the session server-side (abandonSession); Today sweeps
+  dangling endedAt-null sessions older than 48h (sweepAbandonedSessions).
+  Verified end-to-end with Playwright: answer → reload → offer → resume
+  to the exact question, ribbon on Today, tear-up removal, and timed
+  resume with the clock still draining — all pass.
+
 - M2 (test infra) DONE: vitest (`pnpm test`), 8 suites / 206 tests green
   covering pacing, elo, srs, lesson contract (all 24 lessons), latex
   parsing, plan math, all 9 generators, and docs-consistency (README/

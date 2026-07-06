@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, lt } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
@@ -247,6 +247,73 @@ export async function finishSession(
     .set({ endedAt: new Date(), summary })
     .where(eq(sessions.id, sessionId))
     .run();
+}
+
+// ---------------------------------------------------------------------------
+// In-flight session recovery (resume / tear up / sweep)
+// ---------------------------------------------------------------------------
+
+/** Rehydrates a resumed session's questions in snapshot order. Unlike the
+ *  start actions this does not filter on verified: a question retired
+ *  mid-session should still render for the session that already holds it. */
+export async function fetchQuestionsByIds(
+  questionIds: number[],
+): Promise<Question[]> {
+  if (questionIds.length === 0) return [];
+  const rows = await db
+    .select()
+    .from(questions)
+    .where(inArray(questions.id, questionIds))
+    .all();
+  const byId = new Map(rows.map((q) => [q.id, q]));
+  return questionIds
+    .map((id) => byId.get(id))
+    .filter((q): q is Question => Boolean(q));
+}
+
+/** True while the session can still be resumed (started, never saved). */
+export async function isSessionOpen(sessionId: number): Promise<boolean> {
+  const row = await db
+    .select({ endedAt: sessions.endedAt })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .get();
+  return row != null && row.endedAt == null;
+}
+
+/** "Tear it up": closes an in-flight session without marking anything.
+ *  Attempts already logged (drill answers land as you go) keep counting;
+ *  only the session stops dangling. */
+export async function abandonSession(sessionId: number): Promise<void> {
+  await db
+    .update(sessions)
+    .set({ endedAt: new Date(), summary: { abandoned: true } })
+    .where(and(eq(sessions.id, sessionId), isNull(sessions.endedAt)))
+    .run();
+  revalidatePath("/");
+}
+
+const SWEEP_AGE_MS = 48 * 60 * 60 * 1000;
+
+/** Closes sessions that were started but never finished and are too old
+ *  for any client to still offer a resume (snapshots expire at the same
+ *  48h). Keeps endedAt-null rows from polluting session scans. */
+export async function sweepAbandonedSessions(): Promise<number> {
+  const cutoff = new Date(Date.now() - SWEEP_AGE_MS);
+  const swept = await db
+    .update(sessions)
+    .set({ summary: { abandoned: true, swept: true } })
+    .where(and(isNull(sessions.endedAt), lt(sessions.startedAt, cutoff)))
+    .returning({ id: sessions.id, startedAt: sessions.startedAt })
+    .all();
+  for (const row of swept) {
+    await db
+      .update(sessions)
+      .set({ endedAt: row.startedAt })
+      .where(eq(sessions.id, row.id))
+      .run();
+  }
+  return swept.length;
 }
 
 // ---------------------------------------------------------------------------

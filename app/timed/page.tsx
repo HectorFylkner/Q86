@@ -9,9 +9,9 @@ export const runtime = "nodejs";
 export default async function TimedPage({
   searchParams,
 }: {
-  searchParams: Promise<{ start?: string }>;
+  searchParams: Promise<{ start?: string; resume?: string }>;
 }) {
-  const { start } = await searchParams;
+  const { start, resume } = await searchParams;
   const verifiedTotal =
     (
       await db
@@ -27,6 +27,7 @@ export default async function TimedPage({
       <TimedClient
         verifiedTotal={verifiedTotal}
         autoStart={start === "full" || start === "mini" ? start : null}
+        autoResume={resume === "1"}
       />
     </div>
   );
