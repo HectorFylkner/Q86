@@ -145,12 +145,18 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               </span>
             </button>
           </div>
-          <p className="text-center">
+          <p className="flex flex-wrap justify-center gap-x-4 text-center">
             <Link
               href={`/drill?qids=${card.questionId}`}
               className="text-xs font-medium text-ballpoint hover:underline"
             >
               Re-solve the question this came from →
+            </Link>
+            <Link
+              href={`/learn/${card.subtopic}#cues`}
+              className="text-xs text-graphite hover:text-ballpoint hover:underline"
+            >
+              Chapter: {card.subtopicLabel} →
             </Link>
           </p>
         </>

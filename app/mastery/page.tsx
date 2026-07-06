@@ -50,7 +50,12 @@ export default async function MasteryPage() {
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="text-sm font-medium">
-                      {SUBTOPIC_LABELS[ladder.subtopic]}
+                      <Link
+                        href={`/learn/${ladder.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[ladder.subtopic]}
+                      </Link>
                     </h3>
                     {ladder.mastered && (
                       <span className="font-mono text-[10px] font-semibold text-ballpoint">
