@@ -1,5 +1,8 @@
-/** The deterministic 180-item generation plan (§12 phase 2), shared by
- *  the seed script and the authoring tools. */
+/** The ORIGINAL deterministic 180-item generation plan (§12 phase 2),
+ *  shared by the seed script and the authoring tools. Historical: the
+ *  committed bank has since grown to 360 questions through the authoring
+ *  gate (scripts/author/), so this plan no longer describes the bank's
+ *  distribution — it survives only as the --api top-up target. */
 
 import {
   SKILL_BY_SUBTOPIC,

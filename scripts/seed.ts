@@ -1,26 +1,21 @@
 /**
- * Q86 seed script — installs the 180-question verified bank (§12 phase 2).
+ * Q86 seed script — installs the committed verified bank (360 questions).
  *
- * Default mode loads scripts/seed-bank.json — questions that already
- * passed verification (the two-model pipeline or authored-with-
- * programmatic-verification) — offline, idempotently, no API key needed.
+ * Default mode loads scripts/seed-bank.json — questions that passed the
+ * authoring gate's programmatic brute-force verification (see
+ * scripts/author/) — offline, idempotently, no API key needed.
  *
  * --api generates fresh questions through the §8 pipeline instead
  * (requires ANTHROPIC_API_KEY): resumable, tops up shortfalls, aborts
  * after 15 consecutive verification failures with a pattern report.
- *
- * Distribution (both modes):
- *   - Value/Order/Factors: 70 (≥7 per VOF subtopic)
- *   - Equalities/Inequalities/Algebra (excl. translation): 35
- *   - Counting/Sets/Series/Prob/Stats: 30
- *   - Rates/Ratio/Percent: 20
- *   - algebraic_translation (13) + mixed across all skills (12): 25
- *   - Difficulty ≈ 10% D2 / 30% D3 / 40% D4 / 20% D5
- *   - ~25% of VOF and Equal/Unequal items in DS format
+ * It targets the ORIGINAL §12 phase-2 plan (180 items, seed-plan.ts);
+ * the committed bank has since grown past that through the authoring
+ * gate, so on a seeded database --api reports "already complete" and
+ * exits — by design. See the warning below before using it at all.
  *
  * Usage: pnpm seed          (offline, from scripts/seed-bank.json)
  *        pnpm seed --api    (generate via the AI pipeline)
- *        pnpm seed --plan   (print the generation plan, no API calls)
+ *        pnpm seed --plan   (print the original generation plan)
  */
 
 try {

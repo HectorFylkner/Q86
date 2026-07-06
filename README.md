@@ -24,7 +24,7 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-180-question bank into it — offline, no API key:
+360-question bank into it — offline, no API key:
 
 ```sh
 pnpm install
@@ -35,7 +35,7 @@ pnpm dev
 
 Open http://localhost:3000. The full training loop — drill, timed sets,
 redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 180-question bank ships in `scripts/seed-bank.json`, every
+key: the 360-question bank ships in `scripts/seed-bank.json`, every
 question verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
@@ -55,7 +55,7 @@ cp .env.example .env.local
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed 360-question bank into the DB — offline, idempotent (`--plan` prints the original generation plan) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
