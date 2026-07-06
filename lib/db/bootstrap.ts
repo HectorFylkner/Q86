@@ -64,8 +64,19 @@ async function provision(): Promise<void> {
   }
 }
 
-/** Mirrors drizzle/0001_deep_talon.sql for databases that predate it. */
+/** Mirrors every migration after 0000 for databases that predate them
+ *  (db:push-created databases have no ledger, so late additions land
+ *  here as guarded DDL). */
 async function evolveSchema(): Promise<void> {
+  // drizzle/0002_large_captain_america.sql
+  await client.execute(`create table if not exists lesson_progress (
+    subtopic text primary key not null,
+    read_at integer,
+    checklist text default '[]' not null,
+    checklist_total integer default 0 not null,
+    updated_at integer default (unixepoch() * 1000) not null
+  )`);
+  // drizzle/0001_deep_talon.sql
   await client.execute(`create table if not exists deck_reviews (
     question_id integer primary key not null,
     ease real default 2.5 not null,

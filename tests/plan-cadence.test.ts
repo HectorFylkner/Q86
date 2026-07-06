@@ -20,6 +20,7 @@ function inputs(overrides: Partial<PlanInputs> = {}): PlanInputs {
     eloByCategory: Object.fromEntries(
       PATTERN_CATEGORY_KEYS.map((key) => [key, 1200]),
     ) as PlanInputs["eloByCategory"],
+    curriculum: [],
     ...overrides,
   };
 }

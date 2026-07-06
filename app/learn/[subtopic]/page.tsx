@@ -16,8 +16,10 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import { MarkLessonRead } from "@/components/lesson/learn-progress";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
+import { lessonProgressBySubtopic } from "@/lib/lesson-progress";
 import { listLessons, readLesson } from "@/lib/lessons";
 import {
   ALL_SUBTOPICS,
@@ -51,6 +53,9 @@ export default async function LessonPage({
 
   const parsed = parseLesson(lesson.body);
   const testState = (await chapterTestStates())[subtopic as Subtopic];
+  const progress = (await lessonProgressBySubtopic()).get(
+    subtopic as Subtopic,
+  );
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;
@@ -59,6 +64,10 @@ export default async function LessonPage({
 
   const header = (
     <div>
+      <MarkLessonRead
+        subtopic={subtopic as Subtopic}
+        alreadyRead={progress?.readAt != null}
+      />
       <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
         <Link href="/learn" className="hover:text-ink">
           Learn
@@ -205,6 +214,8 @@ export default async function LessonPage({
           <DrillChecklist
             subtopic={subtopic}
             items={parsed.checklist}
+            initialChecked={progress?.checklist ?? []}
+            serverHasRow={progress != null}
             test={{
               passed: testState?.passed ?? false,
               lastScore: testState

@@ -9,6 +9,7 @@ import {
   deckReviews,
   edits,
   eloRatings,
+  lessonProgress,
   patternAttempts,
   questionFlags,
   questions,
@@ -32,15 +33,16 @@ import {
   type QuestionFilter,
 } from "./engine.ts";
 import { applyRedoResult, createRedoSession, enqueueMiss } from "./redo.ts";
-import type {
-  Confidence,
-  EditReason,
-  ErrorType,
-  FlagReason,
-  FundamentalSkill,
-  SessionFocus,
-  SessionMode,
-  Subtopic,
+import {
+  ALL_SUBTOPICS,
+  type Confidence,
+  type EditReason,
+  type ErrorType,
+  type FlagReason,
+  type FundamentalSkill,
+  type SessionFocus,
+  type SessionMode,
+  type Subtopic,
 } from "./taxonomy.ts";
 
 export type DrillTiming = "untimed" | "soft";
@@ -575,6 +577,60 @@ export async function saveBaselineReport(input: {
     .returning()
     .get();
   return { id: row.id };
+}
+
+// ---------------------------------------------------------------------------
+// Lesson progress (curriculum spine)
+// ---------------------------------------------------------------------------
+
+/** Record that a chapter was opened. Idempotent: the first open wins,
+ *  so read_at means "first read", not "last visited". */
+export async function markLessonRead(subtopic: Subtopic): Promise<void> {
+  if (!ALL_SUBTOPICS.includes(subtopic)) return;
+  await db
+    .insert(lessonProgress)
+    .values({ subtopic, readAt: new Date(), updatedAt: new Date() })
+    .onConflictDoNothing({ target: lessonProgress.subtopic })
+    .run();
+  const row = await db
+    .select()
+    .from(lessonProgress)
+    .where(eq(lessonProgress.subtopic, subtopic))
+    .get();
+  if (row && row.readAt == null) {
+    await db
+      .update(lessonProgress)
+      .set({ readAt: new Date(), updatedAt: new Date() })
+      .where(eq(lessonProgress.subtopic, subtopic))
+      .run();
+  }
+}
+
+/** Persist the chapter's pre-drill checklist ticks (also the migration
+ *  target for pre-server progress that lived in localStorage). */
+export async function saveLessonChecklist(
+  subtopic: Subtopic,
+  checked: number[],
+  total: number,
+): Promise<void> {
+  if (!ALL_SUBTOPICS.includes(subtopic)) return;
+  const clean = [...new Set(checked)]
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < total)
+    .sort((a, b) => a - b);
+  await db
+    .insert(lessonProgress)
+    .values({
+      subtopic,
+      readAt: new Date(),
+      checklist: clean,
+      checklistTotal: total,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: lessonProgress.subtopic,
+      set: { checklist: clean, checklistTotal: total, updatedAt: new Date() },
+    })
+    .run();
 }
 
 // ---------------------------------------------------------------------------
