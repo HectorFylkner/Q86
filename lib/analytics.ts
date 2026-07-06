@@ -98,6 +98,13 @@ export type AnalyticsData = {
   trend: TrendPoint[];
   /** Accuracy per subtopic × difficulty (focused attempts only). */
   difficultyMatrix: DifficultyMatrixRow[];
+  /** Misses filed under one subtopic whose confirmed classification says
+   *  a different concept actually failed (attempts.error_subtag). */
+  crossAttribution: Array<{
+    filed: Subtopic;
+    really: Subtopic;
+    count: number;
+  }>;
   /** Attempts per local day, most recent 84 days (includes zero days). */
   volume: VolumeDay[];
   redoCompliance: {
@@ -124,6 +131,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       timeSeconds: attempts.timeSeconds,
       confidence: attempts.confidence,
       errorType: attempts.errorType,
+      errorSubtag: attempts.errorSubtag,
       createdAt: attempts.createdAt,
       subtopic: questions.subtopic,
       skill: questions.fundamentalSkill,
@@ -309,6 +317,21 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     },
   ).filter((row) => Object.values(row.cells).some((c) => c.total > 0));
 
+  // --- cross-attribution: filed under X, really Y ----------------------------
+  const crossCounts = new Map<string, number>();
+  for (const r of rows) {
+    if (r.correct || r.errorSubtag == null || r.errorSubtag === r.subtopic)
+      continue;
+    const key = `${r.subtopic}|${r.errorSubtag}`;
+    crossCounts.set(key, (crossCounts.get(key) ?? 0) + 1);
+  }
+  const crossAttribution = [...crossCounts.entries()]
+    .map(([key, count]) => {
+      const [filed, really] = key.split("|") as [Subtopic, Subtopic];
+      return { filed, really, count };
+    })
+    .sort((a, b) => b.count - a.count);
+
   // --- training volume, last 84 local days -----------------------------------
   const volume: VolumeDay[] = [];
   {
@@ -393,6 +416,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     calibration,
     trend,
     difficultyMatrix,
+    crossAttribution,
     volume,
     redoCompliance,
     eloBars,

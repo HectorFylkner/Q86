@@ -135,7 +135,18 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 {data.heatmap.rows.map((row) => (
                   <tr key={row.subtopic}>
                     <td className="whitespace-nowrap pr-3 text-xs">
-                      {SUBTOPIC_LABELS[row.subtopic]}
+                      <Link
+                        href={`/learn/${row.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[row.subtopic]}
+                      </Link>
+                      <Link
+                        href={`/drill?sub=${row.subtopic}`}
+                        className="ml-2 font-mono text-[10px] text-graphite hover:text-ballpoint hover:underline"
+                      >
+                        drill →
+                      </Link>
                     </td>
                     {ERROR_TYPES.map((et) => {
                       const count = row.counts[et];
@@ -172,6 +183,42 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         )}
       </Section>
 
+      {/* 2a — cross-attribution: filed under X, really Y */}
+      {data.crossAttribution.length > 0 && (
+        <Section
+          title="Misattributed misses"
+          subtitle="Misses filed under one subtopic whose post-mortem says a different concept actually failed — the reread belongs to the right-hand chapter."
+        >
+          <ul className="space-y-1.5 text-sm">
+            {data.crossAttribution.map((row) => (
+              <li
+                key={`${row.filed}|${row.really}`}
+                className="flex flex-wrap items-baseline gap-x-2"
+              >
+                <span className="font-mono text-xs text-graphite">
+                  {row.count}×
+                </span>
+                <span className="text-graphite">
+                  filed under {SUBTOPIC_LABELS[row.filed]}, really
+                </span>
+                <Link
+                  href={`/learn/${row.really}#ideas`}
+                  className="font-medium text-ballpoint hover:underline"
+                >
+                  {SUBTOPIC_LABELS[row.really]}
+                </Link>
+                <Link
+                  href={`/drill?sub=${row.really}&n=6`}
+                  className="font-mono text-[11px] text-graphite hover:text-ballpoint hover:underline"
+                >
+                  drill →
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
       {/* 2b — accuracy × difficulty matrix */}
       <Section
         title="Accuracy by difficulty"
@@ -197,7 +244,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <tbody>
                 {data.difficultyMatrix.map((row) => (
                   <tr key={row.subtopic} className="border-t border-grid">
-                    <td className="py-1.5 pr-2">{SUBTOPIC_LABELS[row.subtopic]}</td>
+                    <td className="py-1.5 pr-2">
+                      <Link
+                        href={`/learn/${row.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[row.subtopic]}
+                      </Link>
+                    </td>
                     {[2, 3, 4, 5].map((d) => {
                       const cell = row.cells[d];
                       if (!cell || cell.total === 0) {
@@ -210,21 +264,27 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                       const pct = Math.round((cell.correct / cell.total) * 100);
                       return (
                         <td key={d} className="py-1.5 pr-2">
-                          <span
-                            className={cn(
-                              "inline-block rounded-[4px] px-1.5 py-0.5 font-mono",
-                              pct >= 80
-                                ? "bg-ballpoint/10 text-ballpoint"
-                                : pct >= 60
-                                  ? "bg-amber/10 text-amber"
-                                  : "bg-redpen/10 text-redpen",
-                            )}
+                          <Link
+                            href={`/drill?sub=${row.subtopic}&d=${d}`}
+                            title={`Drill ${SUBTOPIC_LABELS[row.subtopic]} at D${d}`}
+                            className="group/cell inline-flex items-baseline gap-1.5"
                           >
-                            {pct}%
-                          </span>{" "}
-                          <span className="text-graphite">
-                            {cell.correct}/{cell.total}
-                          </span>
+                            <span
+                              className={cn(
+                                "inline-block rounded-[4px] px-1.5 py-0.5 font-mono transition-shadow group-hover/cell:ring-1 group-hover/cell:ring-ballpoint/50",
+                                pct >= 80
+                                  ? "bg-ballpoint/10 text-ballpoint"
+                                  : pct >= 60
+                                    ? "bg-amber/10 text-amber"
+                                    : "bg-redpen/10 text-redpen",
+                              )}
+                            >
+                              {pct}%
+                            </span>
+                            <span className="text-graphite">
+                              {cell.correct}/{cell.total}
+                            </span>
+                          </Link>
                         </td>
                       );
                     })}

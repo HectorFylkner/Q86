@@ -146,6 +146,10 @@ async function timedSetEvidence(): Promise<{
  *  chapter-level weakness. */
 const CURRICULUM_WINDOW = 20;
 
+/** Content-gap heat decays: only misses this recent still push their
+ *  chapter up the curriculum. */
+const GAP_RECENCY_DAYS = 14;
+
 /** Per-chapter evidence for the curriculum sequencer, in canonical
  *  chapter order (skill groups as on the Learn index). Shared by the
  *  daily plan and the Learn index so both see the same ordering. */
@@ -158,7 +162,13 @@ export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
   const baseline = await baselineWeakness();
 
   const recent = await db
-    .select({ subtopic: questions.subtopic, correct: attempts.correct })
+    .select({
+      subtopic: questions.subtopic,
+      correct: attempts.correct,
+      errorType: attempts.errorType,
+      errorSubtag: attempts.errorSubtag,
+      createdAt: attempts.createdAt,
+    })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
     .where(eq(attempts.focus, "focused"))
@@ -166,11 +176,24 @@ export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
     .limit(5000)
     .all();
   const windows = new Map<Subtopic, boolean[]>();
+  const flaggedGaps = new Map<Subtopic, number>();
+  const gapCutoff = Date.now() - GAP_RECENCY_DAYS * 86_400_000;
   for (const r of recent) {
     const list = windows.get(r.subtopic) ?? [];
     if (list.length < CURRICULUM_WINDOW) {
       list.push(r.correct);
       windows.set(r.subtopic, list);
+    }
+    // A miss points at a chapter either through a coach/user
+    // cross-attribution (error_subtag names the concept that actually
+    // failed) or a content_gap tag on the question's own subtopic.
+    if (!r.correct && r.createdAt.getTime() >= gapCutoff) {
+      const target =
+        r.errorSubtag ??
+        (r.errorType === "content_gap" ? r.subtopic : null);
+      if (target != null) {
+        flaggedGaps.set(target, (flaggedGaps.get(target) ?? 0) + 1);
+      }
     }
   }
 
@@ -191,6 +214,7 @@ export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
         correct: window.filter(Boolean).length,
         ladderGap: rungs.length > 0 ? unmastered / rungs.length : 1,
         baselineWeakness: baseline?.[skill] ?? null,
+        flaggedGaps: flaggedGaps.get(subtopic) ?? 0,
       });
     }
   }

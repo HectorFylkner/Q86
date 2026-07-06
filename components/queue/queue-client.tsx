@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { DownloadSimple } from "@phosphor-icons/react";
@@ -235,7 +236,12 @@ export function QueueClient({
                 {due.map((d) => (
                   <tr key={d.id} className="border-t border-grid">
                     <td className="py-2 pr-3">
-                      {SUBTOPIC_LABELS[d.subtopic]}
+                      <Link
+                        href={`/learn/${d.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[d.subtopic]}
+                      </Link>
                       <span className="ml-2 text-xs text-graphite">
                         {SKILL_SHORT_LABELS[d.skill]} · D{d.difficulty}
                       </span>
@@ -370,7 +376,12 @@ export function QueueClient({
                     })}
                   </td>
                   <td className="py-1.5 pr-3">
-                    {SUBTOPIC_LABELS[r.subtopic]}
+                    <Link
+                      href={`/learn/${r.subtopic}`}
+                      className="hover:text-ballpoint hover:underline"
+                    >
+                      {SUBTOPIC_LABELS[r.subtopic]}
+                    </Link>
                     <span className="ml-1.5 text-[10px] text-graphite">
                       {r.context === "pure" ? "Pure" : "Real"}
                       {r.format === "data_sufficiency" ? " · DS" : ""}

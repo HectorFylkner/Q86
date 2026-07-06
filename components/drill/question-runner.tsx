@@ -300,7 +300,14 @@ export function QuestionRunner({
                 return (
                   <tr key={i} className="border-b border-grid last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
-                    <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
+                    <td className="px-3 py-2">
+                      <Link
+                        href={`/learn/${q.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[q.subtopic]}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2">
                       <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
                     </td>
@@ -426,25 +433,45 @@ export function QuestionRunner({
       {revealed && currentResult && (
         <>
           {!currentResult.correct && (
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
-              {ERROR_TYPES.map((et, i) => (
-                <button
-                  key={et}
-                  onClick={() => tagError(et)}
-                  disabled={currentResult.attemptId == null}
-                  className={cn(
-                    "rounded-control border px-2 py-1 transition-colors duration-150",
-                    currentResult.errorType === et
-                      ? "border-redpen bg-redpen/5 font-medium text-redpen"
-                      : "border-grid text-graphite hover:border-graphite/50",
-                    currentResult.attemptId == null && "opacity-50",
-                  )}
-                >
-                  <span className="mr-1 font-mono opacity-60">{i + 1}</span>
-                  {ERROR_TYPE_LABELS[et]}
-                </button>
-              ))}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-graphite">Tag the miss (keys 1–6):</span>
+                {ERROR_TYPES.map((et, i) => (
+                  <button
+                    key={et}
+                    onClick={() => tagError(et)}
+                    disabled={currentResult.attemptId == null}
+                    className={cn(
+                      "rounded-control border px-2 py-1 transition-colors duration-150",
+                      currentResult.errorType === et
+                        ? "border-redpen bg-redpen/5 font-medium text-redpen"
+                        : "border-grid text-graphite hover:border-graphite/50",
+                      currentResult.attemptId == null && "opacity-50",
+                    )}
+                  >
+                    <span className="mr-1 font-mono opacity-60">{i + 1}</span>
+                    {ERROR_TYPE_LABELS[et]}
+                  </button>
+                ))}
+              </div>
+              {currentResult.errorType === "content_gap" && (
+                <p className="text-xs">
+                  <span className="text-graphite">
+                    A content gap has a chapter:{" "}
+                  </span>
+                  <Link
+                    href={`/learn/${question.subtopic}#ideas`}
+                    className="font-medium text-ballpoint hover:underline"
+                  >
+                    Reread: {SUBTOPIC_LABELS[question.subtopic]} → The core
+                    ideas
+                  </Link>
+                  <span className="text-graphite">
+                    {" "}
+                    — it also moves this chapter up tomorrow&apos;s plan.
+                  </span>
+                </p>
+              )}
             </div>
           )}
           <SolutionPanel

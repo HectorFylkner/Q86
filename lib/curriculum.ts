@@ -32,6 +32,10 @@ export type CurriculumRow = {
   /** Skill-level weakness from the imported baseline report, 0..1;
    *  null when nothing has been imported. */
   baselineWeakness: number | null;
+  /** Recent misses that point at this chapter as a content problem:
+   *  content_gap tags on its own questions plus coach/user
+   *  cross-attributions (error_subtag) filed from any question. */
+  flaggedGaps: number;
 };
 
 export type CurriculumAction = "read" | "finish" | "test";
@@ -62,13 +66,24 @@ const W_DRILL = 0.5;
 const W_BASELINE = 0.25;
 const W_LADDER = 0.25;
 
-/** Weakness 0..1 — higher means this chapter deserves attention sooner. */
+/** How hard flagged content gaps push a chapter up the queue: each
+ *  recent gap adds a third of the bump, saturating at three. One
+ *  content_gap tag today is enough to reorder near-ties tomorrow;
+ *  three make the chapter hard to ignore. */
+const GAP_BUMP = 0.15;
+const GAP_SATURATION = 3;
+
+/** Weakness 0..1(+bump) — higher means this chapter deserves attention
+ *  sooner. */
 export function weaknessScore(row: CurriculumRow): number {
   const drill =
     (row.attempts - row.correct + 0.5 * PRIOR_WEIGHT) /
     (row.attempts + PRIOR_WEIGHT);
   const baseline = row.baselineWeakness ?? 0.5;
-  return W_DRILL * drill + W_BASELINE * baseline + W_LADDER * row.ladderGap;
+  const gaps = GAP_BUMP * Math.min(1, row.flaggedGaps / GAP_SATURATION);
+  return (
+    W_DRILL * drill + W_BASELINE * baseline + W_LADDER * row.ladderGap + gaps
+  );
 }
 
 export function qualifiesForTestOut(row: CurriculumRow): boolean {

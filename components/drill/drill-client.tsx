@@ -32,23 +32,31 @@ export function DrillClient({
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
-  autoStartRung?: { subtopic: string; difficulty: number } | null;
+  /** With difficulty: a mastery-ladder rung. Without: a subtopic drill
+   *  (coach prescription / reread follow-up) across all difficulties. */
+  autoStartRung?: {
+    subtopic: string;
+    difficulty: number | null;
+    count?: number;
+  } | null;
   autoStartTest?: Subtopic | null;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
 
-  // Mastery-ladder rung drills arrive as /drill?sub=…&d=…
+  // Subtopic deep links arrive as /drill?sub=…&d=… or /drill?sub=…&n=…
   useEffect(() => {
     if (!autoStartRung || autoStartedRef.current) return;
     autoStartedRef.current = true;
     void handleStart({
       filter: {
         subtopics: [autoStartRung.subtopic as never],
-        difficultyMin: autoStartRung.difficulty,
-        difficultyMax: autoStartRung.difficulty,
+        ...(autoStartRung.difficulty != null && {
+          difficultyMin: autoStartRung.difficulty,
+          difficultyMax: autoStartRung.difficulty,
+        }),
       },
-      count: 6,
+      count: autoStartRung.count ?? 6,
       timing: "soft",
       focus: "focused",
     });
