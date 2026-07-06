@@ -1,12 +1,39 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
-import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
+import {
+  computeLadders,
+  MASTERY_BAR,
+  MIN_ATTEMPTS,
+  PACE_BAR_SECONDS,
+  STALE_DAYS,
+  type Rung,
+} from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
   SUBTOPIC_LABELS,
 } from "@/lib/taxonomy";
-import { cn } from "@/lib/utils";
+import { cn, formatSeconds } from "@/lib/utils";
+
+function rungTitle(rung: Rung): string {
+  if (rung.state === "empty") {
+    return `D${rung.difficulty}: no questions in the bank`;
+  }
+  const base = `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window`;
+  const pace =
+    rung.medianSeconds != null
+      ? `, median ${formatSeconds(rung.medianSeconds)} (bar ${formatSeconds(
+          PACE_BAR_SECONDS[rung.difficulty],
+        )})`
+      : "";
+  if (rung.state === "stale") {
+    return `${base} — last attempt ${rung.daysSinceLast} days ago; confirm it still holds`;
+  }
+  if (rung.state === "slow") {
+    return `${base}${pace} — accurate but over the pace bar`;
+  }
+  return `${base}${pace}`;
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,8 +49,12 @@ export default async function MasteryPage() {
         <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
         <p className="text-xs text-graphite">
           A rung clears at ≥{Math.round(MASTERY_BAR * 100)}% over your last 10
-          attempts (minimum {MIN_ATTEMPTS}). {masteredCount} of{" "}
-          {ladders.length} ladders fully climbed.
+          attempts (minimum {MIN_ATTEMPTS}) at exam pace (
+          {formatSeconds(PACE_BAR_SECONDS[3])} at D3 →{" "}
+          {formatSeconds(PACE_BAR_SECONDS[5])} at D5), and decays after{" "}
+          {STALE_DAYS} days without contact — accurate-but-slow and stale
+          rungs show as their own states. {masteredCount} of {ladders.length}{" "}
+          ladders fully climbed.
         </p>
       </div>
 
@@ -67,15 +98,15 @@ export default async function MasteryPage() {
                     {ladder.rungs.map((rung) => (
                       <div key={rung.difficulty} className="flex-1">
                         <div
-                          title={
-                            rung.state === "empty"
-                              ? `D${rung.difficulty}: no questions in the bank`
-                              : `D${rung.difficulty}: ${rung.correct}/${rung.total} in the last window`
-                          }
+                          title={rungTitle(rung)}
                           className={cn(
                             "rounded-[4px] border text-center font-mono text-[11px] leading-6",
                             rung.state === "mastered" &&
                               "border-ballpoint bg-ballpoint text-white",
+                            rung.state === "stale" &&
+                              "border-dashed border-ballpoint/70 bg-ballpoint/10 text-ballpoint",
+                            rung.state === "slow" &&
+                              "border-amber bg-amber text-white",
                             rung.state === "working" &&
                               "border-amber bg-amber/10 text-amber",
                             rung.state === "untouched" &&
@@ -90,14 +121,26 @@ export default async function MasteryPage() {
                       </div>
                     ))}
                   </div>
-                  {ladder.currentRung != null && (
-                    <Link
-                      href={`/drill?sub=${ladder.subtopic}&d=${ladder.currentRung}`}
-                      className="mt-2 inline-block text-xs font-medium text-ballpoint hover:underline"
-                    >
-                      Work rung D{ladder.currentRung} →
-                    </Link>
-                  )}
+                  {ladder.currentRung != null &&
+                    (() => {
+                      const rung = ladder.rungs.find(
+                        (r) => r.difficulty === ladder.currentRung,
+                      );
+                      const label =
+                        rung?.state === "stale"
+                          ? `Confirm D${ladder.currentRung} still holds →`
+                          : rung?.state === "slow"
+                            ? `D${ladder.currentRung} accurate but slow — speed drill →`
+                            : `Work rung D${ladder.currentRung} →`;
+                      return (
+                        <Link
+                          href={`/drill?sub=${ladder.subtopic}&d=${ladder.currentRung}`}
+                          className="mt-2 inline-block text-xs font-medium text-ballpoint hover:underline"
+                        >
+                          {label}
+                        </Link>
+                      );
+                    })()}
                 </div>
               ))}
           </div>

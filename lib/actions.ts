@@ -18,8 +18,11 @@ import {
   type Question,
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
-import { selectChapterTest } from "./chapter-tests.ts";
-import { CHAPTER_TEST_BAR } from "./chapter-test-config.ts";
+import { RETAKE_EXCLUDE_DAYS, selectChapterTest } from "./chapter-tests.ts";
+import {
+  CHAPTER_TEST_BAR,
+  CHAPTER_TEST_SIZE,
+} from "./chapter-test-config.ts";
 import { enrollLessonCards } from "./lesson-cards.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
@@ -86,10 +89,11 @@ export async function startDrill(config: {
 export async function startChapterTest(
   subtopic: Subtopic,
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
-  if (picked.length < 4) {
+  const { questions: picked, eligibleShortfall } =
+    await selectChapterTest(subtopic);
+  if (eligibleShortfall != null) {
     return {
-      error: "Not enough verified questions in this chapter for a test.",
+      error: `Bank too thin for a fresh test — ${eligibleShortfall}/${CHAPTER_TEST_SIZE} eligible questions in this chapter right now (questions seen in the last ${RETAKE_EXCLUDE_DAYS} days sit out so a retake measures the chapter, not recall). Drill the subtopic instead, or come back in a few days.`,
       sessionId: null,
       questions: [],
     };
@@ -271,7 +275,7 @@ export async function finishSession(
       .where(eq(attempts.sessionId, sessionId))
       .all();
     if (
-      rows.length > 0 &&
+      rows.length >= CHAPTER_TEST_SIZE &&
       rows.filter((r) => r.correct).length / rows.length >= CHAPTER_TEST_BAR
     ) {
       await enrollLessonCards(sub as Subtopic);

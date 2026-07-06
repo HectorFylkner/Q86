@@ -90,7 +90,10 @@ export default async function LessonPage({
             </span>
           )}
           {testState?.passed && (
-            <span className="text-ballpoint">✓ test passed</span>
+            <span className="text-ballpoint">
+              ✓ test passed · last {testState.lastCorrect}/
+              {testState.lastTotal}
+            </span>
           )}
         </p>
       )}
