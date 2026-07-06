@@ -31,7 +31,31 @@ Workstream 1 — Trust and foundations.
   top-up target. A docs-consistency test (M2) guards the count from
   drifting again.
 
-## In flight / next
+## In flight
+
+- M2 (test infra) DONE: vitest (`pnpm test`), 8 suites / 206 tests green
+  covering pacing, elo, srs, lesson contract (all 24 lessons), latex
+  parsing, plan math, all 9 generators, and docs-consistency (README/
+  DEPLOY counts asserted against seed-bank.json — drift now fails CI);
+  .github/workflows/ci.yml runs lint → test → verify-bank →
+  db:push+seed offline path → build. Two genuine defects found by the
+  suite and fixed: (1) SRS "hard" stalled forever at 1–2d intervals —
+  now grows ≥1 day; (2) latexChoiceToExpression bailed to null on
+  cross-nested constructs like \frac{\sqrt{2}}{2}, so valid questions
+  with such correct choices could never pass numeric_check — expansion
+  is now innermost-first across frac/sqrt/pow. Bank re-verified after
+  the parser change: all 360 pass.
+- M3 (tokens/analytics): globals.css deduped (:focus-visible/::selection
+  first-pass blocks removed), --on-ballpoint token added both themes and
+  mapped for Tailwind; heatmap now mixes against var(--surface) with
+  theme-flipped text; volume strip rebuilt as Monday-aligned week grid
+  with month labels. The .bg-ballpoint.text-white hack stays until the
+  primitives migration removes the last text-white-on-ballpoint site.
+- M4 (primitives): components/ui/{button,card,chip,stat,key-legend}.tsx
+  written; cn() upgraded to tailwind-merge (math.tsx leading- guard
+  removed as obsolete); 16-file migration fan-out running.
+
+## Next
 
 - M2: vitest + unit tests (pacing, elo, redo, srs, lesson-parse over all
   24 lessons, latex parsing, engine helpers, plan weights, docs

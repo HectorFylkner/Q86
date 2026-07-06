@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      # Bank-wide mechanical re-verification: structural rules + numeric
+      # checks over every question in scripts/seed-bank.json.
+      - run: node --experimental-strip-types scripts/verify-bank.ts
+      # Exercise the offline no-API-key path exactly as a fresh clone would.
+      - run: pnpm db:push
+      - run: pnpm seed
+      - run: pnpm build

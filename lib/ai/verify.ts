@@ -23,19 +23,21 @@ export function latexChoiceToExpression(choice: string): string | null {
   // mixed number would need distribution — bail out instead of guessing.
   if (/-\s*\d+\s*\\[dt]?frac/.test(s)) return null;
   s = s.replace(/(\d)\s*(\\[dt]?frac)/g, "$1+$2");
-  // \frac{a}{b} → ((a)/(b)) — repeat for nesting
-  for (let i = 0; i < 5 && /\\[dt]?frac/.test(s); i++) {
-    s = s.replace(
-      /\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g,
-      "(($1)/($2))",
-    );
+  // Innermost-first expansion: each pattern matches only brace-free
+  // arguments, so iterating resolves any nesting order — \frac{\sqrt{2}}{2},
+  // \sqrt{\frac{1}{2}}, 2^{\frac{1}{2}} — where sequential single passes
+  // used to bail to null on cross-nested constructs.
+  for (
+    let i = 0;
+    i < 8 && /\\[dt]?frac|\\sqrt|\^\{/.test(s);
+    i++
+  ) {
+    s = s
+      .replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, "(($1)/($2))")
+      .replace(/\\sqrt\[(\d+)\]\{([^{}]*)\}/g, "(($2)^(1/$1))")
+      .replace(/\\sqrt\{([^{}]*)\}/g, "sqrt($1)")
+      .replace(/\^\{([^{}]*)\}/g, "^($1)");
   }
-  // \sqrt[n]{x} → ((x)^(1/n)), then \sqrt{x} → sqrt(x)
-  s = s.replace(/\\sqrt\[(\d+)\]\{([^{}]*)\}/g, "(($2)^(1/$1))");
-  for (let i = 0; i < 5 && /\\sqrt/.test(s); i++) {
-    s = s.replace(/\\sqrt\{([^{}]*)\}/g, "sqrt($1)");
-  }
-  s = s.replace(/\^\{([^{}]*)\}/g, "^($1)");
   s = s.replaceAll("{", "(").replaceAll("}", ")");
   s = s.trim();
   if (s.length === 0 || /\\|[a-df-oq-z]/i.test(s.replace(/sqrt|pi|abs/g, ""))) {

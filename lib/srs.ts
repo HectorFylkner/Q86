@@ -39,7 +39,12 @@ export function nextReview(
   if (grade === "hard") {
     return {
       ease: Math.max(1.3, s.ease - 0.05),
-      intervalDays: Math.max(1, Math.round(s.intervalDays * 1.2)),
+      // At least one day of growth: round(1×1.2)=1 and round(2×1.2)=2
+      // would otherwise stall a repeatedly-hard card forever.
+      intervalDays: Math.max(
+        s.intervalDays + 1,
+        Math.round(s.intervalDays * 1.2),
+      ),
       reps: s.reps + 1,
       lapses: s.lapses,
     };

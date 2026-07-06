@@ -14,7 +14,9 @@
     "lint": "eslint .",
     "db:push": "node -e \"require('fs').mkdirSync('data',{recursive:true})\" && drizzle-kit push",
     "seed": "node --experimental-strip-types scripts/seed.ts",
-    "backup": "node --experimental-strip-types scripts/backup.ts"
+    "backup": "node --experimental-strip-types scripts/backup.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",
@@ -31,6 +33,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",
+    "tailwind-merge": "^3.6.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
@@ -44,7 +47,8 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.3.0",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
