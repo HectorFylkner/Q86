@@ -209,6 +209,25 @@ export const deckReviews = sqliteTable(
   (t) => [index("deck_reviews_due_idx").on(t.dueAt)],
 );
 
+// Lesson progress that cannot be derived from attempts: when a chapter
+// was first opened and which pre-drill checklist items are ticked. One
+// row per chapter; the daily plan reads this to sequence the curriculum.
+// (Chapter keys are taxonomy subtopics — the lesson filename, the route
+// param, and this column are the same string.)
+export const lessonProgress = sqliteTable("lesson_progress", {
+  subtopic: text("subtopic").$type<Subtopic>().primaryKey(),
+  readAt: integer("read_at", { mode: "timestamp_ms" }),
+  // Checked item indexes into the chapter's "Before you drill" list.
+  checklist: text("checklist", { mode: "json" })
+    .$type<number[]>()
+    .notNull()
+    .default(sql`'[]'`),
+  checklistTotal: integer("checklist_total").notNull().default(0),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
+
 // Content QC: questions the user flags mid-review. Resolving may retire
 // the question (verified = false) — rows are never deleted.
 export const questionFlags = sqliteTable(
@@ -241,3 +260,4 @@ export type EloRating = typeof eloRatings.$inferSelect;
 export type BaselineReport = typeof baselineReports.$inferSelect;
 export type DeckReview = typeof deckReviews.$inferSelect;
 export type QuestionFlag = typeof questionFlags.$inferSelect;
+export type LessonProgress = typeof lessonProgress.$inferSelect;

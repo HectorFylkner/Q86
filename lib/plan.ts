@@ -2,6 +2,11 @@ import {
   FUNDAMENTAL_SKILLS,
   type FundamentalSkill,
 } from "./taxonomy.ts";
+import {
+  computeCurriculum,
+  type CurriculumPlan,
+  type CurriculumRow,
+} from "./curriculum.ts";
 import type { PatternCategoryKey } from "./generators/index.ts";
 
 /**
@@ -31,7 +36,7 @@ export const PHASE_LABELS: Record<TrainingPhase, string> = {
 
 export const PHASE_NOTES: Record<TrainingPhase, string> = {
   foundations:
-    "Build coverage: climb the mastery ladders and keep every skill in rotation.",
+    "Build coverage: clear the next chapter, pass its test, and keep every skill in rotation.",
   accuracy:
     "Error discipline: clear the redo queue daily and post-mortem every miss.",
   speed:
@@ -71,6 +76,8 @@ export type PlanInputs = {
   dayIndex: number;
   /** Current pattern-trainer ELO per category. */
   eloByCategory: Record<PatternCategoryKey, number>;
+  /** Per-chapter curriculum evidence, in canonical chapter order. */
+  curriculum: CurriculumRow[];
 };
 
 export type DailyPlan = {
@@ -85,6 +92,8 @@ export type DailyPlan = {
   weights: Record<FundamentalSkill, number>;
   dueRedoCount: number;
   timedSetToday: boolean;
+  /** Which chapter to study next, and any test-out shortcuts. */
+  curriculum: CurriculumPlan;
 };
 
 /** Floor 5% per skill so every skill always gets maintenance reps. */
@@ -215,5 +224,6 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     dueRedoCount: inputs.dueRedoCount,
     timedSetToday:
       effectiveCadence > 0 && inputs.dayIndex % effectiveCadence === 0,
+    curriculum: computeCurriculum(inputs.curriculum),
   };
 }

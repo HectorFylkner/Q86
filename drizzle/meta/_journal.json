@@ -15,6 +15,13 @@
       "when": 1783242991470,
       "tag": "0001_deep_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783358619612,
+      "tag": "0002_large_captain_america",
+      "breakpoints": true
     }
   ]
 }

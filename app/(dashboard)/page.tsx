@@ -6,10 +6,15 @@ import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
+import { listLessons } from "@/lib/lessons";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
 import { getSetting } from "@/lib/settings";
-import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
+import {
+  SKILL_SHORT_LABELS,
+  SKILL_LABELS,
+  SUBTOPIC_LABELS,
+} from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -127,6 +132,8 @@ export default async function TodayPage() {
           </div>
         </section>
       )}
+
+      <CurriculumCard curriculum={plan.curriculum} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PlanCard
@@ -283,6 +290,90 @@ export default async function TodayPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+/** The curriculum slot: which chapter the evidence says to work next.
+ *  Weakest unpassed subtopic by drill accuracy, imported baseline, and
+ *  ladder gaps — recommendation-strength, never a lock. */
+function CurriculumCard({
+  curriculum,
+}: {
+  curriculum: ReturnType<typeof computeDailyPlan>["curriculum"];
+}) {
+  const titles = new Map(listLessons().map((l) => [l.subtopic, l.title]));
+  const next = curriculum.next;
+  const ACTION_COPY = {
+    read: "You haven't opened this chapter — read it, then drill it while it's warm.",
+    finish:
+      "Opened but not finished — work through the checklist, then prove it on the test.",
+    test: "The checklist is done or the drill evidence is already there — go take the test.",
+  } as const;
+  return (
+    <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-display text-sm font-semibold">
+            Study · next chapter
+          </h2>
+          {next ? (
+            <>
+              <p className="mt-1 text-base font-medium">
+                {titles.get(next.subtopic) ?? SUBTOPIC_LABELS[next.subtopic]}
+              </p>
+              <p className="mt-0.5 text-xs text-graphite">
+                {ACTION_COPY[next.action]} Weakest unpassed chapter by your
+                drill record, baseline report, and ladder gaps.
+              </p>
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-graphite">
+              All {curriculum.total} chapter tests passed — the curriculum is
+              maintenance now; mixed review keeps it warm.
+            </p>
+          )}
+          {curriculum.testOut.length > 0 && (
+            <p className="mt-2 text-xs text-graphite">
+              Test-out ready (recent accuracy already clears the bar):{" "}
+              {curriculum.testOut.map((s, i) => (
+                <span key={s}>
+                  {i > 0 && " · "}
+                  <Link
+                    href={`/drill?test=${s}`}
+                    className="font-medium text-ballpoint hover:underline"
+                  >
+                    {SUBTOPIC_LABELS[s]}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="font-mono text-xs text-graphite">
+            {curriculum.passed}/{curriculum.total} passed
+          </span>
+          {next &&
+            (next.action === "test" ? (
+              <Link
+                href={`/drill?test=${next.subtopic}`}
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Take the chapter test →
+              </Link>
+            ) : (
+              <Link
+                href={`/learn/${next.subtopic}`}
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                {next.action === "finish"
+                  ? "Finish the chapter →"
+                  : "Read the chapter →"}
+              </Link>
+            ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

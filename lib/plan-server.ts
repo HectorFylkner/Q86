@@ -6,12 +6,16 @@ import {
   questions,
   redoQueue,
 } from "./db/schema.ts";
+import { chapterTestStates } from "./chapter-tests.ts";
+import type { CurriculumRow } from "./curriculum.ts";
 import { ELO_START } from "./elo.ts";
 import { selectQuestions } from "./engine.ts";
 import {
   PATTERN_CATEGORY_KEYS,
   type PatternCategoryKey,
 } from "./generators/index.ts";
+import { checklistDone, lessonProgressBySubtopic } from "./lesson-progress.ts";
+import { computeLadders } from "./mastery.ts";
 import {
   computeDailyPlan,
   type DailyPlan,
@@ -19,7 +23,12 @@ import {
   type SkillRecord,
 } from "./plan.ts";
 import { baselineWeakness, getSetting, weightOverrides } from "./settings.ts";
-import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
+import {
+  FUNDAMENTAL_SKILLS,
+  SUBTOPICS_BY_SKILL,
+  type FundamentalSkill,
+  type Subtopic,
+} from "./taxonomy.ts";
 
 export async function daysToTest(): Promise<number | null> {
   const raw = await getSetting("test_date");
@@ -64,6 +73,61 @@ export async function dueRedoCount(): Promise<number> {
   return rows.length;
 }
 
+/** Most recent focused attempts considered per subtopic when judging
+ *  chapter-level weakness. */
+const CURRICULUM_WINDOW = 20;
+
+/** Per-chapter evidence for the curriculum sequencer, in canonical
+ *  chapter order (skill groups as on the Learn index). Shared by the
+ *  daily plan and the Learn index so both see the same ordering. */
+export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
+  const progress = await lessonProgressBySubtopic();
+  const tests = await chapterTestStates();
+  const ladders = new Map(
+    (await computeLadders()).map((l) => [l.subtopic, l]),
+  );
+  const baseline = await baselineWeakness();
+
+  const recent = await db
+    .select({ subtopic: questions.subtopic, correct: attempts.correct })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.focus, "focused"))
+    .orderBy(desc(attempts.id))
+    .limit(5000)
+    .all();
+  const windows = new Map<Subtopic, boolean[]>();
+  for (const r of recent) {
+    const list = windows.get(r.subtopic) ?? [];
+    if (list.length < CURRICULUM_WINDOW) {
+      list.push(r.correct);
+      windows.set(r.subtopic, list);
+    }
+  }
+
+  const rows: CurriculumRow[] = [];
+  for (const skill of FUNDAMENTAL_SKILLS) {
+    for (const subtopic of SUBTOPICS_BY_SKILL[skill]) {
+      const p = progress.get(subtopic);
+      const window = windows.get(subtopic) ?? [];
+      const ladder = ladders.get(subtopic);
+      const rungs = ladder?.rungs.filter((r) => r.state !== "empty") ?? [];
+      const unmastered = rungs.filter((r) => r.state !== "mastered").length;
+      rows.push({
+        subtopic,
+        read: p?.readAt != null,
+        checklistDone: checklistDone(p),
+        testPassed: tests[subtopic]?.passed ?? false,
+        attempts: window.length,
+        correct: window.filter(Boolean).length,
+        ladderGap: rungs.length > 0 ? unmastered / rungs.length : 1,
+        baselineWeakness: baseline?.[skill] ?? null,
+      });
+    }
+  }
+  return rows;
+}
+
 export async function gatherPlanInputs(): Promise<PlanInputs> {
   const eloRows = new Map(
     (await db.select().from(eloRatings).all()).map((r) => [
@@ -91,6 +155,7 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
       Number.isInteger(cadenceRaw) && cadenceRaw > 0 ? cadenceRaw : 3,
     dayIndex: localDayIndex,
     eloByCategory,
+    curriculum: await gatherCurriculumRows(),
   };
 }
 
