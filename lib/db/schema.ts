@@ -19,6 +19,7 @@ import type {
   QuestionSource,
   SessionFocus,
   SessionMode,
+  Strategy,
   Subtopic,
 } from "../taxonomy.ts";
 
@@ -229,6 +230,28 @@ export const lessonProgress = sqliteTable("lesson_progress", {
     .default(sql`(unixepoch() * 1000)`),
 });
 
+// Worked-example commitments: before a lesson example reveals, the
+// user commits a strategy and an answer — both land here with timing,
+// so the lesson's honor system becomes evidence and strategy selection
+// gets per-method accuracy/time data. correct is graded server-side
+// against the example's answer where extractable, then self-markable.
+export const lessonExampleAttempts = sqliteTable(
+  "lesson_example_attempts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    subtopic: text("subtopic").$type<Subtopic>().notNull(),
+    exampleN: integer("example_n").notNull(),
+    strategy: text("strategy").$type<Strategy>().notNull(),
+    answer: text("answer").notNull(),
+    correct: integer("correct", { mode: "boolean" }),
+    timeSeconds: real("time_seconds").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("lesson_example_idx").on(t.subtopic, t.exampleN)],
+);
+
 // Concept-level spaced retrieval: a chapter's trigger cues and trap
 // gallery become retrieval-first cards when its test is passed, merged
 // into the daily deck (question-derived cards keep priority) and
@@ -298,3 +321,4 @@ export type DeckReview = typeof deckReviews.$inferSelect;
 export type QuestionFlag = typeof questionFlags.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type LessonReview = typeof lessonReviews.$inferSelect;
+export type LessonExampleAttempt = typeof lessonExampleAttempts.$inferSelect;

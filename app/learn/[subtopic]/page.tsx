@@ -176,6 +176,7 @@ export default async function LessonPage({
             {parsed.examples.map((ex, i) => (
               <ExampleCard
                 key={ex.n}
+                subtopic={subtopic as Subtopic}
                 n={ex.n}
                 level={Math.min(i, 2) as 0 | 1 | 2}
                 question={ex.question}

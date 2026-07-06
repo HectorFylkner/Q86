@@ -29,7 +29,11 @@ import {
   PATTERN_CATEGORY_KEYS,
   type PatternCategoryKey,
 } from "./generators/index.ts";
-import { checklistDone, lessonProgressBySubtopic } from "./lesson-progress.ts";
+import {
+  checklistDone,
+  exampleAttemptCounts,
+  lessonProgressBySubtopic,
+} from "./lesson-progress.ts";
 import { computeLadders } from "./mastery.ts";
 import {
   computeDailyPlan,
@@ -160,6 +164,7 @@ const GAP_RECENCY_DAYS = 14;
  *  daily plan and the Learn index so both see the same ordering. */
 export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
   const progress = await lessonProgressBySubtopic();
+  const examples = await exampleAttemptCounts();
   const tests = await chapterTestStates();
   const ladders = new Map(
     (await computeLadders()).map((l) => [l.subtopic, l]),
@@ -214,6 +219,7 @@ export async function gatherCurriculumRows(): Promise<CurriculumRow[]> {
         subtopic,
         read: p?.readAt != null,
         checklistDone: checklistDone(p),
+        examplesAttempted: examples.get(subtopic) ?? 0,
         testPassed: tests[subtopic]?.passed ?? false,
         attempts: window.length,
         correct: window.filter(Boolean).length,

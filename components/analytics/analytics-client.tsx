@@ -31,6 +31,7 @@ import {
   ERROR_TYPES,
   ERROR_TYPE_LABELS,
   SKILL_LABELS,
+  STRATEGY_LABELS,
   SUBTOPIC_LABELS,
   type EditReason,
 } from "@/lib/taxonomy";
@@ -569,6 +570,51 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </BarChart>
         </ResponsiveContainer>
       </Section>
+
+      {/* 5b — strategy performance on worked examples */}
+      {data.strategyStats.some((s) => s.attempts > 0) && (
+        <Section
+          title="Method performance"
+          subtitle="Worked-example commitments by strategy: which methods you reach for, and how they pay off."
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-sm">
+              <thead>
+                <tr className="text-left text-xs text-graphite">
+                  <th className="py-1 pr-3 font-normal">Method</th>
+                  <th className="py-1 pr-3 font-normal">Commits</th>
+                  <th className="py-1 pr-3 font-normal">Accuracy (graded)</th>
+                  <th className="py-1 font-normal">Median time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.strategyStats
+                  .filter((s) => s.attempts > 0)
+                  .map((s) => (
+                    <tr key={s.strategy} className="border-t border-grid">
+                      <td className="py-1.5 pr-3">
+                        {STRATEGY_LABELS[s.strategy]}
+                      </td>
+                      <td className="py-1.5 pr-3 font-mono text-xs">
+                        {s.attempts}
+                      </td>
+                      <td className="py-1.5 pr-3 font-mono text-xs">
+                        {s.graded > 0
+                          ? `${percent(s.correct, s.graded)}% (${s.correct}/${s.graded})`
+                          : "—"}
+                      </td>
+                      <td className="py-1.5 font-mono text-xs">
+                        {s.medianSeconds != null
+                          ? `${Math.round(s.medianSeconds)}s`
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      )}
 
       {/* 6 — rolling trend */}
       <Section

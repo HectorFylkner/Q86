@@ -68,6 +68,20 @@ async function provision(): Promise<void> {
  *  (db:push-created databases have no ledger, so late additions land
  *  here as guarded DDL). */
 async function evolveSchema(): Promise<void> {
+  // drizzle/0004_nice_dracula.sql
+  await client.execute(`create table if not exists lesson_example_attempts (
+    id integer primary key autoincrement not null,
+    subtopic text not null,
+    example_n integer not null,
+    strategy text not null,
+    answer text not null,
+    correct integer,
+    time_seconds real not null,
+    created_at integer default (unixepoch() * 1000) not null
+  )`);
+  await client.execute(
+    "create index if not exists lesson_example_idx on lesson_example_attempts (subtopic, example_n)",
+  );
   // drizzle/0003_peaceful_sue_storm.sql
   await client.execute(`create table if not exists lesson_reviews (
     id integer primary key autoincrement not null,

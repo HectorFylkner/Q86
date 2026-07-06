@@ -21,6 +21,8 @@ export type CurriculumRow = {
   read: boolean;
   /** Every pre-drill checklist item ticked. */
   checklistDone: boolean;
+  /** Distinct worked examples with a logged commitment (0..3). */
+  examplesAttempted: number;
   /** Chapter test passed (sticky). */
   testPassed: boolean;
   /** Focused drill attempts on this subtopic, most recent window. */
@@ -130,11 +132,18 @@ export function qualifiesForTestOut(row: CurriculumRow): boolean {
   );
 }
 
-/** What to do on a chapter, given its state: prove it when the evidence
- *  or the finished checklist says the content is in place; finish an
+/** What to do on a chapter, given its state: prove it when the drill
+ *  evidence says so, or when the chapter is genuinely prepared
+ *  (checklist ticked AND all three examples committed — ticks alone are
+ *  the honor system, and the honor system is not evidence); finish an
  *  opened chapter; otherwise read it. */
 export function actionFor(row: CurriculumRow): CurriculumAction {
-  if (qualifiesForTestOut(row) || row.checklistDone) return "test";
+  if (
+    qualifiesForTestOut(row) ||
+    (row.checklistDone && row.examplesAttempted >= 3)
+  ) {
+    return "test";
+  }
   if (row.read) return "finish";
   return "read";
 }

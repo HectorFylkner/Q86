@@ -2,7 +2,11 @@ import Link from "next/link";
 import { LessonProgressSync } from "@/components/lesson/learn-progress";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { qualifiesForTestOut, weaknessScore } from "@/lib/curriculum";
-import { checklistDone, lessonProgressBySubtopic } from "@/lib/lesson-progress";
+import {
+  EXAMPLES_PER_CHAPTER,
+  isPrepared,
+  lessonProgressBySubtopic,
+} from "@/lib/lesson-progress";
 import { listLessons } from "@/lib/lessons";
 import { gatherCurriculumRows } from "@/lib/plan-server";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
@@ -26,7 +30,10 @@ export default async function LearnPage() {
   );
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   const preparedCount = lessons.filter((l) =>
-    checklistDone(progress.get(l.subtopic)),
+    isPrepared(
+      progress.get(l.subtopic),
+      rows.get(l.subtopic)?.examplesAttempted ?? 0,
+    ),
   ).length;
   // Chapter numbers stay pinned to the canonical order even though the
   // display order below adapts to the evidence.
@@ -110,7 +117,8 @@ export default async function LearnPage() {
                 const p = progress.get(lesson.subtopic);
                 const test = tests[lesson.subtopic];
                 const testOut = row ? qualifiesForTestOut(row) : false;
-                const prepared = checklistDone(p);
+                const examplesDone = row?.examplesAttempted ?? 0;
+                const prepared = isPrepared(p, examplesDone);
                 return (
                   <div
                     key={lesson.subtopic}
@@ -139,9 +147,12 @@ export default async function LearnPage() {
                         ) : null}
                         {prepared ? (
                           <span className="text-ballpoint">✓ prepared</span>
-                        ) : p && p.checklist.length > 0 ? (
+                        ) : examplesDone > 0 || (p && p.checklist.length > 0) ? (
                           <span>
-                            {p.checklist.length}/{p.checklistTotal} checks
+                            {examplesDone}/{EXAMPLES_PER_CHAPTER} examples
+                            {p && p.checklist.length > 0
+                              ? ` · ${p.checklist.length}/${p.checklistTotal} checks`
+                              : ""}
                           </span>
                         ) : p?.readAt != null ? (
                           <span>started</span>

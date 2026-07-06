@@ -101,6 +101,17 @@ export type SessionFocus = (typeof SESSION_FOCUS)[number];
 export const QUESTION_SOURCES = ["seed", "generated", "twin"] as const;
 export type QuestionSource = (typeof QUESTION_SOURCES)[number];
 
+// The four solution strategies a worked example can be attacked with.
+// Committed before every reveal, so strategy selection becomes a
+// trained, measured habit rather than a narrated one.
+export const STRATEGIES = [
+  "algebra",
+  "backsolve",
+  "smart_numbers",
+  "test_cases",
+] as const;
+export type Strategy = (typeof STRATEGIES)[number];
+
 // Content QC: reasons a question can be flagged from the runner.
 export const FLAG_REASONS = [
   "suspected_error",
@@ -186,6 +197,13 @@ export const CONFIDENCE_LABELS: Record<Confidence, string> = {
   guess: "Guess",
   lean: "Lean",
   lock: "Lock",
+};
+
+export const STRATEGY_LABELS: Record<Strategy, string> = {
+  algebra: "Algebra",
+  backsolve: "Backsolve",
+  smart_numbers: "Smart numbers",
+  test_cases: "Test cases",
 };
 
 export const FLAG_REASON_LABELS: Record<FlagReason, string> = {

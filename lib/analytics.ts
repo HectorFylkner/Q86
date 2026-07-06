@@ -4,6 +4,7 @@ import {
   attempts,
   edits,
   eloRatings,
+  lessonExampleAttempts,
   questions,
   redoQueue,
 } from "./db/schema.ts";
@@ -23,8 +24,10 @@ import {
   ERROR_TYPES,
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
+  STRATEGIES,
   type Confidence,
   type ErrorType,
+  type Strategy,
   type Subtopic,
 } from "./taxonomy.ts";
 
@@ -104,6 +107,14 @@ export type AnalyticsData = {
     filed: Subtopic;
     really: Subtopic;
     count: number;
+  }>;
+  /** Per-method performance on worked-example commitments. */
+  strategyStats: Array<{
+    strategy: Strategy;
+    attempts: number;
+    graded: number;
+    correct: number;
+    medianSeconds: number | null;
   }>;
   /** Attempts per local day, most recent 84 days (includes zero days). */
   volume: VolumeDay[];
@@ -332,6 +343,27 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     })
     .sort((a, b) => b.count - a.count);
 
+  // --- strategy performance on worked-example commitments --------------------
+  const exampleRows = await db.select().from(lessonExampleAttempts).all();
+  const strategyStats = STRATEGIES.map((strategy) => {
+    const subset = exampleRows.filter((r) => r.strategy === strategy);
+    const graded = subset.filter((r) => r.correct != null);
+    const times = subset.map((r) => r.timeSeconds).sort((a, b) => a - b);
+    const mid = Math.floor(times.length / 2);
+    return {
+      strategy,
+      attempts: subset.length,
+      graded: graded.length,
+      correct: graded.filter((r) => r.correct).length,
+      medianSeconds:
+        times.length === 0
+          ? null
+          : times.length % 2 === 1
+            ? times[mid]
+            : (times[mid - 1] + times[mid]) / 2,
+    };
+  });
+
   // --- training volume, last 84 local days -----------------------------------
   const volume: VolumeDay[] = [];
   {
@@ -417,6 +449,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     trend,
     difficultyMatrix,
     crossAttribution,
+    strategyStats,
     volume,
     redoCompliance,
     eloBars,

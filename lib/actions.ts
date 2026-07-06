@@ -9,6 +9,7 @@ import {
   deckReviews,
   edits,
   eloRatings,
+  lessonExampleAttempts,
   lessonProgress,
   lessonReviews,
   patternAttempts,
@@ -23,7 +24,10 @@ import {
   CHAPTER_TEST_BAR,
   CHAPTER_TEST_SIZE,
 } from "./chapter-test-config.ts";
+import { gradeCommitment } from "./example-grade.ts";
 import { enrollLessonCards } from "./lesson-cards.ts";
+import { parseLesson } from "./lesson-parse.ts";
+import { readLesson } from "./lessons.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -41,6 +45,7 @@ import {
 import { applyRedoResult, createRedoSession, enqueueMiss } from "./redo.ts";
 import {
   ALL_SUBTOPICS,
+  STRATEGIES,
   type Confidence,
   type EditReason,
   type ErrorType,
@@ -48,6 +53,7 @@ import {
   type FundamentalSkill,
   type SessionFocus,
   type SessionMode,
+  type Strategy,
   type Subtopic,
 } from "./taxonomy.ts";
 
@@ -662,6 +668,65 @@ export async function saveLessonChecklist(
       target: lessonProgress.subtopic,
       set: { checklist: clean, checklistTotal: total, updatedAt: new Date() },
     })
+    .run();
+}
+
+export type LogExampleResult = {
+  error: string | null;
+  id: number | null;
+  /** Server-graded verdict; null when the answer was not unambiguously
+   *  comparable — the card then offers a one-tap self-mark. */
+  correct: boolean | null;
+};
+
+/** A worked-example commitment: strategy + answer, logged with timing
+ *  before the solution reveals. Graded server-side against the
+ *  chapter's own answer line. */
+export async function logExampleAttempt(input: {
+  subtopic: Subtopic;
+  exampleN: number;
+  strategy: Strategy;
+  answer: string;
+  timeSeconds: number;
+}): Promise<LogExampleResult> {
+  if (!ALL_SUBTOPICS.includes(input.subtopic)) {
+    return { error: "Unknown chapter.", id: null, correct: null };
+  }
+  if (!STRATEGIES.includes(input.strategy) || !input.answer.trim()) {
+    return { error: "Commit a strategy and an answer.", id: null, correct: null };
+  }
+  const lesson = readLesson(input.subtopic);
+  const parsed = lesson ? parseLesson(lesson.body) : null;
+  const example = parsed?.examples.find((e) => e.n === input.exampleN);
+  if (!example) {
+    return { error: "Unknown example.", id: null, correct: null };
+  }
+  const correct = gradeCommitment(example.answer, input.answer);
+  const row = await db
+    .insert(lessonExampleAttempts)
+    .values({
+      subtopic: input.subtopic,
+      exampleN: input.exampleN,
+      strategy: input.strategy,
+      answer: input.answer.trim(),
+      correct,
+      timeSeconds: input.timeSeconds,
+    })
+    .returning()
+    .get();
+  return { error: null, id: row.id, correct };
+}
+
+/** Self-mark for commitments the grader could not score (or scored
+ *  wrongly against an approximation). One tap on reveal. */
+export async function markExampleAttempt(
+  id: number,
+  correct: boolean,
+): Promise<void> {
+  await db
+    .update(lessonExampleAttempts)
+    .set({ correct })
+    .where(eq(lessonExampleAttempts.id, id))
     .run();
 }
 
