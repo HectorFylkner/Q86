@@ -15606,6 +15606,681 @@
    },
    "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "How many positive divisors does $600$ have?",
+   "choices": [
+    "12",
+    "16",
+    "20",
+    "24",
+    "30"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFactor: $600 = 2^3 \\cdot 3^1 \\cdot 5^2$. The number of divisors is the product of one-more-than-each-exponent: $(3+1)(1+1)(2+1) = 4 \\cdot 2 \\cdot 3 = 24$.\n\n**Trigger cue**\n\n\"How many divisors\" of a concrete number: factor, then multiply the exponents each raised by one.\n\n**Takeaway**\n\nDivisor count multiplies each prime exponent plus one.",
+   "fastest_path_md": "Read the exponents off $2^3 3^1 5^2$ and multiply $4 \\cdot 2 \\cdot 3 = 24$ without listing a single divisor.",
+   "trap_map": {
+    "0": "Multiplies the exponents $3 \\cdot 1 \\cdot 5$ (mis-remembering as $2 \\cdot 3 \\cdot 5$ collapsed) instead of adding one to each.",
+    "1": "Adds one to only two of the three exponents.",
+    "2": "Uses $(3)(2)(3)$, forgetting to add one to the first exponent.",
+    "4": "Adds the adjusted exponents $4 + 2 + 3$ and then pads, instead of multiplying."
+   },
+   "numeric_check": "24",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "stem_md": "What is the sum of the distinct prime factors of $1{,}155$?",
+   "choices": [
+    "16",
+    "21",
+    "26",
+    "31",
+    "1155"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$1155 = 5 \\cdot 231 = 5 \\cdot 3 \\cdot 77 = 3 \\cdot 5 \\cdot 7 \\cdot 11$. The distinct primes are $3, 5, 7, 11$, summing to $3 + 5 + 7 + 11 = 26$.\n\n**Trigger cue**\n\n\"Sum of distinct prime factors\": peel off small primes one at a time, then add.\n\n**Takeaway**\n\nStrip primes greedily; the leftover is itself prime.",
+   "fastest_path_md": "$1155$ ends in $5$ (factor $5$) and its digits sum to $12$ (factor $3$); $1155/15 = 77 = 7 \\cdot 11$. Add $3+5+7+11 = 26$.",
+   "trap_map": {
+    "0": "Sums $3 + 5 + 7$ but stops before extracting the factor of $11$.",
+    "1": "Adds $3 + 7 + 11$, dropping the factor of $5$.",
+    "3": "Includes an extra $5$ by counting $55 = 5 \\cdot 11$ as if $55$ were prime.",
+    "4": "Reports the number itself, mistaking it for a prime."
+   },
+   "numeric_check": "26",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "What is the smallest positive integer $k$ such that $756k$ is a perfect square?",
+   "choices": [
+    "3",
+    "7",
+    "21",
+    "42",
+    "84"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFactor $756 = 2^2 \\cdot 3^3 \\cdot 7$. A perfect square needs every exponent even; the odd exponents sit on $3$ and $7$, so multiply by $3 \\cdot 7 = 21$. Then $756 \\cdot 21 = 2^2 \\cdot 3^4 \\cdot 7^2 = 15{,}876 = 126^2$.\n\n**Trigger cue**\n\n\"Smallest multiplier to reach a perfect square\": factor and supply the primes with odd exponents.\n\n**Takeaway**\n\nMake every prime exponent even; multiply by the odd ones.",
+   "fastest_path_md": "$756 = 2^2 3^3 7$. Odd exponents on $3$ and $7$ need one more each: multiplier $3 \\cdot 7 = 21$.",
+   "trap_map": {
+    "0": "Supplies only the missing factor of $3$, ignoring the odd exponent on $7$.",
+    "1": "Supplies only the missing factor of $7$, ignoring the odd exponent on $3$.",
+    "3": "Uses $2 \\cdot 3 \\cdot 7$, wrongly treating the even exponent on $2$ as deficient.",
+    "4": "Uses $2^2 \\cdot 3 \\cdot 7$, over-supplying the already-even power of $2$."
+   },
+   "numeric_check": "21",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "What is the greatest integer $k$ such that $2^{k}$ is a factor of $32!$ (the product of the integers from $1$ to $32$)?",
+   "choices": [
+    "16",
+    "24",
+    "31",
+    "32",
+    "63"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLegendre's count: the exponent of $2$ in $32!$ is $\\left\\lfloor \\tfrac{32}{2} \\right\\rfloor + \\left\\lfloor \\tfrac{32}{4} \\right\\rfloor + \\left\\lfloor \\tfrac{32}{8} \\right\\rfloor + \\left\\lfloor \\tfrac{32}{16} \\right\\rfloor + \\left\\lfloor \\tfrac{32}{32} \\right\\rfloor = 16 + 8 + 4 + 2 + 1 = 31$.\n\n**Trigger cue**\n\n\"Highest power of a prime dividing $n!$\": sum the floors of $n$ over increasing prime powers.\n\n**Takeaway**\n\nSum $\\lfloor n/p^i \\rfloor$ over $i$ for the exponent in $n!$.",
+   "fastest_path_md": "Add $16 + 8 + 4 + 2 + 1$ — each term is the previous halved — to get $31$.",
+   "trap_map": {
+    "0": "Counts only the $16$ even numbers, ignoring extra factors of $2$ in multiples of $4, 8, \\ldots$",
+    "1": "Stops the floor sum after $16 + 8$.",
+    "3": "Off-by-one: uses $32$ instead of summing the floors.",
+    "4": "Doubles $32$ or sums $32 + 16 + \\ldots$ without flooring correctly."
+   },
+   "numeric_check": "31",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "What is the smallest positive integer that has exactly four distinct prime factors?",
+   "choices": [
+    "24",
+    "60",
+    "210",
+    "1155",
+    "2310"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nTo minimize a number with four distinct primes, use the four smallest primes each to the first power: $2 \\cdot 3 \\cdot 5 \\cdot 7 = 210$. Any larger prime, or a repeated prime, only increases the value.\n\n**Trigger cue**\n\n\"Smallest with exactly $k$ distinct primes\": multiply the $k$ smallest primes, each once.\n\n**Takeaway**\n\nSmallest with $k$ distinct primes is the product of the first $k$ primes.",
+   "fastest_path_md": "Multiply the first four primes: $2 \\cdot 3 = 6$, $6 \\cdot 5 = 30$, $30 \\cdot 7 = 210$.",
+   "trap_map": {
+    "0": "Uses $2^3 \\cdot 3 = 24$, which has only two distinct primes.",
+    "1": "Uses $2^2 \\cdot 3 \\cdot 5 = 60$, only three distinct primes.",
+    "3": "Multiplies $3 \\cdot 5 \\cdot 7 \\cdot 11 = 1155$, skipping the smallest prime $2$.",
+    "4": "Uses the first five primes $2 \\cdot 3 \\cdot 5 \\cdot 7 \\cdot 11 = 2310$."
+   },
+   "numeric_check": "210",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "stem_md": "What is the greatest prime factor of $2^{11} - 2^{8}$?",
+   "choices": [
+    "2",
+    "7",
+    "31",
+    "127",
+    "1792"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nFactor out the smaller power: $2^{11} - 2^{8} = 2^{8}(2^{3} - 1) = 2^{8} \\cdot 7$. The prime factors are $2$ and $7$, so the greatest is $7$.\n\n**Trigger cue**\n\nA difference of powers of the same base: factor out the lower power first.\n\n**Takeaway**\n\nFactor out the common power; the greatest prime hides in the leftover.",
+   "fastest_path_md": "$2^{8}(2^3 - 1) = 2^8 \\cdot 7$: the only odd prime is $7$.",
+   "trap_map": {
+    "0": "Takes the base $2$ as the largest factor, ignoring the odd cofactor.",
+    "2": "Computes $2^5 - 1 = 31$ by mis-factoring the exponents.",
+    "3": "Reads $2^7 - 1 = 127$, mismatching the extracted power.",
+    "4": "Reports the whole value $2^8 \\cdot 7 = 1792$ without factoring."
+   },
+   "numeric_check": "7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "How many positive divisors of $7{,}200$ are perfect squares?",
+   "choices": [
+    "6",
+    "9",
+    "12",
+    "18",
+    "27"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$7200 = 2^5 \\cdot 3^2 \\cdot 5^2$. A divisor is a perfect square exactly when every prime exponent is even. The even choices are: for $2$, $\\{0, 2, 4\\}$ ($3$ options); for $3$, $\\{0, 2\\}$ ($2$ options); for $5$, $\\{0, 2\\}$ ($2$ options). That gives $3 \\cdot 2 \\cdot 2 = 12$.\n\n**Trigger cue**\n\n\"Perfect-square divisors\": count even exponent choices, one factor per prime.\n\n**Takeaway**\n\nSquare divisors: count even exponents up to each prime's power.",
+   "fastest_path_md": "Even exponents available: $2^5 \\to \\{0,2,4\\}$, $3^2 \\to \\{0,2\\}$, $5^2 \\to \\{0,2\\}$; multiply $3 \\cdot 2 \\cdot 2 = 12$.",
+   "trap_map": {
+    "0": "Multiplies $3 \\cdot 2$ but forgets the second prime with an even option.",
+    "1": "Treats each prime as offering $3$ even exponents regardless of its power.",
+    "3": "Counts all divisors with the exponent-plus-one rule instead of even-only.",
+    "4": "Cubes the count $3$ as if all three primes reached exponent $4$."
+   },
+   "numeric_check": "12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "stem_md": "If $4^{x} = 8^{x - 1}$, what is the value of $x$?",
+   "choices": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "6"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWrite both sides as powers of $2$: $4^{x} = 2^{2x}$ and $8^{x-1} = 2^{3(x-1)} = 2^{3x - 3}$. Equal bases force equal exponents: $2x = 3x - 3$, so $x = 3$.\n\n**Trigger cue**\n\nDifferent bases that are powers of one number: rewrite everything on that common base.\n\n**Takeaway**\n\nCommon base first; then equate exponents.",
+   "fastest_path_md": "Both sides are powers of $2$: $2x = 3(x-1)$ gives $x = 3$.",
+   "trap_map": {
+    "0": "Sets $2x = 3x + 1$ or otherwise mishandles the $-1$ in the exponent.",
+    "1": "Equates the bases $4$ and $8$ directly instead of rewriting on base $2$.",
+    "3": "Solves $2x = 3x - 3$ but adds one to the result.",
+    "4": "Uses $2x = 3(x - 1)$ then doubles the answer."
+   },
+   "numeric_check": "3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "If $3^{x} = 5$, what is the value of $3^{2x + 1}$?",
+   "choices": [
+    "11",
+    "15",
+    "25",
+    "75",
+    "125"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nSplit the exponent using the laws: $3^{2x + 1} = 3^{2x} \\cdot 3^{1} = (3^{x})^{2} \\cdot 3 = 5^{2} \\cdot 3 = 25 \\cdot 3 = 75$.\n\n**Trigger cue**\n\nA target exponent built from a known one: break it into $(3^x)^k \\cdot 3^m$.\n\n**Takeaway**\n\nRewrite the target as powers of the known quantity, then substitute.",
+   "fastest_path_md": "$3^{2x+1} = 3 \\cdot (3^x)^2 = 3 \\cdot 25 = 75$.",
+   "trap_map": {
+    "0": "Adds instead of using exponent laws: $5 + 3^{1} + 3$ style slip.",
+    "1": "Computes $3 \\cdot 5 = 15$, treating $2x + 1$ as $x + 1$.",
+    "2": "Reports $(3^x)^2 = 25$ but drops the extra factor of $3$.",
+    "4": "Uses $5^{3} / 3$ or otherwise cubes the base instead of squaring."
+   },
+   "numeric_check": "75",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "stem_md": "What is the value of $\\dfrac{6^{6}}{2^{6} \\cdot 3^{4}}$?",
+   "choices": [
+    "1",
+    "3",
+    "6",
+    "9",
+    "27"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\n$6^{6} = (2 \\cdot 3)^{6} = 2^{6} \\cdot 3^{6}$. Dividing, $\\dfrac{2^{6} \\cdot 3^{6}}{2^{6} \\cdot 3^{4}} = 3^{6 - 4} = 3^{2} = 9$.\n\n**Trigger cue**\n\nA power of a product over its prime pieces: split the base and cancel.\n\n**Takeaway**\n\nSplit $(ab)^n$ into $a^n b^n$, then subtract exponents.",
+   "fastest_path_md": "$6^6 = 2^6 3^6$; cancel $2^6$ and $3^4$ to leave $3^2 = 9$.",
+   "trap_map": {
+    "0": "Cancels all exponents to $1$, forgetting $3^{6-4}$ remains.",
+    "1": "Computes $3^{6-4}$ as $3^{1}$.",
+    "2": "Leaves a stray factor of $6$ by cancelling only the $3$s.",
+    "4": "Uses $3^{6 - 3} = 27$, mis-subtracting the exponent of $3$."
+   },
+   "numeric_check": "9",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "stem_md": "If $\\sqrt{x} = 2\\sqrt{3}$, what is the value of $x^{2}$?",
+   "choices": [
+    "12",
+    "24",
+    "36",
+    "72",
+    "144"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nSquare both sides: $x = (2\\sqrt{3})^{2} = 4 \\cdot 3 = 12$. Then $x^{2} = 12^{2} = 144$.\n\n**Trigger cue**\n\nA root equals a simplified surd: square to clear the radical, then finish.\n\n**Takeaway**\n\nSquare a coefficient-times-root as $a^2$ times the radicand.",
+   "fastest_path_md": "$x = 4 \\cdot 3 = 12$, so $x^2 = 144$.",
+   "trap_map": {
+    "0": "Stops at $x = 12$, answering the intermediate value.",
+    "1": "Doubles $12$ instead of squaring it.",
+    "2": "Squares only the coefficient: $(2\\sqrt 3)^2$ read as $6^2/1$ mishandled to $36$.",
+    "3": "Computes $(2 \\cdot 3)^2 = 36$ then mislabels, or uses $x = 6$ giving $72$ via a further slip."
+   },
+   "numeric_check": "144",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 2,
+   "stem_md": "What is the value of $\\left(\\dfrac{2}{3}\\right)^{-2}$?",
+   "choices": [
+    "$-\\dfrac{4}{9}$",
+    "$\\dfrac{4}{9}$",
+    "$\\dfrac{3}{2}$",
+    "$\\dfrac{9}{4}$",
+    "$\\dfrac{4}{3}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nA negative exponent inverts the base: $\\left(\\tfrac{2}{3}\\right)^{-2} = \\left(\\tfrac{3}{2}\\right)^{2} = \\tfrac{9}{4}$.\n\n**Trigger cue**\n\nNegative exponent on a fraction: flip the fraction, drop the sign, then apply the power.\n\n**Takeaway**\n\nNegative exponent flips the base; the sign never leaks to the value.",
+   "fastest_path_md": "Flip to $\\tfrac{3}{2}$ and square: $\\tfrac{9}{4}$.",
+   "trap_map": {
+    "0": "Treats the negative exponent as negating the value.",
+    "1": "Squares without flipping the fraction.",
+    "2": "Flips but forgets to apply the exponent $2$.",
+    "4": "Flips and applies exponent $1$ instead of $2$."
+   },
+   "numeric_check": "9/4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $9^{x} - 4 \\cdot 3^{x} + 3 = 0$, what is the sum of all possible values of $x$?",
+   "choices": [
+    "0",
+    "1",
+    "3",
+    "4",
+    "9"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nLet $y = 3^{x}$, so $9^{x} = (3^{x})^{2} = y^{2}$. The equation becomes $y^{2} - 4y + 3 = 0 = (y - 1)(y - 3)$, giving $y = 1$ or $y = 3$. Then $3^{x} = 1 \\Rightarrow x = 0$ and $3^{x} = 3 \\Rightarrow x = 1$. The sum is $0 + 1 = 1$.\n\n**Trigger cue**\n\nA quadratic in $a^{2x}$ and $a^{x}$: substitute $y = a^{x}$ and factor.\n\n**Takeaway**\n\nSubstitute $y = a^x$; solve the quadratic, then recover each $x$.",
+   "fastest_path_md": "$y = 3^x$ gives $(y-1)(y-3) = 0$; $x = 0$ and $x = 1$ sum to $1$.",
+   "trap_map": {
+    "0": "Keeps only the root $x = 0$ from $3^x = 1$.",
+    "2": "Sums the $y$-roots $1 + 3$ instead of the $x$-values, or takes $y = 3$'s exponent wrongly.",
+    "3": "Adds the $y$-values $1 + 3$ and reads it as the $x$-sum.",
+    "4": "Reports $9$ from $9^x$ without substituting."
+   },
+   "numeric_check": "1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 10$ is $2^{n} \\cdot 9$ a perfect square?",
+   "choices": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "10"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$2^{n} \\cdot 9 = 2^{n} \\cdot 3^{2}$. The factor $3^{2}$ is already a square, so the product is a perfect square exactly when $2^{n}$ is — that is, when $n$ is even. In $1 \\le n \\le 10$ the even values are $2, 4, 6, 8, 10$: five of them.\n\n**Trigger cue**\n\n\"$k \\cdot 2^{n}$ a perfect square\": every prime exponent must be even.\n\n**Takeaway**\n\nA product is square exactly when every prime exponent is even.",
+   "fastest_path_md": "$9$ is already square, so need $2^n$ square: $n$ even, five values.",
+   "trap_map": {
+    "0": "Counts only $n \\in \\{2,4,6\\}$ within a mis-set range.",
+    "1": "Counts even $n$ but drops one endpoint.",
+    "3": "Includes an odd $n$ by treating $2^n \\cdot 9$ as square whenever $n$ is a multiple of a small number.",
+    "4": "Calls every $n$ valid because $9$ is a perfect square."
+   },
+   "numeric_check": "5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "How many positive integers less than $100$ are divisible by $6$ but not by $4$?",
+   "choices": [
+    "6",
+    "8",
+    "12",
+    "14",
+    "16"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nMultiples of $6$ below $100$: $6, 12, \\ldots, 96$, which is $16$ numbers. Those also divisible by $4$ are the multiples of $\\mathrm{lcm}(6,4) = 12$: $12, 24, \\ldots, 96$, which is $8$ numbers. Subtract: $16 - 8 = 8$.\n\n**Trigger cue**\n\n\"Divisible by $a$ but not $b$\": count multiples of $a$, then remove multiples of $\\mathrm{lcm}(a,b)$.\n\n**Takeaway**\n\nSubtract multiples of the lcm from multiples of the first.",
+   "fastest_path_md": "$16$ multiples of $6$, minus $8$ multiples of $12$, leaves $8$.",
+   "trap_map": {
+    "0": "Removes multiples of $24$ instead of $12$, over-subtracting.",
+    "2": "Counts multiples of $6$ that are odd, mishandling the exclusion.",
+    "3": "Subtracts only the multiples of $4$ that are not multiples of $6$.",
+    "4": "Reports all $16$ multiples of $6$ without excluding those divisible by $4$."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "How many ordered pairs of positive integers $(a, b)$ with $a < b$ satisfy $\\gcd(a, b) = 6$ and $\\mathrm{lcm}(a, b) = 90$?",
+   "choices": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "6"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nWrite $a = 6m$, $b = 6n$ with $\\gcd(m, n) = 1$. Then $\\mathrm{lcm}(a,b) = 6mn = 90$, so $mn = 15$. Coprime factorizations of $15$: $(1, 15)$ and $(3, 5)$ (and their reverses). With $a < b$, i.e. $m < n$, exactly $(1, 15)$ and $(3, 5)$ qualify — two pairs.\n\n**Trigger cue**\n\n\"$\\gcd$ and $\\mathrm{lcm}$ both fixed\": strip the gcd and count coprime factor pairs of $\\mathrm{lcm}/\\gcd$.\n\n**Takeaway**\n\nCoprime factor pairs of lcm-over-gcd count the solutions.",
+   "fastest_path_md": "$mn = 90/6 = 15$ with $\\gcd(m,n) = 1$ and $m<n$: $(1,15),(3,5)$ — two.",
+   "trap_map": {
+    "0": "Keeps only the $(1, 15)$ split, forgetting $(3, 5)$.",
+    "2": "Counts $(3, 5)$ and both orders of one pair, over-counting by one.",
+    "3": "Includes both orders of each coprime pair, ignoring $a < b$.",
+    "4": "Counts all factor pairs of $15$ without the coprimality or ordering filter."
+   },
+   "numeric_check": "2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "stem_md": "Three lighthouses flash at regular intervals: one every $15$ seconds, one every $20$ seconds, and one every $6$ seconds. If all three flash together at a certain instant, after how many seconds will they next all flash together?",
+   "choices": [
+    "30",
+    "60",
+    "90",
+    "120",
+    "1800"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThey align again at the least common multiple of the intervals. $\\mathrm{lcm}(15, 20) = 60$, and $\\mathrm{lcm}(60, 6) = 60$. So they next flash together after $60$ seconds.\n\n**Trigger cue**\n\n\"Next time repeating events coincide\": least common multiple of the periods.\n\n**Takeaway**\n\nRepeating events realign at the lcm of their periods.",
+   "fastest_path_md": "$\\mathrm{lcm}(15,20) = 60$, and $6 \\mid 60$, so the answer is $60$.",
+   "trap_map": {
+    "0": "Uses $\\mathrm{lcm}(15, 6) = 30$, ignoring the $20$-second interval.",
+    "2": "Reports $90 = \\mathrm{lcm}(15, 6) \\cdot 3$ by a mis-computation.",
+    "3": "Doubles $60$ unnecessarily.",
+    "4": "Multiplies the three intervals $15 \\cdot 20 \\cdot 6$ instead of taking the lcm."
+   },
+   "numeric_check": "60",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "stem_md": "How many positive integers $n \\le 500$ satisfy $\\gcd(n, 15) = 5$?",
+   "choices": [
+    "33",
+    "50",
+    "67",
+    "100",
+    "133"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$\\gcd(n, 15) = 5$ means $5 \\mid n$ but $3 \\nmid n$ (if $3$ also divided $n$, the gcd would be $15$). Write $n = 5k$ with $k \\le 100$. The condition $3 \\nmid n$ becomes $3 \\nmid k$. Among $k = 1, \\ldots, 100$, the multiples of $3$ number $\\lfloor 100/3 \\rfloor = 33$, leaving $100 - 33 = 67$.\n\n**Trigger cue**\n\n\"$\\gcd(n, m) = d$\": require $d \\mid n$ and exclude the extra prime factors of $m$.\n\n**Takeaway**\n\nForce the gcd's factors in and the surplus factors out.",
+   "fastest_path_md": "$n = 5k$, $k \\le 100$, with $3 \\nmid k$: $100 - 33 = 67$.",
+   "trap_map": {
+    "0": "Counts the excluded multiples of $3$ ($33$) instead of the survivors.",
+    "1": "Counts all multiples of $5$ up to $500$ but halves incorrectly.",
+    "3": "Counts every multiple of $5$ ($100$), ignoring the $3 \\nmid n$ requirement.",
+    "4": "Counts multiples of $5$ or of $3$ up to $500$, mixing the conditions."
+   },
+   "numeric_check": "67",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "stem_md": "The greatest common divisor of two positive integers is $12$ and their sum is $84$. How many such unordered pairs are there?",
+   "choices": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "6"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWrite the numbers as $12x$ and $12y$ with $\\gcd(x, y) = 1$. Then $12(x + y) = 84$, so $x + y = 7$. Coprime pairs with $x \\le y$ summing to $7$: $(1, 6)$, $(2, 5)$, $(3, 4)$ — all coprime. That is three pairs.\n\n**Trigger cue**\n\n\"Fixed gcd, fixed sum\": divide out the gcd and count coprime pairs summing to the reduced total.\n\n**Takeaway**\n\nDivide by the gcd; count coprime pairs hitting the reduced sum.",
+   "fastest_path_md": "$x + y = 84/12 = 7$, coprime: $(1,6),(2,5),(3,4)$ — three.",
+   "trap_map": {
+    "0": "Keeps only $(3, 4)$, the pair closest to equal.",
+    "1": "Drops one coprime pair, perhaps discarding $(1, 6)$.",
+    "3": "Counts a non-coprime pair such as a repeated split, adding a fourth.",
+    "4": "Counts ordered pairs, doubling to six."
+   },
+   "numeric_check": "3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "For how many ordered pairs of integers $(a, b)$ with $1 \\le a \\le 4$ and $1 \\le b \\le 4$ is $a^{2} + b^{2}$ odd?",
+   "choices": [
+    "4",
+    "6",
+    "8",
+    "10",
+    "12"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$a^{2}$ has the same parity as $a$, so $a^{2} + b^{2}$ is odd exactly when one of $a, b$ is odd and the other even. Odd values in $\\{1,2,3,4\\}$: $\\{1, 3\\}$ ($2$ of them); even: $\\{2, 4\\}$ ($2$). Odd-then-even gives $2 \\cdot 2 = 4$; even-then-odd gives another $4$. Total $8$.\n\n**Trigger cue**\n\n\"Sum of squares odd\": the two bases must have opposite parity.\n\n**Takeaway**\n\nA sum is odd exactly when its two parts differ in parity.",
+   "fastest_path_md": "Opposite parity needed: $2 \\cdot 2 + 2 \\cdot 2 = 8$.",
+   "trap_map": {
+    "0": "Counts only one of the two opposite-parity orderings.",
+    "1": "Miscounts the odd or even values available in the range.",
+    "3": "Adds the two same-parity cases by mistake, inflating the count.",
+    "4": "Counts all $12$ mixed pairs without checking parity of the sum."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 30$ is $2^{n} + n$ even?",
+   "choices": [
+    "10",
+    "14",
+    "15",
+    "16",
+    "20"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFor $n \\ge 1$, $2^{n}$ is even. An even number plus $n$ is even exactly when $n$ is even. The even integers in $1 \\le n \\le 30$ are $2, 4, \\ldots, 30$: fifteen of them.\n\n**Trigger cue**\n\n\"$2^{n} + n$ parity\": $2^{n}$ is always even for $n \\ge 1$, so the sum follows $n$.\n\n**Takeaway**\n\nEven plus $n$ is even exactly when $n$ is even.",
+   "fastest_path_md": "$2^n$ is even, so need $n$ even: $15$ values.",
+   "trap_map": {
+    "0": "Counts multiples of $3$ or another wrong residue class.",
+    "1": "Miscounts the even numbers in the range by dropping an endpoint or two.",
+    "3": "Includes $n = 0$ or otherwise miscounts by one.",
+    "4": "Counts $n$ where $2^{n} + n$ is odd (the odd $n$) yet reports the even total wrong."
+   },
+   "numeric_check": "15",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "stem_md": "Each of $a$ and $b$ is chosen from $\\{-3, -2, -1, 1, 2, 3\\}$, with the two choices made independently. For how many of the $36$ ordered pairs $(a, b)$ is $ab > 0$?",
+   "choices": [
+    "12",
+    "15",
+    "18",
+    "21",
+    "24"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$ab > 0$ exactly when $a$ and $b$ share a sign. The set has $3$ negative and $3$ positive values. Both positive: $3 \\cdot 3 = 9$; both negative: $3 \\cdot 3 = 9$. Total $18$.\n\n**Trigger cue**\n\n\"Product positive\": the two factors must have the same sign.\n\n**Takeaway**\n\nA product is positive exactly when the factors share a sign.",
+   "fastest_path_md": "Same-sign pairs: $3^2 + 3^2 = 18$.",
+   "trap_map": {
+    "0": "Counts only the both-positive block.",
+    "1": "Miscounts one sign block as having a different size.",
+    "3": "Adds a diagonal or includes some opposite-sign pairs.",
+    "4": "Counts every pair with $a \\ne b$ or similar over-broad condition."
+   },
+   "numeric_check": "18",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 40$ is $n^{2} + 3^{n}$ even?",
+   "choices": [
+    "10",
+    "13",
+    "20",
+    "27",
+    "40"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$3^{n}$ is always odd, and $n^{2}$ has the parity of $n$. The sum $n^{2} + 3^{n}$ is (parity of $n$) $+$ odd, which is even exactly when $n$ is odd. The odd integers in $1 \\le n \\le 40$ are $1, 3, \\ldots, 39$: twenty of them.\n\n**Trigger cue**\n\nAn odd power of an odd base is odd; pair it against $n^{2}$ by parity.\n\n**Takeaway**\n\nOdd base to any power stays odd; only $n^2$ shifts the parity.",
+   "fastest_path_md": "$3^n$ odd, so need $n^2$ odd, i.e. $n$ odd: $20$ values.",
+   "trap_map": {
+    "0": "Counts a wrong residue class rather than the odd integers.",
+    "1": "Miscounts the odd integers in the range.",
+    "3": "Counts the even $n$ (where the sum is odd) instead of the odd $n$.",
+    "4": "Calls the sum even for every $n$, ignoring the parity of $n^2$."
+   },
+   "numeric_check": "20",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 100$ is $\\dfrac{n(n + 1)}{2}$ odd?",
+   "choices": [
+    "25",
+    "40",
+    "48",
+    "50",
+    "60"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe triangular number $T_n = \\tfrac{n(n+1)}{2}$ is odd exactly when $n \\equiv 1$ or $2 \\pmod 4$ (checking one full period: $T_1 = 1$ odd, $T_2 = 3$ odd, $T_3 = 6$ even, $T_4 = 10$ even, then the pattern repeats). In $1 \\le n \\le 100$ each residue class has $25$ members, so the odd ones number $25 + 25 = 50$.\n\n**Trigger cue**\n\n\"Parity of $\\tfrac{n(n+1)}{2}$\": it cycles odd, odd, even, even with period $4$.\n\n**Takeaway**\n\nTriangular numbers run odd, odd, even, even in a four-cycle.",
+   "fastest_path_md": "$T_n$ is odd for $n \\equiv 1, 2 \\pmod 4$: $25 + 25 = 50$.",
+   "trap_map": {
+    "0": "Counts only one residue class, $n \\equiv 1 \\pmod 4$.",
+    "1": "Applies a period-$5$ or otherwise wrong cycle length.",
+    "2": "Counts $n \\equiv 0, 2, 3 \\pmod 4$ or another off-by-a-class error.",
+    "4": "Overcounts by treating three of four residues as giving odd values."
+   },
+   "numeric_check": "50",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "stem_md": "If $x^{3} < x$, which of the following must be true?",
+   "choices": [
+    "$x < 1$",
+    "$x < 0$",
+    "$|x| < 1$",
+    "$x^{2} < 1$",
+    "$\\dfrac{1}{x} > 1$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\n$x^{3} < x \\iff x^{3} - x < 0 \\iff x(x - 1)(x + 1) < 0$. A sign chart gives the solution $x < -1$ or $0 < x < 1$. Test the choices against both regions. $x < 1$ holds throughout (every value is below $1$). Each other choice fails somewhere: $x < 0$ fails at $x = 0.5$; $|x| < 1$ and $x^{2} < 1$ fail at $x = -2$; $\\tfrac{1}{x} > 1$ fails at $x = -2$ (it is negative there).\n\n**Trigger cue**\n\n\"Must be true\" under a cubic inequality: solve the sign chart, then test each option in every region.\n\n**Takeaway**\n\nA must-be-true claim has to survive every region of the solution set.",
+   "fastest_path_md": "The solution set is $x < -1$ or $0 < x < 1$; only $x < 1$ covers both. A single value from each region ($-2$ and $0.5$) kills the rest.",
+   "trap_map": {
+    "1": "Tests only the negative region and misses $0 < x < 1$.",
+    "2": "Tests only the fractional region $0 < x < 1$ and misses $x < -1$.",
+    "3": "Same one-region blind spot: $x^{2} < 1$ fails for $x < -1$.",
+    "4": "Assumes $\\tfrac{1}{x} > 1$ from the $(0,1)$ region, ignoring the negative branch."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
