@@ -19,7 +19,7 @@ export default async function ImportPage() {
   return (
     <div className="space-y-5">
       <SectionTabs group="progress" />
-      <h1 className="font-display text-xl font-semibold">
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-[28px]">
         Score-report import
       </h1>
       <ImportClient />

@@ -19,6 +19,7 @@ export const SECTION_GROUPS = {
   progress: [
     { href: "/mastery", label: "Mastery" },
     { href: "/analytics", label: "Analytics" },
+    { href: "/quality", label: "Question QA" },
     { href: "/import", label: "Import & backup" },
   ],
 } as const;
@@ -30,7 +31,10 @@ export function SectionTabs({
 }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Section" className="flex gap-5 border-b border-grid">
+    <nav
+      aria-label="Section"
+      className="flex gap-5 overflow-x-auto border-b border-grid"
+    >
       {SECTION_GROUPS[group].map((tab) => {
         const active = pathname.startsWith(tab.href);
         return (
@@ -39,7 +43,7 @@ export function SectionTabs({
             href={tab.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 pb-2 text-sm transition-colors",
+              "-mb-px shrink-0 border-b-2 pb-2 text-sm transition-colors",
               active
                 ? "border-ballpoint font-medium text-ink"
                 : "border-transparent text-graphite hover:text-ink",

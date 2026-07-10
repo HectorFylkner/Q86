@@ -11,6 +11,7 @@ export const SETTING_KEYS = [
   "model",
   "seed_progress",
   "user_retired_qids",
+  "model_quarantine_v1_applied",
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 

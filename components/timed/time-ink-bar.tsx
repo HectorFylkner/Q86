@@ -34,8 +34,8 @@ export function TimeInkBar({
         <div className="h-[3px] w-full rounded-full bg-grid" />
         <motion.div
           key={pulseKey}
-          className="absolute left-0 top-0 h-[3px] rounded-full bg-ballpoint"
-          style={{ width: `${fraction * 100}%` }}
+          className="absolute inset-x-0 top-0 h-[3px] origin-left rounded-full bg-ballpoint"
+          style={{ scaleX: fraction }}
           animate={
             pulseKey > 0
               ? { opacity: [1, 0.35, 1], scaleY: [1, 2, 1] }
@@ -62,7 +62,7 @@ export function TimeInkBar({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: passed ? 1 : 0.45 }}
                 transition={{ duration: 0.4 }}
-                className="mt-0.5 -translate-x-1/2 whitespace-nowrap font-mono text-[9px] text-graphite"
+                className="mt-0.5 -translate-x-1/2 whitespace-nowrap font-mono text-[10px] text-graphite"
               >
                 {cp.label}
               </motion.div>

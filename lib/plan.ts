@@ -67,7 +67,11 @@ export type PlanInputs = {
   dueRedoCount: number;
   /** Timed-set cadence in days (settings.timed_set_cadence). */
   cadenceDays: number;
-  /** Whole days since the Unix epoch, for the cadence schedule. */
+  /** Local-calendar days since the latest completed focused timed set. */
+  daysSinceTimedSet: number | null;
+  /** Lifetime verified focused attempts; gates the first timed-set recommendation. */
+  focusedAttemptCount: number;
+  /** @deprecated Retained for callers that still display the old cadence. */
   dayIndex: number;
   /** Current pattern-trainer ELO per category. */
   eloByCategory: Record<PatternCategoryKey, number>;
@@ -84,6 +88,13 @@ export type DailyPlan = {
   };
   weights: Record<FundamentalSkill, number>;
   dueRedoCount: number;
+  /** Completed-session-aware timed-set schedule. */
+  timed: {
+    due: boolean;
+    inDays: number;
+    cadenceDays: number;
+  };
+  /** @deprecated Use `timed.due`; retained while UI callers migrate. */
   timedSetToday: boolean;
 };
 
@@ -203,6 +214,23 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
         ? Math.max(inputs.cadenceDays, 3)
         : inputs.cadenceDays;
 
+  // A learner with no timed history should first build one full section's
+  // worth of focused evidence. After that, cadence is anchored to the last
+  // completed focused timed set instead of an arbitrary epoch-day modulo.
+  const timedDue =
+    inputs.daysSinceTimedSet == null
+      ? inputs.focusedAttemptCount >= 21
+      : inputs.daysSinceTimedSet >= effectiveCadence;
+  const timed = {
+    due: timedDue,
+    inDays: timedDue
+      ? 0
+      : inputs.daysSinceTimedSet == null
+        ? effectiveCadence
+        : Math.max(0, effectiveCadence - inputs.daysSinceTimedSet),
+    cadenceDays: effectiveCadence,
+  };
+
   return {
     phase,
     mock: nextMock(inputs.daysToTest),
@@ -213,7 +241,7 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     },
     weights,
     dueRedoCount: inputs.dueRedoCount,
-    timedSetToday:
-      effectiveCadence > 0 && inputs.dayIndex % effectiveCadence === 0,
+    timed,
+    timedSetToday: timed.due,
   };
 }

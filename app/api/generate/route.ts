@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import {
-  createVerifiedQuestion,
+  createModelCheckedQuestion,
   type PipelineResult,
 } from "@/lib/ai/pipeline";
 import type { GenerationSpec } from "@/lib/ai/prompts";
@@ -141,11 +141,16 @@ export async function POST(request: Request) {
     const sourceQuestion = await db
       .select()
       .from(questions)
-      .where(eq(questions.id, body.twinOf))
+      .where(
+        and(
+          eq(questions.id, body.twinOf),
+          eq(questions.verified, true),
+        ),
+      )
       .get();
     if (!sourceQuestion) {
       return NextResponse.json(
-        { error: `Question ${body.twinOf} not found.` },
+        { error: `Question ${body.twinOf} was not found or is not approved.` },
         { status: 404 },
       );
     }
@@ -168,7 +173,7 @@ export async function POST(request: Request) {
   const results: PipelineResult[] = await runPool(
     specs.map((spec) => async (): Promise<PipelineResult> => {
       try {
-        return await createVerifiedQuestion(spec, { source, twinOf });
+        return await createModelCheckedQuestion(spec, { source, twinOf });
       } catch (e) {
         return {
           ok: false,
@@ -182,11 +187,11 @@ export async function POST(request: Request) {
     3,
   );
 
-  const verified = results.filter((r) => r.ok);
+  const modelChecked = results.filter((r) => r.ok);
   const failed = results.filter((r) => !r.ok);
 
   if (
-    verified.length === 0 &&
+    modelChecked.length === 0 &&
     failed.length > 0 &&
     failed.every((r) => !r.ok && r.failures[0]?.startsWith("API error"))
   ) {
@@ -197,13 +202,14 @@ export async function POST(request: Request) {
   }
   const response = {
     requested: specs.length,
-    verified: verified.length,
+    quarantined: modelChecked.length,
     failed: failed.length,
-    questionIds: verified.map((r) => (r.ok ? r.question.id : -1)),
+    questionIds: modelChecked.map((r) => (r.ok ? r.question.id : -1)),
     failures: failed.flatMap((r) => (r.ok ? [] : r.failures)),
+    reviewUrl: "/quality",
   };
   console.log(
-    `[generate] verified ${response.verified}/${response.requested}` +
+    `[generate] quarantined ${response.quarantined}/${response.requested} model-checked candidates` +
       (response.failed > 0 ? ` (${response.failed} discarded)` : ""),
   );
   return NextResponse.json(response);

@@ -21,7 +21,9 @@ export function SettingsForm({
   async function save() {
     setState("saving");
     try {
-      if (date) await saveSetting("test_date", date);
+      // An empty value intentionally clears the date; previously the form
+      // could set a date but never remove one.
+      await saveSetting("test_date", date);
       await saveSetting("timed_set_cadence", cadenceDays);
       setState("saved");
       router.refresh();
@@ -31,8 +33,8 @@ export function SettingsForm({
   }
 
   return (
-    <div className="flex flex-wrap items-end gap-3">
-      <label className="flex flex-col gap-1 text-xs text-graphite">
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+      <label className="flex min-w-0 flex-col gap-1.5 text-[13px] text-graphite">
         Test date
         <input
           type="date"
@@ -41,10 +43,10 @@ export function SettingsForm({
             setDate(e.target.value);
             setState("idle");
           }}
-          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm text-ink"
         />
       </label>
-      <label className="flex flex-col gap-1 text-xs text-graphite">
+      <label className="flex min-w-0 flex-col gap-1.5 text-[13px] text-graphite">
         Timed set every
         <select
           value={cadenceDays}
@@ -52,7 +54,7 @@ export function SettingsForm({
             setCadenceDays(e.target.value);
             setState("idle");
           }}
-          className="rounded-control border border-grid bg-surface px-2 py-1.5 text-sm text-ink"
+          className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm text-ink"
         >
           {[2, 3, 4, 7].map((d) => (
             <option key={d} value={d}>
@@ -62,16 +64,23 @@ export function SettingsForm({
         </select>
       </label>
       <button
+        type="button"
         onClick={save}
         disabled={state === "saving"}
-        className="rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50"
+        className="min-h-11 rounded-control border border-grid-strong bg-surface px-4 py-2 text-sm font-medium hover:border-ballpoint/50"
       >
         {state === "saving" ? "Saving…" : "Save settings"}
       </button>
-      {state === "saved" && <span className="text-xs text-ballpoint">Saved.</span>}
-      {state === "error" && (
-        <span className="text-xs text-redpen">Saving failed — retry.</span>
-      )}
+      <span className="sm:col-span-3" aria-live="polite" role="status">
+        {state === "saved" && (
+          <span className="text-[13px] text-ballpoint">Plan settings saved.</span>
+        )}
+        {state === "error" && (
+          <span className="text-[13px] text-redpen">
+            Saving failed — your previous settings are unchanged.
+          </span>
+        )}
+      </span>
     </div>
   );
 }

@@ -3,8 +3,8 @@
 Local-first, single-user training platform for GMAT Focus Edition
 Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
-- AI question engine with independent verification — no generated question
-  is ever served unless a second, blind solver agreed with its key
+- AI question candidates get an independent model cross-solve, then remain
+  quarantined until a human completes the three-part Question QA checklist
 - Drill mode and full-section simulation with the official Review & Edit
   mechanic (max 3 edits, justification gate, edit ledger)
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
@@ -24,7 +24,7 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-180-question bank into it — offline, no API key:
+360-question bank into it — offline, no API key:
 
 ```sh
 pnpm install
@@ -35,12 +35,13 @@ pnpm dev
 
 Open http://localhost:3000. The full training loop — drill, timed sets,
 redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 180-question bank ships in `scripts/seed-bank.json`, every
+key: the 360-question bank ships in `scripts/seed-bank.json`, every
 question verified by a programmatic brute-force check before admission.
 
-The AI features (question twins, `/api/generate`, the post-mortem coach,
-score-report import) need a key — copy the template and fill in
-`ANTHROPIC_API_KEY`:
+The AI features (quarantined question candidates and twins, the post-mortem
+coach, score-report import) need a key — copy the template and fill in
+`ANTHROPIC_API_KEY`. Generated candidates never enter drills automatically;
+review them under **Progress → Question QA** first.
 
 ```sh
 cp .env.example .env.local
@@ -54,8 +55,9 @@ cp .env.example .env.local
 | --- | --- |
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
+| `pnpm test` | Run plan and retired-question integrity tests |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed 360-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
@@ -79,7 +81,8 @@ re-verification of the whole bank) and `pnpm seed` (loads new items,
 retires removed ones). The flag is needed below Node 22.18 because these
 tools import the app's TypeScript modules directly.
 
-Avoid `pnpm seed --api` (LLM generation): its verification is an LLM
-cross-solve plus numeric spot-check, and a brute-force audit found that
-gate had passed 22 defective questions out of 43. If you do generate,
-re-verify every new question through the authoring gate.
+`pnpm seed --api` is disabled. Its former LLM cross-solve plus numeric
+spot-check admitted 22 defective questions among 43 candidates in a
+brute-force audit. Generate model-checked candidates from Drill or a
+post-mortem instead; they stay quarantined until explicit human approval.
+Programmatically verified additions still go through `scripts/author/`.

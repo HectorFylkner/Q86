@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight, ShieldWarning } from "@phosphor-icons/react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ScratchCapture } from "@/components/postmortem/capture";
@@ -36,7 +37,7 @@ type CoachState =
 type TwinState =
   | { kind: "idle" }
   | { kind: "working" }
-  | { kind: "done"; ids: number[]; verified: number; failed: number }
+  | { kind: "done"; quarantined: number; failed: number }
   | { kind: "error"; message: string };
 
 export function PostmortemClient({
@@ -113,18 +114,16 @@ export function PostmortemClient({
         body: JSON.stringify({ twinOf: question.id, count: 2 }),
       });
       const body = (await res.json()) as {
-        questionIds?: number[];
-        verified?: number;
+        quarantined?: number;
         failed?: number;
         error?: string;
       };
-      if (!res.ok || body.questionIds == null) {
+      if (!res.ok || body.quarantined == null) {
         throw new Error(body.error ?? `Twin generation failed (${res.status}).`);
       }
       setTwinState({
         kind: "done",
-        ids: body.questionIds,
-        verified: body.verified ?? 0,
+        quarantined: body.quarantined,
         failed: body.failed ?? 0,
       });
     } catch (e) {
@@ -359,11 +358,12 @@ export function PostmortemClient({
 
       {(coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">Twin drills</h2>
+          <h2 className="font-display text-sm font-semibold">Twin candidates</h2>
           <p className="mt-1 text-sm text-graphite">
             Two fresh twins of this question — same math skeleton, opposite
-            context ({question.context === "pure" ? "real" : "pure"}). Both
-            verified before they can appear.
+            context ({question.context === "pure" ? "real" : "pure"}). A model
+            cross-check screens them, then Question QA holds them out of drills
+            until you approve them.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {twinState.kind !== "done" && (
@@ -375,13 +375,13 @@ export function PostmortemClient({
                   twinState.kind === "working" && "cursor-wait opacity-60",
                 )}
               >
-                Queue two verified twin drills
+                Generate two twin candidates
               </button>
             )}
             {twinState.kind === "working" && (
               <span className="flex items-center gap-2 text-sm text-graphite">
                 <span className="skeleton h-3 w-3 rounded-full" />
-                Generating and verifying twins…
+                Drafting and model-checking twins…
               </span>
             )}
             {twinState.kind === "error" && (
@@ -389,23 +389,22 @@ export function PostmortemClient({
             )}
             {twinState.kind === "done" && (
               <>
-                <span className="text-sm">
-                  <span className="text-ballpoint">
-                    {twinState.verified} twins verified
-                  </span>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber">
+                  <ShieldWarning size={17} weight="duotone" />
+                  {twinState.quarantined} model-checked and quarantined
                   {twinState.failed > 0 && (
-                    <span className="text-graphite">
-                      {" "}
-                      · {twinState.failed} failed verification
+                    <span className="font-normal text-graphite">
+                      · {twinState.failed} failed the model check
                     </span>
                   )}
                 </span>
-                {twinState.ids.length > 0 && (
+                {twinState.quarantined > 0 && (
                   <Link
-                    href={`/drill?qids=${twinState.ids.join(",")}`}
-                    className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+                    href="/quality"
+                    className="inline-flex items-center gap-1 rounded-control border border-ballpoint px-4 py-1.5 text-sm font-medium text-ballpoint hover:bg-ballpoint/5"
                   >
-                    Drill the twins now
+                    Review in Question QA
+                    <ArrowRight size={14} weight="bold" />
                   </Link>
                 )}
               </>

@@ -24,7 +24,7 @@ export default async function LearnPage() {
     <div className="space-y-5">
       <div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="font-display text-xl font-semibold">Learn</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-[28px]">Learn</h1>
           <p className="text-xs text-graphite">
             {lessons.length} concept chapters, one per drillable subtopic
             {passedCount > 0 &&

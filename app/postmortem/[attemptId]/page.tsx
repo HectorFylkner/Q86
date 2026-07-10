@@ -31,7 +31,7 @@ export default async function PostmortemPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-xl font-semibold">
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-[28px]">
         Whiteboard post-mortem
       </h1>
       <PostmortemClient attempt={attempt} question={question} />

@@ -169,7 +169,7 @@ const items = [
       "4": "Never merges the prime exponents from the two statements into $2^2 \\cdot 3^3$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const LIMIT = 20000;
       const s1 = [];
       const s2 = [];
@@ -280,7 +280,7 @@ const items = [
       "4": "Declares both useless because neither statement determines $n$ itself.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const isPrime = (m) => {
         if (m < 2) return false;
         for (let p = 2; p * p <= m; p++) if (m % p === 0) return false;

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import { Download } from "lucide-react";
+import { DownloadSimple } from "@phosphor-icons/react";
 import { QuestionRunner } from "@/components/drill/question-runner";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { startRedoSession } from "@/lib/actions";
@@ -92,7 +92,11 @@ export function QueueClient({
     setError(null);
     try {
       const res = await startRedoSession(questionIds);
-      if (res.error != null || res.sessionId == null) {
+      if (
+        res.error != null ||
+        res.sessionId == null ||
+        res.questions.length === 0
+      ) {
         setError(res.error ?? "Could not start the redo run.");
       } else {
         setRunner({ sessionId: res.sessionId, questions: res.questions });
@@ -294,7 +298,7 @@ export function QueueClient({
             onClick={exportCsv}
             className="flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-xs hover:border-graphite/50"
           >
-            <Download size={13} />
+            <DownloadSimple size={13} weight="regular" aria-hidden />
             Export CSV ({filteredLog.length} rows)
           </button>
         </div>

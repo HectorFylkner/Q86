@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, Pencil } from "lucide-react";
+import { BookmarkSimple, PencilSimple } from "@phosphor-icons/react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import type { AnswerRecord } from "@/components/timed/timed-client";
@@ -186,7 +186,7 @@ export function ReviewGrid({
                   : "border-grid text-graphite hover:border-graphite/50",
               )}
             >
-              <Bookmark size={12} />
+              <BookmarkSimple size={12} weight="regular" aria-hidden />
               {bookmarks[openIndex] ? "Bookmarked" : "Bookmark"}
             </button>
             {editedQuestionIds.has(q.id) && (
@@ -215,33 +215,36 @@ export function ReviewGrid({
           Your record: quant edits have destroyed more points than they
           earned. Open a question only if you can name a specific error.
         </p>
-        <div className="mt-4 grid grid-cols-7 gap-2">
+        <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-7">
           {questions.map((q, i) => (
             <button
               key={q.id}
               onClick={() => openQuestion(i)}
               className={cn(
-                "relative flex h-12 flex-col items-center justify-center rounded-control border text-sm transition-colors duration-150 hover:border-graphite/50",
+                "relative flex min-h-14 flex-col items-center justify-center rounded-control border text-sm transition-colors duration-150 hover:border-graphite/50",
                 editedQuestionIds.has(q.id)
                   ? "border-redpen/50 bg-redpen/5"
                   : "border-grid bg-surface",
               )}
             >
               <span className="font-mono">{i + 1}</span>
-              <span className="text-[9px] text-graphite">
+              <span className="text-[10px] text-graphite">
                 {answers[i] ? "answered" : "—"}
               </span>
               {bookmarks[i] && (
-                <Bookmark
+                <BookmarkSimple
                   size={11}
                   className="absolute right-1 top-1 text-amber"
-                  fill="currentColor"
+                  weight="fill"
+                  aria-hidden
                 />
               )}
               {editedQuestionIds.has(q.id) && (
-                <Pencil
+                <PencilSimple
                   size={11}
                   className="absolute left-1 top-1 text-redpen"
+                  weight="regular"
+                  aria-hidden
                 />
               )}
             </button>

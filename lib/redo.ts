@@ -1,12 +1,57 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "./db/index.ts";
-import { redoQueue } from "./db/schema.ts";
+import {
+  questions,
+  redoQueue,
+  sessions,
+  type Question,
+} from "./db/schema.ts";
 
 /** Stage 0|1|2 → due +2d / +7d / +21d after the scheduling event. */
 const STAGE_DELAY_DAYS = [2, 7, 21] as const;
 
 /** Day-21 cold-solve gate: correct, unaided, within 2:30. */
 export const COLD_SOLVE_LIMIT_SECONDS = 150;
+
+export type StartRedoSessionResult = {
+  error: string | null;
+  sessionId: number | null;
+  questions: Question[];
+};
+
+/** Load only active questions and create a session only when something can run. */
+export async function createRedoSession(
+  questionIds: number[],
+): Promise<StartRedoSessionResult> {
+  if (questionIds.length === 0) {
+    return { error: "Nothing due to redo.", sessionId: null, questions: [] };
+  }
+  const rows = await db
+    .select()
+    .from(questions)
+    .where(
+      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+    )
+    .all();
+  const byId = new Map(rows.map((question) => [question.id, question]));
+  const ordered = questionIds
+    .map((id) => byId.get(id))
+    .filter((question): question is Question => Boolean(question));
+  if (ordered.length === 0) {
+    return {
+      error: "Those redo questions are no longer available.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const activeQuestionIds = ordered.map((question) => question.id);
+  const session = await db
+    .insert(sessions)
+    .values({ mode: "redo", config: { questionIds: activeQuestionIds } })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: ordered };
+}
 
 function dueAt(stage: 0 | 1 | 2): Date {
   return new Date(Date.now() + STAGE_DELAY_DAYS[stage] * 24 * 60 * 60 * 1000);

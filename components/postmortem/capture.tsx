@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import imageCompression from "browser-image-compression";
-import { Camera, ClipboardPaste, Upload, X } from "lucide-react";
+import {
+  Camera,
+  ClipboardText,
+  UploadSimple,
+  X,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGES = 3;
@@ -149,7 +154,7 @@ export function ScratchCapture({
             (disabled || (full && !cameraOpen)) && "opacity-50",
           )}
         >
-          <Camera size={14} />
+          <Camera size={14} weight="regular" aria-hidden />
           {cameraOpen ? "Close camera" : "Use the webcam"}
         </button>
         <button
@@ -160,11 +165,11 @@ export function ScratchCapture({
             (disabled || full) && "opacity-50",
           )}
         >
-          <Upload size={14} />
+          <UploadSimple size={14} weight="regular" aria-hidden />
           Upload a photo
         </button>
         <span className="flex items-center gap-1.5 text-xs text-graphite">
-          <ClipboardPaste size={13} />
+          <ClipboardText size={13} weight="regular" aria-hidden />
           or paste from the clipboard
         </span>
         <input
@@ -252,7 +257,7 @@ export function ScratchCapture({
                     aria-label={`Remove image ${i + 1}`}
                     className="absolute -right-2 -top-2 rounded-full border border-grid bg-surface p-0.5 text-graphite hover:text-redpen"
                   >
-                    <X size={13} />
+                    <X size={13} weight="regular" aria-hidden />
                   </button>
                 )}
               </div>

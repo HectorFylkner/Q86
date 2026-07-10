@@ -52,7 +52,6 @@ export function DrillClient({
       timing: "soft",
       focus: "focused",
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStartRung]);
 
   // Chapter tests arrive as /drill?test=<subtopic>
