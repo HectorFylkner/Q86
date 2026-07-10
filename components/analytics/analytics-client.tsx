@@ -1,6 +1,14 @@
 "use client";
 
+import {
+  ArrowRight,
+  Crosshair,
+  Stack,
+  Timer,
+  WarningCircle,
+} from "@phosphor-icons/react";
 import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 import {
   Bar,
   BarChart,
@@ -49,18 +57,40 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   } as const;
   if (data.attemptCount === 0) {
     return (
-      <div className="space-y-4">
-        <p className="rounded-card border border-grid bg-surface p-5 text-sm text-graphite shadow-ambient">
-          No attempts logged yet. Run a drill or a timed set and the report
-          fills in.
-        </p>
+      <div className="space-y-8">
+        <section className="grid gap-6 border-y border-grid-strong py-9 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-ballpoint/25 bg-ballpoint/10 text-ballpoint">
+            <Crosshair size={28} weight="duotone" aria-hidden />
+          </span>
+          <div>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-graphite">
+              Evidence pending
+            </p>
+            <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight">
+              Give the dashboard a clean baseline.
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-graphite">
+              A 12-question focused drill is enough to start the accuracy,
+              pacing, and confidence story. Casual sessions stay excluded.
+            </p>
+          </div>
+          <Link
+            href="/drill?plan=1"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-control bg-ballpoint px-4 py-2 text-sm font-semibold text-white"
+          >
+            Start the baseline
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+        </section>
         <Footer />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
+      <InsightBrief data={data} />
+
       {/* 1 — score-report mirror */}
       <Section
         title="Score-report mirror"
@@ -122,8 +152,11 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                                   ? "transparent"
                                   : `color-mix(in srgb, ${REDPEN} ${Math.round(
                                       12 + intensity * 68,
-                                    )}%, white)`,
-                              color: intensity > 0.55 ? "white" : INK,
+                                    )}%, var(--surface))`,
+                              color:
+                                intensity > 0.55
+                                  ? "var(--on-redpen)"
+                                  : INK,
                             }}
                           >
                             {count > 0 ? count : ""}
@@ -428,7 +461,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             data={data.calibration.map((c) => ({
               bucket: `${c.confidence[0].toUpperCase()}${c.confidence.slice(1)} (${c.total})`,
               expected: c.expected,
-              actual: c.actual ?? 0,
+              actual: c.actual,
             }))}
             margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
             barCategoryGap="28%"
@@ -450,8 +483,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             />
             <Tooltip
               contentStyle={tooltipStyle}
-              formatter={(value: number, name: string) => [
-                `${value}%`,
+              formatter={(value, name) => [
+                value == null ? "Insufficient evidence" : `${String(value)}%`,
                 name === "expected" ? "Expected" : "Actual",
               ]}
             />
@@ -620,6 +653,157 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   );
 }
 
+type Insight = {
+  title: string;
+  evidence: string;
+  href: string;
+  action: string;
+  tone: "blue" | "amber" | "red";
+  icon: React.ReactNode;
+};
+
+function InsightBrief({ data }: { data: AnalyticsData }) {
+  const insights: Insight[] = [];
+  const weakestSkill = data.mirror.skills
+    .filter((bar) => bar.total >= 5)
+    .sort(
+      (a, b) =>
+        a.correct / a.total - b.correct / b.total || b.total - a.total,
+    )[0];
+
+  if (data.redoCompliance.overdue > 0) {
+    insights.push({
+      title: "Close the overdue loop first",
+      evidence: `${data.redoCompliance.overdue} spaced redo${data.redoCompliance.overdue === 1 ? " is" : "s are"} overdue. New volume is less valuable while exact misses are decaying.`,
+      href: "/queue?start=1",
+      action: "Clear the redo queue",
+      tone: "red",
+      icon: <Stack size={20} weight="duotone" aria-hidden />,
+    });
+  }
+
+  if (weakestSkill) {
+    const accuracy = percent(weakestSkill.correct, weakestSkill.total);
+    insights.push({
+      title: `${weakestSkill.label} is the current leverage point`,
+      evidence: `${accuracy}% over ${weakestSkill.total} focused attempts—enough evidence to prioritize without treating a tiny sample as truth.`,
+      href: "/mastery",
+      action: "Open the mastery rung",
+      tone: accuracy < 60 ? "red" : "amber",
+      icon: <Crosshair size={20} weight="duotone" aria-hidden />,
+    });
+  }
+
+  if (data.zones.over245 > 0 || data.zones.sub60Wrong > 0) {
+    const dominant =
+      data.zones.over245 >= data.zones.sub60Wrong
+        ? `${data.zones.over245} attempts ran past 2:45`
+        : `${data.zones.sub60Wrong} wrong answers landed under 60 seconds`;
+    insights.push({
+      title: "Pacing is costing decisions",
+      evidence: `${dominant}. Use a mini set to rehearse the decision checkpoint, not just faster arithmetic.`,
+      href: "/timed?start=mini",
+      action: "Run a 15-minute set",
+      tone: "amber",
+      icon: <Timer size={20} weight="duotone" aria-hidden />,
+    });
+  }
+
+  const worstCalibration = data.calibration
+    .filter((bucket) => bucket.actual != null && bucket.total >= 5)
+    .sort(
+      (a, b) =>
+        Math.abs((b.actual ?? b.expected) - b.expected) -
+        Math.abs((a.actual ?? a.expected) - a.expected),
+    )[0];
+  if (
+    insights.length < 3 &&
+    worstCalibration?.actual != null &&
+    Math.abs(worstCalibration.actual - worstCalibration.expected) >= 15
+  ) {
+    insights.push({
+      title: `${worstCalibration.confidence} confidence needs recalibration`,
+      evidence: `Actual accuracy is ${worstCalibration.actual}% against a ${worstCalibration.expected}% reference over ${worstCalibration.total} attempts.`,
+      href: "/drill",
+      action: "Run a deliberate drill",
+      tone: "blue",
+      icon: <WarningCircle size={20} weight="duotone" aria-hidden />,
+    });
+  }
+
+  const shown = insights.slice(0, 3);
+  if (shown.length === 0) {
+    shown.push({
+      title: "Keep collecting clean evidence",
+      evidence:
+        "No single weakness has enough signal to outrank the rest. A balanced focused drill is the honest next step.",
+      href: "/drill?plan=1",
+      action: "Start the balanced drill",
+      tone: "blue",
+      icon: <Crosshair size={20} weight="duotone" aria-hidden />,
+    });
+  }
+
+  return (
+    <section aria-labelledby="coach-brief-title">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-grid-strong pb-4">
+        <div>
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-graphite">
+            Coach brief
+          </p>
+          <h2
+            id="coach-brief-title"
+            className="mt-1 font-display text-2xl font-semibold tracking-tight"
+          >
+            Evidence translated into action.
+          </h2>
+        </div>
+        <p className="max-w-md text-[13px] leading-5 text-graphite">
+          Deterministic findings from focused, trusted attempts—never a
+          predicted official score.
+        </p>
+      </div>
+      <div className="divide-y divide-grid">
+        {shown.map((insight, index) => (
+          <article
+            key={`${insight.title}-${index}`}
+            className="grid gap-3 py-5 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-4"
+          >
+            <span
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full border",
+                insight.tone === "blue" &&
+                  "border-ballpoint/25 bg-ballpoint/10 text-ballpoint",
+                insight.tone === "amber" &&
+                  "border-amber/25 bg-amber/10 text-amber",
+                insight.tone === "red" &&
+                  "border-redpen/25 bg-redpen/10 text-redpen",
+              )}
+            >
+              {insight.icon}
+            </span>
+            <div>
+              <h3 className="font-display text-[17px] font-semibold tracking-tight">
+                {insight.title}
+              </h3>
+              <p className="mt-1 max-w-2xl text-[13px] leading-5 text-graphite">
+                {insight.evidence}
+              </p>
+            </div>
+            <Link
+              href={insight.href}
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ballpoint hover:underline"
+            >
+              {insight.action}
+              <ArrowRight size={15} aria-hidden />
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 
 
 function Section({
@@ -632,9 +816,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-      <h2 className="font-display text-sm font-semibold">{title}</h2>
-      <p className="mb-3 mt-0.5 text-xs text-graphite">{subtitle}</p>
+    <section className="border-t border-grid-strong pt-5">
+      <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
+      <p className="mb-4 mt-1 text-[13px] leading-5 text-graphite">{subtitle}</p>
       {children}
     </section>
   );
@@ -684,8 +868,8 @@ function ZoneStat({
   signed?: boolean;
 }) {
   return (
-    <div className="rounded-card border border-grid bg-surface px-3 py-2">
-      <div className="text-[11px] text-graphite">{label}</div>
+    <div className="border-l border-grid-strong pl-3">
+      <div className="text-[12px] text-graphite">{label}</div>
       <div
         className={cn(
           "font-mono text-xl font-medium",

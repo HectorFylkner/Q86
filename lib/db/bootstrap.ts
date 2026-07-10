@@ -7,11 +7,12 @@ import {
   userRetiredIds,
   verifiedSeedCount,
 } from "./seed-bank.ts";
+import { applyModelQuarantineMigration } from "./model-quarantine.ts";
 
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
  * instance) the first server boot applies the schema and loads the
- * committed 180-question bank, so deploying never requires terminal
+ * committed 360-question bank, so deploying never requires terminal
  * steps. Databases created earlier via `pnpm db:push` are left to the
  * scripts (they have no migration ledger to build on), and every step is
  * idempotent, so repeated cold starts are safe.
@@ -42,6 +43,13 @@ async function provision(): Promise<void> {
     // have no ledger to build on), so late additions land as guarded
     // DDL mirroring the migration files. Idempotent by construction.
     await evolveSchema();
+  }
+
+  const legacyQuarantined = await applyModelQuarantineMigration();
+  if (legacyQuarantined > 0) {
+    console.log(
+      `Q86 bootstrap: quarantined ${legacyQuarantined} legacy model-generated question${legacyQuarantined === 1 ? "" : "s"}.`,
+    );
   }
 
   // User-retired questions stay unverified, so the expected count shrinks

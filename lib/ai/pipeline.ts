@@ -1,8 +1,8 @@
 import { generateObject, type LanguageModel } from "ai";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { questions, type Question } from "../db/schema.ts";
-import { DS_CHOICES, type QuestionSource } from "../taxonomy.ts";
+import { DS_CHOICES } from "../taxonomy.ts";
 import { getModel, withRetry } from "./model.ts";
 import {
   generatorSystem,
@@ -14,7 +14,7 @@ import { generatedQuestionSchema, type GeneratedQuestion } from "./schemas.ts";
 import { evaluateExpression, verifyCandidate } from "./verify.ts";
 
 const GENERATOR_TEMPERATURE = 0.7;
-/** §8.2: mismatch → regenerate (max 2 retries), else discard. */
+/** Model cross-solve mismatch → regenerate (max 2 retries), else discard. */
 const MAX_GENERATION_ATTEMPTS = 3;
 
 export type PipelineSuccess = {
@@ -67,15 +67,15 @@ function postProcess(
 }
 
 /**
- * §8.1 + §8.2: generate one question, verify it independently, and insert
- * it with verified = true. Verification failures regenerate up to 2 times,
- * then the question is discarded and the failure reasons returned.
- * API-level errors (after §8.4 retries) throw.
+ * Generate one question, require an independent model cross-solve, then store
+ * it quarantined (`verified = false`). The model check is a useful screening
+ * signal, not proof of mathematical correctness; a human must approve the
+ * candidate in Question QA before any training selector can serve it.
  */
-export async function createVerifiedQuestion(
+export async function createModelCheckedQuestion(
   spec: GenerationSpec,
   opts: {
-    source: QuestionSource;
+    source: "generated" | "twin";
     twinOf?: number;
   },
   model?: LanguageModel,
@@ -88,13 +88,20 @@ export async function createVerifiedQuestion(
       (await db
         .select()
         .from(questions)
-        .where(eq(questions.id, opts.twinOf))
+        .where(
+          and(
+            eq(questions.id, opts.twinOf),
+            eq(questions.verified, true),
+          ),
+        )
         .get()) ?? null;
     if (!twinSource) {
       return {
         ok: false,
         attemptsUsed: 0,
-        failures: [`twin source question ${opts.twinOf} not found`],
+        failures: [
+          `twin source question ${opts.twinOf} is missing or not approved`,
+        ],
       };
     }
   }
@@ -167,7 +174,9 @@ export async function createVerifiedQuestion(
         fastestPathMd: candidate.fastest_path_md,
         trapMap,
         numericCheck: candidate.numeric_check,
-        verified: true,
+        // A blind model agreement is not a correctness proof. Human QA is the
+        // only path that may promote generated/twin candidates to training.
+        verified: false,
         twinOf: opts.twinOf ?? null,
       })
       .returning()

@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowRight, ShieldWarning } from "@phosphor-icons/react";
 import type { QuestionFilter } from "@/lib/engine";
 import type { DrillTiming } from "@/lib/actions";
 import {
@@ -56,7 +58,7 @@ export function DrillSetup({
   const [genState, setGenState] = useState<
     | { kind: "idle" }
     | { kind: "working"; stage: string }
-    | { kind: "done"; verified: number; failed: number }
+    | { kind: "done"; quarantined: number; failed: number }
     | { kind: "error"; message: string }
   >({ kind: "idle" });
 
@@ -95,8 +97,8 @@ export function DrillSetup({
   }
 
   async function generateMore() {
-    setGenState({ kind: "working", stage: "Generating questions…" });
-    const stages = ["Generating questions…", "Verifying questions…"];
+    setGenState({ kind: "working", stage: "Drafting candidates…" });
+    const stages = ["Drafting candidates…", "Running the model cross-check…"];
     let stageIdx = 0;
     const ticker = setInterval(() => {
       stageIdx = (stageIdx + 1) % stages.length;
@@ -123,8 +125,15 @@ export function DrillSetup({
             `Generation failed with status ${res.status}.`,
         );
       }
-      const body = (await res.json()) as { verified: number; failed: number };
-      setGenState({ kind: "done", verified: body.verified, failed: body.failed });
+      const body = (await res.json()) as {
+        quarantined: number;
+        failed: number;
+      };
+      setGenState({
+        kind: "done",
+        quarantined: body.quarantined,
+        failed: body.failed,
+      });
       router.refresh();
     } catch (e) {
       setGenState({
@@ -357,7 +366,7 @@ export function DrillSetup({
             Start drill: {Math.min(count, matching)} questions
           </button>
           <span className="text-sm text-graphite">
-            {matching} verified questions match this filter
+            {matching} approved questions match this filter
             {matching > 0 && matching < count && " — drill clamped to match"}
           </span>
         </div>
@@ -365,11 +374,12 @@ export function DrillSetup({
 
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
-          Generate more questions
+          Generate question candidates
         </h2>
         <p className="mt-1 text-sm text-graphite">
-          Ten fresh questions matching the filter above, each independently
-          verified before it can appear in a drill.
+          Ten fresh candidates matching the filter above. A second model checks
+          each key, then Question QA holds every candidate out of training until
+          you approve it.
         </p>
         <div className="mt-3 flex items-center gap-3">
           <button
@@ -380,7 +390,7 @@ export function DrillSetup({
               genState.kind === "working" && "cursor-wait opacity-60",
             )}
           >
-            Generate 10 more
+            Generate 10 candidates
           </button>
           {genState.kind === "working" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
@@ -389,15 +399,24 @@ export function DrillSetup({
             </span>
           )}
           {genState.kind === "done" && (
-            <span className="text-sm">
-              <span className="text-ballpoint">
-                {genState.verified} verified
+            <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-1.5 font-medium text-amber">
+                <ShieldWarning size={17} weight="duotone" />
+                {genState.quarantined} model-checked and quarantined
               </span>
               {genState.failed > 0 && (
                 <span className="text-graphite">
-                  {" "}
-                  · {genState.failed} failed verification
+                  {genState.failed} failed the model check
                 </span>
+              )}
+              {genState.quarantined > 0 && (
+                <Link
+                  href="/quality"
+                  className="inline-flex items-center gap-1 font-medium text-ballpoint hover:underline"
+                >
+                  Review in Question QA
+                  <ArrowRight size={14} weight="bold" />
+                </Link>
               )}
             </span>
           )}

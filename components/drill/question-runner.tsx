@@ -9,6 +9,7 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { useSessionFocus } from "@/components/use-session-focus";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
@@ -68,6 +69,11 @@ export function QuestionRunner({
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const startRef = useRef(Date.now());
+
+  useSessionFocus(
+    phase !== "done",
+    mode === "redo" ? "Redo session in progress" : "Drill in progress",
+  );
 
   const question = questions[index];
   const currentResult = results[index];

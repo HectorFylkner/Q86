@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Flame } from "lucide-react";
+import { Fire } from "@phosphor-icons/react";
 import { Md } from "@/components/math";
 import { Odometer } from "@/components/odometer";
 import { ResultStroke } from "@/components/drill/result-stroke";
@@ -224,7 +224,7 @@ export function PatternsClient({
         )}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5 text-sm">
-            <Flame size={15} className="text-amber" />
+            <Fire size={15} weight="regular" className="text-amber" aria-hidden />
             <span className="font-mono font-medium">{dayStreak}</span>
             <span className="text-graphite">day streak</span>
           </div>

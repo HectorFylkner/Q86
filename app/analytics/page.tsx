@@ -13,7 +13,7 @@ export default async function AnalyticsPage() {
     <div className="space-y-4">
       <SectionTabs group="progress" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="font-display text-xl font-semibold">Analytics</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-[28px]">Analytics</h1>
         {data.casualExcluded > 0 && (
           <p className="text-xs text-graphite">
             {data.casualExcluded} casual-session attempt

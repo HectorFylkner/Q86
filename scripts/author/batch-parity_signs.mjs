@@ -48,7 +48,7 @@ const items = [
       "4": "Expects adding $2$ to flip the parity of the odd product $xy$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       // enumerate all integer pairs with x^2*y odd; test which choice is ALWAYS even
       const models = [];
       for (let x = -9; x <= 9; x++)

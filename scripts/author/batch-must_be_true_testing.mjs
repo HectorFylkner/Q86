@@ -69,7 +69,7 @@ const items = [
       "3": "Upgrades the same-sign fact to a positive sum, forgetting the both-negative case.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -24; i <= 24; i++) {
         for (let j = -24; j <= 24; j++) {
@@ -80,7 +80,7 @@ const items = [
       }
       const preds = [
         (a, b) => a > b,
-        (a, b) => a > 0,
+        (a) => a > 0,
         (a, b) => b > 0,
         (a, b) => a + b > 0,
         (a, b) => Math.abs(a) > Math.abs(b),
@@ -110,7 +110,7 @@ const items = [
       "4": "Assumes the nonzero factor $a$ must be negative, making the sum negative.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -20; i <= 20; i++) {
         for (let j = -20; j <= 20; j++) {
@@ -120,10 +120,10 @@ const items = [
         }
       }
       const preds = [
-        (a, b) => a === 0,
+        (a) => a === 0,
         (a, b) => b === 0,
         (a, b) => a + b === 0,
-        (a, b) => a > 0,
+        (a) => a > 0,
         (a, b) => a + b < 0,
       ];
       return { kind: "index", index: onlyAlwaysTrue(models, preds, 10) };
@@ -190,7 +190,7 @@ const items = [
       "4": "Divides $x < y$ by the negative number $y$ without flipping the sign.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -24; i <= -1; i++) {
         for (let j = -24; j <= -1; j++) {
@@ -236,7 +236,7 @@ const items = [
       "4": "Believes squaring evens numbers out, though squares preserve parity.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const mod2 = (n) => ((n % 2) + 2) % 2;
       const models = [];
       for (let j = -9; j <= 9; j++) {
@@ -248,7 +248,7 @@ const items = [
         (j, k) => mod2(j * k) === 1,
         (j, k) => mod2(j * k) === 0,
         (j, k) => mod2(j - k) === 0,
-        (j, k) => mod2(j) === 1,
+        (j) => mod2(j) === 1,
         (j, k) => mod2(j * j + k * k) === 0,
       ];
       return { kind: "index", index: onlyAlwaysTrue(models, preds) };
@@ -276,7 +276,7 @@ const items = [
       "4": "Doubts (1) because $y$'s sign is unknown, though $|y|$ absorbs both signs.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -24; i <= 24; i++) {
         for (let j = -24; j <= 24; j++) models.push([i / 2, j / 2]);
@@ -284,7 +284,7 @@ const items = [
       const index = dsIndex(
         models,
         ([x, y]) => x > Math.abs(y),
-        ([x, y]) => x > 0,
+        ([x]) => x > 0,
         ([x, y]) => x + y > 0,
         { s1: 10, s2: 10, both: 10 },
       );
@@ -313,7 +313,7 @@ const items = [
       "4": "Keeps both roots of (1) even after (2) eliminates $a = 0$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -20; i <= 20; i++) models.push([i / 2]);
       const index = dsIndex(
@@ -384,7 +384,7 @@ const items = [
       "3": "Cancels powers of $z$ in each statement, reducing both to $z < -1$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -30; i <= 30; i++) models.push([i / 10]);
       const index = dsIndex(
@@ -425,7 +425,7 @@ const items = [
       "4": "Pins the profit on day three; $(2, 9, -10)$ satisfies everything with $r < 0$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let p = -10; p <= 10; p++) {
         for (let qq = -10; qq <= 10; qq++) {
@@ -436,10 +436,10 @@ const items = [
       }
       const negCount = (a, b, c) => [a, b, c].filter((v) => v < 0).length;
       const preds = [
-        (a, b, c) => a < 0,
+        (a) => a < 0,
         (a, b, c) => negCount(a, b, c) === 1,
         (a, b, c) => negCount(a, b, c) === 2,
-        (a, b, c) => a + b > 0,
+        (a, b) => a + b > 0,
         (a, b, c) => c > 0,
       ];
       return { kind: "index", index: onlyAlwaysTrue(models, preds) };
@@ -467,7 +467,7 @@ const items = [
       "4": "Reads $a \\ne b$ as $a > b$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -20; i <= 20; i++) {
         for (let j = -20; j <= 20; j++) {
@@ -477,7 +477,7 @@ const items = [
         }
       }
       const preds = [
-        (a, b) => a > 0,
+        (a) => a > 0,
         (a, b) => a * b > 0,
         (a, b) => Math.abs(a) === Math.abs(b),
         (a, b) => a + b > 0,
@@ -508,7 +508,7 @@ const items = [
       "3": "Builds a symmetric bound from the nearer endpoint $-2$, trimming the set.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -80; i <= 80; i++) {
         const x = i / 20;

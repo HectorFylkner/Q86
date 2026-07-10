@@ -58,7 +58,7 @@ const items = [
       "4": "Misses that once $b = 3 \\ne 1$ is known, the exponent equation $x = 2x - 6$ has the single solution $x = 6$.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (const b of [0.25, 0.5, 1, 2, 3, 4]) {
         for (let k = -40; k <= 40; k++) models.push({ b, x: k / 4 });

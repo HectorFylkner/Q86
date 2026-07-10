@@ -27,7 +27,13 @@ export default async function QueuePage({
     })
     .from(redoQueue)
     .innerJoin(questions, eq(redoQueue.questionId, questions.id))
-    .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, now)))
+    .where(
+      and(
+        eq(redoQueue.cleared, false),
+        lte(redoQueue.dueAt, now),
+        eq(questions.verified, true),
+      ),
+    )
     .orderBy(redoQueue.dueAt)
     .all()) as DueRow[];
 
@@ -43,7 +49,13 @@ export default async function QueuePage({
     })
     .from(redoQueue)
     .innerJoin(questions, eq(redoQueue.questionId, questions.id))
-    .where(and(eq(redoQueue.cleared, false), gt(redoQueue.dueAt, now)))
+    .where(
+      and(
+        eq(redoQueue.cleared, false),
+        gt(redoQueue.dueAt, now),
+        eq(questions.verified, true),
+      ),
+    )
     .orderBy(redoQueue.dueAt)
     .limit(30)
     .all()) as DueRow[];
@@ -67,6 +79,7 @@ export default async function QueuePage({
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(questions.verified, true))
     .orderBy(desc(attempts.id))
     .limit(500)
     .all()) as LogRow[];
@@ -74,7 +87,7 @@ export default async function QueuePage({
   return (
     <div className="space-y-4">
       <SectionTabs group="review" />
-      <h1 className="font-display text-xl font-semibold">
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-[28px]">
         Redo queue &amp; error log
       </h1>
       <QueueClient

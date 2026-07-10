@@ -1,10 +1,20 @@
-import { and, desc, eq, lte } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  lte,
+  sql,
+} from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
   eloRatings,
   questions,
   redoQueue,
+  sessions,
 } from "./db/schema.ts";
 import { ELO_START } from "./elo.ts";
 import { selectQuestions } from "./engine.ts";
@@ -42,6 +52,7 @@ async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
         and(
           eq(questions.fundamentalSkill, skill),
           eq(attempts.focus, "focused"),
+          eq(questions.verified, true),
         ),
       )
       .orderBy(desc(attempts.id))
@@ -59,9 +70,67 @@ export async function dueRedoCount(): Promise<number> {
   const rows = await db
     .select({ id: redoQueue.id })
     .from(redoQueue)
-    .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, new Date())))
+    .innerJoin(questions, eq(redoQueue.questionId, questions.id))
+    .where(
+      and(
+        eq(redoQueue.cleared, false),
+        lte(redoQueue.dueAt, new Date()),
+        eq(questions.verified, true),
+      ),
+    )
     .all();
   return rows.length;
+}
+
+const DAY_MS = 86_400_000;
+
+/** Calendar-day ordinal in the server's local timezone, stable across DST. */
+function localDayOrdinal(date: Date): number {
+  return Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS,
+  );
+}
+
+async function timedSetEvidence(): Promise<{
+  daysSinceTimedSet: number | null;
+  focusedAttemptCount: number;
+}> {
+  const [latestTimed, attemptRow] = await Promise.all([
+    db
+      .select({ endedAt: sessions.endedAt })
+      .from(sessions)
+      .where(
+        and(
+          inArray(sessions.mode, ["timed_set", "section_sim"]),
+          isNotNull(sessions.endedAt),
+          // Older session configs omit focus; focused is the product default.
+          sql`coalesce(json_extract(${sessions.config}, '$.focus'), 'focused') = 'focused'`,
+        ),
+      )
+      .orderBy(desc(sessions.endedAt))
+      .limit(1)
+      .get(),
+    db
+      .select({ n: count() })
+      .from(attempts)
+      .innerJoin(questions, eq(attempts.questionId, questions.id))
+      .where(
+        and(eq(attempts.focus, "focused"), eq(questions.verified, true)),
+      )
+      .get(),
+  ]);
+
+  const endedAt = latestTimed?.endedAt ?? null;
+  return {
+    daysSinceTimedSet:
+      endedAt == null
+        ? null
+        : Math.max(
+            0,
+            localDayOrdinal(new Date()) - localDayOrdinal(new Date(endedAt)),
+          ),
+    focusedAttemptCount: attemptRow?.n ?? 0,
+  };
 }
 
 export async function gatherPlanInputs(): Promise<PlanInputs> {
@@ -76,6 +145,7 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   ) as Record<PatternCategoryKey, number>;
 
   const cadenceRaw = Number((await getSetting("timed_set_cadence")) ?? "3");
+  const timedEvidence = await timedSetEvidence();
   // Local-calendar day index so the cadence flips at local midnight.
   const now = new Date();
   const localDayIndex = Math.floor(
@@ -89,6 +159,7 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
     dueRedoCount: await dueRedoCount(),
     cadenceDays:
       Number.isInteger(cadenceRaw) && cadenceRaw > 0 ? cadenceRaw : 3,
+    ...timedEvidence,
     dayIndex: localDayIndex,
     eloByCategory,
   };

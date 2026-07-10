@@ -48,7 +48,13 @@ export async function todaysDeck(): Promise<{
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(and(eq(attempts.correct, false), eq(attempts.focus, "focused")))
+    .where(
+      and(
+        eq(attempts.correct, false),
+        eq(attempts.focus, "focused"),
+        eq(questions.verified, true),
+      ),
+    )
     .orderBy(desc(attempts.id))
     .limit(300)
     .all();

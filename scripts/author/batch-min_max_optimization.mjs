@@ -176,7 +176,7 @@ const items = [
       "4": "Treats the definite No from (2) as a failure to answer rather than as sufficiency.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = nondecreasingTuples(5, -10, 70, 60);
       const idx = dsSufficiencyIndex(
         models,
@@ -247,7 +247,7 @@ const items = [
       "4": "Believes a yes/no product question requires the exact value of $xy$, which neither statement gives.",
     },
     numeric_check: null,
-    check(q) {
+    check() {
       const models = [];
       for (let i = -60; i <= 60; i++) {
         for (let j = -60; j <= 60; j++) {

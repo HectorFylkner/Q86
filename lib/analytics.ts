@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
@@ -133,7 +133,9 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(eq(attempts.focus, "focused"))
+    .where(
+      and(eq(attempts.focus, "focused"), eq(questions.verified, true)),
+    )
     .orderBy(desc(attempts.id))
     .limit(5000)
     .all();
@@ -142,7 +144,8 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   const casualRows = await db
     .select({ sessionId: attempts.sessionId })
     .from(attempts)
-    .where(eq(attempts.focus, "casual"))
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(and(eq(attempts.focus, "casual"), eq(questions.verified, true)))
     .all();
   const casualExcluded = casualRows.length;
   const casualSessionIds = new Set(
@@ -210,6 +213,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       })
       .from(edits)
       .innerJoin(questions, eq(edits.questionId, questions.id))
+      .where(eq(questions.verified, true))
       .orderBy(desc(edits.id))
       .all()
   ).filter((e) => !casualSessionIds.has(e.sessionId));
@@ -225,6 +229,8 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       confidence: attempts.confidence,
     })
     .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(questions.verified, true))
     .all();
   const confidenceByKey = new Map(
     attemptConfidence.map((a) => [`${a.sessionId}|${a.questionId}`, a.confidence]),
@@ -325,7 +331,12 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   }
 
   // --- redo compliance ---------------------------------------------------------
-  const redoRows = await db.select().from(redoQueue).all();
+  const redoRows = await db
+    .select({ cleared: redoQueue.cleared, dueAt: redoQueue.dueAt })
+    .from(redoQueue)
+    .innerJoin(questions, eq(redoQueue.questionId, questions.id))
+    .where(eq(questions.verified, true))
+    .all();
   const nowMs = Date.now();
   const redoCompliance = {
     open: redoRows.filter((r) => !r.cleared).length,

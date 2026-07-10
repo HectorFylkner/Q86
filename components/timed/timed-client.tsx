@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Bookmark } from "lucide-react";
+import { BookmarkSimple } from "@phosphor-icons/react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { TimeInkBar, type Checkpoint } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
 import { MarkingSummary } from "@/components/timed/marking-summary";
+import { useSessionFocus } from "@/components/use-session-focus";
 import {
   saveTimedSession,
   startTimedSet,
@@ -80,6 +81,16 @@ export function TimedClient({
   const violatedRef = useRef(false);
   const totalSeconds = kind === "full" ? 45 * 60 : 15 * 60;
   const questionCount = kind === "full" ? 21 : 7;
+
+  useSessionFocus(
+    stage.kind === "ritual" ||
+      stage.kind === "running" ||
+      stage.kind === "review" ||
+      stage.kind === "saving",
+    kind === "full"
+      ? "Timed section in progress"
+      : "Timed mini set in progress",
+  );
 
   const checkpoints: Checkpoint[] =
     kind === "full"
@@ -587,7 +598,7 @@ export function TimedClient({
                   : "border-grid text-graphite hover:border-graphite/50",
               )}
             >
-              <Bookmark size={12} />
+              <BookmarkSimple size={12} weight="regular" aria-hidden />
               {bookmarks[currentIndex] ? "Bookmarked" : "Bookmark"}
               <span className="font-mono text-[10px] opacity-60">B</span>
             </button>

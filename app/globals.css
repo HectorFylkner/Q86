@@ -1,48 +1,65 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Q86 design tokens — "the marked exam".
-   Exam paper, graphite, ballpoint ink, and the reviewer's red pen.
-   Default is exam-paper light (match conditions); "night desk" dark is
-   available via the nav toggle or the OS preference.
+   Q86 design tokens — "the Quant desk".
+   A disciplined exam workstation: warm canvas, crisp answer sheet, graphite
+   type, one ballpoint accent, and correction colours used only as evidence.
 --------------------------------------------------------------------------- */
 
 :root {
-  --paper: #fafaf7;
-  --surface: #ffffff;
-  --grid: #e9e6dd;
-  --ink: #17181a;
-  --graphite: #5e6268;
-  --ballpoint: #2239c4;
-  --redpen: #c63b2f;
-  --amber: #b7791f;
-  --highlight: #f5efd9;
+  --paper: #f7f6f1;
+  --surface: #fffefb;
+  --surface-raised: #ffffff;
+  --grid: #dfddd4;
+  --grid-strong: #c9c6bc;
+  --ink: #1b1d1f;
+  --graphite: #5e6369;
+  --faint: #777c82;
+  --ballpoint: #2746b4;
+  --redpen: #b73b32;
+  --amber: #855a0d;
+  --highlight: #f1eee4;
+  --on-ballpoint: #ffffff;
+  --on-redpen: #ffffff;
+  --on-amber: #ffffff;
 }
 
-/* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
+/* Night desk: cool graphite canvas, warm ink, lifted correction colours. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #141519;
-    --surface: #1c1e24;
-    --grid: #2b2e36;
-    --ink: #eceae4;
-    --graphite: #9ca1a8;
-    --ballpoint: #8fa0f2;
-    --redpen: #e0705f;
-    --amber: #d9a050;
-    --highlight: #2b2820;
+    --paper: #111318;
+    --surface: #191c22;
+    --surface-raised: #1f2229;
+    --grid: #313640;
+    --grid-strong: #454b57;
+    --ink: #f0eee7;
+    --graphite: #a8adb5;
+    --faint: #8d939d;
+    --ballpoint: #9cabff;
+    --redpen: #ed8171;
+    --amber: #e2af5b;
+    --highlight: #292a29;
+    --on-ballpoint: #111318;
+    --on-redpen: #24100d;
+    --on-amber: #211708;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #141519;
-  --surface: #1c1e24;
-  --grid: #2b2e36;
-  --ink: #eceae4;
-  --graphite: #9ca1a8;
-  --ballpoint: #8fa0f2;
-  --redpen: #e0705f;
-  --amber: #d9a050;
-  --highlight: #2b2820;
+  --paper: #111318;
+  --surface: #191c22;
+  --surface-raised: #1f2229;
+  --grid: #313640;
+  --grid-strong: #454b57;
+  --ink: #f0eee7;
+  --graphite: #a8adb5;
+  --faint: #8d939d;
+  --ballpoint: #9cabff;
+  --redpen: #ed8171;
+  --amber: #e2af5b;
+  --highlight: #292a29;
+  --on-ballpoint: #111318;
+  --on-redpen: #24100d;
+  --on-amber: #211708;
 }
 
 /* KaTeX inherits currentColor, but its rules/fraction bars use borders that
@@ -51,61 +68,61 @@
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-grid: var(--grid);
+  --color-grid-strong: var(--grid-strong);
   --color-ink: var(--ink);
   --color-graphite: var(--graphite);
+  --color-faint: var(--faint);
   --color-ballpoint: var(--ballpoint);
   --color-redpen: var(--redpen);
   --color-amber: var(--amber);
   --color-highlight: var(--highlight);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
-    sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
     monospace;
 
-  --radius-card: 10px;
-  --radius-control: 6px;
+  --radius-card: 14px;
+  --radius-control: 8px;
 
-  --shadow-ambient: 0 1px 2px rgb(23 24 26 / 0.04),
-    0 4px 12px rgb(23 24 26 / 0.03);
+  --shadow-ambient: 0 1px 1px rgb(23 24 26 / 0.035),
+    0 10px 28px -22px rgb(23 24 26 / 0.3);
+  --shadow-raised: 0 1px 2px rgb(23 24 26 / 0.06),
+    0 22px 60px -34px rgb(23 24 26 / 0.38);
 }
 
 html {
   /* Tabular figures everywhere — timers, tables, counters never wobble. */
   font-variant-numeric: tabular-nums;
+  min-width: 320px;
+  scroll-behavior: smooth;
 }
 
 body {
+  min-height: 100dvh;
   color: var(--ink);
   background-color: var(--paper);
-  /* Faint graph-paper grid, 24 px cell, on the app shell only.
-     Cards are solid --surface, so the grid never shows inside them. */
-  background-image: repeating-linear-gradient(
+  background-image: radial-gradient(
+      circle at 12% -10%,
+      color-mix(in srgb, var(--ballpoint) 7%, transparent),
+      transparent 30rem
+    ),
+    repeating-linear-gradient(
       0deg,
       transparent,
       transparent 23px,
-      color-mix(in srgb, var(--grid) 42%, transparent) 23px,
-      color-mix(in srgb, var(--grid) 42%, transparent) 24px
+      color-mix(in srgb, var(--grid) 34%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 34%, transparent) 24px
     ),
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 23px,
-      color-mix(in srgb, var(--grid) 42%, transparent) 23px,
-      color-mix(in srgb, var(--grid) 42%, transparent) 24px
+      color-mix(in srgb, var(--grid) 34%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 34%, transparent) 24px
     );
-}
-
-/* Visible keyboard focus, always. */
-:focus-visible {
-  outline: 2px solid var(--ballpoint);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: var(--highlight);
 }
 
 /* KaTeX display math should scroll, never overflow the card. */
@@ -125,17 +142,10 @@ body {
   font-size: 1.15em;
 }
 
-/* Night desk lifts --ballpoint for contrast AS TEXT, which leaves white
-   labels on ballpoint fills at ~2.5:1. On dark, every ballpoint-filled
-   control carries paper-dark text instead. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .bg-ballpoint.text-white {
-    color: var(--paper);
-  }
-}
-:root[data-theme="dark"] .bg-ballpoint.text-white {
-  color: var(--paper);
-}
+/* Filled semantic controls always use an explicit contrast token. */
+.bg-ballpoint.text-white { color: var(--on-ballpoint); }
+.bg-redpen.text-white { color: var(--on-redpen); }
+.bg-amber.text-white { color: var(--on-amber); }
 
 /* Loading skeleton shimmer (opacity only — safe under reduced motion). */
 @keyframes q86-skeleton {
@@ -148,7 +158,7 @@ body {
   }
 }
 .skeleton {
-  background: var(--grid);
+  background: color-mix(in srgb, var(--grid) 78%, var(--surface));
   border-radius: 6px;
   animation: q86-skeleton 1.4s ease-in-out infinite;
 }
@@ -165,26 +175,23 @@ body {
   border-radius: 4px;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
 ::selection {
   background: color-mix(in srgb, var(--ballpoint) 22%, transparent);
 }
 
 button {
   touch-action: manipulation;
+  transition: scale 120ms ease, opacity 120ms ease;
 }
 button:not(:disabled):active {
-  transform: translateY(0.5px);
+  scale: 0.985;
 }
 
 /* Form controls: one consistent voice (height, radius, border, focus). */
 input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]),
 select,
 textarea {
-  min-height: 38px;
+  min-height: 42px;
   border-radius: var(--radius-control);
   border: 1px solid var(--grid);
   background-color: var(--surface);
@@ -222,9 +229,35 @@ input[type="date"] {
   scrollbar-color: color-mix(in srgb, var(--graphite) 35%, transparent) transparent;
 }
 
+/* Active drills and timed work collapse the shell to a quiet exit rail. */
+html[data-session="focus"] .session-hide,
+html[data-session="focus"] .app-footer {
+  display: none !important;
+}
+html[data-session="focus"] .session-label {
+  display: flex !important;
+}
+html[data-session="focus"] .app-nav header {
+  position: static;
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
+}
+html[data-session="focus"] .app-main {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+@media (max-width: 639px) {
+  input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]),
+  select,
+  button {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
   }
 }

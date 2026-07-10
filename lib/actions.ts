@@ -31,7 +31,7 @@ import {
   selectTimedSet,
   type QuestionFilter,
 } from "./engine.ts";
-import { applyRedoResult, enqueueMiss } from "./redo.ts";
+import { applyRedoResult, createRedoSession, enqueueMiss } from "./redo.ts";
 import type {
   Confidence,
   EditReason,
@@ -103,26 +103,7 @@ export async function startChapterTest(
 export async function startRedoSession(
   questionIds: number[],
 ): Promise<StartDrillResult> {
-  if (questionIds.length === 0) {
-    return { error: "Nothing due to redo.", sessionId: null, questions: [] };
-  }
-  const rows = await db
-    .select()
-    .from(questions)
-    .where(
-      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
-    )
-    .all();
-  const byId = new Map(rows.map((q) => [q.id, q]));
-  const ordered = questionIds
-    .map((id) => byId.get(id))
-    .filter((q): q is Question => Boolean(q));
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "redo", config: { questionIds } })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  return createRedoSession(questionIds);
 }
 
 /** Start a drill with an exact question list (redo of twins, coach

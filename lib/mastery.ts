@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions } from "./db/schema.ts";
 import {
@@ -50,7 +50,9 @@ export async function computeLadders(): Promise<Ladder[]> {
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(eq(attempts.focus, "focused"))
+    .where(
+      and(eq(attempts.focus, "focused"), eq(questions.verified, true)),
+    )
     .orderBy(desc(attempts.id))
     .limit(5000)
     .all();
