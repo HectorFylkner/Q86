@@ -132,20 +132,44 @@ Integration is semantic, not a blanket merge or conflict strategy.
 - Reverified branch heads, lesson counts, bank counts, test-file counts, and
   Problem Solving answer-position distributions.
 - Recorded the integration plan and preservation contract before product edits.
+- Integrated the learning branch in reviewed feature slices while retaining the
+  command-center dashboard, QA/quarantine workflow, retired-question rules, safe
+  seed command, and native tests:
+  - lesson parser validation and derived counts;
+  - persistent chapter progress and weakest-first/test-out sequencing;
+  - one-tap remediation from analytics, review, post-mortem, deck, and queue;
+  - cue/trap retrieval cards and interleaved review;
+  - retention-, pace-, and completion-aware chapter-test evidence;
+  - answer/method commitments for worked examples;
+  - visual lesson directives and the two strategy chapters;
+  - all source authoring batches and the append-only 603-question bank.
+- Verified that the first 360 objects in the learning bank are unchanged and
+  the remaining 243 are additions; the current loader inserts all 603 without
+  deleting history.
+- Recorded a pilot audit for exponent/root properties, algebraic translation,
+  and probability. It identifies 42 independently assessable concepts and
+  shows that the current bank cannot honestly meet a six-scored-item floor for
+  most of them; these shortfalls will remain visible rather than being hidden
+  by undersized tests.
+- Re-ran the combined baseline: 603-question mechanical bank verification,
+  six native tests, lesson validation for 26 files, ESLint, and a production
+  build all complete successfully. The bank result is explicitly mechanical,
+  not yet evidence of replayable mathematical or semantic verification.
 
 ## Open work
 
-1. Finish the file-level branch conflict audit and lock the first integration
-   slice.
-2. Port the learning branch's integrity-safe foundations and 603-question bank.
-3. Add the versioned curriculum graph, stable IDs, validators, and coverage
+1. Add the versioned curriculum graph, stable IDs, validators, and coverage
    reports.
-4. Backfill question/concept metadata without changing historical numeric IDs.
-5. Build and verify the three complete pilot concept flows.
-6. Expand the inventory to every remaining subtopic and expose honest
+2. Backfill question/concept metadata without changing historical numeric IDs.
+3. Make deterministic verification replayable and add semantic QA; repair the
+   audited combinatorics explanation.
+4. Persist deterministic Problem Solving presentation permutations while
+   leaving Data Sufficiency choices canonical.
+5. Port the strongest automated tests and corrected tiered-test, lucky-guess,
+   timed-transfer, and recertification rules from the other divergent branches.
+6. Build and verify the three complete pilot concept flows.
+7. Expand the inventory to every remaining subtopic and expose honest
    production/unpublished status.
-7. Add replayable mathematical and semantic QA, answer permutation, and full
-   regression coverage.
 8. Run migration, seed-idempotency, test, lint, build, validation, and browser
    verification matrices.
 
@@ -164,7 +188,8 @@ Integration is semantic, not a blanket merge or conflict strategy.
 
 ## Next action
 
-Integrate the learning branch's lesson validation, server-derived progress,
-chapter-test integrity, and expanded bank into the command-center base while
-preserving command-center QA and tests. Run the existing test suite after each
-feature slice.
+Land the versioned pilot concept graph and coverage audit, stable question
+identity/permutation work, and corrected assessment rules as independently
+reviewable slices. Then wire those contracts into the lesson, practice,
+mastery, tutor, and daily-plan surfaces, keeping under-covered assessments
+unavailable with exact shortfalls.
