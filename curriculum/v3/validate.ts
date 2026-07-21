@@ -3,6 +3,8 @@ import { readLesson } from "../../lib/lessons.ts";
 import { bankQuestionUid, buildCoverageLedger, readSeedBank } from "./coverage.ts";
 import { buildCurriculumV3, type CurriculumV3 } from "./graph.ts";
 import { PILOT_SUBTOPICS } from "./pilot-concepts.ts";
+import { PILOT_CONCEPT_SEGMENTS } from "./segments/index.ts";
+import { validateConceptSegments } from "./segments/validate.ts";
 import type { ConceptRecord, CoverageLedger } from "./types.ts";
 
 export type CurriculumValidationIssue = {
@@ -82,6 +84,7 @@ function evidenceSourceIssues(curriculum: CurriculumV3): CurriculumValidationIss
   }
 
   for (const example of curriculum.examples) {
+    if (example.source.kind !== "q86_lesson") continue;
     const parsed = parsedByChapter.get(example.chapter);
     if (!parsed?.examples.some((item) => item.question.includes(example.sourceQuestionNeedle))) {
       issues.push({
@@ -91,6 +94,7 @@ function evidenceSourceIssues(curriculum: CurriculumV3): CurriculumValidationIss
     }
   }
   for (const check of curriculum.checks) {
+    if (check.source.kind !== "q86_lesson") continue;
     const parsed = parsedByChapter.get(check.chapter);
     if (!parsed?.checklist.some((item) => item.includes(check.sourceTextNeedle))) {
       issues.push({
@@ -151,6 +155,14 @@ export function validateCurriculumV3(
   }
 
   issues.push(...prerequisiteIssues(curriculum.concepts));
+  issues.push(
+    ...validateConceptSegments(PILOT_CONCEPT_SEGMENTS, conceptIds).map(
+      (issue) => ({
+        code: `segment_${issue.code}`,
+        message: issue.message,
+      }),
+    ),
+  );
   for (const concept of curriculum.concepts) {
     if (concept.canonicalOwner !== concept.id) {
       issues.push({ code: "invalid_canonical_owner", message: `${concept.id} names ${concept.canonicalOwner} as owner; leaf records must own themselves` });

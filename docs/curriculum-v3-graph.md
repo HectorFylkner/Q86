@@ -47,6 +47,7 @@ node --experimental-strip-types scripts/audit-curriculum-coverage.ts
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts --json
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts --summary-json
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts --write-snapshot
+node --experimental-strip-types scripts/audit-curriculum-coverage.ts --write-report
 node --experimental-strip-types --test tests/curriculum-v3.test.ts
 ```
 
