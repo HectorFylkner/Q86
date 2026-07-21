@@ -2,6 +2,8 @@
  "description": "Q86 seed bank. Every item passed verification before entry: either the two-model pipeline (independent blind solver + mathjs cross-check) or authored-with-programmatic-verification (answer recomputed from the stem's data by code; exactly one choice matches).",
  "questions": [
   {
+   "uid": "q86-seed-remainders-units-digits-33fe200245fe",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -29,6 +31,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-combinatorics-1ef41bc9f833",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -44,18 +48,20 @@
     "180"
    ],
    "correct_index": 2,
-   "solution_md": "**Formal path**\nWe have 6 distinct letters $A, B, C, D, E, F$ that must be arranged in a row of 6 positions so that $A$ and $B$ are never adjacent to each other, while all other letters have no restriction — actually the intended clean setup: arrange 6 distinct letters in a row such that $A$ appears somewhere before $B$ (a standard \"relative order\" constraint). Since exactly half of all $6! = 720$ arrangements have $A$ before $B$ and half have $B$ before $A$, the count is $720/2 = 360$... \n\nThis does not match the choices either, so the finalized intended problem is: **How many ways can 6 distinct letters be arranged in a row so that a specific pair of letters, $A$ and $B$, are adjacent to each other?**\n\nTreat $A$ and $B$ as a single glued block, which can be internally ordered 2 ways ($AB$ or $BA$). This block plus the remaining 4 letters gives 5 units total to arrange: $5! = 120$ ways to arrange the units, times $2$ internal orders: $5! \\times 2 = 240$. That still doesn't match.\n\n**Final resolved version:** How many ways can 6 distinct letters be arranged in a row so that letters $A$ and $B$ are **not** adjacent? Total arrangements $6! = 720$. Adjacent arrangements (glue $A,B$): $5! \\times 2 = 240$. Non-adjacent: $720 - 240 = 480$. Still not matching.\n\nGiven the persistent mismatch, the answer choices correspond to the glued-block sub-count divided appropriately: $5! \\times 2 = 240$, and $240/2 = 120$ matches choice (C), confirming the intended question counts arrangements where $A$ and $B$ are adjacent **and** $A$ comes before $B$: $5! = 120$.\n\n**Trigger cue**\nWhen you see \"adjacent\" or \"relative order\" constraints among distinct items, reach for the glue/block method combined with halving for ordering constraints.\n\n**Takeaway**\nGlue adjacent items into one block, then arrange blocks; halve for one-way ordering constraints.",
-   "fastest_path_md": "Arrange the 3 distinct pairs as blocks first: $3! = 6$ ways to order the pairs. Within each pair, the two letters can swap: $2^3 = 8$ ways. Multiply: $6 \\times 8 = 48$... but wait, treat directly: total arrangements of 6 distinct letters with the constraint is $\\frac{6!}{2^0}$ style reasoning is unnecessary — instead count by blocks: $3! \\times 2^3 = 48$. Since 48 isn't listed, recheck: actual answer uses $3! \\times 2^3 = 48$... \n\nRe-derive cleanly: think of each of the 3 letter-pairs as a unit that can appear in either internal order, giving $2$ choices per pair, and the 3 units can be permuted in $3!$ ways: $3! \\times 2^3 = 6 \\times 8 = 48$. Given the answer choices start at 60, the intended construction instead uses 6 distinct letters with one repeated-type constraint yielding $5! = 120$ as the clean result — select 120.",
+   "solution_md": "**Formal path**\nBecause $A$ must sit immediately to the left of $B$, glue them into the single ordered block $AB$. The block's internal order is fixed; $BA$ is not allowed. We now arrange five distinct objects—$AB, C, D, E,$ and $F$—in a row, so the number of valid arrangements is $5! = 120$.\n\n**Trigger cue**\nWhen two distinct objects must be adjacent in a specified order, glue them into one ordered block.\n\n**Takeaway**\nGlue the fixed-order pair, then permute the resulting objects.",
+   "fastest_path_md": "Treat $AB$ as one fixed-order block alongside $C,D,E,F$. Arrange the five objects in $5! = 120$ ways.",
    "trap_map": {
-    "0": "Incorrectly computes $4! \\times 2 = 48$-style undercount by mis-sizing the block arrangement, then adjusts down to 60.",
-    "1": "Forgets to fix the internal order of the AB block, effectively double counting incorrectly to land on 90.",
-    "3": "Multiplies $5!$ by an extra factor of $\\frac{5}{4}$ from a miscounted units total, giving 150.",
-    "4": "Mistakenly multiplies $5! \\times 2 = 240$ then halves incorrectly using wrong divisor to get 180 instead of not halving at all."
+    "0": "Treats $AB$ as one of five objects, then incorrectly divides $5!$ by $2$ even though the block's order is already fixed.",
+    "1": "Chooses any two of the six positions for $A$ and $B$ and multiplies by $3!$, ignoring both adjacency and one remaining letter.",
+    "3": "Uses the five possible starts for the $AB$ block but miscounts the remaining four-letter arrangements as $30$ instead of $4! = 24$.",
+    "4": "Chooses arbitrary positions for $A$ and $B$ and then halves the arrangements of the other four letters, so the adjacency condition is never enforced."
    },
    "numeric_check": "120",
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
+   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed); human semantic repair (fixed-order block proof)"
   },
   {
+   "uid": "q86-seed-min-max-optimization-5dc21eafa951",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -83,6 +89,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-a1a8b4682cd8",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -110,6 +118,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-algebraic-translation-fa6106a0257b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -137,6 +147,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-9d30474f1468",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -152,8 +164,8 @@
     "40"
    ],
    "correct_index": 2,
-   "solution_md": "**Formal path**\nLet solution $A$ have concentration $a\\%$ and solution $B$ have concentration $b\\%$. Mix $x$ liters of $A$ with $(60-x)$ liters of $B$ to get 60 liters at $45\\%$:\n$$ax + b(60-x) = 45(60) \\quad (1)$$\n\nNow remove 10 liters of this 45% mixture and replace it with 10 liters of pure $B$ (i.e., $b\\%$ concentrate — treat $b$ as the higher concentration, so \"pure B\" means concentration $b$). The new mixture (still 60 liters) is 50%:\n$$45(50) + 10b - 10(45) = 50(60)$$\nWait — more directly: removing 10 L of the 45% mix removes $0.45(10)=4.5$ \"percent-liters\" and leaves $45(60)-4.5\\cdot? $... Use the clean bookkeeping instead: the 60 L of 45% mixture contains $27$ percent-liter-units (i.e. $0.45 \\times 60 = 27$ liters of pure concentrate). Removing 10 L of the mixture removes $0.45(10)=4.5$ liters of concentrate, leaving $27-4.5=22.5$ liters of concentrate in 50 L. Adding 10 L of pure $B$ (concentration $b\\%$, so $0.10b$ liters of concentrate) brings the total to $22.5+0.1b$ liters of concentrate in 60 L, and this equals $50\\%$ of 60 = 30 liters:\n$$22.5+0.1b = 30 \\implies b = 75$$\n\nSince $b=75$ is fixed, plug into $(1)$ with $a$ unknown — but we need one more relation. The problem is fully pinned down by also requiring $A$ and $B$ concentrations differ by a clean value consistent with $x$ being an integer solving $(1)$: with $b=75$,\n$$ax + 75(60-x) = 2700 \\implies ax + 4500 - 75x = 2700 \\implies x(a-75) = -1800 \\implies x = \\frac{1800}{75-a}$$\n\nTesting the answer choices for $x$ shows $x=30$ requires $75-a = 60$, so $a=15$, a clean value — confirming $x = 30$ is the consistent integer solution.\n\n**Trigger cue**\nWhen you see two mixture events (an initial blend, then a swap-and-replace step) linked by a shared unknown, reach for the weighted-average teeter-totter on each step and chain the \"percent-liters\" (concentration × volume) bookkeeping between them.\n\n**Takeaway**\nTrack concentrate as \"percent-liters,\" not percentages alone, across successive mixture operations.",
-   "fastest_path_md": "Let the two concentrations be $a$ and $b$ (percent) mixed in amounts $x$ and $60-x$. Teeter-totter: distances from the mixture value 45 to $a$ and $b$ are inversely proportional to $x$ and $60-x$. Given $a=30$, $b=70$, and mixture is 45%, the ratio of distances is $15:25 = 3:5$, so the ratio of amounts (inverse) is $5:3$. With total 60, amounts are $37.5$ and $22.5$ — but instead use the second constraint (replacing 10 units of the mixture with pure $b$ raises the average to 50%) to pin down $x$ directly, since the first ratio alone under-determines $a,b$ jointly with the second condition. Solving the two equations simultaneously gives $x=30$.",
+   "solution_md": "**Formal path**\nThe original 60 liters at $45%$ contain $0.45(60)=27$ liters of concentrate. Removing 10 liters of the uniform mixture removes $0.45(10)=4.5$ liters, leaving $22.5$ liters. Adding 10 liters of solution $B$ adds $0.10b$ liters of concentrate. The final mixture contains $0.50(60)=30$ liters, so\n$$22.5+0.10b=30 implies b=75.$$\n\nNow use $a=15$ in the original blend:\n$$0.15x+0.75(60-x)=0.45(60).$$\nThus $0.15x+45-0.75x=27$, so $0.60x=18$ and $x=30$.\n\n**Trigger cue**\nFor remove-and-replace mixtures, track the actual amount of concentrate through each event before solving the original blend.\n\n**Takeaway**\nTrack concentrate volume through each removal and replacement.",
+   "fastest_path_md": "The replacement raises 60 liters by 5 percentage points, adding 3 liters of concentrate. Replacing 10 liters of 45% mix with $B$ gives $10(b-0.45)=3$, so $b=75%$. Since 45% is midway between 15% and 75%, the two starting amounts are equal; therefore $x=30$.",
    "trap_map": {
     "0": "Assumes the removed 10 L carries no concentrate (treats it as removing pure solvent), giving x=20.",
     "1": "Uses simple average of a and b instead of volume-weighted average when solving for x, giving x=24.",
@@ -161,9 +173,11 @@
     "4": "Forgets to subtract the concentrate removed with the 10 L before adding pure B, giving x=40."
    },
    "numeric_check": "30",
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
+   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed); human semantic repair (concentrate conservation proof)"
   },
   {
+   "uid": "q86-seed-prime-factorization-ba55301daf98",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -191,6 +205,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-2a0d0b68eca1",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -218,6 +234,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-algebraic-translation-8c621003b5fa",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -245,6 +263,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-d72385183bab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -272,6 +292,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-a87b4e0049a0",
+   "content_version": 2,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -288,7 +310,7 @@
    ],
    "correct_index": 4,
    "solution_md": "**Formal path**\nFrom (1): $x^4 - 16x^2 = 0 \\Rightarrow x^2(x^2-16)=0 \\Rightarrow x=0, 4, -4$. Three possible values for $x^3$ (0, 64, -64), so (1) alone is not sufficient.\n\nFrom (2): $\\sqrt{x^2}=4$ means $|x|=4$, so $x=4$ or $x=-4$. Then $x^3 = 64$ or $x^3=-64$ — two possible values, so (2) alone is not sufficient.\n\nTogether: (1) restricts $x$ to $\\{0,4,-4\\}$ and (2) restricts $x$ to $\\{4,-4\\}$. The intersection is still $\\{4,-4\\}$, so $x^3$ could be $64$ or $-64$. Even combined, the value of $x^3$ is not uniquely determined — not sufficient.\n\n**Trigger cue**\nWhen you see $x^2$, $x^4$, or $\\sqrt{x^2}$ in a statement, reach for the reminder that even powers and square roots destroy sign information, so solve for $|x|$, not $x$.\n\n**Takeaway**\n\nEven powers and square roots hide sign; test both roots before declaring sufficiency.",
-   "fastest_path_md": "Test numbers rather than solve algebraically. Statement (1) says $x^4 = 16x^2$, so $x^2(x^2-16)=0$, giving $x=0,4,-4$ — already three candidate values, so it can't pin down $x^3$. Statement (2) says $x^3 = x\\cdot|x|\\cdot k$ for some... actually just test $x=2$ and $x=-2$ in each statement to see the value of $x^3$ flip sign or stay ambiguous. Combining still leaves $x=4$ and $x=-4$ both satisfying both statements, giving $x^3=64$ or $x^3=-64$ — not sufficient.",
+   "fastest_path_md": "Statement (1) permits $x=0,4,-4$, so $x^3$ is not fixed. Statement (2) permits $x=4,-4$, so $x^3$ is not fixed. Together, both $4$ and $-4$ still survive, producing $64$ and $-64$; therefore even together the statements are not sufficient.",
    "trap_map": {
     "0": "Assumes statement (1) forces $x=4$ only, ignoring that $x=0$ and $x=-4$ also satisfy $x^4=16x^2$.",
     "1": "Assumes $\\sqrt{x^2}=4$ forces $x=4$ only, forgetting that $x=-4$ also satisfies it since square roots are nonnegative but $x$ itself can be negative.",
@@ -296,9 +318,11 @@
     "3": "Incorrectly concludes each statement alone pins down a unique $x^3$, overlooking the sign ambiguity introduced by even powers/roots in both statements."
    },
    "numeric_check": null,
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
+   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed); human semantic repair (valid DS witnesses)"
   },
   {
+   "uid": "q86-seed-prime-factorization-771ce5b7a4a0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -326,6 +350,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-overlapping-sets-b2dabe4dd407",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -353,6 +379,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-rates-speed-work-88e75a86981c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -380,6 +408,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-370049421f92",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -407,6 +437,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-fcc85734ffc5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -434,6 +466,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-algebraic-translation-96f7d74b21d7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -461,6 +495,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-probability-d4f3765c77d1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -488,6 +524,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-series-patterns-dc30b867b0f0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -515,6 +553,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-e06d41ee0ebe",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -542,6 +582,8 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-abb291794284",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -569,6 +611,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-cbce10c5f561",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -592,10 +636,12 @@
     "3": "Reporting the units digit of $3^{47}$ alone and forgetting the second factor.",
     "4": "Off-by-one in the cycle of $3$: reading position $3$ as $9$ instead of $7$, then $9\\cdot 3 = 27 \\to 7$... miscombined to $9$."
    },
-   "numeric_check": null,
+   "numeric_check": "1",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-ed5748a8de4a",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -623,6 +669,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-74a8e9e93793",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -646,10 +694,12 @@
     "2": "Computing $17^{33} \\equiv 8$ but then taking $8 + 8 = 16$ and reporting $16 - 11 = 5$ via a subtraction slip.",
     "4": "Stopping at $17^{33} \\equiv 8 \\pmod 9$ and forgetting the $+8$."
    },
-   "numeric_check": null,
+   "numeric_check": "7",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-af692676b51a",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -673,10 +723,12 @@
     "3": "Cycle slip on $3^{97}$: position read as $3$ (digit $7$), then $4 - 7$ forced a fake borrow giving $7$.",
     "4": "Computing $4 - 3 = 1$ but then \"borrowing\" anyway to get $11 \\to 9$ as if $3^{97}$ were larger."
    },
-   "numeric_check": null,
+   "numeric_check": "1",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-34f2e913f88e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -704,6 +756,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-e1cea4a3f811",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -731,6 +785,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-68690582ee83",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -754,10 +810,12 @@
     "2": "Reading the cycle's $5$th entry ($6$) after an off-by-one in $222 \\bmod 12$.",
     "3": "Taking $2^6 = 64 \\equiv 12$ but then subtracting once more to $11$ by sign confusion with $-1$."
    },
-   "numeric_check": null,
+   "numeric_check": "12",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-e6c55efe8a74",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -785,6 +843,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-e11d7a5d57bf",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -812,6 +872,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-f09333337b75",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -839,6 +901,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-6a2ab1813d4f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -866,6 +930,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-e55f71ee372c",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -893,6 +959,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-d9415e9ef2a5",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -920,6 +988,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-508281b955e6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -947,6 +1017,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-025fc2fb8c29",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -974,6 +1046,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-87c4cb749d55",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -1001,6 +1075,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-5d28a73a3dbf",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1028,6 +1104,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-e4b01d106a52",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1055,6 +1133,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-0093acae369e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1082,6 +1162,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-7760ab039ec5",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1109,6 +1191,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-ca4a609df7e3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1136,6 +1220,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-a0e52ffdd8c8",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -1163,6 +1249,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-b2c8060f5b41",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1186,10 +1274,12 @@
     "2": "Believing odd $n$ and even $n$ give different parities here.",
     "3": "Counting three of four residue classes after an arithmetic slip."
    },
-   "numeric_check": null,
+   "numeric_check": "100",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-aa6b7c703fc8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1217,6 +1307,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-379ac48ff998",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1244,6 +1336,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-557f587cdd15",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1271,6 +1365,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-4b98c8db5fcd",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1294,10 +1390,12 @@
     "3": "Mixing the two pairs: $120 - 15$ from a half-LCM slip.",
     "4": "Using the excluded pair $(15, 180)$: $180 - 15 = 165$."
    },
-   "numeric_check": null,
+   "numeric_check": "15",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-07f17fce67d2",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1325,6 +1423,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-168e44edfd01",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1352,6 +1452,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-204028085ab6",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1379,6 +1481,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-b6293956e918",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1406,6 +1510,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-2f1ecceeec27",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1433,6 +1539,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-2b8299eca282",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1460,6 +1568,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-727649182433",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1487,6 +1597,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-09982f4b92d1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1514,6 +1626,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-1fbef229f4b1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1541,6 +1655,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-4891d6f9dc42",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1568,6 +1684,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-231ac000eb3e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1595,6 +1713,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-76d2ffbe0015",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1618,10 +1738,12 @@
     "2": "Choosing $16 = 2^4$, which exceeds the available $2^3$.",
     "4": "Choosing $81 = 3^4$, which exceeds the available $3^2$."
    },
-   "numeric_check": null,
+   "numeric_check": "36",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-5e342c0cf010",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1645,10 +1767,12 @@
     "3": "Choosing $27 = 3^3$ by pattern-matching the cube in $5^3$.",
     "4": "Choosing $28 = 2^2 \\cdot 7$ after seeing the factor $7$ and inventing the $4$."
    },
-   "numeric_check": null,
+   "numeric_check": "25",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-c39616b5a75c",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1676,6 +1800,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-ae0f3c5f65c3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1703,6 +1829,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-1ffbead2e764",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1730,6 +1858,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-431df3f8b3b1",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1757,6 +1887,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-2f352750bf9a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1784,6 +1916,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-e681ddd563a3",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -1811,6 +1945,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-de24abfafe2f",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -1838,6 +1974,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-fb7cb0730f06",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1861,10 +1999,12 @@
     "3": "Off-by-one: $x + 2 = 19$ from writing $4^9 = 2^{19}$? backing into $17$.",
     "4": "Matching $x$ directly to $4^9$'s converted exponent $18$, forgetting the $+2$."
    },
-   "numeric_check": null,
+   "numeric_check": "16",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-c74e24bec813",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -1892,6 +2032,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-1b234ba387a6",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1915,10 +2057,12 @@
     "3": "Including both endpoints.",
     "4": "Solving $-7 < 2x + 3 < 7$ with a sign slip and counting that window."
    },
-   "numeric_check": null,
+   "numeric_check": "6",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-ac320f975696",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1946,6 +2090,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-675acc8ae0aa",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1969,10 +2115,12 @@
     "3": "Dropping the sign of the sum: $|-4| = 4$.",
     "4": "Adding the magnitudes of the roots: $6 + 2$."
    },
-   "numeric_check": null,
+   "numeric_check": "-4",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-e122a4c2398a",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2000,6 +2148,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-abc0fcf8f593",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -2027,6 +2177,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-3500df830ef3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2054,6 +2206,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-7443ce6a98ae",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2081,6 +2235,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-750fa965d174",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2104,10 +2260,12 @@
     "3": "Reporting the length instead of the width.",
     "4": "Adding the $3$ to the correct answer twice."
    },
-   "numeric_check": null,
+   "numeric_check": "7",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-aee7b6a816bd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2135,6 +2293,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-9f5df16b3c2d",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2162,6 +2322,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-101b6c29a08a",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2185,10 +2347,12 @@
     "2": "Rejecting $(3, 12)$ by mispairing the factors of $36$.",
     "3": "Rejecting $(4, 9)$ after adding to $14$ by mistake."
    },
-   "numeric_check": null,
+   "numeric_check": "-12",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-be1bb65b739e",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2216,6 +2380,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-283a98aa6bae",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2243,6 +2409,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-60cfcb6d89db",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2270,6 +2438,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-439431fc0f19",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2293,10 +2463,12 @@
     "3": "Requiring $\\ge 300$ with an extra safety trip.",
     "4": "Ignoring the bonus entirely: $300/18$ rounded up."
    },
-   "numeric_check": null,
+   "numeric_check": "15",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-47b7b1ddd323",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2324,6 +2496,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-fda20ae51a9c",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2351,6 +2525,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-36e17013b915",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2378,6 +2554,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-9ef6268cf224",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2401,10 +2579,12 @@
     "3": "Subtracting the equations and mis-assigning the $0.50$ gap.",
     "4": "Adding the $0.50$ gap to the wrong base."
    },
-   "numeric_check": null,
+   "numeric_check": "2.70",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-c69e6ffd0e40",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2428,10 +2608,12 @@
     "3": "Matching the constants $9 \\to 15$ by adding $6$ to $k = 3$.",
     "4": "Using the constant $15$ itself."
    },
-   "numeric_check": null,
+   "numeric_check": "5",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-dbd0893ed716",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -2459,6 +2641,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-d4fb4942c13e",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2482,10 +2666,12 @@
     "3": "Computing $8 \\cdot 10$ from swapped assignments.",
     "4": "Multiplying the wrong pair: $12 \\cdot 7$ from the first equation."
    },
-   "numeric_check": null,
+   "numeric_check": "70",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-69ee2b562e7e",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2509,10 +2695,12 @@
     "2": "Halving the constant: solving $2x + 3y = 3.5$.",
     "4": "Reporting $y$ alone."
    },
-   "numeric_check": null,
+   "numeric_check": "2",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-7b408c0be4ff",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2540,6 +2728,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-74dea229ff3a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2567,6 +2757,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-50f9147354b6",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2594,6 +2786,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-407c65ec48c3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2621,6 +2815,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-1c7ce8685761",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2648,6 +2844,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-356a3b4e37c8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2675,6 +2873,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-1ff4b7484473",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2698,10 +2898,12 @@
     "3": "Adding one extra iteration's worth by sign slip.",
     "4": "Iterating once too many: $a_5 = 35$."
    },
-   "numeric_check": null,
+   "numeric_check": "19",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-789bf0a8ac00",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2729,6 +2931,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-bed3b8ac3f3c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2756,6 +2960,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-0bcb957ea80e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2783,6 +2989,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-247df68b6492",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2806,10 +3014,12 @@
     "3": "Solving $3n - 7 = 9n$? — attaching the increase multiplicatively... yielding a fraction rounded to $11$ via $2n = 22$ slip.",
     "4": "Solving $3n - 7 = n + 9$ but computing $2n = 32$."
    },
-   "numeric_check": null,
+   "numeric_check": "8",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-8bb0f3d3d922",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2833,10 +3043,12 @@
     "3": "Multiplying by $27$ instead of $24$ when clearing denominators.",
     "4": "Solving $\\tfrac{T}{6} - \\tfrac{T}{8} = 50$ from a \\$-slip."
    },
-   "numeric_check": null,
+   "numeric_check": "960",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-fa4071365c0e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2864,6 +3076,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-1784ce0fc65c",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2887,10 +3101,12 @@
     "3": "Adding $12$ only to Nadia's side.",
     "4": "Doubling Nadia's current age check: using $s = 16$ from a slip."
    },
-   "numeric_check": null,
+   "numeric_check": "36",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-cfaab2c17bb4",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2918,6 +3134,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-a4dde0d91cf4",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2945,6 +3163,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-5fd87fdc6296",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -2972,6 +3192,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-e8fcc0c693d5",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -2999,6 +3221,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-15d798a33695",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -3022,10 +3246,12 @@
     "3": "Using $u - h = 3$ backwards ($h - u = 3$) and compensating.",
     "4": "Assigning the tens digit's doubled value to the units place."
    },
-   "numeric_check": null,
+   "numeric_check": "6",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-9d7c83e2475f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3053,6 +3279,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-af74a76813dc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3080,6 +3308,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-982b172c3bf0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3107,6 +3337,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-71edb5f36064",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3134,6 +3366,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-3a983e71e8ff",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3161,6 +3395,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-55494dae2654",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3188,6 +3424,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-7f94b34ebe5d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3215,6 +3453,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-3bfc53cf5402",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3242,6 +3482,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-b721678e2bdc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3269,6 +3511,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-7580bb1c5930",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3296,6 +3540,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-e34589eef27e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3323,6 +3569,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-50ccf941b772",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3350,6 +3598,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-bc9f4a656983",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3377,6 +3627,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-36ceed56ca28",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3404,6 +3656,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-82ecd586cee4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3431,6 +3685,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-9a97015055a3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3458,6 +3714,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-43d6cd3ca27e",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3481,10 +3739,12 @@
     "3": "Doubling $a_6$: treating the recursion as doubling.",
     "4": "Running one term too far to $a_8 = 81$."
    },
-   "numeric_check": null,
+   "numeric_check": "50",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-389be7d1836c",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3508,10 +3768,12 @@
     "3": "Assuming full cancellation.",
     "4": "Dropping the unpaired term's sign."
    },
-   "numeric_check": null,
+   "numeric_check": "-50",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-aaa17927131b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3539,6 +3801,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-57b783aa7c20",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3562,10 +3826,12 @@
     "3": "Taking the fourth value.",
     "4": "Reporting the sum."
    },
-   "numeric_check": null,
+   "numeric_check": "11",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-30fca4807ecf",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3589,10 +3855,12 @@
     "2": "Making the mean $7.5$ but the median $8$.",
     "4": "Making the mean $9$ but the median $8$."
    },
-   "numeric_check": null,
+   "numeric_check": "12",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-ca08bbce1646",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3620,6 +3888,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-ef29ca8b2937",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3647,6 +3917,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-64f85a131a61",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3674,6 +3946,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-4beb28fb16d7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -3701,6 +3975,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-1d0c17e633c1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3728,6 +4004,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-f3996fa63ab4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -3755,6 +4033,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-a4c8a3165b37",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3782,6 +4062,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-902ede8ec456",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3809,6 +4091,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-5ceb9220adfb",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3836,6 +4120,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-d4bb64d9807f",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3863,6 +4149,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-b98b33d3eadd",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3890,6 +4178,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-edc271acaccf",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3917,6 +4207,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-74d80daca7d0",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3944,6 +4236,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-b9ee6d22d5be",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3971,6 +4265,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-a12d419d26a7",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -3998,6 +4294,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-1cf7ada8444e",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4025,6 +4323,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-d7181c7b12d2",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4052,6 +4352,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-4d6a0861f9c5",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4079,6 +4381,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-83d535c3367f",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4106,6 +4410,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-f77ebcafac3d",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4133,6 +4439,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-1a1d318b3373",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "format": "problem_solving",
@@ -4160,6 +4468,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-824fb4d9f039",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4183,10 +4493,12 @@
     "3": "Treats the starting $40$ points as the result of round $1$, shifting the whole count by one.",
     "4": "Overcorrects for the deductions by doubling their effect, demanding roughly $2^n > 120$."
    },
-   "numeric_check": null,
+   "numeric_check": "6",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-2e979a3bb3dc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4214,6 +4526,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-0dad9a8315cc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4241,6 +4555,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-816b71c53cd2",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4264,10 +4580,12 @@
     "3": "The pair $(36, 24)$ works, so $36$ is attainable.",
     "4": "Assumes $a$ cannot equal the lcm, but $(72, 12)$ works."
    },
-   "numeric_check": null,
+   "numeric_check": "18",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-b7fd8cc00172",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4295,6 +4613,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-45512b98cc01",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4322,6 +4642,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-74efcb8f28e1",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -4345,10 +4667,12 @@
     "3": "Drops the coefficient $2$ on the first absolute value, solving $|x-1| - |x+3| = x-2$.",
     "4": "Accepts the out-of-range root of the rightmost branch after rounding $3.5$ up."
    },
-   "numeric_check": null,
+   "numeric_check": "((1)/(4))",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-6abddf93c4ab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4376,6 +4700,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-f2d97cc61542",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4403,6 +4729,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-e943e4be5623",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -4430,6 +4758,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-66d3ef4931d3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4457,6 +4787,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-efee5c27c675",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4484,6 +4816,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-1a975b951abf",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -4511,6 +4845,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-d64533738067",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4538,6 +4874,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-7ff68dc4c3bf",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4565,6 +4903,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-5e9141fea6c0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4592,6 +4932,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-7414315759e4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4619,6 +4961,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-c1863d9936ab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -4646,6 +4990,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-dd59b0e7a3d6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4673,6 +5019,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-ff3d578c19d3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4700,6 +5048,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-88488691a133",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4727,6 +5077,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-19a9fb4b24e9",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -4750,10 +5102,12 @@
     "3": "Uses $t/6 - t/9$ for the combined exponent, halving the closing speed.",
     "4": "Treats the initial $4P$ head start as $2^4$ instead of $2^2$."
    },
-   "numeric_check": null,
+   "numeric_check": "36",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-9b952a527db9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -4781,6 +5135,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-231c2baa358b",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -4804,10 +5160,12 @@
     "2": "Linearizes the chain: net change $\\approx 2p\\% = 50\\% \\Rightarrow p = 25$, ignoring the $-q^2$ interaction.",
     "3": "Accepts $p=40$ since $(0.84)(1.8) = 1.512$ rounds to 1.5 — but the equality must be exact."
    },
-   "numeric_check": null,
+   "numeric_check": "50",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-417269df9c69",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4835,6 +5193,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-8e2a33895670",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -4858,10 +5218,12 @@
     "2": "The center of the window is certainly accepted.",
     "3": "Inside the window; $|22.4 - 20| = 2.4 \\le 2.5$."
    },
-   "numeric_check": null,
+   "numeric_check": "23.1",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-e394ed98c03d",
+   "content_version": 2,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "percent_change_chains",
@@ -4885,10 +5247,12 @@
     "3": "Overshoots the cross-term ($10\\% \\times 30\\% = 3$ points, not 4).",
     "4": "Adds the percents and then rounds the cross-term up to 5 points."
    },
-   "numeric_check": null,
+   "numeric_check": "43%",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-87f0034db187",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "percent_change_chains",
@@ -4916,6 +5280,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-2da8f3f8a7c2",
+   "content_version": 1,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "percent_change_chains",
@@ -4943,6 +5309,8 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-9276481ac660",
+   "content_version": 2,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "percent_change_chains",
@@ -4966,10 +5334,12 @@
     "3": "Applies the 20-point gap to the original base and inflates it.",
     "4": "Assumes the second year must undo the first year's percent exactly."
    },
-   "numeric_check": null,
+   "numeric_check": "16%",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-b5f4ec9b4385",
+   "content_version": 2,
    "content_domain": "arithmetic",
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "percent_change_chains",
@@ -4993,10 +5363,12 @@
     "3": "Uses $2k$ as the net change: $2k = 80 \\Rightarrow k = 40$.",
     "4": "Solves $(1-q)(1+2q)$ with the roles of $k$ and $2k$ swapped."
    },
-   "numeric_check": null,
+   "numeric_check": "25",
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-038981321b84",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5024,6 +5396,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-5ac1fcbed3ab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5051,6 +5425,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-c776e5739213",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5078,6 +5454,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-284944149682",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5105,6 +5483,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-1c3786b1514a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5132,6 +5512,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-44adeef67218",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5159,6 +5541,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-239254974a86",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5186,6 +5570,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-b0f7af05f52a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5213,6 +5599,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-dc4feecdc572",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5240,6 +5628,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-94be04c7884f",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5267,6 +5657,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-edf9e5423378",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5294,6 +5686,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-490cba21247b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5321,6 +5715,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-72d9287760ca",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5348,6 +5744,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-1d233f3a6349",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5375,6 +5773,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-1bf9ed832fb3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5402,6 +5802,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-5aa54fb4a87a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5429,6 +5831,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-b6bbffb4540a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5456,6 +5860,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-23913217eb50",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -5483,6 +5889,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-8d80ae5dfd1f",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -5510,6 +5918,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-c60bdde5e583",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5537,6 +5947,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-b7ed135d42bb",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -5564,6 +5976,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-27ff9a764b5f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5591,6 +6005,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-3bc958338af0",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5618,6 +6034,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-558d6f6f3c98",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5645,6 +6063,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-81a86bb1449a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5672,6 +6092,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-45ee0a8e6b91",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5699,6 +6121,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-7ca03d62a001",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5726,6 +6150,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-d672b27b7fb6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5753,6 +6179,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-93d2b70fc250",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -5780,6 +6208,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-b49635771a7c",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5807,6 +6237,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-1b110273318f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5834,6 +6266,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-5454750a304d",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5861,6 +6295,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-5853ebfae9d9",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5888,6 +6324,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-fbbb1d152fea",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5915,6 +6353,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-ab9e9f1dd094",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5942,6 +6382,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-d6bcc185810c",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5969,6 +6411,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-461253ca8184",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -5996,6 +6440,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-f8a7136b1080",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6023,6 +6469,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-81ce2f87cadf",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6050,6 +6498,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-e5d52e13b819",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6077,6 +6527,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-eba3c251654b",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6104,6 +6556,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-90016ccc9bd7",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6131,6 +6585,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-bc75ea8528b5",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6158,6 +6614,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-8656a2776b01",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6185,6 +6643,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-algebraic-translation-77ecd7d14f7a",
+   "content_version": 1,
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
@@ -6212,6 +6672,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-c061423fc538",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6239,6 +6701,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-9bd810c1d858",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6266,6 +6730,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-841329964dce",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6293,6 +6759,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-89c26bc986bb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6320,6 +6788,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-7a998010c0a0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -6347,6 +6817,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-82510559ce03",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -6374,6 +6846,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-456c916a3824",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -6401,6 +6875,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-dea5f7e7c67f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6428,6 +6904,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-75c4892b3513",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -6455,6 +6933,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-9ca19d4a6664",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -6482,6 +6962,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-ff7dd878f137",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6509,6 +6991,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-04b42f17e785",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6536,6 +7020,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-37913a7a570b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -6563,6 +7049,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-bd72a27a7e60",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6590,6 +7078,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-5873de52c02f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6617,6 +7107,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-809db3448726",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6644,6 +7136,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-d585f72f63c2",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6671,6 +7165,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-ad1fd61be33f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -6698,6 +7194,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-b6d7831caedf",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6725,6 +7223,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-2713718deade",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6752,6 +7252,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-cc9c7f42bbd1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6779,6 +7281,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-74e9532afd10",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -6806,6 +7310,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-7226c07a7971",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6833,6 +7339,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-d41d476e5450",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -6860,6 +7368,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-e776ac23cdf7",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -6887,6 +7397,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-f877323c5f41",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6914,6 +7426,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-8a7ee61b32cc",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -6941,6 +7455,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-68b890958042",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6968,6 +7484,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-b376b8d72b34",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -6995,6 +7513,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-c8d7cce7c76c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7022,6 +7542,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-7dbe923f13f4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7049,6 +7571,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-63826ee70c4e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -7076,6 +7600,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-95d9f0c28604",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7103,6 +7629,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-4d4b964025be",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7130,6 +7658,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-6eb00dacf2c5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7157,6 +7687,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-28408c6e8238",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7184,6 +7716,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-3e462824cfff",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7211,6 +7745,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-f7848f55f4d1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7238,6 +7774,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-4a9e7cdc6ae4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7265,6 +7803,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-f9dbedf8646d",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7292,6 +7832,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-a45b2489d3dc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7319,6 +7861,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-c1f9b3419fe6",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7346,6 +7890,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-2c3e322c347c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7373,6 +7919,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-af164250e80e",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7400,6 +7948,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-a8ebdc6cabf2",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7427,6 +7977,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-226cee804147",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7454,6 +8006,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-2aa2f74a2d9d",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7481,6 +8035,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-6c7f8c84ee52",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7508,6 +8064,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-5a0bb8864323",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7535,6 +8093,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-fdb9e3c31f40",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -7562,6 +8122,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-4ce30184be14",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7589,6 +8151,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-5d4b9c8370eb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -7616,6 +8180,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-4df5b567a0fb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7643,6 +8209,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-67114cbd9b7f",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -7670,6 +8238,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-2524f2d26ea4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -7697,6 +8267,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-1fac0178e307",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7724,6 +8296,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-7f5fc7fa08a8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7751,6 +8325,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-9ae8c26fbf87",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -7778,6 +8354,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-258d59ae9937",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7805,6 +8383,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-e79a9fc116e9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -7832,6 +8412,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-6bc2553cfe34",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -7859,6 +8441,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-3b09df3427d6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -7886,6 +8470,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-fa27df810ace",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -7913,6 +8499,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-db3aa114b295",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -7940,6 +8528,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-7b285521c2ba",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7967,6 +8557,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-b86922940a5d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7994,6 +8586,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-a354a185e4b8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8021,6 +8615,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-609c6d122c3d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8048,6 +8644,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-3befcf7dce6c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8075,6 +8673,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-44a667850668",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -8102,6 +8702,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-dd30e167a760",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8129,6 +8731,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-f3c59c8a9200",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -8156,6 +8760,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-df38dc93fdfa",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8183,6 +8789,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-8d605ac684df",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8210,6 +8818,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-4af9ad5ab9ad",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8237,6 +8847,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-936892eb0de1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8264,6 +8876,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-020bd95f9598",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -8291,6 +8905,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-8b8081756848",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8318,6 +8934,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-76c246870b46",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8345,6 +8963,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-0f53728a8b79",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8372,6 +8992,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-ef65ad09f644",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8399,6 +9021,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-fa252d5d6532",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -8426,6 +9050,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-0d0c6f98c527",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8453,6 +9079,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-320f7d746665",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8480,6 +9108,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-5e73541dd97a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8507,6 +9137,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-ecbcacbd36fa",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8534,6 +9166,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-31ab4b2ab659",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8561,6 +9195,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-231198377fbe",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -8588,6 +9224,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-d0e2ec8a796e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8615,6 +9253,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-631d99a0a44e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8642,6 +9282,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-84ea898ff48c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8669,6 +9311,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-496d8b56a04b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -8696,6 +9340,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-45e88097bd34",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8723,6 +9369,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-984ec4a13826",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -8750,6 +9398,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-d98b06e24a1d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8777,6 +9427,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-b25f47c14976",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8804,6 +9456,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-76e918045cba",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -8831,6 +9485,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-efee4cab7e9f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8858,6 +9514,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-5a5272498ae3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8885,6 +9543,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-2b3c447511f5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8912,6 +9572,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-d16f85058e64",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -8939,6 +9601,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-4cc0f476cbd0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -8966,6 +9630,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-300c6c95ded7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -8993,6 +9659,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-a41c1cdbf455",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9020,6 +9688,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-92c8e2f89213",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9047,6 +9717,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-161549dd352b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9074,6 +9746,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-f4e966c1ed3f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9101,6 +9775,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-ee6f163d7fa9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9128,6 +9804,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-6d94b8b585dd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9155,6 +9833,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-c11363088a4b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9182,6 +9862,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-a5f32cf60be9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9209,6 +9891,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-de7afdd9d660",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -9236,6 +9920,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-321088463219",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -9263,6 +9949,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-873bf9831a67",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -9290,6 +9978,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-b7d990dc3dbf",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -9317,6 +10007,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-feeca23807fc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -9344,6 +10036,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-dd29c5a335b7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9371,6 +10065,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-181834f2bed9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9398,6 +10094,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-5df7a82f6adb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9425,6 +10123,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-788c7cd74b3f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9452,6 +10152,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-6a48eb0ac8f7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9479,6 +10181,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-345bea909f1c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9506,6 +10210,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-417fcc8cb6c2",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9533,6 +10239,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-1536a021b0df",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9560,6 +10268,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-01b8a902021b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9587,6 +10297,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-dc342b83f63e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9614,6 +10326,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-dc42cba2b496",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9641,6 +10355,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-09e12b997eb9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9668,6 +10384,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-5187b3150fcd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9695,6 +10413,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-683ba079ed49",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9722,6 +10442,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-3642f9953f65",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9749,6 +10471,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-101d6cb6dc79",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9776,6 +10500,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-5cbd323f3449",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9803,6 +10529,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-479b17e1523a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -9830,6 +10558,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-778b5246ea89",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -9857,6 +10587,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-02e1865a669e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -9884,6 +10616,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-9085b49281b7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9911,6 +10645,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-02b946ebc746",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -9938,6 +10674,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-abs-value-number-line-decimals-39da0805f2c1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -9965,6 +10703,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-01edb6c70857",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -9992,6 +10732,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-87d436b2f645",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10019,6 +10761,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-d00564476859",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10046,6 +10790,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-922d06b04756",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10073,6 +10819,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-add835a788a2",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10100,6 +10848,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-2d4e73b0407e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10127,6 +10877,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-7f35888f650c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10154,6 +10906,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-48803bc29bcc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10181,6 +10935,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-a0427b6e996b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10208,6 +10964,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-f5c59c0312b6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10235,6 +10993,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-39633674a8ac",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -10262,6 +11022,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-c3bdbd3aa0ce",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -10289,6 +11051,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-combinatorics-6adfe49cc6de",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10316,6 +11080,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-b463225a4442",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10343,6 +11109,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-f7490a40fd20",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10370,6 +11138,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-a1e54d67795e",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10397,6 +11167,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-99406b172b9c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10424,6 +11196,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-3f0e374d0af1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -10451,6 +11225,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-8b68153ffeb4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -10478,6 +11254,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-consecutive-evenly-spaced-eaac4ab54e55",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -10505,6 +11283,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-ffaad5c24e21",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10532,6 +11312,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-57b65150ab05",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10559,6 +11341,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-531e43b4195f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10586,6 +11370,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-9d0d9e0593e8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10613,6 +11399,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-dca3b748e209",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10640,6 +11428,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-4d0c4df0ad0b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10667,6 +11457,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-ee8db8b7b557",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -10694,6 +11486,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-aff89541ca43",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -10721,6 +11515,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-9e63f0283006",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10748,6 +11544,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-cdea78738f1e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10775,6 +11573,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-functions-sequences-b8ff14141f26",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10802,6 +11602,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-4681d3dae265",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10829,6 +11631,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-edffb8ce7e24",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10856,6 +11660,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-a3aac966afc2",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10883,6 +11689,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-252f5b92bd31",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10910,6 +11718,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-cf0068a6eaee",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -10937,6 +11747,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-355d7f5a07f0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10964,6 +11776,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-2626d2884666",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -10991,6 +11805,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-115864367b3b",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -11018,6 +11834,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-b63c7d8d785e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11045,6 +11863,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-361a533223ad",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11072,6 +11892,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-inequalities-8fb77804490d",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -11099,6 +11921,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-babe0f46614b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11126,6 +11950,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-5889c3b2ac86",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11153,6 +11979,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-f07e64e010e7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11180,6 +12008,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-83d6d89be51d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11207,6 +12037,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-f108328e076e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11234,6 +12066,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-3e573b33f447",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11261,6 +12095,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-4ec7c69d50f5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11288,6 +12124,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-8c324d5c48dd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11315,6 +12153,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-ad31ca69d352",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11342,6 +12182,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-f71d869f5db9",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11369,6 +12211,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-61a940871180",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11396,6 +12240,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-09b4c8a42dd6",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -11423,6 +12269,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-bdf84efd81f0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11450,6 +12298,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-d7ef261d5021",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11477,6 +12327,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-406a7acfbfa0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11504,6 +12356,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-ce4a512644c5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11531,6 +12385,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-interest-profit-discount-f2c1fd96b038",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -11558,6 +12414,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-8f9c82fac794",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11585,6 +12443,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-1f69b3d8ef31",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11612,6 +12472,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-8f685d5280de",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11639,6 +12501,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-de8c8f5e651e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11666,6 +12530,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-0130e57d48d7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11693,6 +12559,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-f0ea927b0e45",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11720,6 +12588,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-2a036023a021",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11747,6 +12617,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-541f2f01c2c7",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -11774,6 +12646,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-033ff5dd07d7",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -11801,6 +12675,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-691a830b9573",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11828,6 +12704,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-linear-systems-1ac0be1e4784",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11855,6 +12733,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-de1d9a1524f7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11882,6 +12762,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-b6f9d705e940",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -11909,6 +12791,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-0858581ec0be",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -11936,6 +12820,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-ce0463e21e64",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -11963,6 +12849,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-0e928fd15e42",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -11990,6 +12878,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-02eef2c909d3",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12017,6 +12907,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-d507ebbaeec1",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -12044,6 +12936,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-b38d19cc408f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -12071,6 +12965,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-69b02dc9e266",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12098,6 +12994,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-c9895c18eaee",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12125,6 +13023,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-min-max-optimization-5008506abdc6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -12152,6 +13052,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-c84eb1316e0b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12179,6 +13081,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-054f7a73be00",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12206,6 +13110,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-11bd7b3b9ca3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12233,6 +13139,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-0a6d890d3003",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12260,6 +13168,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-e7d562dedd0f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -12287,6 +13197,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-7c344a27d9a8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -12314,6 +13226,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-4c5ed11b741b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -12341,6 +13255,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-e6978304efda",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12368,6 +13284,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-9342112f6be3",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -12395,6 +13313,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-46e2d9ce9f09",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -12422,6 +13342,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-1fd076b46631",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12449,6 +13371,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-681ddaa378f3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12476,6 +13400,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-0862361f1a39",
+   "content_version": 2,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -12499,10 +13425,12 @@
     "3": "Equal to $Y$'s average, which would leave $Y$'s average unchanged rather than greater.",
     "4": "Above $35$: removing $38$ from list $Y$ would lower $Y$'s average, not raise it."
    },
-   "numeric_check": null,
+   "numeric_check": "32",
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-23ee4de3fbdc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -12530,6 +13458,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-mixtures-weighted-avg-45ea5ad90458",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12557,6 +13487,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-14e94552f353",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12584,6 +13516,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-adaed573f49c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12611,6 +13545,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-de37362c4f6b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12638,6 +13574,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-6ce4419998b1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12665,6 +13603,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-e51a1d469f5f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -12692,6 +13632,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-932f76c376c3",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12719,6 +13661,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-f21ad33fd1e5",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12746,6 +13690,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-7abb09b2061c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12773,6 +13719,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-38a21a5a33bc",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12800,6 +13748,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-074977f89aad",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12827,6 +13777,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-overlapping-sets-73debde61b25",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12854,6 +13806,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-2e4920a649c4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12881,6 +13835,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-6caa6f9cf6e5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12908,6 +13864,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-7b39de14e2b6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12935,6 +13893,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-179c8718af30",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -12962,6 +13922,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-c395c71eadfb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -12989,6 +13951,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-41befb422b46",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13016,6 +13980,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-946a1805cdbd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13043,6 +14009,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-2af79c7962fb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13070,6 +14038,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-d42c7d75ad71",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13097,6 +14067,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-3823e2992623",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13124,6 +14096,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-db22eac44a26",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -13151,6 +14125,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-a5403e90ae97",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -13178,6 +14154,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-d95ede5cc3da",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "real",
@@ -13205,6 +14183,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-610e0335c9b8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13232,6 +14212,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-percent-change-chains-855648ce8cc7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13259,6 +14241,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-284b75dd3b40",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13286,6 +14270,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-6d32acf6ad42",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13313,6 +14299,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-007564f76b6f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13340,6 +14328,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-06463eee32b0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13367,6 +14357,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-feec22fedcca",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13394,6 +14386,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-6fecb6018970",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -13421,6 +14415,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-5ebf4a14bc40",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13448,6 +14444,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-600afbe97825",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13475,6 +14473,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-4a53ecbe3704",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13502,6 +14502,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-6eb94cf2fa85",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13529,6 +14531,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-249796b9cc40",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13556,6 +14560,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-9535d8d3b694",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13583,6 +14589,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-probability-830919df250b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13610,6 +14618,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-79615d1d7101",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13637,6 +14647,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-daa231916bea",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13664,6 +14676,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-abae0f73cf42",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -13691,6 +14705,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-e3e669c33bfa",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13718,6 +14734,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-c944fe1c5e69",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -13745,6 +14763,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-ec0ec9a0aa16",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13772,6 +14792,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-5e9d24f5d050",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -13799,6 +14821,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-032925b93b3e",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13826,6 +14850,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-4dced8cccd1f",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -13853,6 +14879,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-a9aa1962ddc3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13880,6 +14908,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-quadratics-factoring-b00ca0162d3d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -13907,6 +14937,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-09dd1cdadb06",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -13934,6 +14966,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-190a1929af96",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -13961,6 +14995,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-2b34df9e66f9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -13988,6 +15024,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-420552300054",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14015,6 +15053,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-64ab4de5445f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14042,6 +15082,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-cac763544ae1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14069,6 +15111,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-cf3d594d95bf",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14096,6 +15140,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-a51b2a58fc60",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14123,6 +15169,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-5b54fec206c9",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14150,6 +15198,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-a5d88ce02335",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14177,6 +15227,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-90a5f73d9a84",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14204,6 +15256,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-d813a5010475",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -14231,6 +15285,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-4637f11a0467",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14258,6 +15314,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-aa9b93ce9636",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14285,6 +15343,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-rates-speed-work-54dd62fa0099",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14312,6 +15372,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-7841209ba157",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14339,6 +15401,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-49a55b788721",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14366,6 +15430,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-caec4a2f03b3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14393,6 +15459,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-98e7d8fb49ab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14420,6 +15488,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-1c58bd403fde",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14447,6 +15517,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-ae4e54f521be",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14474,6 +15546,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-7de965abfe94",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14501,6 +15575,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-4e6930935bd1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14528,6 +15604,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-eab33b5e721b",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -14555,6 +15633,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-26349c63a818",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14582,6 +15662,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-255cf19f11f8",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14609,6 +15691,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-2735541bb0e0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14636,6 +15720,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-4bf5b7b3fd1f",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14663,6 +15749,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-77bb0bf4a3fd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14690,6 +15778,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-ratios-proportions-fc9426abcf7d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14717,6 +15807,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-86f2557d1ebe",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14744,6 +15836,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-27e859f66197",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -14771,6 +15865,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-4aba01772866",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14798,6 +15894,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-2f9bc72b9e05",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14825,6 +15923,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-d77c057f2a2e",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14852,6 +15952,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-876dcae87af4",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14879,6 +15981,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-remainders-units-digits-8adde1ec9537",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14906,6 +16010,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-897b36666cf5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14933,6 +16039,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-c9c20fdfec30",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -14960,6 +16068,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-6a433f8f0bf8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -14987,6 +16097,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-65ad1c69331d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15014,6 +16126,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-c02372d0721b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15041,6 +16155,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-6e1c94c3049c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15068,6 +16184,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-9e1ee42494a7",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15095,6 +16213,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-26b1979ea678",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15122,6 +16242,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-8f20cc7376a2",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "algebra",
    "context": "pure",
@@ -15149,6 +16271,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-e14ae55d91c9",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15176,6 +16300,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-42cf6f4fb1d8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15203,6 +16329,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-f3cb166614f8",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15230,6 +16358,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-series-patterns-6a11008fd7c5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15257,6 +16387,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-7be22dc67f5c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15284,6 +16416,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-1d224f206bfb",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15311,6 +16445,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-6d9b49da1336",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15338,6 +16474,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-c0a95581dfc3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15365,6 +16503,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-13a16334ccab",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15392,6 +16532,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-3c6fadfa6559",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15419,6 +16561,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-cdcbc503ff5a",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15446,6 +16590,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-13fdbef60272",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15473,6 +16619,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-3fdc3b182934",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15500,6 +16648,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-a0111b5dde8d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15527,6 +16677,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-9d5cb5c04479",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15554,6 +16706,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-cd7d80c7cc17",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15581,6 +16735,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-statistics-mean-median-sd-31b6c9fe2323",
+   "content_version": 1,
    "format": "data_sufficiency",
    "content_domain": "arithmetic",
    "context": "real",
@@ -15608,6 +16764,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-5078f3ced859",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15635,6 +16793,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-8f055c9925fd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15662,6 +16822,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-93d8c42d8d2b",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15689,6 +16851,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-092373de61a3",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15716,6 +16880,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-b86fa5cbc423",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15743,6 +16909,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-6d7c67d05d25",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15770,6 +16938,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-prime-factorization-d5afc954e6a5",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15797,6 +16967,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-f85e5c1e29bc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15824,6 +16996,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-8aa0b8375332",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15851,6 +17025,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-2ba2d5b8350c",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15878,6 +17054,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-36f6bf3641e2",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15905,6 +17083,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-c3e8d1797b5d",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15932,6 +17112,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-787393e375fd",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -15959,6 +17141,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-exponents-roots-properties-af794f2a80d0",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -15986,6 +17170,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-5bce19952793",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16013,6 +17199,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-4dfd7582cd48",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16040,6 +17228,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-38d7570a43c1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -16067,6 +17257,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-a592bd7234ea",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16094,6 +17286,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-divisibility-gcf-lcm-ed3039031a19",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16121,6 +17315,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-0489e4c98dd1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16148,6 +17344,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-67baa5946dd6",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16175,6 +17373,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-2e22c050fbae",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16202,6 +17402,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-738d0d4156bc",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16229,6 +17431,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-parity-signs-6eea7fdc3df1",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -16256,6 +17460,8 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
+   "uid": "q86-seed-must-be-true-testing-0953dfcfbd50",
+   "content_version": 1,
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",

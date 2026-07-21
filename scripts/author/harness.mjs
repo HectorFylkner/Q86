@@ -29,6 +29,10 @@ import {
   numbersAgree,
 } from "../../lib/ai/verify.ts";
 import { DS_CHOICES } from "../../lib/taxonomy.ts";
+import {
+  deriveSeedQuestionUid,
+  SEED_QUESTION_UID_PATTERN,
+} from "../../lib/question-uid.ts";
 
 const BANK = path.join(import.meta.dirname, "..", "seed-bank.json");
 
@@ -44,6 +48,11 @@ export function verifyAndAppend(items, { dryRun = false } = {}) {
     if (!q.choices || q.choices.length !== 5) return fail(i, "needs exactly 5 choices");
     if (new Set(q.choices.map((c) => c.trim())).size !== 5) fail(i, "choices not distinct");
     if (q.correct_index < 0 || q.correct_index > 4) fail(i, "bad correct_index");
+    if (q.uid != null && !SEED_QUESTION_UID_PATTERN.test(q.uid))
+      fail(i, `invalid uid ${q.uid}`);
+    if (q.content_version != null &&
+        (!Number.isInteger(q.content_version) || q.content_version < 1))
+      fail(i, `invalid content_version ${q.content_version}`);
     const wrong = [0,1,2,3,4].filter((x) => x !== q.correct_index);
     for (const w of wrong) if (!q.trap_map[String(w)]) fail(i, `trap_map missing ${w}`);
     for (const h of ["**Formal path**","**Trigger cue**","**Takeaway**"])
@@ -89,14 +98,31 @@ export function verifyAndAppend(items, { dryRun = false } = {}) {
 
   const bank = JSON.parse(fs.readFileSync(BANK, "utf8"));
   const stems = new Set(bank.questions.map((q) => q.stem_md));
+  const uids = new Set(bank.questions.map((q) => q.uid));
   let added = 0, dupes = 0;
   for (const q of items) {
     if (stems.has(q.stem_md)) { dupes++; continue; }
-    const fields = { ...q, provenance: q.provenance ?? "authored + brute-force programmatic verification" };
+    const uid = q.uid ?? deriveSeedQuestionUid(q);
+    if (uids.has(uid)) {
+      failures.push(`new item UID already exists: ${uid}`);
+      continue;
+    }
+    const fields = {
+      ...q,
+      uid,
+      content_version: q.content_version ?? 1,
+      provenance: q.provenance ?? "authored + brute-force programmatic verification",
+    };
     delete fields.check;
     bank.questions.push(fields);
     stems.add(q.stem_md);
+    uids.add(uid);
     added++;
+  }
+  if (failures.length) {
+    console.error(`✗ ${failures.length} failures:`);
+    for (const failure of failures) console.error("  " + failure);
+    process.exit(1);
   }
   if (!dryRun) fs.writeFileSync(BANK, JSON.stringify(bank, null, 1));
   console.log(`✓ all ${items.length} items verified — ${added} appended${dupes ? `, ${dupes} duplicates skipped` : ""}${dryRun ? " (dry run)" : ""}. Bank total: ${bank.questions.length}`);

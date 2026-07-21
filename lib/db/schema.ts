@@ -28,6 +28,11 @@ export const questions = sqliteTable(
   "questions",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    // Stable content identity. Seed-bank rows always carry one; legacy and
+    // model-authored rows may remain null until their own identity workflow
+    // assigns one. SQLite's unique index permits multiple null values.
+    uid: text("uid"),
+    contentVersion: integer("content_version").notNull().default(1),
     source: text("source").$type<QuestionSource>().notNull(),
     format: text("format").$type<QuestionFormat>().notNull(),
     contentDomain: text("content_domain").$type<ContentDomain>().notNull(),
@@ -58,9 +63,53 @@ export const questions = sqliteTable(
       .default(sql`(unixepoch() * 1000)`),
   },
   (t) => [
+    uniqueIndex("questions_uid_idx").on(t.uid),
     index("questions_skill_idx").on(t.fundamentalSkill),
     index("questions_subtopic_idx").on(t.subtopic),
     index("questions_verified_idx").on(t.verified),
+  ],
+);
+
+export type QuestionContentSnapshot = {
+  uid: string;
+  contentVersion: number;
+  format: QuestionFormat;
+  contentDomain: ContentDomain;
+  context: Context;
+  fundamentalSkill: FundamentalSkill;
+  subtopic: Subtopic;
+  difficulty: number;
+  stemMd: string;
+  choices: string[];
+  correctIndex: number;
+  solutionMd: string;
+  fastestPathMd: string;
+  trapMap: Record<string, string>;
+  numericCheck: string | null;
+};
+
+/** Immutable evidence of each installed seed content version. */
+export const questionRevisions = sqliteTable(
+  "question_revisions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    contentVersion: integer("content_version").notNull(),
+    contentHash: text("content_hash").notNull(),
+    snapshot: text("snapshot", { mode: "json" })
+      .$type<QuestionContentSnapshot>()
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("question_revisions_version_idx").on(
+      t.questionId,
+      t.contentVersion,
+    ),
   ],
 );
 
@@ -309,6 +358,7 @@ export const questionFlags = sqliteTable(
 
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
+export type QuestionRevision = typeof questionRevisions.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
 export type NewAttempt = typeof attempts.$inferInsert;

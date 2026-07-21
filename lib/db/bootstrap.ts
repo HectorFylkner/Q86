@@ -1,12 +1,7 @@
 import path from "node:path";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { client, db } from "./index.ts";
-import {
-  loadBank,
-  readBank,
-  userRetiredIds,
-  verifiedSeedCount,
-} from "./seed-bank.ts";
+import { loadBank, seedBankNeedsSync } from "./seed-bank.ts";
 import { applyModelQuarantineMigration } from "./model-quarantine.ts";
 
 /**
@@ -52,14 +47,13 @@ async function provision(): Promise<void> {
     );
   }
 
-  // User-retired questions stay unverified, so the expected count shrinks
-  // by that many — otherwise every boot would re-run the loader forever.
-  const bankSize =
-    readBank().questions.length - (await userRetiredIds()).size;
-  if ((await verifiedSeedCount()) < bankSize) {
-    const { inserted, updated, retired } = await loadBank();
+  // Count equality cannot detect an editorial version change or a legacy
+  // row still missing its stable UID, so compare identity/version state.
+  if (await seedBankNeedsSync()) {
+    const { inserted, updated, backfilled, retired, revisions } =
+      await loadBank();
     console.log(
-      `Q86 bootstrap: seed bank loaded (${inserted} inserted, ${updated} refreshed, ${retired} retired).`,
+      `Q86 bootstrap: seed bank loaded (${inserted} inserted, ${updated} refreshed, ${backfilled} legacy IDs backfilled, ${retired} retired, ${revisions} revision snapshots recorded).`,
     );
   }
 }
@@ -68,6 +62,36 @@ async function provision(): Promise<void> {
  *  (db:push-created databases have no ledger, so late additions land
  *  here as guarded DDL). */
 async function evolveSchema(): Promise<void> {
+  // drizzle/0005_question_identity.sql. ADD COLUMN lacks a portable
+  // IF NOT EXISTS form across the deployed SQLite/libSQL versions, so inspect
+  // first. This preserves existing numeric question IDs and all foreign keys.
+  const questionColumns = await client.execute("pragma table_info('questions')");
+  const questionColumnNames = new Set(
+    questionColumns.rows.map((row) => String(row.name)),
+  );
+  if (!questionColumnNames.has("uid")) {
+    await client.execute("alter table questions add column uid text");
+  }
+  if (!questionColumnNames.has("content_version")) {
+    await client.execute(
+      "alter table questions add column content_version integer default 1 not null",
+    );
+  }
+  await client.execute(
+    "create unique index if not exists questions_uid_idx on questions (uid)",
+  );
+  await client.execute(`create table if not exists question_revisions (
+    id integer primary key autoincrement not null,
+    question_id integer not null,
+    content_version integer not null,
+    content_hash text not null,
+    snapshot text not null,
+    created_at integer default (unixepoch() * 1000) not null,
+    foreign key (question_id) references questions(id)
+  )`);
+  await client.execute(
+    "create unique index if not exists question_revisions_version_idx on question_revisions (question_id, content_version)",
+  );
   // drizzle/0004_nice_dracula.sql
   await client.execute(`create table if not exists lesson_example_attempts (
     id integer primary key autoincrement not null,
