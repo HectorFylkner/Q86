@@ -1,13 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildQuestionChoiceRoster,
   buildSessionChoiceOrders,
+  canonicalIndexForQuestion,
   canonicalIndexFromDisplay,
+  choiceOrderForQuestion,
   choicesInDisplayOrder,
   createChoiceOrder,
+  displayIndexForQuestion,
   displayIndexFromCanonical,
   isChoiceOrder,
   parsePersistedChoiceOrder,
+  parsePersistedQuestionChoiceRoster,
+  questionChoiceKey,
+  questionInDisplayOrder,
   trapMapInDisplayOrder,
 } from "../lib/question-choice-order.ts";
 
@@ -123,4 +130,95 @@ test("PS key placement is approximately uniform across session seeds", () => {
       `distribution ${counts.join(", ")} exceeded 8% tolerance`,
     );
   }
+});
+
+test("runtime roster presents aligned fields and inverts display submissions", () => {
+  const canonical = {
+    id: 86,
+    uid: "q86-seed-algebra-runtime0123",
+    contentVersion: 4,
+    format: "problem_solving" as const,
+    choices: ["A", "B", "C", "D", "E"],
+    correctIndex: 1,
+    trapMap: {
+      0: "trap A",
+      2: "trap C",
+      3: "trap D",
+      4: "trap E",
+    } as Record<string, string>,
+  };
+  const roster = buildQuestionChoiceRoster([canonical], "runtime-alignment");
+  const restored = parsePersistedQuestionChoiceRoster(
+    JSON.parse(JSON.stringify(roster)),
+  );
+  assert.ok(restored);
+
+  const displayed = questionInDisplayOrder(canonical, restored);
+  const displayedKey = displayIndexForQuestion(
+    canonical.correctIndex,
+    canonical,
+    restored,
+  );
+  assert.equal(displayed.correctIndex, displayedKey);
+  assert.equal(displayed.choices[displayedKey], canonical.choices[1]);
+  assert.equal(
+    canonicalIndexForQuestion(displayedKey, canonical, restored),
+    canonical.correctIndex,
+  );
+  for (let displayIndex = 0; displayIndex < 5; displayIndex++) {
+    const canonicalIndex = canonicalIndexForQuestion(
+      displayIndex,
+      canonical,
+      restored,
+    );
+    assert.equal(
+      displayed.choices[displayIndex],
+      canonical.choices[canonicalIndex],
+    );
+    assert.equal(
+      displayed.trapMap[String(displayIndex)],
+      canonical.trapMap[String(canonicalIndex)],
+    );
+  }
+});
+
+test("UID-less generated identity is stable and content-version mismatches fail closed", () => {
+  const generated = {
+    id: 987,
+    uid: null,
+    contentVersion: 1,
+    format: "problem_solving" as const,
+  };
+  assert.equal(
+    questionChoiceKey(generated),
+    "db:987:v1:fproblem_solving",
+  );
+  const roster = buildQuestionChoiceRoster([generated], "generated-candidate");
+  assert.deepEqual(
+    choiceOrderForQuestion(roster, generated),
+    roster.byQuestionId["987"].order,
+  );
+  assert.throws(
+    () =>
+      choiceOrderForQuestion(
+        roster,
+        { ...generated, contentVersion: 2 },
+      ),
+    /changed after this session started/,
+  );
+  assert.equal(
+    parsePersistedQuestionChoiceRoster({
+      ...roster,
+      byQuestionId: {
+        987: {
+          ...roster.byQuestionId["987"],
+          order: {
+            ...roster.byQuestionId["987"].order,
+            displayToCanonical: [0, 0, 1, 2, 3],
+          },
+        },
+      },
+    }),
+    null,
+  );
 });

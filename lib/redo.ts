@@ -3,9 +3,9 @@ import { db } from "./db/index.ts";
 import {
   questions,
   redoQueue,
-  sessions,
   type Question,
 } from "./db/schema.ts";
+import { createQuestionSession } from "./question-session.ts";
 
 /** Stage 0|1|2 → due +2d / +7d / +21d after the scheduling event. */
 const STAGE_DELAY_DAYS = [2, 7, 21] as const;
@@ -26,15 +26,19 @@ export async function createRedoSession(
   if (questionIds.length === 0) {
     return { error: "Nothing due to redo.", sessionId: null, questions: [] };
   }
+  const uniqueQuestionIds = [...new Set(questionIds)];
   const rows = await db
     .select()
     .from(questions)
     .where(
-      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+      and(
+        inArray(questions.id, uniqueQuestionIds),
+        eq(questions.verified, true),
+      ),
     )
     .all();
   const byId = new Map(rows.map((question) => [question.id, question]));
-  const ordered = questionIds
+  const ordered = uniqueQuestionIds
     .map((id) => byId.get(id))
     .filter((question): question is Question => Boolean(question));
   if (ordered.length === 0) {
@@ -45,12 +49,16 @@ export async function createRedoSession(
     };
   }
   const activeQuestionIds = ordered.map((question) => question.id);
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "redo", config: { questionIds: activeQuestionIds } })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  const created = await createQuestionSession({
+    mode: "redo",
+    questions: ordered,
+    config: { questionIds: activeQuestionIds },
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
 function dueAt(stage: 0 | 1 | 2): Date {

@@ -7,7 +7,6 @@ import {
   attempts,
   baselineReports,
   deckReviews,
-  edits,
   eloRatings,
   lessonExampleAttempts,
   lessonProgress,
@@ -43,14 +42,21 @@ import {
   selectTimedSet,
   type QuestionFilter,
 } from "./engine.ts";
-import { applyRedoResult, createRedoSession, enqueueMiss } from "./redo.ts";
+import {
+  recordQuestionAttempt,
+  saveTimedQuestionSession,
+  type LogAttemptInput,
+  type SaveTimedResponse,
+  type TimedEditInput,
+  type TimedResultInput,
+} from "./question-attempts.ts";
+import { createQuestionSession } from "./question-session.ts";
+import { createRedoSession } from "./redo.ts";
 import {
   ALL_CHAPTER_KEYS,
   ALL_SUBTOPICS,
   STRATEGIES,
   STRATEGY_CHAPTERS,
-  type Confidence,
-  type EditReason,
   type ErrorType,
   type FlagReason,
   type FundamentalSkill,
@@ -61,6 +67,13 @@ import {
   type ChapterKey,
   type Subtopic,
 } from "./taxonomy.ts";
+
+export type {
+  LogAttemptInput,
+  SaveTimedResponse,
+  TimedEditInput,
+  TimedResultInput,
+} from "./question-attempts.ts";
 
 export type DrillTiming = "untimed" | "soft";
 
@@ -85,15 +98,16 @@ export async function startDrill(config: {
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: config as unknown as Record<string, unknown>,
-    })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: picked,
+    config: config as unknown as Record<string, unknown>,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
 /** Chapter test: the pass-bar gate behind a Learn chapter. */
@@ -109,21 +123,19 @@ export async function startChapterTest(
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: {
-        chapter_test: subtopic,
-        count: picked.length,
-        // The server-selected roster is the scoring contract. Completion and
-        // correctness are later recomputed from persisted attempts against it.
-        questionIds: picked.map((question) => question.id),
-      },
-    })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: picked,
+    config: {
+      chapter_test: subtopic,
+      count: picked.length,
+    },
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
 export async function startRedoSession(
@@ -140,15 +152,19 @@ export async function startDrillWithQuestions(
   if (questionIds.length === 0) {
     return { error: "No questions to drill.", sessionId: null, questions: [] };
   }
+  const uniqueQuestionIds = [...new Set(questionIds)];
   const rows = await db
     .select()
     .from(questions)
     .where(
-      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+      and(
+        inArray(questions.id, uniqueQuestionIds),
+        eq(questions.verified, true),
+      ),
     )
     .all();
   const byId = new Map(rows.map((q) => [q.id, q]));
-  const ordered = questionIds
+  const ordered = uniqueQuestionIds
     .map((id) => byId.get(id))
     .filter((q): q is Question => Boolean(q));
   if (ordered.length === 0) {
@@ -158,53 +174,22 @@ export async function startDrillWithQuestions(
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "drill", config: { questionIds } })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: ordered,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
-export async function logAttempt(input: {
-  sessionId: number | null;
-  questionId: number;
-  mode: SessionMode;
-  selectedIndex: number;
-  timeSeconds: number;
-  confidence: Confidence;
-  focus?: SessionFocus;
-}): Promise<{ attemptId: number; correct: boolean }> {
-  const q = await db
-    .select()
-    .from(questions)
-    .where(eq(questions.id, input.questionId))
-    .get();
-  if (!q) throw new Error(`Question ${input.questionId} not found`);
-  const correct = input.selectedIndex === q.correctIndex;
-
-  const attempt = await db
-    .insert(attempts)
-    .values({
-      questionId: input.questionId,
-      sessionId: input.sessionId,
-      mode: input.mode,
-      focus: input.focus ?? "focused",
-      selectedIndex: input.selectedIndex,
-      correct,
-      timeSeconds: input.timeSeconds,
-      confidence: input.confidence,
-    })
-    .returning()
-    .get();
-
-  if (input.mode === "redo") {
-    await applyRedoResult(q.id, correct, input.timeSeconds);
-  } else if (!correct) {
-    await enqueueMiss(q.id, attempt.id);
-  }
-
-  return { attemptId: attempt.id, correct };
+export async function logAttempt(input: LogAttemptInput): Promise<{
+  attemptId: number;
+  correct: boolean;
+}> {
+  return recordQuestionAttempt(input);
 }
 
 export type QuestionHistoryRow = {
@@ -327,37 +312,18 @@ export async function startTimedSet(config: {
     };
   }
   const mode = config.kind === "full" ? "section_sim" : "timed_set";
-  const session = await db
-    .insert(sessions)
-    .values({ mode, config: config as unknown as Record<string, unknown> })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked, mode };
+  const created = await createQuestionSession({
+    mode,
+    questions: picked,
+    config: config as unknown as Record<string, unknown>,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+    mode,
+  };
 }
-
-export type TimedResultInput = {
-  questionId: number;
-  selectedIndex: number;
-  timeSeconds: number;
-  confidence: Confidence;
-  bookmarked: boolean;
-  timeViolation: boolean;
-};
-
-export type TimedEditInput = {
-  questionId: number;
-  fromIndex: number;
-  toIndex: number;
-  reason: EditReason;
-  justification: string;
-};
-
-export type SaveTimedResponse = {
-  attemptIdByQuestionId: Record<number, number>;
-  correctByQuestionId: Record<number, boolean>;
-  sessionEditNet: number;
-  lifetimeEditNet: number;
-};
 
 export async function saveTimedSession(input: {
   sessionId: number;
@@ -368,126 +334,7 @@ export async function saveTimedSession(input: {
   notReachedCount: number;
   focus?: SessionFocus;
 }): Promise<SaveTimedResponse> {
-  if (input.edits.length > 3) {
-    throw new Error("A section allows at most 3 edits.");
-  }
-  for (const edit of input.edits) {
-    if (edit.justification.trim().length < 20) {
-      throw new Error(
-        "Every edit needs a justification of at least 20 characters.",
-      );
-    }
-  }
-
-  const questionRows = await db
-    .select()
-    .from(questions)
-    .where(
-      inArray(
-        questions.id,
-        input.results.map((r) => r.questionId),
-      ),
-    )
-    .all();
-  const byId = new Map(questionRows.map((q) => [q.id, q]));
-
-  const attemptIdByQuestionId: Record<number, number> = {};
-  const correctByQuestionId: Record<number, boolean> = {};
-
-  await db.transaction(async (tx) => {
-    for (const result of input.results) {
-      const q = byId.get(result.questionId);
-      if (!q) throw new Error(`Question ${result.questionId} not found`);
-      const correct = result.selectedIndex === q.correctIndex;
-      correctByQuestionId[q.id] = correct;
-      const attempt = await tx
-        .insert(attempts)
-        .values({
-          questionId: q.id,
-          sessionId: input.sessionId,
-          mode: input.mode,
-          focus: input.focus ?? "focused",
-          selectedIndex: result.selectedIndex,
-          correct,
-          timeSeconds: result.timeSeconds,
-          confidence: result.confidence,
-        })
-        .returning()
-        .get();
-      attemptIdByQuestionId[q.id] = attempt.id;
-    }
-
-    for (const edit of input.edits) {
-      const q = byId.get(edit.questionId);
-      if (!q) continue;
-      await tx
-        .insert(edits)
-        .values({
-          sessionId: input.sessionId,
-          questionId: edit.questionId,
-          fromIndex: edit.fromIndex,
-          toIndex: edit.toIndex,
-          fromCorrect: edit.fromIndex === q.correctIndex,
-          toCorrect: edit.toIndex === q.correctIndex,
-          reason: edit.reason,
-          justification: edit.justification.trim(),
-        })
-        .run();
-    }
-  });
-
-  // Redo enqueue outside the transaction: it has its own dedupe logic.
-  for (const result of input.results) {
-    if (!correctByQuestionId[result.questionId]) {
-      await enqueueMiss(
-        result.questionId,
-        attemptIdByQuestionId[result.questionId],
-      );
-    }
-  }
-
-  const sessionEditNet = input.edits.reduce((net, edit) => {
-    const q = byId.get(edit.questionId);
-    if (!q) return net;
-    return (
-      net +
-      (edit.toIndex === q.correctIndex ? 1 : 0) -
-      (edit.fromIndex === q.correctIndex ? 1 : 0)
-    );
-  }, 0);
-
-  const allEdits = await db.select().from(edits).all();
-  const lifetimeEditNet = allEdits.reduce(
-    (net, e) => net + (e.toCorrect ? 1 : 0) - (e.fromCorrect ? 1 : 0),
-    0,
-  );
-
-  const correctCount = Object.values(correctByQuestionId).filter(Boolean).length;
-  const summary = {
-    total: input.results.length + input.notReachedCount,
-    answered: input.results.length,
-    correct: correctCount,
-    timeViolations: input.results.filter((r) => r.timeViolation).length,
-    sub60Wrong: input.results.filter(
-      (r) => r.timeSeconds < 60 && !correctByQuestionId[r.questionId],
-    ).length,
-    editCount: input.edits.length,
-    editNet: sessionEditNet,
-    notReached: input.notReachedCount,
-    durationSeconds: input.durationSeconds,
-  };
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, input.sessionId))
-    .run();
-
-  return {
-    attemptIdByQuestionId,
-    correctByQuestionId,
-    sessionEditNet,
-    lifetimeEditNet,
-  };
+  return saveTimedQuestionSession(input);
 }
 
 // ---------------------------------------------------------------------------
