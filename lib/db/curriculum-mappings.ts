@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { buildQuestionMappings } from "../../curriculum/v3/coverage.ts";
 import { buildCurriculumV3 } from "../../curriculum/v3/graph.ts";
@@ -9,6 +10,32 @@ import {
 } from "./schema.ts";
 
 export const CURRICULUM_MAPPING_VERSION = 1;
+
+function reviewedSourceMappings() {
+  const curriculum = buildCurriculumV3();
+  const curated = buildQuestionMappings(curriculum).filter(
+    (mapping) =>
+      mapping.status === "mapped" &&
+      mapping.mappingConfidence === "curated_rule" &&
+      mapping.primaryConceptId != null,
+  );
+  return { curriculum, curated };
+}
+
+/** Includes both reviewed assignments and the concept metadata materialized
+ * beside them, so any source-controlled mapping change invalidates bootstrap. */
+export function curriculumMappingFingerprint(): string {
+  const { curriculum, curated } = reviewedSourceMappings();
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        mappingVersion: CURRICULUM_MAPPING_VERSION,
+        concepts: curriculum.concepts,
+        curated,
+      }),
+    )
+    .digest("hex");
+}
 
 export type CurrentQuestionDiagnosis = {
   conceptId: string;
@@ -161,15 +188,9 @@ export async function syncCurriculumV3Mappings(): Promise<{
   desiredRows: number;
   insertedRows: number;
 }> {
-  const curriculum = buildCurriculumV3();
+  const { curriculum, curated } = reviewedSourceMappings();
   const conceptById = new Map(
     curriculum.concepts.map((concept) => [concept.id, concept]),
-  );
-  const curated = buildQuestionMappings(curriculum).filter(
-    (mapping) =>
-      mapping.status === "mapped" &&
-      mapping.mappingConfidence === "curated_rule" &&
-      mapping.primaryConceptId != null,
   );
   const installedQuestions = await db
     .select({

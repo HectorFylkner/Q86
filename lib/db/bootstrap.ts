@@ -1,10 +1,19 @@
 import path from "node:path";
+import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { client, db } from "./index.ts";
-import { loadBank, seedBankNeedsSync } from "./seed-bank.ts";
+import {
+  loadBank,
+  seedBankFingerprint,
+  seedBankNeedsSync,
+} from "./seed-bank.ts";
 import { applyModelQuarantineMigration } from "./model-quarantine.ts";
 import { evolveConceptEvidenceSchema } from "./concept-evidence-evolution.ts";
-import { syncCurriculumV3Mappings } from "./curriculum-mappings.ts";
+import {
+  curriculumMappingFingerprint,
+  syncCurriculumV3Mappings,
+} from "./curriculum-mappings.ts";
+import { settings } from "./schema.ts";
 
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
@@ -15,6 +24,17 @@ import { syncCurriculumV3Mappings } from "./curriculum-mappings.ts";
  * idempotent, so repeated cold starts are safe.
  */
 let ready: Promise<void> | null = null;
+
+const BOOTSTRAP_REVISION_KEY = "q86_bootstrap_revision";
+const SCHEMA_REVISION = "0007_session_item_runtime";
+
+/** A content-addressed release checkpoint. It changes for schema, bank, or
+ * reviewed mapping changes, while remaining stable across server workers. */
+export const BOOTSTRAP_REVISION = [
+  SCHEMA_REVISION,
+  seedBankFingerprint(),
+  curriculumMappingFingerprint(),
+].join(":");
 
 export function ensureDbReady(): Promise<void> {
   ready ??= provision().catch((e) => {
@@ -29,6 +49,15 @@ async function provision(): Promise<void> {
     "select name from sqlite_master where type = 'table' and name = 'questions'",
   );
   const hasTables = existing.rows.length > 0;
+
+  if (hasTables) {
+    const checkpoint = await db
+      .select({ value: settings.value })
+      .from(settings)
+      .where(eq(settings.key, BOOTSTRAP_REVISION_KEY))
+      .get();
+    if (checkpoint?.value === BOOTSTRAP_REVISION) return;
+  }
 
   if (!hasTables) {
     await migrate(db, {
@@ -64,6 +93,15 @@ async function provision(): Promise<void> {
       `Q86 bootstrap: stored ${mappingSync.insertedRows} reviewed concept mapping rows across ${mappingSync.mappedQuestions} pilot questions.`,
     );
   }
+  await db
+    .insert(settings)
+    .values({ key: BOOTSTRAP_REVISION_KEY, value: BOOTSTRAP_REVISION })
+    .onConflictDoUpdate({
+      target: settings.key,
+      set: { value: BOOTSTRAP_REVISION },
+    })
+    .run();
+  console.log("Q86 bootstrap: release checkpoint recorded.");
 }
 
 /** Mirrors every migration after 0000 for databases that predate them

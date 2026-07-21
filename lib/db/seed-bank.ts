@@ -44,6 +44,12 @@ export function readBank(): { questions: BankQuestion[] } {
   return JSON.parse(fs.readFileSync(BANK_PATH, "utf8"));
 }
 
+/** Stable source revision used by bootstrap to avoid re-reading and
+ * re-validating the full remote bank on every serverless cold start. */
+export function seedBankFingerprint(): string {
+  return createHash("sha256").update(fs.readFileSync(BANK_PATH)).digest("hex");
+}
+
 /** Questions the user retired via a content flag. The loader must never
  *  re-verify these, or a retirement would undo itself on the next boot. */
 export const USER_RETIRED_KEY = "user_retired_qids";
