@@ -12,7 +12,7 @@ import { applyModelQuarantineMigration } from "./model-quarantine.ts";
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
  * instance) the first server boot applies the schema and loads the
- * committed 360-question bank, so deploying never requires terminal
+ * committed question bank, so deploying never requires terminal
  * steps. Databases created earlier via `pnpm db:push` are left to the
  * scripts (they have no migration ledger to build on), and every step is
  * idempotent, so repeated cold starts are safe.

@@ -1,5 +1,6 @@
 /**
- * Q86 seed script — installs the committed 360-question trusted bank.
+ * Q86 seed script — installs the committed trusted bank. Counts are derived
+ * from scripts/seed-bank.json; run scripts/bank-stats.ts for the current mix.
  *
  * The default path is offline and idempotent. `--api` is intentionally
  * disabled: model cross-solves once admitted defective questions to the bank,

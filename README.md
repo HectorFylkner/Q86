@@ -1,7 +1,8 @@
 # Q86
 
-Local-first, single-user training platform for GMAT Focus Edition
-Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
+Local-first, single-user training platform for the current GMAT
+Quantitative Reasoning section, plus an explicitly labeled quantitative Data
+Sufficiency bridge. The name is the target: a Quant scaled score of 86.
 
 - AI question candidates get an independent model cross-solve, then remain
   quarantined until a human completes the three-part Question QA checklist
@@ -24,10 +25,12 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-360-question bank into it — offline, no API key:
+question bank into it — offline, no API key. The count is derived from the
+bank rather than duplicated in documentation:
 
 ```sh
 pnpm install
+node --experimental-strip-types scripts/bank-stats.ts
 pnpm db:push
 pnpm seed
 pnpm dev
@@ -35,8 +38,10 @@ pnpm dev
 
 Open http://localhost:3000. The full training loop — drill, timed sets,
 redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 360-question bank ships in `scripts/seed-bank.json`, every
-question verified by a programmatic brute-force check before admission.
+key: the bank ships in `scripts/seed-bank.json`. Authoring batches execute
+programmatic checks before admission; `verify-bank.ts` performs a separate
+bank-wide audit. See `docs/curriculum-v3-state.md` for the distinction between
+current mechanical validation and replayable proof coverage.
 
 The AI features (quarantined question candidates and twins, the post-mortem
 coach, score-report import) need a key — copy the template and fill in
@@ -57,7 +62,8 @@ cp .env.example .env.local
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm test` | Run plan and retired-question integrity tests |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 360-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `node --experimental-strip-types scripts/bank-stats.ts` | Derive the current bank size, format mix, per-subtopic counts, and canonical key distribution |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
