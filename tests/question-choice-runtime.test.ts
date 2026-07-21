@@ -39,7 +39,7 @@ test("question sessions persist display order while attempt and edit history sta
 
   const { db, client } = await import("../lib/db/index.ts");
   closeAppClient = () => client.close();
-  const { attempts, edits, questions, sessions } = await import(
+  const { attempts, edits, questions, sessionItems, sessions } = await import(
     "../lib/db/schema.ts"
   );
   const {
@@ -146,6 +146,27 @@ test("question sessions persist display order while attempt and edit history sta
     drillRoster.byQuestionId[String(problemSolving.id)].questionKey,
     `db:${problemSolving.id}:v1:fproblem_solving`,
   );
+  const storedDrillItems = await db
+    .select()
+    .from(sessionItems)
+    .where(eq(sessionItems.sessionId, drill.session.id))
+    .orderBy(sessionItems.position)
+    .all();
+  assert.equal(storedDrillItems.length, 2);
+  assert.deepEqual(
+    storedDrillItems.map((item) => item.questionId),
+    [problemSolving.id, dataSufficiency.id],
+  );
+  assert.equal(
+    storedDrillItems[0].questionUid,
+    `db:${problemSolving.id}:v1:fproblem_solving`,
+  );
+  assert.equal(storedDrillItems[1].questionUid, dataSufficiency.uid);
+  assert.deepEqual(
+    storedDrillItems[0].displayToCanonical,
+    drillRoster.byQuestionId[String(problemSolving.id)].order
+      .displayToCanonical,
+  );
 
   const displayedPs = drill.questions[0];
   assert.equal(
@@ -193,6 +214,7 @@ test("question sessions persist display order while attempt and edit history sta
   assert.equal(storedDrillAttempt.correct, true);
 
   const loadedDrill = await loadQuestionSession(drill.session.id, "drill");
+  assert.equal(loadedDrill.sessionItems.length, 2);
   assert.deepEqual(
     questionInDisplayOrder(problemSolving, loadedDrill.choiceOrderRoster),
     displayedPs,

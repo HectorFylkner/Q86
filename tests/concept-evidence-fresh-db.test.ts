@@ -33,7 +33,7 @@ test("fresh migration creates constrained, replayable concept evidence", async (
   const migrationCount = await client.execute(
     "select count(*) as count from __drizzle_migrations",
   );
-  assert.equal(migrationCount.rows[0].count, 7);
+  assert.equal(migrationCount.rows[0].count, 8);
 
   await client.execute({
     sql: `insert into questions (

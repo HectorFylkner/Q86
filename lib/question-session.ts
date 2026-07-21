@@ -1,13 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
+  sessionItems,
   sessions,
   type Question,
   type Session,
+  type SessionItem,
 } from "./db/schema.ts";
 import {
   buildQuestionChoiceRoster,
+  isChoiceOrder,
   parsePersistedQuestionChoiceRoster,
   questionInDisplayOrder,
   type PersistedQuestionChoiceRoster,
@@ -20,6 +23,8 @@ export type LoadedQuestionSession = {
   session: Session;
   questionIds: readonly number[];
   choiceOrderRoster: PersistedQuestionChoiceRoster;
+  /** Empty only for sessions created before immutable session items existed. */
+  sessionItems: readonly SessionItem[];
 };
 
 /**
@@ -30,6 +35,8 @@ export async function createQuestionSession(input: {
   mode: SessionMode;
   questions: readonly Question[];
   config?: Record<string, unknown>;
+  /** Optional blueprint-owned slot names, aligned one-for-one with questions. */
+  blueprintSlots?: readonly string[];
   /** Deterministic injection for integration tests; production uses a UUID. */
   sessionSeed?: string;
 }): Promise<{ session: Session; questions: Question[] }> {
@@ -41,16 +48,57 @@ export async function createQuestionSession(input: {
     input.questions,
     input.sessionSeed ?? randomUUID(),
   );
+  const blueprintSlots =
+    input.blueprintSlots ??
+    input.questions.map(
+      (_, position) => `roster.${String(position + 1).padStart(3, "0")}`,
+    );
+  if (
+    blueprintSlots.length !== input.questions.length ||
+    blueprintSlots.some((slot) => slot.trim().length === 0) ||
+    new Set(blueprintSlots).size !== blueprintSlots.length
+  ) {
+    throw new Error(
+      "Session blueprint slots must be non-empty, unique, and aligned with the question roster.",
+    );
+  }
   const config = {
     ...(input.config ?? {}),
     questionIds,
     [SESSION_CHOICE_ROSTER_KEY]: choiceOrderRoster,
   };
-  const session = await db
-    .insert(sessions)
-    .values({ mode: input.mode, config })
-    .returning()
-    .get();
+  const session = await db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(sessions)
+      .values({ mode: input.mode, config })
+      .returning()
+      .get();
+    await tx
+      .insert(sessionItems)
+      .values(
+        input.questions.map((question, position) => {
+          const rosterEntry =
+            choiceOrderRoster.byQuestionId[String(question.id)];
+          if (!rosterEntry) {
+            throw new Error(
+              `Question ${question.id} is missing from the new session roster.`,
+            );
+          }
+          return {
+            sessionId: inserted.id,
+            position,
+            questionId: question.id,
+            questionUid: question.uid?.trim() || rosterEntry.questionKey,
+            questionContentVersion: question.contentVersion,
+            blueprintSlot: blueprintSlots[position],
+            choiceOrderAlgorithm: rosterEntry.order.algorithm,
+            displayToCanonical: rosterEntry.order.displayToCanonical,
+          };
+        }),
+      )
+      .run();
+    return inserted;
+  });
 
   return {
     session,
@@ -105,7 +153,68 @@ export async function loadQuestionSession(
     throw new Error(`Session ${sessionId} has a mismatched question roster.`);
   }
 
-  return { session, questionIds, choiceOrderRoster };
+  const persistedSessionItems = await db
+    .select()
+    .from(sessionItems)
+    .where(eq(sessionItems.sessionId, sessionId))
+    .orderBy(asc(sessionItems.position))
+    .all();
+  // Sessions created before curriculum-v3 remain readable from their stored
+  // JSON roster. New sessions must have a complete, immutable relational copy.
+  if (persistedSessionItems.length > 0) {
+    if (persistedSessionItems.length !== questionIds.length) {
+      throw new Error(`Session ${sessionId} has an incomplete item roster.`);
+    }
+    for (const [position, item] of persistedSessionItems.entries()) {
+      const questionId = questionIds[position];
+      const rosterEntry = choiceOrderRoster.byQuestionId[String(questionId)];
+      const identity = rosterEntry
+        ? parseRosterQuestionIdentity(rosterEntry.questionKey)
+        : null;
+      if (
+        item.position !== position ||
+        item.questionId !== questionId ||
+        rosterEntry == null ||
+        identity == null ||
+        item.questionUid !== identity.persistedUid ||
+        item.questionContentVersion !== identity.contentVersion ||
+        item.choiceOrderAlgorithm !== rosterEntry.order.algorithm ||
+        !isChoiceOrder(item.displayToCanonical) ||
+        item.displayToCanonical.some(
+          (canonicalIndex, displayIndex) =>
+            canonicalIndex !==
+            rosterEntry.order.displayToCanonical[displayIndex],
+        )
+      ) {
+        throw new Error(`Session ${sessionId} has a corrupted item roster.`);
+      }
+    }
+  }
+
+  return {
+    session,
+    questionIds,
+    choiceOrderRoster,
+    sessionItems: persistedSessionItems,
+  };
+}
+
+function parseRosterQuestionIdentity(
+  questionKey: string,
+): { persistedUid: string; contentVersion: number } | null {
+  const uid = questionKey.match(
+    /^uid:(.+):v([1-9]\d*):f(?:problem_solving|data_sufficiency)$/,
+  );
+  if (uid) {
+    return { persistedUid: uid[1], contentVersion: Number(uid[2]) };
+  }
+  const local = questionKey.match(
+    /^db:([1-9]\d*):v([1-9]\d*):f(?:problem_solving|data_sufficiency)$/,
+  );
+  if (local) {
+    return { persistedUid: questionKey, contentVersion: Number(local[2]) };
+  }
+  return null;
 }
 
 function parseQuestionIds(value: unknown): number[] {

@@ -349,11 +349,20 @@ const CONCEPT_EVIDENCE_DDL = [
       select raise(abort,
         'distractor mapping is not a valid mapped-question distractor');
     end`,
-  `create trigger if not exists session_item_identity_insert
+  `drop trigger if exists session_item_identity_insert`,
+  `create trigger session_item_identity_insert
     before insert on session_items
     when not exists (
       select 1 from questions q
-      where q.id = new.question_id and q.uid = new.question_uid
+      where q.id = new.question_id
+        and (
+          q.uid = new.question_uid
+          or (
+            q.uid is null
+            and new.question_uid = 'db:' || q.id || ':v'
+              || new.question_content_version || ':f' || q.format
+          )
+        )
         and (q.content_version = new.question_content_version or exists (
           select 1 from question_revisions qr
           where qr.question_id = q.id
