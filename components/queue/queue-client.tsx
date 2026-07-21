@@ -37,6 +37,32 @@ export type DueRow = {
   difficulty: number;
 };
 
+export type ConceptActionRow = {
+  id: number;
+  conceptId: string;
+  conceptTitle: string;
+  parentSubtopic: string;
+  misconceptionId: string | null;
+  trigger:
+    | "wrong"
+    | "slow"
+    | "hinted"
+    | "low_confidence"
+    | "changed_from_correct"
+    | "retention_slip"
+    | "stale"
+    | "manual";
+  actionType:
+    | "review_concept"
+    | "review_misconception"
+    | "retry_check"
+    | "targeted_practice"
+    | "retrieval_card"
+    | "recertify_concept";
+  rationaleMd: string;
+  createdAt: Date;
+};
+
 export type LogRow = {
   id: number;
   createdAt: Date;
@@ -60,12 +86,28 @@ const STAGE_LABELS: Record<number, string> = {
   2: "stage 2 · +21d cold-solve",
 };
 
+function canUseFreshCheck(action: ConceptActionRow): boolean {
+  return (
+    action.trigger !== "manual" &&
+    action.trigger !== "retention_slip" &&
+    action.trigger !== "stale" &&
+    [
+      "review_concept",
+      "review_misconception",
+      "retry_check",
+      "targeted_practice",
+    ].includes(action.actionType)
+  );
+}
+
 export function QueueClient({
+  conceptActions,
   due,
   upcoming,
   log,
   autoStart,
 }: {
+  conceptActions: ConceptActionRow[];
   due: DueRow[];
   upcoming: DueRow[];
   log: LogRow[];
@@ -202,6 +244,66 @@ export function QueueClient({
           {error}
         </p>
       )}
+
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-display text-sm font-semibold">
+            Exact concept actions · {conceptActions.length}
+          </h2>
+          <Link href="/coverage" className="text-xs text-ballpoint hover:underline">
+            Coverage ledger
+          </Link>
+        </div>
+        {conceptActions.length === 0 ? (
+          <p className="mt-2 text-sm text-graphite">
+            No concept-level remediation is open.
+          </p>
+        ) : (
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {conceptActions.map((action) => (
+              <li
+                key={action.id}
+                className="rounded-control border border-grid bg-highlight/20 p-3"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <Link
+                    href={`/learn/${action.parentSubtopic}/${encodeURIComponent(action.conceptId)}${action.actionType === "review_misconception" ? "#misconceptions" : ""}`}
+                    className="text-sm font-semibold hover:text-ballpoint hover:underline"
+                  >
+                    {action.conceptTitle}
+                  </Link>
+                  <span className="rounded-full border border-amber/30 bg-amber/5 px-2 py-1 font-mono text-[9px] uppercase tracking-wide text-amber">
+                    {action.trigger.replaceAll("_", " ")}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-graphite">
+                  {action.rationaleMd}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={`/learn/${action.parentSubtopic}/${encodeURIComponent(action.conceptId)}`}
+                    className="rounded-control border border-grid bg-surface px-3 py-1.5 text-xs hover:border-ballpoint/50"
+                  >
+                    Review exact lesson
+                  </Link>
+                  {canUseFreshCheck(action) ? (
+                    <Link
+                      href={`/drill?concept=${encodeURIComponent(action.conceptId)}&remediation=${action.id}&n=1`}
+                      className="rounded-control bg-ballpoint px-3 py-1.5 text-xs font-medium text-white"
+                    >
+                      Try a fresh aligned check
+                    </Link>
+                  ) : (
+                    <span className="rounded-control border border-amber/30 px-3 py-1.5 text-xs text-amber">
+                      Scheduled evidence required
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">

@@ -125,10 +125,34 @@ export default async function ConceptLessonPage({
           </p>
           <p className="mt-2 text-lg font-semibold">Unavailable</p>
           <p className="text-xs text-graphite">
-            {coverage.replayablyVerifiedQuestionIds.length}/6 replayably verified items
+            {coverage.replayablyVerifiedQuestionIds.length}/{coverage.scoredItemRequirement} replayably verified items
           </p>
         </div>
       </section>
+
+      <nav
+        aria-label="Concept actions"
+        className="flex flex-wrap items-center gap-2 rounded-card border border-grid bg-surface p-3 shadow-ambient"
+      >
+        <Link
+          href={`/learn/${concept.parentSubtopic}`}
+          className="rounded-control border border-grid px-4 py-2 text-sm text-graphite hover:border-ballpoint/50 hover:text-ballpoint"
+        >
+          Chapter overview
+        </Link>
+        {coverage.rawScoredQuestionIds.length > 0 ? (
+          <Link
+            href={`/drill?concept=${encodeURIComponent(concept.id)}&n=${Math.min(6, coverage.rawScoredQuestionIds.length)}`}
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          >
+            Practice this exact concept · {coverage.rawScoredQuestionIds.length} available
+          </Link>
+        ) : (
+          <span className="rounded-control border border-amber/35 bg-amber/5 px-4 py-2 text-sm text-amber">
+            Targeted practice closed · 0 mapped items
+          </span>
+        )}
+      </nav>
 
       {!segment ? (
         <section className="space-y-5 rounded-card border border-amber/35 bg-surface p-5 shadow-ambient sm:p-7">

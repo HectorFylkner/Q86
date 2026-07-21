@@ -29,6 +29,7 @@ export function DrillClient({
   autoStartIds,
   autoStartRung,
   autoStartTest,
+  autoStartConcept,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
@@ -40,9 +41,27 @@ export function DrillClient({
     count?: number;
   } | null;
   autoStartTest?: Subtopic | null;
+  autoStartConcept?: {
+    conceptId: string;
+    title: string;
+    count: number;
+    remediationId?: number;
+  } | null;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (!autoStartConcept || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    void handleStart({
+      filter: { conceptIds: [autoStartConcept.conceptId] },
+      count: autoStartConcept.count,
+      timing: "untimed",
+      focus: "focused",
+      remediationId: autoStartConcept.remediationId,
+    });
+  }, [autoStartConcept]);
 
   // Subtopic deep links arrive as /drill?sub=…&d=… or /drill?sub=…&n=…
   useEffect(() => {

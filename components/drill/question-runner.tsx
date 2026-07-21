@@ -41,6 +41,7 @@ type Result = {
   confidence: Confidence;
   attemptId: number | null;
   saveState: AttemptSaveState;
+  remediationResolved: boolean;
   errorType: ErrorType | null;
 };
 
@@ -75,6 +76,7 @@ export function QuestionRunner({
   const [finishing, setFinishing] = useState(false);
   const [finishFailed, setFinishFailed] = useState(false);
   const startRef = useRef(Date.now());
+  const submitStartedRef = useRef(false);
 
   useSessionFocus(
     phase !== "done",
@@ -102,12 +104,17 @@ export function QuestionRunner({
         confidence: result.confidence,
         focus,
       })
-        .then(({ attemptId }) => {
+        .then(({ attemptId, remediationResolved }) => {
           setHint(null);
           setResults((current) =>
             current.map((item, i) =>
               i === resultIndex
-                ? { ...item, attemptId, saveState: "saved" }
+                ? {
+                    ...item,
+                    attemptId,
+                    saveState: "saved",
+                    remediationResolved,
+                  }
                 : item,
             ),
           );
@@ -134,7 +141,7 @@ export function QuestionRunner({
   }, [phase, timing, index]);
 
   const submit = useCallback(() => {
-    if (phase !== "answering") return;
+    if (phase !== "answering" || submitStartedRef.current) return;
     if (selected == null) {
       setHint("Pick an answer — keys 1–5 or A–E.");
       return;
@@ -143,6 +150,7 @@ export function QuestionRunner({
       setHint("Set confidence first — G guess, L lean, K lock.");
       return;
     }
+    submitStartedRef.current = true;
     const timeSeconds = (Date.now() - startRef.current) / 1000;
     const correct = selected === question.correctIndex;
     const result: Result = {
@@ -153,6 +161,7 @@ export function QuestionRunner({
       confidence,
       attemptId: null,
       saveState: "saving",
+      remediationResolved: false,
       errorType: null,
     };
     setResults((r) => [...r, result]);
@@ -188,6 +197,7 @@ export function QuestionRunner({
       setHint(null);
       setElapsed(0);
       setFinishFailed(false);
+      submitStartedRef.current = false;
       startRef.current = Date.now();
     } else {
       const all = results;
@@ -495,6 +505,15 @@ export function QuestionRunner({
               Retry save
             </button>
           </div>
+        )}
+        {currentResult?.remediationResolved && (
+          <p
+            className="mt-2 rounded-control border border-ballpoint/30 bg-ballpoint/5 px-3 py-2 text-sm text-ballpoint"
+            role="status"
+          >
+            Fresh independent check passed. This remediation action is cleared;
+            mastery remains governed by the full evidence blueprint.
+          </p>
         )}
       </motion.div>
 

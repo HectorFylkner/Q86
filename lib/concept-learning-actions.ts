@@ -191,7 +191,7 @@ export async function finalizeConceptItem(
     return inserted;
   });
 
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.Q86_SKIP_REVALIDATE !== "1") {
     const { revalidatePath } = await import("next/cache");
     revalidatePath(
       `/learn/${segment.conceptId.split(".")[3]}/${segment.conceptId}`,

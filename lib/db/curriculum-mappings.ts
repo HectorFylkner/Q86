@@ -1,10 +1,61 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { buildQuestionMappings } from "../../curriculum/v3/coverage.ts";
 import { buildCurriculumV3 } from "../../curriculum/v3/graph.ts";
 import { db } from "./index.ts";
-import { questionConceptMappings, questions } from "./schema.ts";
+import {
+  distractorMisconceptionMappings,
+  questionConceptMappings,
+  questions,
+} from "./schema.ts";
 
 export const CURRICULUM_MAPPING_VERSION = 1;
+
+export type CurrentQuestionDiagnosis = {
+  conceptId: string;
+  mappingVersion: number;
+  misconceptionId: string | null;
+};
+
+export async function currentQuestionMisconceptionIds(input: {
+  questionId: number;
+  questionContentVersion: number;
+  conceptId: string;
+}): Promise<string[]> {
+  const diagnosis = await currentQuestionDiagnosis(input);
+  if (diagnosis == null || diagnosis.conceptId !== input.conceptId) return [];
+  const rows = await db
+    .select({
+      misconceptionId: distractorMisconceptionMappings.misconceptionId,
+      editorialState: distractorMisconceptionMappings.editorialState,
+    })
+    .from(distractorMisconceptionMappings)
+    .where(
+      and(
+        eq(distractorMisconceptionMappings.questionId, input.questionId),
+        eq(
+          distractorMisconceptionMappings.questionContentVersion,
+          input.questionContentVersion,
+        ),
+        eq(distractorMisconceptionMappings.conceptId, input.conceptId),
+        eq(
+          distractorMisconceptionMappings.mappingVersion,
+          diagnosis.mappingVersion,
+        ),
+      ),
+    )
+    .all();
+  return [
+    ...new Set(
+      rows
+        .filter(
+          (row) =>
+            row.editorialState === "reviewed" ||
+            row.editorialState === "approved",
+        )
+        .map((row) => row.misconceptionId),
+    ),
+  ];
+}
 
 type DesiredMapping = typeof questionConceptMappings.$inferInsert;
 
@@ -23,6 +74,79 @@ function mappingKey(
     row.conceptId,
     row.mappingVersion,
   ].join("\u0000");
+}
+
+/** Resolve only when the latest mapping for the exact content version is reviewed. */
+export async function currentQuestionDiagnosis(input: {
+  questionId: number;
+  questionContentVersion: number;
+  canonicalChoiceIndex?: number;
+}): Promise<CurrentQuestionDiagnosis | null> {
+  const primary = await db
+    .select()
+    .from(questionConceptMappings)
+    .where(
+      and(
+        eq(questionConceptMappings.questionId, input.questionId),
+        eq(
+          questionConceptMappings.questionContentVersion,
+          input.questionContentVersion,
+        ),
+        eq(questionConceptMappings.role, "primary"),
+      ),
+    )
+    .orderBy(desc(questionConceptMappings.mappingVersion))
+    .get();
+  if (
+    !primary ||
+    (primary.editorialState !== "reviewed" &&
+      primary.editorialState !== "approved")
+  ) {
+    return null;
+  }
+  const distractor =
+    input.canonicalChoiceIndex == null
+      ? null
+      : await db
+          .select({
+            misconceptionId:
+              distractorMisconceptionMappings.misconceptionId,
+          })
+          .from(distractorMisconceptionMappings)
+          .where(
+            and(
+              eq(
+                distractorMisconceptionMappings.questionId,
+                input.questionId,
+              ),
+              eq(
+                distractorMisconceptionMappings.questionContentVersion,
+                input.questionContentVersion,
+              ),
+              eq(
+                distractorMisconceptionMappings.canonicalChoiceIndex,
+                input.canonicalChoiceIndex,
+              ),
+              eq(
+                distractorMisconceptionMappings.conceptId,
+                primary.conceptId,
+              ),
+              eq(
+                distractorMisconceptionMappings.mappingVersion,
+                primary.mappingVersion,
+              ),
+              inArray(distractorMisconceptionMappings.editorialState, [
+                "reviewed",
+                "approved",
+              ]),
+            ),
+          )
+          .get();
+  return {
+    conceptId: primary.conceptId,
+    mappingVersion: primary.mappingVersion,
+    misconceptionId: distractor?.misconceptionId ?? null,
+  };
 }
 
 /**

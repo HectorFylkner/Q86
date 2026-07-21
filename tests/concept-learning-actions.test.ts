@@ -12,9 +12,9 @@ test("concept commitments log hints, corrections, unknowns, and exact remediatio
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "q86-concept-action-"));
   const databasePath = path.join(tempDir, "q86.db");
   const previousUrl = process.env.TURSO_DATABASE_URL;
-  const previousNodeEnv = process.env.NODE_ENV;
+  const previousSkipRevalidate = process.env.Q86_SKIP_REVALIDATE;
   process.env.TURSO_DATABASE_URL = `file:${databasePath}`;
-  process.env.NODE_ENV = "test";
+  process.env.Q86_SKIP_REVALIDATE = "1";
   let closeAppClient: (() => void) | null = null;
 
   t.after(async () => {
@@ -22,8 +22,11 @@ test("concept commitments log hints, corrections, unknowns, and exact remediatio
     await rm(tempDir, { recursive: true, force: true });
     if (previousUrl == null) delete process.env.TURSO_DATABASE_URL;
     else process.env.TURSO_DATABASE_URL = previousUrl;
-    if (previousNodeEnv == null) delete process.env.NODE_ENV;
-    else process.env.NODE_ENV = previousNodeEnv;
+    if (previousSkipRevalidate == null) {
+      delete process.env.Q86_SKIP_REVALIDATE;
+    } else {
+      process.env.Q86_SKIP_REVALIDATE = previousSkipRevalidate;
+    }
   });
 
   const migrationClient = createClient({ url: `file:${databasePath}` });

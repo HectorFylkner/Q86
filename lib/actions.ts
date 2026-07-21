@@ -19,11 +19,7 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { RETAKE_EXCLUDE_DAYS, selectChapterTest } from "./chapter-tests.ts";
-import {
-  CHAPTER_TEST_BAR,
-  CHAPTER_TEST_SIZE,
-} from "./chapter-test-config.ts";
-import { scoreAssessment } from "./assessment-reliability.ts";
+import { CHAPTER_TEST_SIZE } from "./chapter-test-config.ts";
 import { gradeCommitment } from "./example-grade.ts";
 import { enrollLessonCards } from "./lesson-cards.ts";
 import { parseLesson } from "./lesson-parse.ts";
@@ -51,10 +47,17 @@ import {
   type TimedResultInput,
 } from "./question-attempts.ts";
 import { createQuestionSession } from "./question-session.ts";
+import { finishQuestionSession } from "./question-session-completion.ts";
+import {
+  CONCEPT_REMEDIATION_CONFIG_KEY,
+  exposedVariantFamilyIds,
+  openConceptRemediation,
+  remediationCanResolveFromFreshQuestion,
+} from "./concept-remediations.ts";
+import { currentQuestionMisconceptionIds } from "./db/curriculum-mappings.ts";
 import { createRedoSession } from "./redo.ts";
 import {
   ALL_CHAPTER_KEYS,
-  ALL_SUBTOPICS,
   STRATEGIES,
   STRATEGY_CHAPTERS,
   type ErrorType,
@@ -88,20 +91,110 @@ export async function startDrill(config: {
   count: number;
   timing: DrillTiming;
   focus?: SessionFocus;
+  /** Bind one open action to a fresh, exact-concept proof attempt. */
+  remediationId?: number;
 }): Promise<StartDrillResult> {
-  const picked = await selectQuestions(config.filter, config.count);
-  if (picked.length === 0) {
+  const requestedConceptId =
+    config.filter.conceptIds?.length === 1
+      ? config.filter.conceptIds[0]
+      : null;
+  const remediation =
+    config.remediationId != null && requestedConceptId != null
+      ? await openConceptRemediation(
+          config.remediationId,
+          requestedConceptId,
+        )
+      : null;
+  if (config.remediationId != null && remediation == null) {
     return {
       error:
-        "No verified questions match this filter. Generate some from this screen or run pnpm seed.",
+        "That remediation is no longer open or does not match this exact concept.",
       sessionId: null,
       questions: [],
     };
   }
+  if (remediation && !remediationCanResolveFromFreshQuestion(remediation)) {
+    return {
+      error:
+        "This action needs delayed retrieval or recertification evidence and cannot be cleared by one practice question.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+
+  let effectiveFilter = config.filter;
+  let picked: Question[];
+  if (remediation) {
+    const priorFamilies = await exposedVariantFamilyIds();
+    effectiveFilter = {
+      ...config.filter,
+      excludeVariantFamilyIds: [
+        ...new Set([
+          ...(config.filter.excludeVariantFamilyIds ?? []),
+          ...priorFamilies,
+        ]),
+      ],
+    };
+    let candidates = await selectQuestions(effectiveFilter, 10_000);
+    if (remediation.actionType === "review_misconception") {
+      candidates = (
+        await Promise.all(
+          candidates.map(async (question) => ({
+            question,
+            misconceptionIds: await currentQuestionMisconceptionIds({
+              questionId: question.id,
+              questionContentVersion: question.contentVersion,
+              conceptId: remediation.conceptId,
+            }),
+          })),
+        )
+      )
+        .filter(({ misconceptionIds }) =>
+          remediation.misconceptionId != null
+            ? misconceptionIds.includes(remediation.misconceptionId)
+            : false,
+        )
+        .map(({ question }) => question);
+    }
+    picked = candidates.slice(0, 1);
+  } else {
+    picked = await selectQuestions(effectiveFilter, config.count);
+  }
+  if (picked.length === 0) {
+    return {
+      error: remediation
+        ? "No fresh aligned item is available yet. This action stays open until the concept bank has another reviewed question family."
+        : "No verified questions match this filter. Generate some from this screen or run pnpm seed.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const boundRemediation = remediation
+    ? {
+        id: remediation.id,
+        remediationUid: remediation.remediationUid,
+        conceptId: remediation.conceptId,
+      }
+    : null;
   const created = await createQuestionSession({
     mode: "drill",
     questions: picked,
-    config: config as unknown as Record<string, unknown>,
+    config: {
+      ...config,
+      count: picked.length,
+      filter: effectiveFilter,
+      ...(boundRemediation && {
+        [CONCEPT_REMEDIATION_CONFIG_KEY]: boundRemediation,
+      }),
+    } as unknown as Record<string, unknown>,
+    blueprintSlots: remediation
+      ? [`remediation.${remediation.id}.fresh-independent-check`]
+      : config.filter.conceptIds?.length === 1
+        ? picked.map(
+            (_, position) =>
+              `concept.${config.filter.conceptIds![0]}.practice.${String(position + 1).padStart(2, "0")}`,
+          )
+        : undefined,
   });
   return {
     error: null,
@@ -188,6 +281,7 @@ export async function startDrillWithQuestions(
 export async function logAttempt(input: LogAttemptInput): Promise<{
   attemptId: number;
   correct: boolean;
+  remediationResolved: boolean;
 }> {
   return recordQuestionAttempt(input);
 }
@@ -232,57 +326,10 @@ export async function tagAttempt(
 
 export async function finishSession(
   sessionId: number,
-  summary: Record<string, unknown>,
+  _clientSummary: Record<string, unknown>,
 ): Promise<void> {
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, sessionId))
-    .run();
-
-  // A passed chapter test enrolls that chapter's trigger cues and trap
-  // gallery as spaced retrieval cards — retention is scheduled, never
-  // left to discipline. Recomputed from the attempts rows, not the
-  // client summary.
-  const session = await db
-    .select()
-    .from(sessions)
-    .where(eq(sessions.id, sessionId))
-    .get();
-  const chapterConfig = session?.config as
-    | { chapter_test?: string; questionIds?: unknown }
-    | undefined;
-  const sub = chapterConfig?.chapter_test;
-  if (sub && ALL_SUBTOPICS.includes(sub as Subtopic)) {
-    const rows = await db
-      .select({
-        questionId: attempts.questionId,
-        selectedIndex: attempts.selectedIndex,
-        correctIndex: questions.correctIndex,
-        confidence: attempts.confidence,
-      })
-      .from(attempts)
-      .innerJoin(questions, eq(attempts.questionId, questions.id))
-      .where(eq(attempts.sessionId, sessionId))
-      .all();
-    const configuredQuestionIds =
-      Array.isArray(chapterConfig?.questionIds) &&
-      chapterConfig.questionIds.every((id) => Number.isInteger(id))
-        ? (chapterConfig.questionIds as number[])
-        : null;
-    const expectedQuestionIds =
-      configuredQuestionIds ?? [...new Set(rows.map((row) => row.questionId))];
-    const score = scoreAssessment({
-      tier: "easy",
-      expectedQuestionIds,
-      attempts: rows,
-      completedAtMs: session?.endedAt?.getTime() ?? null,
-      passThresholdOverride: CHAPTER_TEST_BAR,
-    });
-    if (expectedQuestionIds.length === CHAPTER_TEST_SIZE && score.passed) {
-      await enrollLessonCards(sub as Subtopic);
-    }
-  }
+  void _clientSummary;
+  await finishQuestionSession(sessionId);
 }
 
 // ---------------------------------------------------------------------------

@@ -31,6 +31,7 @@ export type DrillConfigValue = {
   count: number;
   timing: DrillTiming;
   focus: SessionFocus;
+  remediationId?: number;
 };
 
 const COUNT_OPTIONS = [5, 10, 15, 20];
