@@ -9,6 +9,10 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import {
+  attemptIsPersisted,
+  type AttemptSaveState,
+} from "@/components/drill/runner-persistence";
 import { useSessionFocus } from "@/components/use-session-focus";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
@@ -36,7 +40,7 @@ type Result = {
   timeSeconds: number;
   confidence: Confidence;
   attemptId: number | null;
-  saveFailed: boolean;
+  saveState: AttemptSaveState;
   errorType: ErrorType | null;
 };
 
@@ -68,6 +72,8 @@ export function QuestionRunner({
   const [hint, setHint] = useState<string | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [finishing, setFinishing] = useState(false);
+  const [finishFailed, setFinishFailed] = useState(false);
   const startRef = useRef(Date.now());
 
   useSessionFocus(
@@ -77,6 +83,46 @@ export function QuestionRunner({
 
   const question = questions[index];
   const currentResult = results[index];
+
+  const persistAttempt = useCallback(
+    (result: Result, resultIndex: number) => {
+      setResults((current) =>
+        current.map((item, i) =>
+          i === resultIndex
+            ? { ...item, attemptId: null, saveState: "saving" }
+            : item,
+        ),
+      );
+      logAttempt({
+        sessionId,
+        questionId: result.questionId,
+        mode,
+        selectedIndex: result.selectedIndex,
+        timeSeconds: result.timeSeconds,
+        confidence: result.confidence,
+        focus,
+      })
+        .then(({ attemptId }) => {
+          setHint(null);
+          setResults((current) =>
+            current.map((item, i) =>
+              i === resultIndex
+                ? { ...item, attemptId, saveState: "saved" }
+                : item,
+            ),
+          );
+        })
+        .catch(() => {
+          setHint(null);
+          setResults((current) =>
+            current.map((item, i) =>
+              i === resultIndex ? { ...item, saveState: "failed" } : item,
+            ),
+          );
+        });
+    },
+    [sessionId, mode, focus],
+  );
 
   useEffect(() => {
     if (phase !== "answering" || timing !== "soft") return;
@@ -106,36 +152,34 @@ export function QuestionRunner({
       timeSeconds,
       confidence,
       attemptId: null,
-      saveFailed: false,
+      saveState: "saving",
       errorType: null,
     };
     setResults((r) => [...r, result]);
     setPhase("revealed");
     setHint(null);
 
-    logAttempt({
-      sessionId,
-      questionId: question.id,
-      mode,
-      selectedIndex: selected,
-      timeSeconds,
-      confidence,
-      focus,
-    })
-      .then(({ attemptId }) => {
-        setResults((r) =>
-          r.map((res, i) => (i === index ? { ...res, attemptId } : res)),
-        );
-      })
-      .catch(() => {
-        setResults((r) =>
-          r.map((res, i) => (i === index ? { ...res, saveFailed: true } : res)),
-        );
-      });
-  }, [phase, selected, confidence, question, sessionId, mode, focus, index]);
+    persistAttempt(result, index);
+  }, [phase, selected, confidence, question, index, persistAttempt]);
+
+  const retryAttempt = useCallback(() => {
+    const result = results[index];
+    if (!result || result.saveState !== "failed") return;
+    setHint(null);
+    persistAttempt(result, index);
+  }, [results, index, persistAttempt]);
 
   const next = useCallback(() => {
-    if (phase !== "revealed") return;
+    if (phase !== "revealed" || finishing) return;
+    const current = results[index];
+    if (!attemptIsPersisted(current)) {
+      setHint(
+        current?.saveState === "failed"
+          ? "Retry the save before continuing."
+          : "Saving this attempt before continuing…",
+      );
+      return;
+    }
     if (index + 1 < questions.length) {
       setIndex(index + 1);
       setPhase("answering");
@@ -143,6 +187,7 @@ export function QuestionRunner({
       setConfidence(null);
       setHint(null);
       setElapsed(0);
+      setFinishFailed(false);
       startRef.current = Date.now();
     } else {
       const all = results;
@@ -154,10 +199,19 @@ export function QuestionRunner({
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
       };
-      finishSession(sessionId, summary).catch(() => {});
-      setPhase("done");
+      setFinishing(true);
+      setFinishFailed(false);
+      finishSession(sessionId, summary)
+        .then(() => {
+          setPhase("done");
+          setFinishing(false);
+        })
+        .catch(() => {
+          setFinishing(false);
+          setFinishFailed(true);
+        });
     }
-  }, [phase, index, questions.length, results, sessionId]);
+  }, [phase, finishing, index, questions.length, results, sessionId]);
 
   const tagError = useCallback(
     (errorType: ErrorType) => {
@@ -422,11 +476,25 @@ export function QuestionRunner({
             {hint}
           </p>
         )}
-        {currentResult?.saveFailed && (
-          <p className="mt-2 text-sm text-redpen" role="alert">
-            This attempt was not saved — check that the dev server can reach
-            ./data/q86.db.
+        {currentResult?.saveState === "saving" && (
+          <p className="mt-2 text-sm text-graphite" role="status">
+            Saving this attempt…
           </p>
+        )}
+        {currentResult?.saveState === "failed" && (
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <p className="text-sm text-redpen" role="alert">
+              This attempt was not saved. Your answer is still here; retry to
+              continue.
+            </p>
+            <button
+              type="button"
+              onClick={retryAttempt}
+              className="rounded-control border border-redpen/40 bg-surface px-3 py-1.5 text-sm font-medium text-redpen hover:border-redpen"
+            >
+              Retry save
+            </button>
+          </div>
         )}
       </motion.div>
 
@@ -478,6 +546,12 @@ export function QuestionRunner({
             question={question}
             selectedIndex={currentResult.selectedIndex}
           />
+          {finishFailed && (
+            <p className="text-sm text-redpen" role="alert">
+              Your attempts are saved, but the session could not be closed.
+              Select Finish to retry.
+            </p>
+          )}
           <div className="flex items-center justify-between">
             <button
               onClick={gotoPostmortem}
@@ -491,10 +565,18 @@ export function QuestionRunner({
               <span className="ml-2 font-mono text-[10px] text-graphite">P</span>
             </button>
             <button
+              type="button"
               onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              disabled={!attemptIsPersisted(currentResult) || finishing}
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {index + 1 < questions.length ? "Next question" : "Finish"}
+              {currentResult.saveState === "saving"
+                ? "Saving…"
+                : finishing
+                  ? "Finishing…"
+                  : index + 1 < questions.length
+                    ? "Next question"
+                    : "Finish"}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
             </button>
           </div>
