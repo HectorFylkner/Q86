@@ -18,7 +18,7 @@ export function ConceptSegmentView({
   prerequisites,
 }: ConceptSegmentViewProps) {
   return (
-    <div className="space-y-9">
+    <div className="min-w-0 space-y-9">
       <SectionShell id="objective" index={1} title="Objective + prerequisites">
         <p className="text-base leading-relaxed">{segment.objective}</p>
         {prerequisites.length > 0 && (
@@ -58,13 +58,13 @@ export function ConceptSegmentView({
 
       <SectionShell id="model" index={2} title="Model + formal rule">
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+          <div className="min-w-0 rounded-card border border-grid bg-surface p-4 shadow-ambient">
             <p className="font-mono text-[10px] uppercase tracking-wide text-ballpoint">
               Intuitive model
             </p>
             <Md source={segment.intuitiveModelMd} className="mt-2 text-sm" />
           </div>
-          <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+          <div className="min-w-0 rounded-card border border-grid bg-surface p-4 shadow-ambient">
             <p className="font-mono text-[10px] uppercase tracking-wide text-ballpoint">
               Formal rule
             </p>
@@ -122,13 +122,13 @@ export function ConceptSegmentView({
 
       <SectionShell id="contrast" index={5} title="Contrast pair">
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-card border border-grid bg-surface p-4">
+          <div className="min-w-0 rounded-card border border-grid bg-surface p-4">
             <p className="font-mono text-[10px] uppercase tracking-wide text-ballpoint">
               Case A
             </p>
             <Md source={segment.contrastPair.caseAMd} className="mt-2 text-sm" />
           </div>
-          <div className="rounded-card border border-grid bg-surface p-4">
+          <div className="min-w-0 rounded-card border border-grid bg-surface p-4">
             <p className="font-mono text-[10px] uppercase tracking-wide text-redpen">
               Case B
             </p>
@@ -146,7 +146,7 @@ export function ConceptSegmentView({
           {segment.misconceptions.map((misconception) => (
             <article
               key={misconception.id}
-              className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
+              className="min-w-0 rounded-card border border-grid bg-surface p-4 shadow-ambient"
             >
               <h3 className="text-sm font-semibold">{misconception.title}</h3>
               <p className="mt-2 text-xs font-medium uppercase tracking-wide text-amber">
@@ -201,7 +201,7 @@ export function ConceptSegmentView({
       <SectionShell id="speed" index={8} title="Speed method + guardrail">
         <Md source={segment.speedMethod.methodMd} className="text-sm" />
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-card border border-ballpoint/25 bg-ballpoint/5 p-4">
+          <div className="min-w-0 rounded-card border border-ballpoint/25 bg-ballpoint/5 p-4">
             <p className="font-mono text-[10px] uppercase tracking-wide text-ballpoint">
               Safe when
             </p>
@@ -211,7 +211,7 @@ export function ConceptSegmentView({
               ))}
             </ul>
           </div>
-          <div className="rounded-card border border-redpen/25 bg-redpen/5 p-4">
+          <div className="min-w-0 rounded-card border border-redpen/25 bg-redpen/5 p-4">
             <p className="font-mono text-[10px] uppercase tracking-wide text-redpen">
               Unsafe when
             </p>

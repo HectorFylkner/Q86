@@ -52,7 +52,7 @@ export default async function ConceptLessonPage({
       : concept.parentSubtopic.replaceAll("_", " ");
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6">
       <header>
         <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
           <Link href="/learn" className="hover:text-ballpoint">
@@ -86,7 +86,7 @@ export default async function ConceptLessonPage({
             {segment ? "teaching complete" : "unpublished segment"}
           </span>
         </div>
-        <p className="mt-2 font-mono text-[10px] text-faint">
+        <p className="mt-2 [overflow-wrap:anywhere] font-mono text-[10px] text-faint">
           {concept.id} · content {concept.contentVersion}
         </p>
       </header>

@@ -17,7 +17,7 @@ export function SectionShell({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24">
+    <section id={id} className="min-w-0 scroll-mt-24">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
         <span className="font-mono text-[11px] font-medium text-ballpoint">
           {String(index).padStart(2, "0")}
