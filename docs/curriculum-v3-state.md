@@ -70,6 +70,8 @@ audited separately.
   Quant question type.
 - Public scope and product-pattern sources, their check date, and the no-copy
   boundary are recorded in `docs/curriculum-v3-sources.md`.
+- The section-aware expansion contract and the gates for any future
+  three-section claim are recorded in `docs/three-section-roadmap.md`.
 
 ## Feature-level integration plan
 
