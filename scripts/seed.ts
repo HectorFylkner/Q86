@@ -8,7 +8,7 @@
  * instead of participating in seed completion.
  *
  * Usage: pnpm seed          Load scripts/seed-bank.json
- *        pnpm seed --plan   Print the historical target distribution
+ *        pnpm seed --plan   Print the current committed-bank distribution
  *        pnpm seed --api    Exit safely with migration guidance
  */
 
@@ -18,23 +18,25 @@ try {
   // .env.local may not exist; database configuration may come from the host.
 }
 
-import { SKILL_BY_SUBTOPIC } from "../lib/taxonomy.ts";
-import { buildPlan, type PlanItem } from "./seed-plan.ts";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  computeBankStats,
+  type BankStatsQuestion,
+} from "../lib/bank-stats.ts";
 
-function printPlanSummary(plan: PlanItem[]): void {
-  const bySkill = new Map<string, number>();
-  const byDifficulty = new Map<number, number>();
-  const byFormat = new Map<string, number>();
-  for (const item of plan) {
-    const skill = SKILL_BY_SUBTOPIC[item.subtopic];
-    bySkill.set(skill, (bySkill.get(skill) ?? 0) + 1);
-    byDifficulty.set(item.difficulty, (byDifficulty.get(item.difficulty) ?? 0) + 1);
-    byFormat.set(item.format, (byFormat.get(item.format) ?? 0) + 1);
-  }
-  console.log(`Plan: ${plan.length} items`);
-  console.log("  by skill:", Object.fromEntries(bySkill));
-  console.log("  by difficulty:", Object.fromEntries([...byDifficulty].sort()));
-  console.log("  by format:", Object.fromEntries(byFormat));
+function printBankSummary(): void {
+  const bank = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "scripts", "seed-bank.json"), "utf8"),
+  ) as { questions: BankStatsQuestion[] };
+  const stats = computeBankStats(bank.questions);
+  console.log(`Committed bank: ${stats.total} items`);
+  console.log("  by skill:", stats.bySkill);
+  console.log("  by difficulty:", stats.byDifficulty);
+  console.log("  by format:", {
+    problem_solving: stats.problemSolving,
+    data_sufficiency: stats.dataSufficiency,
+  });
 }
 
 async function main(): Promise<void> {
@@ -55,7 +57,7 @@ async function main(): Promise<void> {
   }
 
   if (process.argv.includes("--plan")) {
-    printPlanSummary(buildPlan());
+    printBankSummary();
     return;
   }
 

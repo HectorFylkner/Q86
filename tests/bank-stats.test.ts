@@ -15,6 +15,14 @@ test("bank statistics are derived and internally consistent", () => {
     stats.total,
   );
   assert.equal(
+    Object.values(stats.bySkill).reduce((sum, n) => sum + n, 0),
+    stats.total,
+  );
+  assert.equal(
+    Object.values(stats.byDifficulty).reduce((sum, n) => sum + n, 0),
+    stats.total,
+  );
+  assert.equal(
     stats.canonicalKeyPositions.problemSolving.reduce((sum, n) => sum + n, 0),
     stats.problemSolving,
   );

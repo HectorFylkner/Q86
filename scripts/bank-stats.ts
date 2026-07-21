@@ -11,6 +11,8 @@ const stats = computeBankStats(bank.questions);
 console.log(`Questions: ${stats.total}`);
 console.log(`Problem Solving: ${stats.problemSolving}`);
 console.log(`Data Sufficiency bridge: ${stats.dataSufficiency}`);
+console.log(`By skill: ${JSON.stringify(stats.bySkill)}`);
+console.log(`By difficulty: ${JSON.stringify(stats.byDifficulty)}`);
 console.log(
   `Canonical PS keys A–E: ${stats.canonicalKeyPositions.problemSolving.join(" / ")}`,
 );
