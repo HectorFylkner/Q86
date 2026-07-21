@@ -4,6 +4,7 @@ import { client, db } from "./index.ts";
 import { loadBank, seedBankNeedsSync } from "./seed-bank.ts";
 import { applyModelQuarantineMigration } from "./model-quarantine.ts";
 import { evolveConceptEvidenceSchema } from "./concept-evidence-evolution.ts";
+import { syncCurriculumV3Mappings } from "./curriculum-mappings.ts";
 
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
@@ -55,6 +56,12 @@ async function provision(): Promise<void> {
       await loadBank();
     console.log(
       `Q86 bootstrap: seed bank loaded (${inserted} inserted, ${updated} refreshed, ${backfilled} legacy IDs backfilled, ${retired} retired, ${revisions} revision snapshots recorded).`,
+    );
+  }
+  const mappingSync = await syncCurriculumV3Mappings();
+  if (mappingSync.insertedRows > 0) {
+    console.log(
+      `Q86 bootstrap: stored ${mappingSync.insertedRows} reviewed concept mapping rows across ${mappingSync.mappedQuestions} pilot questions.`,
     );
   }
 }
