@@ -3,6 +3,7 @@ import { migrate } from "drizzle-orm/libsql/migrator";
 import { client, db } from "./index.ts";
 import { loadBank, seedBankNeedsSync } from "./seed-bank.ts";
 import { applyModelQuarantineMigration } from "./model-quarantine.ts";
+import { evolveConceptEvidenceSchema } from "./concept-evidence-evolution.ts";
 
 /**
  * Self-provisioning: on a fresh database (local file or a brand-new Turso
@@ -61,7 +62,7 @@ async function provision(): Promise<void> {
 /** Mirrors every migration after 0000 for databases that predate them
  *  (db:push-created databases have no ledger, so late additions land
  *  here as guarded DDL). */
-async function evolveSchema(): Promise<void> {
+export async function evolveSchema(): Promise<void> {
   // drizzle/0005_question_identity.sql. ADD COLUMN lacks a portable
   // IF NOT EXISTS form across the deployed SQLite/libSQL versions, so inspect
   // first. This preserves existing numeric question IDs and all foreign keys.
@@ -92,6 +93,10 @@ async function evolveSchema(): Promise<void> {
   await client.execute(
     "create unique index if not exists question_revisions_version_idx on question_revisions (question_id, content_version)",
   );
+  // drizzle/0006_concept_evidence.sql. Source-controlled graph definitions
+  // remain outside the database; these tables preserve only versioned
+  // mappings, learning evidence, exact session rosters, and action records.
+  await evolveConceptEvidenceSchema(client);
   // drizzle/0004_nice_dracula.sql
   await client.execute(`create table if not exists lesson_example_attempts (
     id integer primary key autoincrement not null,

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  check,
   index,
   integer,
   real,
@@ -7,6 +8,8 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import type { CertificationStatus } from "../assessment-reliability.ts";
+import type { ChoiceOrder } from "../question-choice-order.ts";
 import type {
   ChapterKey,
   Confidence,
@@ -113,6 +116,115 @@ export const questionRevisions = sqliteTable(
   ],
 );
 
+/**
+ * Versioned editorial mappings from a stable question identity to the
+ * source-controlled curriculum graph. Concept, archetype, and surface-form
+ * definitions deliberately do not live in the database: the graph remains
+ * reviewable in git, while these rows preserve which mapping was in force for
+ * a particular question content version.
+ */
+export const questionConceptMappings = sqliteTable(
+  "question_concept_mappings",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    questionUid: text("question_uid").notNull(),
+    questionContentVersion: integer("question_content_version").notNull(),
+    conceptId: text("concept_id").notNull(),
+    role: text("role").$type<"primary" | "secondary">().notNull(),
+    archetypeId: text("archetype_id").notNull(),
+    surfaceFormId: text("surface_form_id").notNull(),
+    mappingVersion: integer("mapping_version").notNull(),
+    editorialState: text("editorial_state")
+      .$type<"draft" | "reviewed" | "approved" | "retired">()
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("question_concept_mapping_version_idx").on(
+      t.questionUid,
+      t.questionContentVersion,
+      t.conceptId,
+      t.mappingVersion,
+    ),
+    uniqueIndex("question_concept_primary_version_idx")
+      .on(t.questionUid, t.questionContentVersion, t.mappingVersion)
+      .where(sql`${t.role} = 'primary'`),
+    index("question_concept_concept_idx").on(
+      t.conceptId,
+      t.editorialState,
+    ),
+    check(
+      "question_concept_content_version_check",
+      sql`${t.questionContentVersion} >= 1`,
+    ),
+    check(
+      "question_concept_mapping_version_check",
+      sql`${t.mappingVersion} >= 1`,
+    ),
+    check(
+      "question_concept_role_check",
+      sql`${t.role} in ('primary', 'secondary')`,
+    ),
+    check(
+      "question_concept_editorial_state_check",
+      sql`${t.editorialState} in ('draft', 'reviewed', 'approved', 'retired')`,
+    ),
+  ],
+);
+
+/** One canonical distractor maps to one stable misconception per release. */
+export const distractorMisconceptionMappings = sqliteTable(
+  "distractor_misconception_mappings",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    questionUid: text("question_uid").notNull(),
+    questionContentVersion: integer("question_content_version").notNull(),
+    canonicalChoiceIndex: integer("canonical_choice_index").notNull(),
+    conceptId: text("concept_id").notNull(),
+    misconceptionId: text("misconception_id").notNull(),
+    mappingVersion: integer("mapping_version").notNull(),
+    editorialState: text("editorial_state")
+      .$type<"draft" | "reviewed" | "approved" | "retired">()
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("distractor_misconception_version_idx").on(
+      t.questionUid,
+      t.questionContentVersion,
+      t.canonicalChoiceIndex,
+      t.mappingVersion,
+    ),
+    index("distractor_misconception_idx").on(t.misconceptionId),
+    check(
+      "distractor_choice_index_check",
+      sql`${t.canonicalChoiceIndex} between 0 and 4`,
+    ),
+    check(
+      "distractor_question_content_version_check",
+      sql`${t.questionContentVersion} >= 1`,
+    ),
+    check(
+      "distractor_mapping_version_check",
+      sql`${t.mappingVersion} >= 1`,
+    ),
+    check(
+      "distractor_editorial_state_check",
+      sql`${t.editorialState} in ('draft', 'reviewed', 'approved', 'retired')`,
+    ),
+  ],
+);
+
 export const sessions = sqliteTable("sessions", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   mode: text("mode").$type<SessionMode>().notNull(),
@@ -125,6 +237,68 @@ export const sessions = sqliteTable("sessions", {
   endedAt: integer("ended_at", { mode: "timestamp_ms" }),
   summary: text("summary", { mode: "json" }).$type<Record<string, unknown>>(),
 });
+
+/**
+ * The immutable roster needed to replay a session exactly. Position and
+ * blueprint slot are session-owned; question identity/version and the
+ * display-to-canonical permutation remain fixed even after bank edits.
+ */
+export const sessionItems = sqliteTable(
+  "session_items",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => sessions.id),
+    position: integer("position").notNull(),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    questionUid: text("question_uid").notNull(),
+    questionContentVersion: integer("question_content_version").notNull(),
+    blueprintSlot: text("blueprint_slot").notNull(),
+    choiceOrderAlgorithm: text("choice_order_algorithm").notNull(),
+    displayToCanonical: text("display_to_canonical", { mode: "json" })
+      .$type<ChoiceOrder>()
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("session_items_position_idx").on(t.sessionId, t.position),
+    uniqueIndex("session_items_question_idx").on(t.sessionId, t.questionUid),
+    uniqueIndex("session_items_blueprint_slot_idx").on(
+      t.sessionId,
+      t.blueprintSlot,
+    ),
+    check("session_items_position_check", sql`${t.position} >= 0`),
+    check(
+      "session_items_content_version_check",
+      sql`${t.questionContentVersion} >= 1`,
+    ),
+    check(
+      "session_items_choice_order_check",
+      sql`json_valid(${t.displayToCanonical})
+        and json_array_length(${t.displayToCanonical}) = 5
+        and json_extract(${t.displayToCanonical}, '$[0]') between 0 and 4
+        and json_extract(${t.displayToCanonical}, '$[1]') between 0 and 4
+        and json_extract(${t.displayToCanonical}, '$[2]') between 0 and 4
+        and json_extract(${t.displayToCanonical}, '$[3]') between 0 and 4
+        and json_extract(${t.displayToCanonical}, '$[4]') between 0 and 4
+        and json_extract(${t.displayToCanonical}, '$[0]') != json_extract(${t.displayToCanonical}, '$[1]')
+        and json_extract(${t.displayToCanonical}, '$[0]') != json_extract(${t.displayToCanonical}, '$[2]')
+        and json_extract(${t.displayToCanonical}, '$[0]') != json_extract(${t.displayToCanonical}, '$[3]')
+        and json_extract(${t.displayToCanonical}, '$[0]') != json_extract(${t.displayToCanonical}, '$[4]')
+        and json_extract(${t.displayToCanonical}, '$[1]') != json_extract(${t.displayToCanonical}, '$[2]')
+        and json_extract(${t.displayToCanonical}, '$[1]') != json_extract(${t.displayToCanonical}, '$[3]')
+        and json_extract(${t.displayToCanonical}, '$[1]') != json_extract(${t.displayToCanonical}, '$[4]')
+        and json_extract(${t.displayToCanonical}, '$[2]') != json_extract(${t.displayToCanonical}, '$[3]')
+        and json_extract(${t.displayToCanonical}, '$[2]') != json_extract(${t.displayToCanonical}, '$[4]')
+        and json_extract(${t.displayToCanonical}, '$[3]') != json_extract(${t.displayToCanonical}, '$[4]')`,
+    ),
+  ],
+);
 
 export const attempts = sqliteTable(
   "attempts",
@@ -144,6 +318,10 @@ export const attempts = sqliteTable(
     confidence: text("confidence").$type<Confidence>().notNull(),
     errorType: text("error_type").$type<ErrorType>(),
     errorSubtag: text("error_subtag").$type<Subtopic>(),
+    // Stable graph references add precision without replacing the broad,
+    // official-report-compatible errorSubtag analytics spine.
+    errorConceptId: text("error_concept_id"),
+    misconceptionId: text("misconception_id"),
     // JSON array of up to 3 scratch-work images stored as data URLs
     // (kept in the DB so serverless hosts work; legacy rows may hold
     // relative file paths from the era of on-disk storage).
@@ -158,6 +336,8 @@ export const attempts = sqliteTable(
     index("attempts_question_idx").on(t.questionId),
     index("attempts_session_idx").on(t.sessionId),
     index("attempts_created_idx").on(t.createdAt),
+    index("attempts_error_concept_idx").on(t.errorConceptId),
+    index("attempts_misconception_idx").on(t.misconceptionId),
   ],
 );
 
@@ -302,6 +482,282 @@ export const lessonExampleAttempts = sqliteTable(
   (t) => [index("lesson_example_idx").on(t.subtopic, t.exampleN)],
 );
 
+/**
+ * Evidence from independently addressable examples and checks. The item UID
+ * and version are authored in the source-controlled concept segment; the
+ * attempt UID makes retries and offline/form replays idempotent without
+ * collapsing legitimate later attempts on the same item.
+ */
+export const conceptLearningAttempts = sqliteTable(
+  "concept_learning_attempts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    attemptUid: text("attempt_uid").notNull(),
+    sessionId: integer("session_id").references(() => sessions.id),
+    conceptId: text("concept_id").notNull(),
+    itemUid: text("item_uid").notNull(),
+    itemContentVersion: integer("item_content_version").notNull(),
+    itemKind: text("item_kind").$type<"example" | "check">().notNull(),
+    originalAnswer: text("original_answer"),
+    originalMethod: text("original_method"),
+    declaredUnknown: integer("declared_unknown", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    highestHintLevel: integer("highest_hint_level").notNull().default(0),
+    correction: text("correction"),
+    finalAnswer: text("final_answer"),
+    initialCorrect: integer("initial_correct", { mode: "boolean" }).notNull(),
+    finalCorrect: integer("final_correct", { mode: "boolean" }).notNull(),
+    timeSeconds: real("time_seconds").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("concept_learning_attempt_uid_idx").on(t.attemptUid),
+    index("concept_learning_item_idx").on(
+      t.conceptId,
+      t.itemUid,
+      t.createdAt,
+    ),
+    index("concept_learning_session_idx").on(t.sessionId),
+    check(
+      "concept_learning_item_version_check",
+      sql`${t.itemContentVersion} >= 1`,
+    ),
+    check(
+      "concept_learning_item_kind_check",
+      sql`${t.itemKind} in ('example', 'check')`,
+    ),
+    check(
+      "concept_learning_original_commitment_check",
+      sql`${t.declaredUnknown} = 1 or (${t.originalAnswer} is not null and length(trim(${t.originalAnswer})) > 0)`,
+    ),
+    check(
+      "concept_learning_unknown_correctness_check",
+      sql`not (${t.declaredUnknown} = 1 and ${t.initialCorrect} = 1)`,
+    ),
+    check(
+      "concept_learning_hint_level_check",
+      sql`${t.highestHintLevel} between 0 and 5`,
+    ),
+    check(
+      "concept_learning_final_answer_check",
+      sql`${t.finalCorrect} = 0 or (${t.finalAnswer} is not null and length(trim(${t.finalAnswer})) > 0)`,
+    ),
+    check("concept_learning_time_check", sql`${t.timeSeconds} >= 0`),
+  ],
+);
+
+/**
+ * Fine-grained, immutable assistance evidence. One event can link to the
+ * eventual graded attempt, the pre-answer session item, or both.
+ */
+export const assistanceEvents = sqliteTable(
+  "assistance_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    eventUid: text("event_uid").notNull(),
+    conceptId: text("concept_id").notNull(),
+    misconceptionId: text("misconception_id"),
+    learningAttemptId: integer("learning_attempt_id").references(
+      () => conceptLearningAttempts.id,
+    ),
+    questionAttemptId: integer("question_attempt_id").references(
+      () => attempts.id,
+    ),
+    sessionItemId: integer("session_item_id").references(
+      () => sessionItems.id,
+    ),
+    kind: text("kind")
+      .$type<
+        | "hint_opened"
+        | "hint_applied"
+        | "worked_solution_revealed"
+        | "tutor_intervention"
+      >()
+      .notNull(),
+    hintLevel: integer("hint_level"),
+    details: text("details", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'`),
+    occurredAt: integer("occurred_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("assistance_event_uid_idx").on(t.eventUid),
+    index("assistance_concept_time_idx").on(t.conceptId, t.occurredAt),
+    index("assistance_learning_attempt_idx").on(t.learningAttemptId),
+    index("assistance_question_attempt_idx").on(t.questionAttemptId),
+    check(
+      "assistance_event_kind_check",
+      sql`${t.kind} in ('hint_opened', 'hint_applied', 'worked_solution_revealed', 'tutor_intervention')`,
+    ),
+    check(
+      "assistance_event_subject_check",
+      sql`${t.learningAttemptId} is not null or ${t.questionAttemptId} is not null or ${t.sessionItemId} is not null`,
+    ),
+    check(
+      "assistance_event_hint_level_check",
+      sql`${t.hintLevel} is null or ${t.hintLevel} between 1 and 5`,
+    ),
+  ],
+);
+
+/**
+ * Append-only certification ledger. Current state is derived from the highest
+ * contiguous sequence for a concept; no mutable "mastered" truth is stored.
+ */
+export const conceptCertificationTransitions = sqliteTable(
+  "concept_certification_transitions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    transitionUid: text("transition_uid").notNull(),
+    conceptId: text("concept_id").notNull(),
+    sequence: integer("sequence").notNull(),
+    fromStatus: text("from_status").$type<CertificationStatus>().notNull(),
+    toStatus: text("to_status").$type<CertificationStatus>().notNull(),
+    eventType: text("event_type")
+      .$type<
+        | "accuracy_passed"
+        | "timed_transfer_passed"
+        | "stale"
+        | "evidence_slipped"
+        | "recertification_started"
+        | "recertification_passed"
+        | "recertification_failed"
+      >()
+      .notNull(),
+    evidenceSessionId: integer("evidence_session_id").references(
+      () => sessions.id,
+    ),
+    evidence: text("evidence", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'`),
+    occurredAt: integer("occurred_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("concept_certification_transition_uid_idx").on(
+      t.transitionUid,
+    ),
+    uniqueIndex("concept_certification_sequence_idx").on(
+      t.conceptId,
+      t.sequence,
+    ),
+    index("concept_certification_time_idx").on(t.conceptId, t.occurredAt),
+    check("concept_certification_sequence_check", sql`${t.sequence} >= 0`),
+    check(
+      "concept_certification_from_status_check",
+      sql`${t.fromStatus} in ('unproven', 'accuracy_proven', 'certified', 'recertification_required', 'recertifying')`,
+    ),
+    check(
+      "concept_certification_to_status_check",
+      sql`${t.toStatus} in ('unproven', 'accuracy_proven', 'certified', 'recertification_required', 'recertifying')`,
+    ),
+    check(
+      "concept_certification_event_type_check",
+      sql`${t.eventType} in ('accuracy_passed', 'timed_transfer_passed', 'stale', 'evidence_slipped', 'recertification_started', 'recertification_passed', 'recertification_failed')`,
+    ),
+  ],
+);
+
+/** A concrete next action produced by diagnosis, not an inert analytics row. */
+export const conceptRemediations = sqliteTable(
+  "concept_remediations",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    remediationUid: text("remediation_uid").notNull(),
+    conceptId: text("concept_id").notNull(),
+    misconceptionId: text("misconception_id"),
+    sourceQuestionAttemptId: integer("source_question_attempt_id").references(
+      () => attempts.id,
+    ),
+    sourceLearningAttemptId: integer("source_learning_attempt_id").references(
+      () => conceptLearningAttempts.id,
+    ),
+    sourceCertificationTransitionId: integer(
+      "source_certification_transition_id",
+    ).references(() => conceptCertificationTransitions.id),
+    trigger: text("trigger")
+      .$type<
+        | "wrong"
+        | "slow"
+        | "hinted"
+        | "low_confidence"
+        | "changed_from_correct"
+        | "retention_slip"
+        | "stale"
+        | "manual"
+      >()
+      .notNull(),
+    actionType: text("action_type")
+      .$type<
+        | "review_concept"
+        | "review_misconception"
+        | "retry_check"
+        | "targeted_practice"
+        | "retrieval_card"
+        | "recertify_concept"
+      >()
+      .notNull(),
+    // Stable graph/content ID; consumers derive the route rather than storing
+    // a brittle URL.
+    actionTargetId: text("action_target_id").notNull(),
+    status: text("status")
+      .$type<"open" | "in_progress" | "resolved" | "dismissed">()
+      .notNull()
+      .default("open"),
+    priority: integer("priority").notNull().default(3),
+    rationaleMd: text("rationale_md").notNull(),
+    dueAt: integer("due_at", { mode: "timestamp_ms" }),
+    resolvedAt: integer("resolved_at", { mode: "timestamp_ms" }),
+    resolutionEvidence: text("resolution_evidence", { mode: "json" }).$type<
+      Record<string, unknown>
+    >(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    uniqueIndex("concept_remediation_uid_idx").on(t.remediationUid),
+    index("concept_remediation_queue_idx").on(t.status, t.dueAt, t.priority),
+    index("concept_remediation_concept_idx").on(t.conceptId, t.status),
+    check(
+      "concept_remediation_trigger_check",
+      sql`${t.trigger} in ('wrong', 'slow', 'hinted', 'low_confidence', 'changed_from_correct', 'retention_slip', 'stale', 'manual')`,
+    ),
+    check(
+      "concept_remediation_action_check",
+      sql`${t.actionType} in ('review_concept', 'review_misconception', 'retry_check', 'targeted_practice', 'retrieval_card', 'recertify_concept')`,
+    ),
+    check(
+      "concept_remediation_status_check",
+      sql`${t.status} in ('open', 'in_progress', 'resolved', 'dismissed')`,
+    ),
+    check(
+      "concept_remediation_priority_check",
+      sql`${t.priority} between 1 and 5`,
+    ),
+    check(
+      "concept_remediation_source_check",
+      sql`${t.trigger} = 'manual' or ${t.sourceQuestionAttemptId} is not null or ${t.sourceLearningAttemptId} is not null or ${t.sourceCertificationTransitionId} is not null`,
+    ),
+    check(
+      "concept_remediation_resolution_check",
+      sql`((${t.status} in ('resolved', 'dismissed')) and ${t.resolvedAt} is not null)
+        or ((${t.status} in ('open', 'in_progress')) and ${t.resolvedAt} is null)`,
+    ),
+  ],
+);
+
 // Concept-level spaced retrieval: a chapter's trigger cues and trap
 // gallery become retrieval-first cards when its test is passed, merged
 // into the daily deck (question-derived cards keep priority) and
@@ -359,7 +815,12 @@ export const questionFlags = sqliteTable(
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
 export type QuestionRevision = typeof questionRevisions.$inferSelect;
+export type QuestionConceptMapping =
+  typeof questionConceptMappings.$inferSelect;
+export type DistractorMisconceptionMapping =
+  typeof distractorMisconceptionMappings.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+export type SessionItem = typeof sessionItems.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
 export type NewAttempt = typeof attempts.$inferInsert;
 export type Edit = typeof edits.$inferSelect;
@@ -373,3 +834,9 @@ export type QuestionFlag = typeof questionFlags.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type LessonReview = typeof lessonReviews.$inferSelect;
 export type LessonExampleAttempt = typeof lessonExampleAttempts.$inferSelect;
+export type ConceptLearningAttempt =
+  typeof conceptLearningAttempts.$inferSelect;
+export type AssistanceEvent = typeof assistanceEvents.$inferSelect;
+export type ConceptCertificationTransition =
+  typeof conceptCertificationTransitions.$inferSelect;
+export type ConceptRemediation = typeof conceptRemediations.$inferSelect;

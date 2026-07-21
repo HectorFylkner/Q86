@@ -1,0 +1,2474 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "9ee5d8a9-3441-4c4a-8ff6-d09a2a3231a0",
+  "prevId": "31bf3d65-733d-4cb8-bf8a-84116d85c130",
+  "tables": {
+    "assistance_events": {
+      "name": "assistance_events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "event_uid": {
+          "name": "event_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "misconception_id": {
+          "name": "misconception_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "learning_attempt_id": {
+          "name": "learning_attempt_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "question_attempt_id": {
+          "name": "question_attempt_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "session_item_id": {
+          "name": "session_item_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hint_level": {
+          "name": "hint_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "details": {
+          "name": "details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "assistance_event_uid_idx": {
+          "name": "assistance_event_uid_idx",
+          "columns": [
+            "event_uid"
+          ],
+          "isUnique": true
+        },
+        "assistance_concept_time_idx": {
+          "name": "assistance_concept_time_idx",
+          "columns": [
+            "concept_id",
+            "occurred_at"
+          ],
+          "isUnique": false
+        },
+        "assistance_learning_attempt_idx": {
+          "name": "assistance_learning_attempt_idx",
+          "columns": [
+            "learning_attempt_id"
+          ],
+          "isUnique": false
+        },
+        "assistance_question_attempt_idx": {
+          "name": "assistance_question_attempt_idx",
+          "columns": [
+            "question_attempt_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "assistance_events_learning_attempt_id_concept_learning_attempts_id_fk": {
+          "name": "assistance_events_learning_attempt_id_concept_learning_attempts_id_fk",
+          "tableFrom": "assistance_events",
+          "tableTo": "concept_learning_attempts",
+          "columnsFrom": [
+            "learning_attempt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "assistance_events_question_attempt_id_attempts_id_fk": {
+          "name": "assistance_events_question_attempt_id_attempts_id_fk",
+          "tableFrom": "assistance_events",
+          "tableTo": "attempts",
+          "columnsFrom": [
+            "question_attempt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "assistance_events_session_item_id_session_items_id_fk": {
+          "name": "assistance_events_session_item_id_session_items_id_fk",
+          "tableFrom": "assistance_events",
+          "tableTo": "session_items",
+          "columnsFrom": [
+            "session_item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "assistance_event_kind_check": {
+          "name": "assistance_event_kind_check",
+          "value": "\"assistance_events\".\"kind\" in ('hint_opened', 'hint_applied', 'worked_solution_revealed', 'tutor_intervention')"
+        },
+        "assistance_event_subject_check": {
+          "name": "assistance_event_subject_check",
+          "value": "\"assistance_events\".\"learning_attempt_id\" is not null or \"assistance_events\".\"question_attempt_id\" is not null or \"assistance_events\".\"session_item_id\" is not null"
+        },
+        "assistance_event_hint_level_check": {
+          "name": "assistance_event_hint_level_check",
+          "value": "\"assistance_events\".\"hint_level\" is null or \"assistance_events\".\"hint_level\" between 1 and 5"
+        }
+      }
+    },
+    "attempts": {
+      "name": "attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "focus": {
+          "name": "focus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'focused'"
+        },
+        "selected_index": {
+          "name": "selected_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct": {
+          "name": "correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time_seconds": {
+          "name": "time_seconds",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "error_type": {
+          "name": "error_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "error_subtag": {
+          "name": "error_subtag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "error_concept_id": {
+          "name": "error_concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "misconception_id": {
+          "name": "misconception_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scratch_image_path": {
+          "name": "scratch_image_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ai_feedback_md": {
+          "name": "ai_feedback_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_notes": {
+          "name": "user_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "attempts_question_idx": {
+          "name": "attempts_question_idx",
+          "columns": [
+            "question_id"
+          ],
+          "isUnique": false
+        },
+        "attempts_session_idx": {
+          "name": "attempts_session_idx",
+          "columns": [
+            "session_id"
+          ],
+          "isUnique": false
+        },
+        "attempts_created_idx": {
+          "name": "attempts_created_idx",
+          "columns": [
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "attempts_error_concept_idx": {
+          "name": "attempts_error_concept_idx",
+          "columns": [
+            "error_concept_id"
+          ],
+          "isUnique": false
+        },
+        "attempts_misconception_idx": {
+          "name": "attempts_misconception_idx",
+          "columns": [
+            "misconception_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "attempts_question_id_questions_id_fk": {
+          "name": "attempts_question_id_questions_id_fk",
+          "tableFrom": "attempts",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "attempts_session_id_sessions_id_fk": {
+          "name": "attempts_session_id_sessions_id_fk",
+          "tableFrom": "attempts",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "baseline_reports": {
+      "name": "baseline_reports",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "raw_text": {
+          "name": "raw_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parsed": {
+          "name": "parsed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "concept_certification_transitions": {
+      "name": "concept_certification_transitions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "transition_uid": {
+          "name": "transition_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from_status": {
+          "name": "from_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "to_status": {
+          "name": "to_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "evidence_session_id": {
+          "name": "evidence_session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "concept_certification_transition_uid_idx": {
+          "name": "concept_certification_transition_uid_idx",
+          "columns": [
+            "transition_uid"
+          ],
+          "isUnique": true
+        },
+        "concept_certification_sequence_idx": {
+          "name": "concept_certification_sequence_idx",
+          "columns": [
+            "concept_id",
+            "sequence"
+          ],
+          "isUnique": true
+        },
+        "concept_certification_time_idx": {
+          "name": "concept_certification_time_idx",
+          "columns": [
+            "concept_id",
+            "occurred_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "concept_certification_transitions_evidence_session_id_sessions_id_fk": {
+          "name": "concept_certification_transitions_evidence_session_id_sessions_id_fk",
+          "tableFrom": "concept_certification_transitions",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "evidence_session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "concept_certification_sequence_check": {
+          "name": "concept_certification_sequence_check",
+          "value": "\"concept_certification_transitions\".\"sequence\" >= 0"
+        },
+        "concept_certification_from_status_check": {
+          "name": "concept_certification_from_status_check",
+          "value": "\"concept_certification_transitions\".\"from_status\" in ('unproven', 'accuracy_proven', 'certified', 'recertification_required', 'recertifying')"
+        },
+        "concept_certification_to_status_check": {
+          "name": "concept_certification_to_status_check",
+          "value": "\"concept_certification_transitions\".\"to_status\" in ('unproven', 'accuracy_proven', 'certified', 'recertification_required', 'recertifying')"
+        },
+        "concept_certification_event_type_check": {
+          "name": "concept_certification_event_type_check",
+          "value": "\"concept_certification_transitions\".\"event_type\" in ('accuracy_passed', 'timed_transfer_passed', 'stale', 'evidence_slipped', 'recertification_started', 'recertification_passed', 'recertification_failed')"
+        }
+      }
+    },
+    "concept_learning_attempts": {
+      "name": "concept_learning_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "attempt_uid": {
+          "name": "attempt_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "item_uid": {
+          "name": "item_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "item_content_version": {
+          "name": "item_content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "item_kind": {
+          "name": "item_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "original_answer": {
+          "name": "original_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "original_method": {
+          "name": "original_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "declared_unknown": {
+          "name": "declared_unknown",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "highest_hint_level": {
+          "name": "highest_hint_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "correction": {
+          "name": "correction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "final_answer": {
+          "name": "final_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "initial_correct": {
+          "name": "initial_correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "final_correct": {
+          "name": "final_correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time_seconds": {
+          "name": "time_seconds",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "concept_learning_attempt_uid_idx": {
+          "name": "concept_learning_attempt_uid_idx",
+          "columns": [
+            "attempt_uid"
+          ],
+          "isUnique": true
+        },
+        "concept_learning_item_idx": {
+          "name": "concept_learning_item_idx",
+          "columns": [
+            "concept_id",
+            "item_uid",
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "concept_learning_session_idx": {
+          "name": "concept_learning_session_idx",
+          "columns": [
+            "session_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "concept_learning_attempts_session_id_sessions_id_fk": {
+          "name": "concept_learning_attempts_session_id_sessions_id_fk",
+          "tableFrom": "concept_learning_attempts",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "concept_learning_item_version_check": {
+          "name": "concept_learning_item_version_check",
+          "value": "\"concept_learning_attempts\".\"item_content_version\" >= 1"
+        },
+        "concept_learning_item_kind_check": {
+          "name": "concept_learning_item_kind_check",
+          "value": "\"concept_learning_attempts\".\"item_kind\" in ('example', 'check')"
+        },
+        "concept_learning_original_commitment_check": {
+          "name": "concept_learning_original_commitment_check",
+          "value": "\"concept_learning_attempts\".\"declared_unknown\" = 1 or (\"concept_learning_attempts\".\"original_answer\" is not null and length(trim(\"concept_learning_attempts\".\"original_answer\")) > 0)"
+        },
+        "concept_learning_unknown_correctness_check": {
+          "name": "concept_learning_unknown_correctness_check",
+          "value": "not (\"concept_learning_attempts\".\"declared_unknown\" = 1 and \"concept_learning_attempts\".\"initial_correct\" = 1)"
+        },
+        "concept_learning_hint_level_check": {
+          "name": "concept_learning_hint_level_check",
+          "value": "\"concept_learning_attempts\".\"highest_hint_level\" between 0 and 5"
+        },
+        "concept_learning_final_answer_check": {
+          "name": "concept_learning_final_answer_check",
+          "value": "\"concept_learning_attempts\".\"final_correct\" = 0 or (\"concept_learning_attempts\".\"final_answer\" is not null and length(trim(\"concept_learning_attempts\".\"final_answer\")) > 0)"
+        },
+        "concept_learning_time_check": {
+          "name": "concept_learning_time_check",
+          "value": "\"concept_learning_attempts\".\"time_seconds\" >= 0"
+        }
+      }
+    },
+    "concept_remediations": {
+      "name": "concept_remediations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "remediation_uid": {
+          "name": "remediation_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "misconception_id": {
+          "name": "misconception_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_question_attempt_id": {
+          "name": "source_question_attempt_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_learning_attempt_id": {
+          "name": "source_learning_attempt_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_certification_transition_id": {
+          "name": "source_certification_transition_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trigger": {
+          "name": "trigger",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "action_type": {
+          "name": "action_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "action_target_id": {
+          "name": "action_target_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'open'"
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 3
+        },
+        "rationale_md": {
+          "name": "rationale_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "due_at": {
+          "name": "due_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolution_evidence": {
+          "name": "resolution_evidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "concept_remediation_uid_idx": {
+          "name": "concept_remediation_uid_idx",
+          "columns": [
+            "remediation_uid"
+          ],
+          "isUnique": true
+        },
+        "concept_remediation_queue_idx": {
+          "name": "concept_remediation_queue_idx",
+          "columns": [
+            "status",
+            "due_at",
+            "priority"
+          ],
+          "isUnique": false
+        },
+        "concept_remediation_concept_idx": {
+          "name": "concept_remediation_concept_idx",
+          "columns": [
+            "concept_id",
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "concept_remediations_source_question_attempt_id_attempts_id_fk": {
+          "name": "concept_remediations_source_question_attempt_id_attempts_id_fk",
+          "tableFrom": "concept_remediations",
+          "tableTo": "attempts",
+          "columnsFrom": [
+            "source_question_attempt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "concept_remediations_source_learning_attempt_id_concept_learning_attempts_id_fk": {
+          "name": "concept_remediations_source_learning_attempt_id_concept_learning_attempts_id_fk",
+          "tableFrom": "concept_remediations",
+          "tableTo": "concept_learning_attempts",
+          "columnsFrom": [
+            "source_learning_attempt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "concept_remediations_source_certification_transition_id_concept_certification_transitions_id_fk": {
+          "name": "concept_remediations_source_certification_transition_id_concept_certification_transitions_id_fk",
+          "tableFrom": "concept_remediations",
+          "tableTo": "concept_certification_transitions",
+          "columnsFrom": [
+            "source_certification_transition_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "concept_remediation_trigger_check": {
+          "name": "concept_remediation_trigger_check",
+          "value": "\"concept_remediations\".\"trigger\" in ('wrong', 'slow', 'hinted', 'low_confidence', 'changed_from_correct', 'retention_slip', 'stale', 'manual')"
+        },
+        "concept_remediation_action_check": {
+          "name": "concept_remediation_action_check",
+          "value": "\"concept_remediations\".\"action_type\" in ('review_concept', 'review_misconception', 'retry_check', 'targeted_practice', 'retrieval_card', 'recertify_concept')"
+        },
+        "concept_remediation_status_check": {
+          "name": "concept_remediation_status_check",
+          "value": "\"concept_remediations\".\"status\" in ('open', 'in_progress', 'resolved', 'dismissed')"
+        },
+        "concept_remediation_priority_check": {
+          "name": "concept_remediation_priority_check",
+          "value": "\"concept_remediations\".\"priority\" between 1 and 5"
+        },
+        "concept_remediation_source_check": {
+          "name": "concept_remediation_source_check",
+          "value": "\"concept_remediations\".\"trigger\" = 'manual' or \"concept_remediations\".\"source_question_attempt_id\" is not null or \"concept_remediations\".\"source_learning_attempt_id\" is not null or \"concept_remediations\".\"source_certification_transition_id\" is not null"
+        },
+        "concept_remediation_resolution_check": {
+          "name": "concept_remediation_resolution_check",
+          "value": "((\"concept_remediations\".\"status\" in ('resolved', 'dismissed')) and \"concept_remediations\".\"resolved_at\" is not null)\n        or ((\"concept_remediations\".\"status\" in ('open', 'in_progress')) and \"concept_remediations\".\"resolved_at\" is null)"
+        }
+      }
+    },
+    "deck_reviews": {
+      "name": "deck_reviews",
+      "columns": {
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ease": {
+          "name": "ease",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2.5
+        },
+        "interval_days": {
+          "name": "interval_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reps": {
+          "name": "reps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "lapses": {
+          "name": "lapses",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "due_at": {
+          "name": "due_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "deck_reviews_due_idx": {
+          "name": "deck_reviews_due_idx",
+          "columns": [
+            "due_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "deck_reviews_question_id_questions_id_fk": {
+          "name": "deck_reviews_question_id_questions_id_fk",
+          "tableFrom": "deck_reviews",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "distractor_misconception_mappings": {
+      "name": "distractor_misconception_mappings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_uid": {
+          "name": "question_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_content_version": {
+          "name": "question_content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "canonical_choice_index": {
+          "name": "canonical_choice_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "misconception_id": {
+          "name": "misconception_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mapping_version": {
+          "name": "mapping_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "editorial_state": {
+          "name": "editorial_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "distractor_misconception_version_idx": {
+          "name": "distractor_misconception_version_idx",
+          "columns": [
+            "question_uid",
+            "question_content_version",
+            "canonical_choice_index",
+            "mapping_version"
+          ],
+          "isUnique": true
+        },
+        "distractor_misconception_idx": {
+          "name": "distractor_misconception_idx",
+          "columns": [
+            "misconception_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "distractor_misconception_mappings_question_id_questions_id_fk": {
+          "name": "distractor_misconception_mappings_question_id_questions_id_fk",
+          "tableFrom": "distractor_misconception_mappings",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "distractor_choice_index_check": {
+          "name": "distractor_choice_index_check",
+          "value": "\"distractor_misconception_mappings\".\"canonical_choice_index\" between 0 and 4"
+        },
+        "distractor_question_content_version_check": {
+          "name": "distractor_question_content_version_check",
+          "value": "\"distractor_misconception_mappings\".\"question_content_version\" >= 1"
+        },
+        "distractor_mapping_version_check": {
+          "name": "distractor_mapping_version_check",
+          "value": "\"distractor_misconception_mappings\".\"mapping_version\" >= 1"
+        },
+        "distractor_editorial_state_check": {
+          "name": "distractor_editorial_state_check",
+          "value": "\"distractor_misconception_mappings\".\"editorial_state\" in ('draft', 'reviewed', 'approved', 'retired')"
+        }
+      }
+    },
+    "edits": {
+      "name": "edits",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from_index": {
+          "name": "from_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "to_index": {
+          "name": "to_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from_correct": {
+          "name": "from_correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "to_correct": {
+          "name": "to_correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "justification": {
+          "name": "justification",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "edits_session_id_sessions_id_fk": {
+          "name": "edits_session_id_sessions_id_fk",
+          "tableFrom": "edits",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "edits_question_id_questions_id_fk": {
+          "name": "edits_question_id_questions_id_fk",
+          "tableFrom": "edits",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "elo_ratings": {
+      "name": "elo_ratings",
+      "columns": {
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1200
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lesson_example_attempts": {
+      "name": "lesson_example_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "subtopic": {
+          "name": "subtopic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "example_n": {
+          "name": "example_n",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "strategy": {
+          "name": "strategy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct": {
+          "name": "correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "time_seconds": {
+          "name": "time_seconds",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "lesson_example_idx": {
+          "name": "lesson_example_idx",
+          "columns": [
+            "subtopic",
+            "example_n"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lesson_progress": {
+      "name": "lesson_progress",
+      "columns": {
+        "subtopic": {
+          "name": "subtopic",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "read_at": {
+          "name": "read_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "checklist": {
+          "name": "checklist",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "checklist_total": {
+          "name": "checklist_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lesson_reviews": {
+      "name": "lesson_reviews",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "subtopic": {
+          "name": "subtopic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "front": {
+          "name": "front",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "back": {
+          "name": "back",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ease": {
+          "name": "ease",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2.5
+        },
+        "interval_days": {
+          "name": "interval_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reps": {
+          "name": "reps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "lapses": {
+          "name": "lapses",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "due_at": {
+          "name": "due_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "retired": {
+          "name": "retired",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "lesson_reviews_due_idx": {
+          "name": "lesson_reviews_due_idx",
+          "columns": [
+            "retired",
+            "due_at"
+          ],
+          "isUnique": false
+        },
+        "lesson_reviews_card_idx": {
+          "name": "lesson_reviews_card_idx",
+          "columns": [
+            "subtopic",
+            "kind",
+            "ordinal"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "pattern_attempts": {
+      "name": "pattern_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "prompt_text": {
+          "name": "prompt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct_answer": {
+          "name": "correct_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_answer": {
+          "name": "user_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ms": {
+          "name": "ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct": {
+          "name": "correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "pattern_category_idx": {
+          "name": "pattern_category_idx",
+          "columns": [
+            "category",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "question_concept_mappings": {
+      "name": "question_concept_mappings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_uid": {
+          "name": "question_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_content_version": {
+          "name": "question_content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "concept_id": {
+          "name": "concept_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archetype_id": {
+          "name": "archetype_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "surface_form_id": {
+          "name": "surface_form_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mapping_version": {
+          "name": "mapping_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "editorial_state": {
+          "name": "editorial_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "question_concept_mapping_version_idx": {
+          "name": "question_concept_mapping_version_idx",
+          "columns": [
+            "question_uid",
+            "question_content_version",
+            "concept_id",
+            "mapping_version"
+          ],
+          "isUnique": true
+        },
+        "question_concept_primary_version_idx": {
+          "name": "question_concept_primary_version_idx",
+          "columns": [
+            "question_uid",
+            "question_content_version",
+            "mapping_version"
+          ],
+          "isUnique": true,
+          "where": "\"question_concept_mappings\".\"role\" = 'primary'"
+        },
+        "question_concept_concept_idx": {
+          "name": "question_concept_concept_idx",
+          "columns": [
+            "concept_id",
+            "editorial_state"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "question_concept_mappings_question_id_questions_id_fk": {
+          "name": "question_concept_mappings_question_id_questions_id_fk",
+          "tableFrom": "question_concept_mappings",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "question_concept_content_version_check": {
+          "name": "question_concept_content_version_check",
+          "value": "\"question_concept_mappings\".\"question_content_version\" >= 1"
+        },
+        "question_concept_mapping_version_check": {
+          "name": "question_concept_mapping_version_check",
+          "value": "\"question_concept_mappings\".\"mapping_version\" >= 1"
+        },
+        "question_concept_role_check": {
+          "name": "question_concept_role_check",
+          "value": "\"question_concept_mappings\".\"role\" in ('primary', 'secondary')"
+        },
+        "question_concept_editorial_state_check": {
+          "name": "question_concept_editorial_state_check",
+          "value": "\"question_concept_mappings\".\"editorial_state\" in ('draft', 'reviewed', 'approved', 'retired')"
+        }
+      }
+    },
+    "question_flags": {
+      "name": "question_flags",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'open'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "question_flags_status_idx": {
+          "name": "question_flags_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "question_flags_question_id_questions_id_fk": {
+          "name": "question_flags_question_id_questions_id_fk",
+          "tableFrom": "question_flags",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "question_revisions": {
+      "name": "question_revisions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_version": {
+          "name": "content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "question_revisions_version_idx": {
+          "name": "question_revisions_version_idx",
+          "columns": [
+            "question_id",
+            "content_version"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "question_revisions_question_id_questions_id_fk": {
+          "name": "question_revisions_question_id_questions_id_fk",
+          "tableFrom": "question_revisions",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "questions": {
+      "name": "questions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "uid": {
+          "name": "uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "content_version": {
+          "name": "content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "format": {
+          "name": "format",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_domain": {
+          "name": "content_domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "context": {
+          "name": "context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fundamental_skill": {
+          "name": "fundamental_skill",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subtopic": {
+          "name": "subtopic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "difficulty": {
+          "name": "difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stem_md": {
+          "name": "stem_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "choices": {
+          "name": "choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct_index": {
+          "name": "correct_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "solution_md": {
+          "name": "solution_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fastest_path_md": {
+          "name": "fastest_path_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "trap_map": {
+          "name": "trap_map",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "numeric_check": {
+          "name": "numeric_check",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "verified": {
+          "name": "verified",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "twin_of": {
+          "name": "twin_of",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "questions_uid_idx": {
+          "name": "questions_uid_idx",
+          "columns": [
+            "uid"
+          ],
+          "isUnique": true
+        },
+        "questions_skill_idx": {
+          "name": "questions_skill_idx",
+          "columns": [
+            "fundamental_skill"
+          ],
+          "isUnique": false
+        },
+        "questions_subtopic_idx": {
+          "name": "questions_subtopic_idx",
+          "columns": [
+            "subtopic"
+          ],
+          "isUnique": false
+        },
+        "questions_verified_idx": {
+          "name": "questions_verified_idx",
+          "columns": [
+            "verified"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "redo_queue": {
+      "name": "redo_queue",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_attempt_id": {
+          "name": "source_attempt_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "due_at": {
+          "name": "due_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cleared": {
+          "name": "cleared",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "redo_due_idx": {
+          "name": "redo_due_idx",
+          "columns": [
+            "cleared",
+            "due_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "redo_queue_question_id_questions_id_fk": {
+          "name": "redo_queue_question_id_questions_id_fk",
+          "tableFrom": "redo_queue",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "redo_queue_source_attempt_id_attempts_id_fk": {
+          "name": "redo_queue_source_attempt_id_attempts_id_fk",
+          "tableFrom": "redo_queue",
+          "tableTo": "attempts",
+          "columnsFrom": [
+            "source_attempt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "session_items": {
+      "name": "session_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_uid": {
+          "name": "question_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_content_version": {
+          "name": "question_content_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "blueprint_slot": {
+          "name": "blueprint_slot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "choice_order_algorithm": {
+          "name": "choice_order_algorithm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "display_to_canonical": {
+          "name": "display_to_canonical",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "session_items_position_idx": {
+          "name": "session_items_position_idx",
+          "columns": [
+            "session_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "session_items_question_idx": {
+          "name": "session_items_question_idx",
+          "columns": [
+            "session_id",
+            "question_uid"
+          ],
+          "isUnique": true
+        },
+        "session_items_blueprint_slot_idx": {
+          "name": "session_items_blueprint_slot_idx",
+          "columns": [
+            "session_id",
+            "blueprint_slot"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "session_items_session_id_sessions_id_fk": {
+          "name": "session_items_session_id_sessions_id_fk",
+          "tableFrom": "session_items",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "session_items_question_id_questions_id_fk": {
+          "name": "session_items_question_id_questions_id_fk",
+          "tableFrom": "session_items",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "session_items_position_check": {
+          "name": "session_items_position_check",
+          "value": "\"session_items\".\"position\" >= 0"
+        },
+        "session_items_content_version_check": {
+          "name": "session_items_content_version_check",
+          "value": "\"session_items\".\"question_content_version\" >= 1"
+        },
+        "session_items_choice_order_check": {
+          "name": "session_items_choice_order_check",
+          "value": "json_valid(\"session_items\".\"display_to_canonical\")\n        and json_array_length(\"session_items\".\"display_to_canonical\") = 5\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[0]') between 0 and 4\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[1]') between 0 and 4\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[2]') between 0 and 4\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[3]') between 0 and 4\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[4]') between 0 and 4\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[0]') != json_extract(\"session_items\".\"display_to_canonical\", '$[1]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[0]') != json_extract(\"session_items\".\"display_to_canonical\", '$[2]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[0]') != json_extract(\"session_items\".\"display_to_canonical\", '$[3]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[0]') != json_extract(\"session_items\".\"display_to_canonical\", '$[4]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[1]') != json_extract(\"session_items\".\"display_to_canonical\", '$[2]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[1]') != json_extract(\"session_items\".\"display_to_canonical\", '$[3]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[1]') != json_extract(\"session_items\".\"display_to_canonical\", '$[4]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[2]') != json_extract(\"session_items\".\"display_to_canonical\", '$[3]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[2]') != json_extract(\"session_items\".\"display_to_canonical\", '$[4]')\n        and json_extract(\"session_items\".\"display_to_canonical\", '$[3]') != json_extract(\"session_items\".\"display_to_canonical\", '$[4]')"
+        }
+      }
+    },
+    "sessions": {
+      "name": "sessions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "mode": {
+          "name": "mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "config": {
+          "name": "config",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "settings": {
+      "name": "settings",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
