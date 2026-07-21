@@ -113,7 +113,7 @@ export async function selectTimedSet(
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
 ): Promise<Question[]> {
-  // Faithful to the GMAT Focus Quant section: problem solving only. Data
+  // Faithful to the current GMAT Quant section: Problem Solving only. Data
   // Sufficiency lives in the Data Insights section on the real exam, so
   // DS questions train through drills, never inside a section sim.
   const formats: QuestionFormat[] = ["problem_solving"];

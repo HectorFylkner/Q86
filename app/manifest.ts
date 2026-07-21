@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Q86 — GMAT Quant Training",
     short_name: "Q86",
     description:
-      "Personal GMAT Focus quant training: drills, timed sections, spaced redo, honest analytics.",
+      "Concept-level GMAT Quant training: drills, timed sections, spaced retrieval, and honest analytics.",
     start_url: "/",
     display: "standalone",
     background_color: "#FAFAF7",

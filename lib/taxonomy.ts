@@ -1,4 +1,4 @@
-// The domain taxonomy. Mirrors the official GMAT Focus score-report
+// The domain taxonomy. Mirrors the official GMAT score-report
 // categories exactly so platform analytics map 1:1 to real reports.
 
 export const CONTENT_DOMAINS = ["arithmetic", "algebra"] as const;
