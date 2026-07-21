@@ -19,6 +19,8 @@ Content volume or a scaffold without aligned evidence does not count.
   this curriculum branch has not been pushed or deployed.
 - Working tree: `work/Q86-curriculum-v3`
 - Branch: `codex/curriculum-v3`
+- Implementation head verified by this record: `ab621ba` (the state-only commit
+  that records these results follows it).
 - Base: `origin/codex/q86-command-center` at `0c2bf2d`
 - Status at branch creation: clean
 - Authority: local commits are allowed; push and deploy are not allowed
@@ -60,9 +62,13 @@ audited separately.
 
 - The broad `Subtopic` taxonomy is the stable official-report and analytics
   parent. Curriculum v3 adds child concepts; it does not replace this spine.
-- Current questions have only broad skill/subtopic/difficulty/format/context
-  metadata. Attempts can diagnose only another broad subtopic.
-- Current chapter tests draw from a broad pool rather than a concept blueprint.
+- All 603 seed questions now have stable UIDs and content versions. Seventy-eight
+  pilot questions have current reviewed primary concept mappings (plus 15
+  secondary mappings); the remaining 525 are explicitly unresolved at leaf
+  level. Question and lesson misses can now create exact concept remediation.
+- Legacy chapter tests still draw from broad subtopic pools. Curriculum v3 has
+  explicit, versioned pilot blueprints, but certification execution remains
+  closed until their proof and item-family slots can be filled.
 - Current question authoring runs a `check()` before append, then strips it.
   `verify-bank.ts` cannot replay many mathematical proofs from the committed
   bank alone.
@@ -154,11 +160,27 @@ Integration is semantic, not a blanket merge or conflict strategy.
 - Verified that the first 360 objects in the learning bank are unchanged and
   the remaining 243 are additions; the current loader inserts all 603 without
   deleting history.
-- Recorded a pilot audit for exponent/root properties, algebraic translation,
-  and probability. It identifies 43 independently assessable concepts and
-  shows that the current bank cannot honestly meet a six-scored-item floor for
-  most of them; these shortfalls will remain visible rather than being hidden
-  by undersized tests.
+- Added a versioned child-concept graph and coverage ledger: all 279 core ideas
+  are dispositioned as 267 canonical concepts plus 12 deliberate merges, with
+  272 total concept records and no missing prerequisite references or cycles.
+- Completed the structured teaching contract for all 43 pilot leaves: 14
+  exponent/root concepts, 13 algebraic-translation concepts, and 16 probability
+  concepts. Their registered micro-lessons contain 129 stable worked examples,
+  258 graded retrieval checks, 43 prerequisite checks, 129 named
+  misconceptions, and 1,548 progressive hints. The merged graph exposes 138
+  examples, 279 checks, and 152 misconceptions after legacy evidence is
+  retained. These are teaching-contract counts, not learning-effectiveness or
+  mastery claims.
+- Added independently addressable concept routes, answer/method commitment,
+  “I don't know yet,” progressive hints, correction capture, immutable learning
+  evidence, prerequisite links, exact-concept practice, and an honest coverage
+  UI. The other 229 concepts remain `source_only` with explicit shortfalls.
+- Added three exact-roster assessment specifications covering 14/13/16 pilot
+  concepts. Seven distinct stages per leaf—diagnostic/test-out, easy, medium,
+  hard, short-delay, long-delay, and timed Problem Solving transfer—produce 301
+  no-repeat slots. The pilot proof floor is therefore seven distinct families,
+  above the global floor of six. This is a validated blueprint specification,
+  not an open certification runtime.
 - Added provisional 90%/80%/70% tier policies, exact-roster server scoring,
   full-completion checks, sibling/recent-item exclusion hooks, hint/guess
   independence rules, timed-transfer eligibility, and stale/recertification
@@ -169,52 +191,129 @@ Integration is semantic, not a blanket merge or conflict strategy.
   and stable-UID seed reconciliation. A legacy-fixture test preserves numeric
   question ID 86 and its attempt foreign key, leaves an unrelated generated
   same-stem row untouched, and proves a repeated load creates no new revision.
-- Added semantic-static QA, deterministic numeric answer evidence for 434 of
-  496 Problem Solving questions, and a pure persisted choice-order contract.
+- Added semantic-static QA and numeric answer-alignment evidence for 434 of 496
+  Problem Solving questions. This evidence validates the keyed numeric value;
+  it is not a replayable stem-to-key mathematical proof. Under the stricter v3
+  gate, 0/603 questions currently have certification-grade replayable proof;
+  62 PS and all 107 DS items remain structural-only.
   Repaired the audited six-letter fixed-order explanation, the narrated 60 L
   mixture self-correction, and invalid witnesses in an exponent DS fastest
-  path. The remaining 62 PS items and all 107 DS items do not yet have
-  replayable mathematical proof specifications; choice permutation is tested
-  but not yet wired into runtime session submission.
-- Re-ran the combined suite after integration: 603-question bank verification,
-  17 native tests and 27 Vitest tests all pass. The latest fully aggregated
-  lint/build run before this identity slice passed; they will be rerun after
-  the concept graph and runtime ordering land.
+  path.
+- Persisted deterministic per-session Problem Solving answer permutations while
+  keeping Data Sufficiency canonical. Immutable `session_items` freeze question
+  UID/version, position, blueprint slot, and display-to-canonical order;
+  progression waits for attempt persistence, failed saves are retryable, and
+  session closure ignores client summaries and requires exactly one server
+  attempt for every roster item.
+- Added migrations `0005_question_identity.sql`, `0006_concept_evidence.sql`,
+  and `0007_session_item_runtime.sql`, each paired with guarded bootstrap
+  evolution. Existing numeric question IDs and history references remain in
+  place.
+- Materialized 93 reviewed mapping rows for the 78 pilot questions. Exact
+  diagnosis uses only the latest mapping for the current question content
+  version; a newer draft or retired mapping closes that item instead of falling
+  back to stale reviewed metadata.
+- Routed wrong, slow, hinted, guessed-correct, and changed-from-correct responses
+  to concrete concept actions. One action can be cleared only by a newly bound,
+  previously unrostered/unattempted question family answered correctly,
+  independently, and within the pace guardrail. Resolution evidence records the
+  session item, content and mapping versions, variant family, confidence, and
+  time; it never creates a mastery or certification transition. If no fresh
+  family exists, the action remains open with an explicit shortfall.
+- Current checks pass for graph/coverage, all 43 lesson contracts, immutable
+  answer ordering, mapping sync, remediation creation/resolution,
+  guessed-answer non-resolution, server-recomputed session closure, and the
+  drill persistence barrier.
+- Repaired a phone-width overflow exposed by long formal expressions and stable
+  concept IDs. Lesson grid children now opt out of min-content expansion, IDs
+  wrap only when necessary, and the final 390 px checks have no document-level
+  horizontal overflow.
+
+## Verification record
+
+All commands below ran on the local `codex/curriculum-v3` branch. The browser
+matrix used a newly bootstrapped temporary SQLite database; it did not read or
+modify the normal project database.
+
+- `pnpm install --frozen-lockfile`: lockfile current; install succeeded.
+- Existing-fixture evolution, fresh migration, and identity migration: 3/3
+  passed. The legacy fixture preserved question ID 86 and its attempt foreign
+  key, and a repeated evolution was idempotent.
+- Fresh database plus two explicit seed passes: 603 trusted questions, 603
+  immutable revision snapshots, 93 reviewed mapping rows, and 8 applied
+  migrations after both passes; neither repeat inserted or retired a question.
+- `pnpm test`: 51 native tests plus 27 Vitest tests, 78/78 passed.
+- `pnpm exec tsc --noEmit`: passed. The retired-question deck assertion now
+  checks the actual `DeckCard` discriminant and ID rather than a nonexistent
+  property.
+- `pnpm lint`: 0 errors and 3 warnings, all in unchanged source-authoring batch
+  scripts for unused local variables.
+- `pnpm build`: Next.js production compilation, type validation, page-data
+  collection, and all 8 static pages completed successfully.
+- Lesson validator: 26 files, all 24 taxonomy subtopics covered, all chapters
+  valid against the rendering dialect.
+- Curriculum validator: 272 concepts, 279 idea dispositions, 78 mapped and 525
+  explicitly unresolved questions, 43 teaching-complete segments, 0
+  certification-ready concepts, and 0 replayably verified scored items; all
+  graph and readiness assertions passed.
+- Bank verifier: all 603 questions passed mechanical and semantic-static QA;
+  434/496 PS items have numeric answer-alignment evidence.
+- Browser matrix: desktop and 390 x 844 phone layouts in light and dark modes
+  covered `/coverage`, the exact concept lesson, `/drill`, and `/queue`. Pages
+  had meaningful content, no Next.js error overlay, no browser errors, and no
+  document-level overflow after the responsive repair. Wide ledgers remain
+  locally scrollable by design.
+- Browser evidence loop: a correct lesson response using a hint created one
+  exact action; a separate unseen, focused, confidence-locked correct question
+  resolved it without creating a certification transition. A deliberately
+  wrong locked response likewise created a `WRONG` action for the same exact
+  concept and a third unseen family resolved it. Finishing a question session
+  produced a server-derived roster summary.
+- Browser exhaustion boundary: after all three reviewed families for the sample
+  concept had been rostered, another hinted action remained open and the drill
+  route stated that no fresh aligned item was available. It did not recycle a
+  family or grant mastery. The concept page simultaneously showed assessment
+  unavailable at 0/7 replayably verified items.
 
 ## Open work
 
-1. Add the versioned curriculum graph, stable content IDs, validators, and
-   coverage reports.
-2. Backfill question/concept metadata without changing historical numeric IDs.
-3. Expand replayable mathematical verification from 434/496 PS and 0/107 DS
-   to the complete bank.
-4. Wire and persist deterministic Problem Solving presentation permutations while
-   leaving Data Sufficiency choices canonical.
-5. Persist and surface the corrected tiered-test, hint-independence,
-   timed-transfer, and recertification policies.
-6. Build and verify the three complete pilot concept flows.
-7. Expand the curated graph and aligned content to every remaining subtopic,
-   while exposing honest
-   production/unpublished status.
-8. Run migration, seed-idempotency, test, lint, build, validation, and browser
-   verification matrices.
+1. Author source-controlled proof specifications that replay every stem-to-key
+   result, including DS sufficiency classifications; numeric answer alignment
+   alone cannot open certification.
+2. Add enough reviewed, distinct variant families to fill every pilot's seven
+   no-repeat stages across three difficulty bands and two surface forms. Today,
+   2/43 pilot leaves have no raw mapped item, 22 have one, and only one has at
+   least seven; none has seven replayably verified families.
+3. Implement the still-closed certification executor: maximum-matched blueprint
+   selection, frozen revision scoring, pre-answer assistance joins, append-only
+   results/transitions, delayed-review scheduling, timed transfer after accuracy,
+   and derived chapter state. Do not open a tier until its exact roster exists.
+4. Add exposure events for learning items and any richer tutor surface so their
+   remediation can use the same strict unseen/independent resolution rule.
+5. Expand the 229 source-only concepts and curate the 525 unresolved question
+   mappings, including the two strategy chapters, without manufacturing shallow
+   Verbal or remaining Data Insights content.
 
 ## Current risks and blockers
 
-- The branch integrations overlap heavily in schema, actions, plan, mastery,
-  navigation, and package versions. Blind cherry-picks would silently regress
-  behavior.
 - Existing question authoring checks are not replayable from the committed bank;
   rebuilding verifiers for legacy items is substantial work.
-- Concept mappings for 603 questions require semantic review; automated mapping
-  may propose candidates but cannot silently publish them.
-- The full production lesson contract is intentionally much stricter than the
-  current markdown. Most non-pilot concepts will initially expose real coverage
-  shortfalls rather than false completion.
+- The 78 pilot mappings are reviewed and current, but 525 questions remain
+  deliberately unresolved. Automated candidates cannot silently publish them.
+- The raw pilot pool is too thin even before proof filtering: 41/43 leaves have
+  any mapped item, 40/43 lack three raw difficulty bands, all 43 lack two mapped
+  surface forms, and 0/43 can fill the seven replayable stages.
+- Twenty-two pilot concepts have only one mapped question, so a miss can consume
+  the only family and leave no honest fresh resolver. The queue must keep those
+  actions open until the bank expands.
+- “Lesson `production_ready`” applies to 43 teaching segments; end-to-end
+  `productionReady`, assessment-eligible, and certification-ready counts remain
+  zero. Using the bare phrase “production-ready concepts” would conflate these
+  states.
 
 ## Next action
 
-Land the versioned concept graph and coverage audit, then wire the persisted
-choice-order contract into every session path. Use the resulting coverage
-shortfalls to author and verify the three pilot lesson/practice/assessment
-loops, keeping every under-covered assessment unavailable with exact reasons.
+Author replayable proof specifications and distinct item families against the
+301-slot ledger, beginning with the two zero-item leaves and the 22 one-item
+leaves. Only after those cells are real should the frozen certification executor
+be implemented and any tier opened.
