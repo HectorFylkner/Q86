@@ -12,7 +12,11 @@ Content volume or a scaffold without aligned evidence does not count.
 
 ## Working state
 
-- Repository: `HectorFylkner/Q86`
+- GitHub repository: `HectorFylkner/Q86`
+- Vercel project: `q86` (`prj_4NZz5obQB6brQzMYniGO2lpgKOpz`), Next.js,
+  with `q86.vercel.app` assigned. The latest observed ready preview is
+  `dpl_BkPcwPQhSixkqAq3dZdN1YTsTZoS` from command-center commit `0c2bf2d`;
+  this curriculum branch has not been pushed or deployed.
 - Working tree: `work/Q86-curriculum-v3`
 - Branch: `codex/curriculum-v3`
 - Base: `origin/codex/q86-command-center` at `0c2bf2d`
