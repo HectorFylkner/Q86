@@ -32,12 +32,12 @@ The remote refs were fetched immediately before this audit. All four advanced
 branches remain independent descendants of `origin/main` (`f004b4d`); none
 contains the full feature union.
 
-| Branch | Head | Lessons | Bank | Test files | Distinctive strengths | Known limits |
-| --- | --- | ---: | ---: | ---: | --- | --- |
-| `origin/codex/q86-command-center` | `0c2bf2d` | 24 | 360 | 3 | Current command center, navigation, question QA/quarantine, derived plan work, Node test runner | Broad-subtopic curriculum; small test suite; no learning-segment features |
-| `origin/claude/q86-learning-segment-b0wljw` | `b7736ca` | 26 | 603 | 0 | Lesson commitments, persistent progress, curriculum sequencing/test-out, cue/trap retrieval, interleaving, stale/slow mastery, integrity-hardened chapter tests, two strategy chapters, visual directives | No automated test suite; still broad-subtopic mastery; divergent UI/data code |
-| `origin/claude/q86-ambitious-prompt-joz85p` | `d77ae7a` | 24 | 360 | 9 | Vitest/CI, broad pure-engine coverage, session persistence, shared UI primitives, dark-mode repairs | Does not include the learning or command-center branches |
-| `origin/claude/q86-gmat-quant-trainer-rz519o` | `bd9e61d` | 24 | 360 | 15 | Timed-transfer ramp, lucky-guess extraction, tiered chapter tests/recertification, execution analytics, additional engine tests | Some test-state logic trusts client summaries or partial tests; does not include later integrity fixes |
+| Branch | Head | Lessons | Lesson words | Bank | Test files | Distinctive strengths | Known limits |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- |
+| `origin/codex/q86-command-center` | `0c2bf2d` | 24 | 34,759 | 360 | 3 | Current command center, navigation, question QA/quarantine, derived plan work, Node test runner | Broad-subtopic curriculum; small test suite; no learning-segment features |
+| `origin/claude/q86-learning-segment-b0wljw` | `b7736ca` | 26 | 38,207 | 603 | 0 | Lesson commitments, persistent progress, curriculum sequencing/test-out, cue/trap retrieval, interleaving, stale/slow mastery, integrity-hardened chapter tests, two strategy chapters, visual directives | No automated test suite; still broad-subtopic mastery; divergent UI/data code |
+| `origin/claude/q86-ambitious-prompt-joz85p` | `d77ae7a` | 24 | 34,759 | 360 | 9 | Vitest/CI, broad pure-engine coverage, session persistence, shared UI primitives, dark-mode repairs | Does not include the learning or command-center branches |
+| `origin/claude/q86-gmat-quant-trainer-rz519o` | `bd9e61d` | 24 | 34,759 | 360 | 15 | Timed-transfer ramp, lucky-guess extraction, tiered chapter tests/recertification, execution analytics, additional engine tests | Some test-state logic trusts client summaries or partial tests; does not include later integrity fixes |
 
 Current/default lessons contain 259 authored core ideas across 24 chapters but
 only 72 worked examples. The learning branch contains 279 core ideas across 26
@@ -159,24 +159,42 @@ Integration is semantic, not a blanket merge or conflict strategy.
   shows that the current bank cannot honestly meet a six-scored-item floor for
   most of them; these shortfalls will remain visible rather than being hidden
   by undersized tests.
-- Re-ran the combined baseline: 603-question mechanical bank verification,
-  six native tests, lesson validation for 26 files, ESLint, and a production
-  build all complete successfully. The bank result is explicitly mechanical,
-  not yet evidence of replayable mathematical or semantic verification.
+- Added provisional 90%/80%/70% tier policies, exact-roster server scoring,
+  full-completion checks, sibling/recent-item exclusion hooks, hint/guess
+  independence rules, timed-transfer eligibility, and stale/recertification
+  transitions. The legacy chapter UI remains explicitly on its existing 75%
+  threshold until concept blueprints and tier state are persisted.
+- Added stable non-positional UIDs and positive content versions to all 603
+  seed questions, immutable question-revision snapshots, guarded migration,
+  and stable-UID seed reconciliation. A legacy-fixture test preserves numeric
+  question ID 86 and its attempt foreign key, leaves an unrelated generated
+  same-stem row untouched, and proves a repeated load creates no new revision.
+- Added semantic-static QA, deterministic numeric answer evidence for 434 of
+  496 Problem Solving questions, and a pure persisted choice-order contract.
+  Repaired the audited six-letter fixed-order explanation, the narrated 60 L
+  mixture self-correction, and invalid witnesses in an exponent DS fastest
+  path. The remaining 62 PS items and all 107 DS items do not yet have
+  replayable mathematical proof specifications; choice permutation is tested
+  but not yet wired into runtime session submission.
+- Re-ran the combined suite after integration: 603-question bank verification,
+  17 native tests and 27 Vitest tests all pass. The latest fully aggregated
+  lint/build run before this identity slice passed; they will be rerun after
+  the concept graph and runtime ordering land.
 
 ## Open work
 
-1. Add the versioned curriculum graph, stable IDs, validators, and coverage
-   reports.
+1. Add the versioned curriculum graph, stable content IDs, validators, and
+   coverage reports.
 2. Backfill question/concept metadata without changing historical numeric IDs.
-3. Make deterministic verification replayable and add semantic QA; repair the
-   audited combinatorics explanation.
-4. Persist deterministic Problem Solving presentation permutations while
+3. Expand replayable mathematical verification from 434/496 PS and 0/107 DS
+   to the complete bank.
+4. Wire and persist deterministic Problem Solving presentation permutations while
    leaving Data Sufficiency choices canonical.
-5. Port the strongest automated tests and corrected tiered-test, lucky-guess,
-   timed-transfer, and recertification rules from the other divergent branches.
+5. Persist and surface the corrected tiered-test, hint-independence,
+   timed-transfer, and recertification policies.
 6. Build and verify the three complete pilot concept flows.
-7. Expand the inventory to every remaining subtopic and expose honest
+7. Expand the curated graph and aligned content to every remaining subtopic,
+   while exposing honest
    production/unpublished status.
 8. Run migration, seed-idempotency, test, lint, build, validation, and browser
    verification matrices.
@@ -196,8 +214,7 @@ Integration is semantic, not a blanket merge or conflict strategy.
 
 ## Next action
 
-Land the versioned pilot concept graph and coverage audit, stable question
-identity/permutation work, and corrected assessment rules as independently
-reviewable slices. Then wire those contracts into the lesson, practice,
-mastery, tutor, and daily-plan surfaces, keeping under-covered assessments
-unavailable with exact shortfalls.
+Land the versioned concept graph and coverage audit, then wire the persisted
+choice-order contract into every session path. Use the resulting coverage
+shortfalls to author and verify the three pilot lesson/practice/assessment
+loops, keeping every under-covered assessment unavailable with exact reasons.
