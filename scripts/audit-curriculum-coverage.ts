@@ -4,6 +4,9 @@ import { buildCurriculumV3 } from "../curriculum/v3/graph.ts";
 
 const curriculum = buildCurriculumV3();
 const ledger = buildCoverageLedger(curriculum);
+const teachingReadyConceptSegments = ledger.concepts.filter(
+  (item) => item.lessonStatus === "production_ready",
+).length;
 const compactSnapshot = {
   schemaVersion: ledger.schemaVersion,
   generatedFrom: ledger.generatedFrom,
@@ -11,6 +14,7 @@ const compactSnapshot = {
   summary: {
     mappedQuestions: ledger.questionMappings.filter((item) => item.status === "mapped").length,
     unresolvedQuestions: ledger.unresolvedQuestionIds.length,
+    teachingReadyConceptSegments,
     productionReadyConcepts: ledger.productionReadyConceptIds.length,
     replayablyVerifiedQuestions: new Set(
       ledger.concepts.flatMap((item) => item.replayablyVerifiedQuestionIds),
@@ -62,16 +66,18 @@ if (process.argv.includes("--write-snapshot")) {
   emit(`- Bank questions: ${ledger.generatedFrom.bankQuestionCount}`);
   emit(`- Pilot questions leaf-mapped: ${mapped.length} (${fallback.length} provisional fallback)`);
   emit(`- Non-pilot questions explicitly unresolved at leaf level: ${ledger.unresolvedQuestionIds.length}`);
-  emit(`- Production-ready concepts: ${ledger.productionReadyConceptIds.length}`);
+  emit(`- Teaching-complete concept segments: ${teachingReadyConceptSegments}`);
+  emit(`- End-to-end production-ready concepts: ${ledger.productionReadyConceptIds.length}`);
   emit("- Replayably verified scored questions: 0 (numeric answer evidence validates a keyed value, not the stem-to-key proof)");
   emit();
   emit("## Evidence floors");
   emit();
   emit(`A production concept needs at least ${ledger.policy.minimumExamples} worked examples, ${ledger.policy.minimumGradedImmediateChecks} graded immediate checks, ${ledger.policy.minimumNamedMisconceptions} named misconceptions, ${ledger.policy.minimumReplayablyVerifiedScoredItems} replayably verified scored items, ${ledger.policy.minimumDifficultyBands} difficulty bands, and ${ledger.policy.minimumSurfaceForms} surface forms.`);
+  emit("The no-repeat pilot blueprint raises the scored-item requirement to 7 per concept: diagnostic/test-out, easy, medium, hard, short-delay, long-delay, and timed-transfer slots.");
   emit();
   emit("## Per-concept ledger");
   emit();
-  emit("| Parent | Concept | Lesson | Ex | Graded checks | Misconceptions | Raw / replayable | Bands | Forms | Eligible | Shortfalls |");
+  emit("| Parent | Concept | Lesson | Ex | Graded checks | Misconceptions | Raw / replayable / required | Bands | Forms | Eligible | Shortfalls |");
   emit("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|");
   for (const cell of ledger.concepts) {
     const concept = byConcept.get(cell.conceptId)!;
@@ -80,12 +86,12 @@ if (process.argv.includes("--write-snapshot")) {
       (key) => key !== "unclassified",
     ).length;
     const shortfalls = cell.shortfalls.join("; ").replace(/\|/g, "\\|");
-    emit(`| ${concept.parentSubtopic} | \`${cell.conceptId}\` | ${cell.lessonStatus} | ${cell.exampleIds.length} | ${cell.gradedCheckIds.length} | ${cell.misconceptionIds.length} | ${cell.rawScoredQuestionIds.length} / ${cell.replayablyVerifiedQuestionIds.length} | ${bands} | ${forms} | ${cell.assessmentEligible ? "yes" : "no"} | ${shortfalls} |`);
+    emit(`| ${concept.parentSubtopic} | \`${cell.conceptId}\` | ${cell.lessonStatus} | ${cell.exampleIds.length} | ${cell.gradedCheckIds.length} | ${cell.misconceptionIds.length} | ${cell.rawScoredQuestionIds.length} / ${cell.replayablyVerifiedQuestionIds.length} / ${cell.scoredItemRequirement} | ${bands} | ${forms} | ${cell.assessmentEligible ? "yes" : "no"} | ${shortfalls} |`);
   }
   emit();
   emit("## Interpretation");
   emit();
-  emit("All concepts remain unpublished for mastery certification. One probability leaf now meets the complete structured teaching contract; the remaining pilot leaves are still source-only or missing segments, and the bank still lacks replayable proof specifications. Non-pilot bank questions are dispositioned—not orphaned—but deliberately remain unresolved at leaf level until their chapters receive curated question mapping.");
+  emit(`All concepts remain unpublished for mastery certification. ${teachingReadyConceptSegments} pilot leaves meet the structured teaching contract, but the bank still lacks replayable proof specifications and therefore cannot fill any certification blueprint. Non-pilot bank questions are dispositioned—not orphaned—but deliberately remain unresolved at leaf level until their chapters receive curated question mapping.`);
   const report = `${lines.join("\n")}\n`;
   if (process.argv.includes("--write-report")) {
     fs.writeFileSync("docs/curriculum-v3-coverage.md", report);

@@ -1,4 +1,5 @@
 import { parseLesson } from "../../lib/lesson-parse.ts";
+import { validateAssessmentBlueprints } from "./assessment-blueprints.ts";
 import { readLesson } from "../../lib/lessons.ts";
 import { bankQuestionUid, buildCoverageLedger, readSeedBank } from "./coverage.ts";
 import { buildCurriculumV3, type CurriculumV3 } from "./graph.ts";
@@ -155,6 +156,7 @@ export function validateCurriculumV3(
   }
 
   issues.push(...prerequisiteIssues(curriculum.concepts));
+  issues.push(...validateAssessmentBlueprints(curriculum));
   issues.push(
     ...validateConceptSegments(PILOT_CONCEPT_SEGMENTS, conceptIds).map(
       (issue) => ({

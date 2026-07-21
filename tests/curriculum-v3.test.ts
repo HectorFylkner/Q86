@@ -166,6 +166,9 @@ test("checked-in machine-readable coverage ledger matches the live audit", () =>
     summary: {
       mappedQuestions: ledger.questionMappings.filter((item) => item.status === "mapped").length,
       unresolvedQuestions: ledger.unresolvedQuestionIds.length,
+      teachingReadyConceptSegments: ledger.concepts.filter(
+        (item) => item.lessonStatus === "production_ready",
+      ).length,
       productionReadyConcepts: ledger.productionReadyConceptIds.length,
       replayablyVerifiedQuestions: new Set(
         ledger.concepts.flatMap((item) => item.replayablyVerifiedQuestionIds),

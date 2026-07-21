@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { Context, QuestionFormat, Subtopic } from "../../lib/taxonomy.ts";
+import { requiredUniqueScoredItemsForConcept } from "./assessment-blueprints.ts";
 import { buildCurriculumV3, type CurriculumV3 } from "./graph.ts";
 import { PILOT_CONCEPT_IDS, PILOT_SUBTOPICS } from "./pilot-concepts.ts";
 import type {
@@ -242,6 +243,10 @@ export function buildCoverageLedger(
       questionMappings.map((mapping) => mapping.surfaceFormId).filter(Boolean),
     );
     const gradedChecks = checks.filter((check) => check.isGraded);
+    const scoredItemRequirement = Math.max(
+      COVERAGE_POLICY.minimumReplayablyVerifiedScoredItems,
+      requiredUniqueScoredItemsForConcept(concept.id),
+    );
     const shortfalls: string[] = [];
     if (examples.length < COVERAGE_POLICY.minimumExamples)
       shortfalls.push(`worked examples ${examples.length}/${COVERAGE_POLICY.minimumExamples}`);
@@ -249,8 +254,8 @@ export function buildCoverageLedger(
       shortfalls.push(`graded immediate checks ${gradedChecks.length}/${COVERAGE_POLICY.minimumGradedImmediateChecks}`);
     if (misconceptions.length < COVERAGE_POLICY.minimumNamedMisconceptions)
       shortfalls.push(`named misconceptions ${misconceptions.length}/${COVERAGE_POLICY.minimumNamedMisconceptions}`);
-    if (replayable.length < COVERAGE_POLICY.minimumReplayablyVerifiedScoredItems)
-      shortfalls.push(`replayably verified scored items ${replayable.length}/${COVERAGE_POLICY.minimumReplayablyVerifiedScoredItems}`);
+    if (replayable.length < scoredItemRequirement)
+      shortfalls.push(`replayably verified scored items ${replayable.length}/${scoredItemRequirement}`);
     if (difficultyBands.size < COVERAGE_POLICY.minimumDifficultyBands)
       shortfalls.push(`difficulty bands ${difficultyBands.size}/${COVERAGE_POLICY.minimumDifficultyBands}`);
     if (surfaceForms.size < COVERAGE_POLICY.minimumSurfaceForms)
@@ -269,6 +274,7 @@ export function buildCoverageLedger(
       misconceptionIds: misconceptions.map((item) => item.id),
       rawScoredQuestionIds: questionMappings.map((item) => item.questionUid),
       replayablyVerifiedQuestionIds: replayable.map((item) => item.questionUid),
+      scoredItemRequirement,
       countsByDifficulty: tally(questions.map((question) => question.difficulty)),
       countsByFormat: tally(questions.map((question) => question.format)),
       countsByContext: tally(questions.map((question) => question.context)),

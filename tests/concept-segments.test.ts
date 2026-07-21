@@ -8,24 +8,25 @@ import { validateConceptSegments } from "../curriculum/v3/segments/validate.ts";
 const curriculum = buildCurriculumV3();
 const conceptIds = new Set(curriculum.concepts.map((concept) => concept.id));
 
-test("the first production micro-lesson meets the complete segment contract", () => {
-  assert.equal(PILOT_CONCEPT_SEGMENTS.length, 1);
+test("registered production micro-lessons meet the complete segment contract", () => {
+  assert.ok(PILOT_CONCEPT_SEGMENTS.length > 0);
   assert.deepEqual(validateConceptSegments(PILOT_CONCEPT_SEGMENTS, conceptIds), []);
-  const segment = PILOT_CONCEPT_SEGMENTS[0];
-  assert.equal(segment.examples.length, 3);
-  assert.equal(segment.misconceptions.length, 3);
-  assert.equal(segment.checks.length, 6);
-  assert.deepEqual(
-    new Set(segment.examples.map((example) => example.role)),
-    new Set(["foundation", "application", "transfer_or_boundary"]),
-  );
-  assert.ok(segment.checks.some((check) => check.independence === "guided"));
-  assert.ok(segment.checks.some((check) => check.independence === "independent"));
-  for (const item of [...segment.examples, ...segment.checks]) {
+  for (const segment of PILOT_CONCEPT_SEGMENTS) {
+    assert.equal(segment.examples.length, 3);
+    assert.equal(segment.misconceptions.length, 3);
+    assert.equal(segment.checks.length, 6);
     assert.deepEqual(
-      item.hints.map((hint) => hint.kind),
-      ["goal", "trigger", "setup", "next_move"],
+      new Set(segment.examples.map((example) => example.role)),
+      new Set(["foundation", "application", "transfer_or_boundary"]),
     );
+    assert.ok(segment.checks.some((check) => check.independence === "guided"));
+    assert.ok(segment.checks.some((check) => check.independence === "independent"));
+    for (const item of [...segment.examples, ...segment.checks]) {
+      assert.deepEqual(
+        item.hints.map((hint) => hint.kind),
+        ["goal", "trigger", "setup", "next_move"],
+      );
+    }
   }
 });
 
@@ -47,11 +48,12 @@ test("segment validation rejects hollow evidence and a broken hint ladder", () =
 });
 
 test("segment evidence enriches coverage but does not manufacture assessment readiness", () => {
-  const segment = PILOT_CONCEPT_SEGMENTS[0];
-  const concept = curriculum.concepts.find((item) => item.id === segment.conceptId);
-  assert.equal(concept?.lessonStatus, "production_ready");
-  assert.equal(concept?.productionReady, false);
-  assert.ok(
-    segment.misconceptions.every((item) => concept?.misconceptionIds.includes(item.id)),
-  );
+  for (const segment of PILOT_CONCEPT_SEGMENTS) {
+    const concept = curriculum.concepts.find((item) => item.id === segment.conceptId);
+    assert.equal(concept?.lessonStatus, "production_ready");
+    assert.equal(concept?.productionReady, false);
+    assert.ok(
+      segment.misconceptions.every((item) => concept?.misconceptionIds.includes(item.id)),
+    );
+  }
 });

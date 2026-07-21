@@ -129,6 +129,8 @@ export type CoverageCell = {
   misconceptionIds: readonly string[];
   rawScoredQuestionIds: readonly string[];
   replayablyVerifiedQuestionIds: readonly string[];
+  /** Floor raised when the no-repeat certification blueprint consumes more. */
+  scoredItemRequirement: number;
   countsByDifficulty: Readonly<Record<string, number>>;
   countsByFormat: Readonly<Partial<Record<QuestionFormat, number>>>;
   countsByContext: Readonly<Record<string, number>>;

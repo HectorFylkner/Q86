@@ -17,7 +17,8 @@ console.log(
   + `${ledger.unresolvedQuestionIds.length} explicitly unresolved; ${ledger.generatedFrom.bankQuestionCount} total.`,
 );
 console.log(
-  `Production-ready concepts: ${ledger.productionReadyConceptIds.length}; replayably verified scored items: `
+  `Teaching-complete concept segments: ${ledger.concepts.filter((item) => item.lessonStatus === "production_ready").length}; `
+  + `end-to-end production-ready concepts: ${ledger.productionReadyConceptIds.length}; replayably verified scored items: `
   + `${new Set(ledger.concepts.flatMap((item) => item.replayablyVerifiedQuestionIds)).size}.`,
 );
 

@@ -87,7 +87,7 @@ export default function CoveragePage() {
               Assessment gate
             </p>
             <p className="mt-1 text-sm text-graphite">
-              6 replayably verified items, 3 bands, 2 surface forms—and more when the blueprint consumes more.
+              6 replayably verified items is the floor; the pilot no-repeat blueprint currently requires 7, plus 3 bands and 2 surface forms.
             </p>
           </div>
           <div>
@@ -130,7 +130,7 @@ export default function CoveragePage() {
                       <th className="px-4 py-2 font-normal sm:px-5">Concept</th>
                       <th className="px-3 py-2 font-normal">Teach</th>
                       <th className="px-3 py-2 font-normal">Examples / checks / traps</th>
-                      <th className="px-3 py-2 font-normal">Scored raw / proof</th>
+                      <th className="px-3 py-2 font-normal">Raw / proof / required</th>
                       <th className="px-3 py-2 font-normal">Assessment</th>
                     </tr>
                   </thead>
@@ -157,7 +157,7 @@ export default function CoveragePage() {
                             {cell.exampleIds.length} / {cell.gradedCheckIds.length} / {cell.misconceptionIds.length}
                           </td>
                           <td className="px-3 py-3 font-mono text-xs">
-                            {cell.rawScoredQuestionIds.length} / {cell.replayablyVerifiedQuestionIds.length}
+                            {cell.rawScoredQuestionIds.length} / {cell.replayablyVerifiedQuestionIds.length} / {cell.scoredItemRequirement}
                           </td>
                           <td className="px-3 py-3">
                             <StatusPill ready={cell.assessmentEligible} />
