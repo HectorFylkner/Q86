@@ -17,6 +17,12 @@ import {
   WhyLede,
 } from "@/components/lesson/sections";
 import { MarkLessonRead } from "@/components/lesson/learn-progress";
+import {
+  ConceptChildList,
+  type ConceptChildSummary,
+} from "@/components/lesson/concept-child-list";
+import { buildCoverageLedger } from "@/curriculum/v3/coverage";
+import { buildCurriculumV3 } from "@/curriculum/v3/graph";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
 import { lessonProgressBySubtopic } from "@/lib/lesson-progress";
@@ -37,6 +43,7 @@ export const runtime = "nodejs";
 const RAIL: RailItem[] = [
   { id: "why", label: "Why this matters" },
   { id: "ideas", label: "The core ideas" },
+  { id: "concepts", label: "Concept segments" },
   { id: "examples", label: "Worked examples" },
   { id: "cues", label: "Trigger cues" },
   { id: "traps", label: "Trap gallery" },
@@ -69,6 +76,27 @@ export default async function LessonPage({
   const meta = at >= 0 ? chapters[at] : null;
   const prev = at > 0 ? chapters[at - 1] : null;
   const next = at >= 0 && at < chapters.length - 1 ? chapters[at + 1] : null;
+  const curriculum = buildCurriculumV3();
+  const coverageByConceptId = new Map(
+    buildCoverageLedger(curriculum).concepts.map((cell) => [
+      cell.conceptId,
+      cell,
+    ]),
+  );
+  const conceptChildren: ConceptChildSummary[] = curriculum.concepts
+    .filter((concept) => concept.parentSubtopic === subtopic)
+    .map((concept) => {
+      const coverage = coverageByConceptId.get(concept.id);
+      return {
+        id: concept.id,
+        parentSubtopic: concept.parentSubtopic,
+        title: concept.title,
+        objective: concept.objective,
+        lessonStatus: coverage?.lessonStatus ?? "none",
+        assessmentEligible: coverage?.assessmentEligible ?? false,
+        shortfallCount: coverage?.shortfalls.length ?? 1,
+      };
+    });
 
   const header = (
     <div>
@@ -178,8 +206,22 @@ export default async function LessonPage({
         </SectionShell>
 
         <SectionShell
-          id="examples"
+          id="concepts"
           index={3}
+          title="Concept segments"
+          tagline="one addressable capability at a time"
+        >
+          <p className="mb-3 text-sm leading-relaxed text-graphite">
+            The chapter remains the overview. Each child below is tracked as a
+            separate teaching and assessment claim; unfinished evidence stays
+            visibly closed.
+          </p>
+          <ConceptChildList concepts={conceptChildren} />
+        </SectionShell>
+
+        <SectionShell
+          id="examples"
+          index={4}
           title="Worked examples"
           tagline="easy → exam-hard, try before revealing"
         >
@@ -200,7 +242,7 @@ export default async function LessonPage({
 
         <SectionShell
           id="cues"
-          index={4}
+          index={5}
           title="Trigger cues"
           tagline="phrase → method, memorize these"
         >
@@ -209,7 +251,7 @@ export default async function LessonPage({
 
         <SectionShell
           id="traps"
-          index={5}
+          index={6}
           title="Trap gallery"
           tagline="the classic wrong turns"
         >
@@ -218,14 +260,14 @@ export default async function LessonPage({
 
         <SectionShell
           id="speed"
-          index={6}
+          index={7}
           title="Speed moves"
           tagline="legitimate shortcuts"
         >
           <SpeedMoves moves={parsed.speed} />
         </SectionShell>
 
-        <SectionShell id="checklist" index={7} title="Before you drill">
+        <SectionShell id="checklist" index={8} title="Before you drill">
           <DrillChecklist
             subtopic={subtopic}
             items={parsed.checklist}
