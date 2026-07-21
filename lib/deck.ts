@@ -1,23 +1,34 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
-import { attempts, deckReviews, questions } from "./db/schema.ts";
+import {
+  attempts,
+  deckReviews,
+  lessonReviews,
+  questions,
+} from "./db/schema.ts";
 import { previewIntervals, type ReviewGrade } from "./srs.ts";
-import { SUBTOPIC_LABELS, type Subtopic } from "./taxonomy.ts";
+import { CHAPTER_LABELS, SUBTOPIC_LABELS, type ChapterKey } from "./taxonomy.ts";
 
 /**
  * The takeaway deck: every missed question's one-line Takeaway becomes a
  * flashcard (front: the trigger cue — when to reach for the method;
- * back: the takeaway). Scheduling is graded recall (lib/srs.ts): due
- * cards always appear, new misses fill the remaining slots, and cards
- * you know stretch out to longer and longer intervals.
+ * back: the takeaway), and every passed chapter contributes its trigger
+ * cues and trap gallery as concept cards (lib/lesson-cards.ts).
+ * Scheduling is graded recall (lib/srs.ts): due cards always appear —
+ * question-derived cards first, concept cards after — and new misses
+ * fill the remaining slots up to the daily cap.
  */
 export type DeckCard = {
-  questionId: number;
-  subtopic: Subtopic;
+  /** Question-derived takeaway, or a chapter cue/trap concept card. */
+  source: "question" | "cue" | "trap";
+  /** questions.id for question cards; lesson_reviews.id otherwise. */
+  id: number;
+  subtopic: ChapterKey;
   subtopicLabel: string;
   front: string;
   back: string;
-  missedAgo: Date;
+  /** When the source miss happened; null for concept cards. */
+  missedAgo: Date | null;
   state: "due" | "new";
   /** Interval (days) each grade would schedule, for the button labels. */
   intervals: Record<ReviewGrade, number>;
@@ -81,7 +92,8 @@ export async function todaysDeck(): Promise<{
       continue;
     }
     const card: DeckCard = {
-      questionId: m.questionId,
+      source: "question",
+      id: m.questionId,
       subtopic: m.subtopic,
       subtopicLabel: SUBTOPIC_LABELS[m.subtopic],
       front: cue,
@@ -97,17 +109,45 @@ export async function todaysDeck(): Promise<{
   // Longest-overdue first; every due card shows, new misses fill the rest.
   duePool.sort(
     (a, b) =>
-      (reviews.get(a.questionId)?.dueAt.getTime() ?? 0) -
-      (reviews.get(b.questionId)?.dueAt.getTime() ?? 0),
+      (reviews.get(a.id)?.dueAt.getTime() ?? 0) -
+      (reviews.get(b.id)?.dueAt.getTime() ?? 0),
   );
-  const cards = [
-    ...duePool,
-    ...freshPool.slice(0, Math.max(0, DECK_SIZE - duePool.length)),
-  ];
+
+  // Concept cards from passed chapters, due now, longest-overdue first.
+  // Question-derived cards keep priority; concept cards absorb whatever
+  // the cap leaves, and the rest waits for tomorrow.
+  const allConcept = await db
+    .select()
+    .from(lessonReviews)
+    .where(eq(lessonReviews.retired, false))
+    .all();
+  const conceptRows = allConcept.filter((r) => r.dueAt.getTime() <= now);
+  scheduled += allConcept.length - conceptRows.length;
+  conceptRows.sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
+  const conceptPool: DeckCard[] = conceptRows.map((r) => ({
+    source: r.kind,
+    id: r.id,
+    subtopic: r.subtopic,
+    subtopicLabel: CHAPTER_LABELS[r.subtopic],
+    front: r.front,
+    back: r.back,
+    missedAgo: null,
+    state: r.reps > 0 ? "due" : "new",
+    intervals: previewIntervals(r),
+  }));
+
+  // Scheduled reviews outrank first sightings; question-derived cards
+  // outrank concept cards within each class.
+  const dueConcept = conceptPool.filter((c) => c.state === "due");
+  const newConcept = conceptPool.filter((c) => c.state === "new");
+  const cards: DeckCard[] = [];
+  for (const pool of [duePool, dueConcept, freshPool, newConcept]) {
+    cards.push(...pool.slice(0, Math.max(0, DECK_SIZE - cards.length)));
+  }
   return {
     cards,
-    due: duePool.length,
-    fresh: freshPool.length,
+    due: duePool.length + dueConcept.length,
+    fresh: freshPool.length + newConcept.length,
     scheduled,
   };
 }

@@ -1,6 +1,20 @@
-import { and, count, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  gte,
+  inArray,
+  lte,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { db } from "./db/index.ts";
-import { attempts, questions, type Question } from "./db/schema.ts";
+import {
+  attempts,
+  questionConceptMappings,
+  questions,
+  type Question,
+} from "./db/schema.ts";
 import type {
   ContentDomain,
   Context,
@@ -15,13 +29,27 @@ export type QuestionFilter = {
   formats?: QuestionFormat[];
   contexts?: Context[];
   domains?: ContentDomain[];
+  /** Current reviewed primary mappings for exact concept-level practice. */
+  conceptIds?: string[];
   difficultyMin?: number;
   difficultyMax?: number;
   excludeIds?: number[];
+  /** Canonical item-family ids (question.twinOf ?? question.id) to omit. */
+  excludeVariantFamilyIds?: number[];
 };
 
-function whereFromFilter(filter: QuestionFilter): SQL | undefined {
+function whereFromFilter(
+  filter: QuestionFilter,
+  conceptQuestionIds: readonly number[] | null,
+): SQL | undefined {
   const conds: SQL[] = [eq(questions.verified, true)];
+  if (conceptQuestionIds != null) {
+    conds.push(
+      conceptQuestionIds.length > 0
+        ? inArray(questions.id, conceptQuestionIds)
+        : sql`0 = 1`,
+    );
+  }
   if (filter.skills?.length)
     conds.push(inArray(questions.fundamentalSkill, filter.skills));
   if (filter.subtopics?.length)
@@ -39,11 +67,55 @@ function whereFromFilter(filter: QuestionFilter): SQL | undefined {
   return and(...conds);
 }
 
+async function currentQuestionIdsForConcepts(
+  conceptIds: readonly string[] | undefined,
+): Promise<number[] | null> {
+  if (!conceptIds?.length) return null;
+  const requested = new Set(conceptIds);
+  const rows = await db
+    .select({
+      questionId: questionConceptMappings.questionId,
+      conceptId: questionConceptMappings.conceptId,
+      mappingVersion: questionConceptMappings.mappingVersion,
+      editorialState: questionConceptMappings.editorialState,
+    })
+    .from(questionConceptMappings)
+    .innerJoin(questions, eq(questionConceptMappings.questionId, questions.id))
+    .where(
+      and(
+        eq(questionConceptMappings.role, "primary"),
+        eq(
+          questionConceptMappings.questionContentVersion,
+          questions.contentVersion,
+        ),
+      ),
+    )
+    .all();
+  const latestByQuestion = new Map<number, (typeof rows)[number]>();
+  for (const row of rows) {
+    const prior = latestByQuestion.get(row.questionId);
+    if (!prior || row.mappingVersion > prior.mappingVersion) {
+      latestByQuestion.set(row.questionId, row);
+    }
+  }
+  return [...latestByQuestion.values()]
+    .filter(
+      (row) =>
+        (row.editorialState === "reviewed" ||
+          row.editorialState === "approved") &&
+        requested.has(row.conceptId),
+    )
+    .map((row) => row.questionId);
+}
+
 export async function countQuestions(filter: QuestionFilter): Promise<number> {
+  const conceptQuestionIds = await currentQuestionIdsForConcepts(
+    filter.conceptIds,
+  );
   const row = await db
     .select({ n: count() })
     .from(questions)
-    .where(whereFromFilter(filter))
+    .where(whereFromFilter(filter, conceptQuestionIds))
     .get();
   return row?.n ?? 0;
 }
@@ -57,10 +129,21 @@ export async function selectQuestions(
   filter: QuestionFilter,
   count: number,
 ): Promise<Question[]> {
+  const conceptQuestionIds = await currentQuestionIdsForConcepts(
+    filter.conceptIds,
+  );
   const excluded = new Set(filter.excludeIds ?? []);
+  const excludedFamilies = new Set(filter.excludeVariantFamilyIds ?? []);
   const candidates = (
-    await db.select().from(questions).where(whereFromFilter(filter)).all()
-  ).filter((q) => !excluded.has(q.id));
+    await db
+      .select()
+      .from(questions)
+      .where(whereFromFilter(filter, conceptQuestionIds))
+      .all()
+  ).filter(
+    (q) =>
+      !excluded.has(q.id) && !excludedFamilies.has(q.twinOf ?? q.id),
+  );
   if (candidates.length === 0) return [];
 
   const correctRows = await db
@@ -113,7 +196,7 @@ export async function selectTimedSet(
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
 ): Promise<Question[]> {
-  // Faithful to the GMAT Focus Quant section: problem solving only. Data
+  // Faithful to the current GMAT Quant section: Problem Solving only. Data
   // Sufficiency lives in the Data Insights section on the real exam, so
   // DS questions train through drills, never inside a section sim.
   const formats: QuestionFormat[] = ["problem_solving"];

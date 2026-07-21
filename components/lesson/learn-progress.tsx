@@ -1,52 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { checklistKey } from "./drill-checklist";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { markLessonRead, saveLessonChecklist } from "@/lib/actions";
+import type { ChapterKey } from "@/lib/taxonomy";
 
-type ReadState = { c: number; t: number };
-
-function readState(subtopic: string): ReadState | null {
-  try {
-    const raw = localStorage.getItem(checklistKey(subtopic));
-    if (!raw) return null;
-    const saved = JSON.parse(raw) as { c?: number[]; t?: number };
-    if (!Array.isArray(saved.c) || typeof saved.t !== "number") return null;
-    return { c: saved.c.length, t: saved.t };
-  } catch {
-    return null;
-  }
-}
-
-/** Per-chapter readiness badge, from the chapter's checklist ticks. */
-export function ReadBadge({ subtopic }: { subtopic: string }) {
-  const [state, setState] = useState<ReadState | null>(null);
-  useEffect(() => setState(readState(subtopic)), [subtopic]);
-  if (!state || state.c === 0) return null;
-  const done = state.t > 0 && state.c >= state.t;
-  return (
-    <span
-      className={`font-mono text-[11px] ${done ? "text-ballpoint" : "text-graphite"}`}
-    >
-      {done ? "✓ prepared" : `${state.c}/${state.t} checks`}
-    </span>
-  );
-}
-
-/** Header line on the Learn index: how many chapters are fully prepared. */
-export function LearnPrepared({ subtopics }: { subtopics: string[] }) {
-  const [prepared, setPrepared] = useState<number | null>(null);
+/** Pre-server lesson progress lived in localStorage under
+ *  `q86-learn:<subtopic>` as {c: checked indexes, t: item count}. This
+ *  one-shot sync pushes any chapter the server does not know about yet
+ *  into lesson_progress, then refreshes so the server-rendered badges
+ *  pick it up. Safe to mount on every visit: chapters the server
+ *  already tracks are skipped. */
+export function LessonProgressSync({ known }: { known: ChapterKey[] }) {
+  const router = useRouter();
+  const ranRef = useRef(false);
   useEffect(() => {
-    let n = 0;
-    for (const s of subtopics) {
-      const st = readState(s);
-      if (st && st.t > 0 && st.c >= st.t) n++;
+    if (ranRef.current) return;
+    ranRef.current = true;
+    const knownSet = new Set<string>(known);
+    const jobs: Promise<void>[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key?.startsWith("q86-learn:")) continue;
+        const subtopic = key.slice("q86-learn:".length);
+        if (knownSet.has(subtopic)) continue;
+        try {
+          const saved = JSON.parse(localStorage.getItem(key) ?? "") as {
+            c?: number[];
+            t?: number;
+          };
+          if (!Array.isArray(saved.c) || typeof saved.t !== "number") continue;
+          jobs.push(
+            saveLessonChecklist(subtopic as ChapterKey, saved.c, saved.t),
+          );
+        } catch {
+          // Corrupt entry — leave it; the server simply never learns of it.
+        }
+      }
+    } catch {
+      // localStorage unavailable — nothing to migrate.
     }
-    setPrepared(n);
-  }, [subtopics]);
-  if (prepared === null || prepared === 0) return null;
-  return (
-    <p className="font-mono text-xs text-ballpoint">
-      {prepared} of {subtopics.length} chapters prepared
-    </p>
-  );
+    if (jobs.length > 0) {
+      Promise.allSettled(jobs).then(() => router.refresh());
+    }
+  }, [known, router]);
+  return null;
+}
+
+/** Stamps read_at on first open so the plan can tell "never opened"
+ *  from "opened but not finished". Renders nothing. */
+export function MarkLessonRead({
+  subtopic,
+  alreadyRead,
+}: {
+  subtopic: ChapterKey;
+  alreadyRead: boolean;
+}) {
+  const sentRef = useRef(false);
+  useEffect(() => {
+    if (alreadyRead || sentRef.current) return;
+    sentRef.current = true;
+    markLessonRead(subtopic).catch(() => {
+      // Offline or server hiccup — the next visit will stamp it.
+    });
+  }, [subtopic, alreadyRead]);
+  return null;
 }

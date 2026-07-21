@@ -161,7 +161,12 @@ export function PostmortemClient({
         <Chip>{formatSeconds(attempt.timeSeconds)}</Chip>
         <Chip>{CONFIDENCE_LABELS[attempt.confidence]} confidence</Chip>
         <Chip>{SKILL_LABELS[question.fundamentalSkill]}</Chip>
-        <Chip>{SUBTOPIC_LABELS[question.subtopic]}</Chip>
+        <Link
+          href={`/learn/${question.subtopic}`}
+          className="rounded-control border border-grid bg-surface px-1.5 py-0.5 text-[11px] transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+        >
+          {SUBTOPIC_LABELS[question.subtopic]} ↗
+        </Link>
       </div>
 
       <details
@@ -267,6 +272,21 @@ export function PostmortemClient({
               </span>
               .
             </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/drill?sub=${coach.prescription.subtopic}&n=${coach.prescription.count}`}
+                className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              >
+                Start the prescription →
+              </Link>
+              <Link
+                href={`/learn/${coach.prescription.subtopic}#ideas`}
+                className="text-sm font-medium text-ballpoint hover:underline"
+              >
+                Reread: {SUBTOPIC_LABELS[coach.prescription.subtopic]} → The
+                core ideas
+              </Link>
+            </div>
           </CoachBlock>
           <div className="rounded-control bg-highlight px-3 py-2 text-sm font-medium">
             {coach.takeaway_15_words}
@@ -322,6 +342,27 @@ export function PostmortemClient({
               ))}
             </select>
           </div>
+          {(errorSubtag != null || errorType === "content_gap") && (
+            <p className="mt-3 text-sm">
+              <span className="text-graphite">
+                The classification points at a chapter:{" "}
+              </span>
+              <Link
+                href={`/learn/${errorSubtag ?? question.subtopic}#ideas`}
+                className="font-medium text-ballpoint hover:underline"
+              >
+                Reread: {SUBTOPIC_LABELS[errorSubtag ?? question.subtopic]} →
+                The core ideas
+              </Link>
+              <span className="text-graphite"> · </span>
+              <Link
+                href={`/drill?sub=${errorSubtag ?? question.subtopic}&n=6`}
+                className="font-medium text-ballpoint hover:underline"
+              >
+                Drill it →
+              </Link>
+            </p>
+          )}
           <textarea
             value={notes}
             onChange={(e) => {

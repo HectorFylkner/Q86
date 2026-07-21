@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Target,
   Timer,
+  TreeStructure,
   UploadSimple,
   type Icon,
 } from "@phosphor-icons/react";
@@ -91,7 +92,7 @@ const progress = {
   href: "/mastery",
   label: "Progress",
   description: "Inspect mastery, analytics, and score-report baselines.",
-  routes: ["/mastery", "/analytics", "/quality", "/import"],
+  routes: ["/mastery", "/analytics", "/coverage", "/quality", "/import"],
   keywords: ["stats", "mastery", "analytics", "backup"],
   icon: ChartLineUp,
 } satisfies NavigationItem;
@@ -182,6 +183,15 @@ export const QUICK_GROUPS = [
         routes: ["/analytics"],
         keywords: ["stats", "charts", "report", "data"],
         icon: ChartBar,
+      },
+      {
+        href: "/coverage",
+        label: "Coverage ledger",
+        description:
+          "Inspect concept teaching, mappings, proof floors, and exact gaps.",
+        routes: ["/coverage"],
+        keywords: ["curriculum", "concept", "evidence", "unpublished"],
+        icon: TreeStructure,
       },
       {
         href: "/quality",

@@ -1,4 +1,4 @@
-// The domain taxonomy. Mirrors the official GMAT Focus score-report
+// The domain taxonomy. Mirrors the official GMAT score-report
 // categories exactly so platform analytics map 1:1 to real reports.
 
 export const CONTENT_DOMAINS = ["arithmetic", "algebra"] as const;
@@ -70,6 +70,21 @@ export const SKILL_BY_SUBTOPIC: Record<Subtopic, FundamentalSkill> =
     ).flatMap(([skill, subs]) => subs.map((s) => [s, skill])),
   ) as Record<Subtopic, FundamentalSkill>;
 
+// Strategy chapters live on the Learn index beside the subtopic
+// chapters but teach cross-cutting method, so they have no question
+// pool and no chapter test. They extend the chapter namespace (lesson
+// filename = route param = progress key), never the question taxonomy
+// — questions always carry a real subtopic.
+export const STRATEGY_CHAPTERS = [
+  "data_sufficiency_discipline",
+  "choosing_fastest_path",
+] as const;
+export type StrategyChapter = (typeof STRATEGY_CHAPTERS)[number];
+
+/** Anything a lesson file, learn route, or lesson-progress row can be
+ *  keyed by: a drillable subtopic or a strategy chapter. */
+export type ChapterKey = Subtopic | StrategyChapter;
+
 export const ERROR_TYPES = [
   "content_gap",
   "setup_error",
@@ -100,6 +115,17 @@ export type SessionFocus = (typeof SESSION_FOCUS)[number];
 
 export const QUESTION_SOURCES = ["seed", "generated", "twin"] as const;
 export type QuestionSource = (typeof QUESTION_SOURCES)[number];
+
+// The four solution strategies a worked example can be attacked with.
+// Committed before every reveal, so strategy selection becomes a
+// trained, measured habit rather than a narrated one.
+export const STRATEGIES = [
+  "algebra",
+  "backsolve",
+  "smart_numbers",
+  "test_cases",
+] as const;
+export type Strategy = (typeof STRATEGIES)[number];
 
 // Content QC: reasons a question can be flagged from the runner.
 export const FLAG_REASONS = [
@@ -158,6 +184,21 @@ export const SUBTOPIC_LABELS: Record<Subtopic, string> = {
   series_patterns: "Series & patterns",
 };
 
+export const STRATEGY_CHAPTER_LABELS: Record<StrategyChapter, string> = {
+  data_sufficiency_discipline: "Data Sufficiency decision discipline",
+  choosing_fastest_path: "Choosing the fastest path",
+};
+
+export const ALL_CHAPTER_KEYS: ChapterKey[] = [
+  ...ALL_SUBTOPICS,
+  ...STRATEGY_CHAPTERS,
+];
+
+export const CHAPTER_LABELS: Record<ChapterKey, string> = {
+  ...SUBTOPIC_LABELS,
+  ...STRATEGY_CHAPTER_LABELS,
+};
+
 export const CONTEXT_LABELS: Record<Context, string> = {
   pure: "Pure",
   real: "Real",
@@ -186,6 +227,13 @@ export const CONFIDENCE_LABELS: Record<Confidence, string> = {
   guess: "Guess",
   lean: "Lean",
   lock: "Lock",
+};
+
+export const STRATEGY_LABELS: Record<Strategy, string> = {
+  algebra: "Algebra",
+  backsolve: "Backsolve",
+  smart_numbers: "Smart numbers",
+  test_cases: "Test cases",
 };
 
 export const FLAG_REASON_LABELS: Record<FlagReason, string> = {

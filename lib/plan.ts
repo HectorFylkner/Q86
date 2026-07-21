@@ -2,6 +2,13 @@ import {
   FUNDAMENTAL_SKILLS,
   type FundamentalSkill,
 } from "./taxonomy.ts";
+import {
+  computeCurriculum,
+  isStudied,
+  INTERLEAVE_MIN_STUDIED,
+  type CurriculumPlan,
+  type CurriculumRow,
+} from "./curriculum.ts";
 import type { PatternCategoryKey } from "./generators/index.ts";
 
 /**
@@ -31,7 +38,7 @@ export const PHASE_LABELS: Record<TrainingPhase, string> = {
 
 export const PHASE_NOTES: Record<TrainingPhase, string> = {
   foundations:
-    "Build coverage: climb the mastery ladders and keep every skill in rotation.",
+    "Build coverage: clear the next chapter, pass its test, and keep every skill in rotation.",
   accuracy:
     "Error discipline: clear the redo queue daily and post-mortem every miss.",
   speed:
@@ -75,6 +82,8 @@ export type PlanInputs = {
   dayIndex: number;
   /** Current pattern-trainer ELO per category. */
   eloByCategory: Record<PatternCategoryKey, number>;
+  /** Per-chapter curriculum evidence, in canonical chapter order. */
+  curriculum: CurriculumRow[];
 };
 
 export type DailyPlan = {
@@ -85,6 +94,10 @@ export type DailyPlan = {
   drill: {
     total: number;
     bySkill: Array<{ skill: FundamentalSkill; count: number }>;
+    /** Interleaved mixed review across studied subtopics once enough
+     *  chapters are past acquisition; skill-blocked before that. */
+    mode: "interleaved" | "by_skill";
+    studiedCount: number;
   };
   weights: Record<FundamentalSkill, number>;
   dueRedoCount: number;
@@ -96,6 +109,8 @@ export type DailyPlan = {
   };
   /** @deprecated Use `timed.due`; retained while UI callers migrate. */
   timedSetToday: boolean;
+  /** Which chapter to study next, and any test-out shortcuts. */
+  curriculum: CurriculumPlan;
 };
 
 /** Floor 5% per skill so every skill always gets maintenance reps. */
@@ -238,10 +253,16 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
     drill: {
       total,
       bySkill: bySkill.map(({ skill, count }) => ({ skill, count })),
+      mode:
+        inputs.curriculum.filter(isStudied).length >= INTERLEAVE_MIN_STUDIED
+          ? "interleaved"
+          : "by_skill",
+      studiedCount: inputs.curriculum.filter(isStudied).length,
     },
     weights,
     dueRedoCount: inputs.dueRedoCount,
     timed,
     timedSetToday: timed.due,
+    curriculum: computeCurriculum(inputs.curriculum),
   };
 }

@@ -41,6 +41,10 @@ Overlapping-sets questions are a fixture of GMAT Focus Quant, and at the Q86 lev
 4. Engineers onsite $= 3(5) = 15$, so engineers remote $= 100 - 15 = 85$.
 5. Check the remote column: $85 + 5 = 90$. Consistent.
 
+The finished table — three subtractions and one small equation fill every cell:
+
+::set-matrix rows="Engineers,Designers" cols="Onsite,Remote" cells="15,85,55,5" total="160"
+
 **Answer: 85**
 
 **Example 3**

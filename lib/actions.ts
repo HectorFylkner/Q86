@@ -7,8 +7,10 @@ import {
   attempts,
   baselineReports,
   deckReviews,
-  edits,
   eloRatings,
+  lessonExampleAttempts,
+  lessonProgress,
+  lessonReviews,
   patternAttempts,
   questionFlags,
   questions,
@@ -16,7 +18,12 @@ import {
   type Question,
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
-import { selectChapterTest } from "./chapter-tests.ts";
+import { RETAKE_EXCLUDE_DAYS, selectChapterTest } from "./chapter-tests.ts";
+import { CHAPTER_TEST_SIZE } from "./chapter-test-config.ts";
+import { gradeCommitment } from "./example-grade.ts";
+import { enrollLessonCards } from "./lesson-cards.ts";
+import { parseLesson } from "./lesson-parse.ts";
+import { readLesson } from "./lessons.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -31,17 +38,45 @@ import {
   selectTimedSet,
   type QuestionFilter,
 } from "./engine.ts";
-import { applyRedoResult, createRedoSession, enqueueMiss } from "./redo.ts";
-import type {
-  Confidence,
-  EditReason,
-  ErrorType,
-  FlagReason,
-  FundamentalSkill,
-  SessionFocus,
-  SessionMode,
-  Subtopic,
+import {
+  recordQuestionAttempt,
+  saveTimedQuestionSession,
+  type LogAttemptInput,
+  type SaveTimedResponse,
+  type TimedEditInput,
+  type TimedResultInput,
+} from "./question-attempts.ts";
+import { createQuestionSession } from "./question-session.ts";
+import { finishQuestionSession } from "./question-session-completion.ts";
+import {
+  CONCEPT_REMEDIATION_CONFIG_KEY,
+  exposedVariantFamilyIds,
+  openConceptRemediation,
+  remediationCanResolveFromFreshQuestion,
+} from "./concept-remediations.ts";
+import { currentQuestionMisconceptionIds } from "./db/curriculum-mappings.ts";
+import { createRedoSession } from "./redo.ts";
+import {
+  ALL_CHAPTER_KEYS,
+  STRATEGIES,
+  STRATEGY_CHAPTERS,
+  type ErrorType,
+  type FlagReason,
+  type FundamentalSkill,
+  type SessionFocus,
+  type SessionMode,
+  type Strategy,
+  type StrategyChapter,
+  type ChapterKey,
+  type Subtopic,
 } from "./taxonomy.ts";
+
+export type {
+  LogAttemptInput,
+  SaveTimedResponse,
+  TimedEditInput,
+  TimedResultInput,
+} from "./question-attempts.ts";
 
 export type DrillTiming = "untimed" | "soft";
 
@@ -56,48 +91,144 @@ export async function startDrill(config: {
   count: number;
   timing: DrillTiming;
   focus?: SessionFocus;
+  /** Bind one open action to a fresh, exact-concept proof attempt. */
+  remediationId?: number;
 }): Promise<StartDrillResult> {
-  const picked = await selectQuestions(config.filter, config.count);
-  if (picked.length === 0) {
+  const requestedConceptId =
+    config.filter.conceptIds?.length === 1
+      ? config.filter.conceptIds[0]
+      : null;
+  const remediation =
+    config.remediationId != null && requestedConceptId != null
+      ? await openConceptRemediation(
+          config.remediationId,
+          requestedConceptId,
+        )
+      : null;
+  if (config.remediationId != null && remediation == null) {
     return {
       error:
-        "No verified questions match this filter. Generate some from this screen or run pnpm seed.",
+        "That remediation is no longer open or does not match this exact concept.",
       sessionId: null,
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: config as unknown as Record<string, unknown>,
-    })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  if (remediation && !remediationCanResolveFromFreshQuestion(remediation)) {
+    return {
+      error:
+        "This action needs delayed retrieval or recertification evidence and cannot be cleared by one practice question.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+
+  let effectiveFilter = config.filter;
+  let picked: Question[];
+  if (remediation) {
+    const priorFamilies = await exposedVariantFamilyIds();
+    effectiveFilter = {
+      ...config.filter,
+      excludeVariantFamilyIds: [
+        ...new Set([
+          ...(config.filter.excludeVariantFamilyIds ?? []),
+          ...priorFamilies,
+        ]),
+      ],
+    };
+    let candidates = await selectQuestions(effectiveFilter, 10_000);
+    if (remediation.actionType === "review_misconception") {
+      candidates = (
+        await Promise.all(
+          candidates.map(async (question) => ({
+            question,
+            misconceptionIds: await currentQuestionMisconceptionIds({
+              questionId: question.id,
+              questionContentVersion: question.contentVersion,
+              conceptId: remediation.conceptId,
+            }),
+          })),
+        )
+      )
+        .filter(({ misconceptionIds }) =>
+          remediation.misconceptionId != null
+            ? misconceptionIds.includes(remediation.misconceptionId)
+            : false,
+        )
+        .map(({ question }) => question);
+    }
+    picked = candidates.slice(0, 1);
+  } else {
+    picked = await selectQuestions(effectiveFilter, config.count);
+  }
+  if (picked.length === 0) {
+    return {
+      error: remediation
+        ? "No fresh aligned item is available yet. This action stays open until the concept bank has another reviewed question family."
+        : "No verified questions match this filter. Generate some from this screen or run pnpm seed.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const boundRemediation = remediation
+    ? {
+        id: remediation.id,
+        remediationUid: remediation.remediationUid,
+        conceptId: remediation.conceptId,
+      }
+    : null;
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: picked,
+    config: {
+      ...config,
+      count: picked.length,
+      filter: effectiveFilter,
+      ...(boundRemediation && {
+        [CONCEPT_REMEDIATION_CONFIG_KEY]: boundRemediation,
+      }),
+    } as unknown as Record<string, unknown>,
+    blueprintSlots: remediation
+      ? [`remediation.${remediation.id}.fresh-independent-check`]
+      : config.filter.conceptIds?.length === 1
+        ? picked.map(
+            (_, position) =>
+              `concept.${config.filter.conceptIds![0]}.practice.${String(position + 1).padStart(2, "0")}`,
+          )
+        : undefined,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
 /** Chapter test: the pass-bar gate behind a Learn chapter. */
 export async function startChapterTest(
   subtopic: Subtopic,
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
-  if (picked.length < 4) {
+  const { questions: picked, eligibleShortfall } =
+    await selectChapterTest(subtopic);
+  if (eligibleShortfall != null) {
     return {
-      error: "Not enough verified questions in this chapter for a test.",
+      error: `Bank too thin for a fresh test — ${eligibleShortfall}/${CHAPTER_TEST_SIZE} eligible questions in this chapter right now (questions seen in the last ${RETAKE_EXCLUDE_DAYS} days sit out so a retake measures the chapter, not recall). Drill the subtopic instead, or come back in a few days.`,
       sessionId: null,
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
-    })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked };
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: picked,
+    config: {
+      chapter_test: subtopic,
+      count: picked.length,
+    },
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
 export async function startRedoSession(
@@ -114,15 +245,19 @@ export async function startDrillWithQuestions(
   if (questionIds.length === 0) {
     return { error: "No questions to drill.", sessionId: null, questions: [] };
   }
+  const uniqueQuestionIds = [...new Set(questionIds)];
   const rows = await db
     .select()
     .from(questions)
     .where(
-      and(inArray(questions.id, questionIds), eq(questions.verified, true)),
+      and(
+        inArray(questions.id, uniqueQuestionIds),
+        eq(questions.verified, true),
+      ),
     )
     .all();
   const byId = new Map(rows.map((q) => [q.id, q]));
-  const ordered = questionIds
+  const ordered = uniqueQuestionIds
     .map((id) => byId.get(id))
     .filter((q): q is Question => Boolean(q));
   if (ordered.length === 0) {
@@ -132,53 +267,23 @@ export async function startDrillWithQuestions(
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "drill", config: { questionIds } })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: ordered };
+  const created = await createQuestionSession({
+    mode: "drill",
+    questions: ordered,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+  };
 }
 
-export async function logAttempt(input: {
-  sessionId: number | null;
-  questionId: number;
-  mode: SessionMode;
-  selectedIndex: number;
-  timeSeconds: number;
-  confidence: Confidence;
-  focus?: SessionFocus;
-}): Promise<{ attemptId: number; correct: boolean }> {
-  const q = await db
-    .select()
-    .from(questions)
-    .where(eq(questions.id, input.questionId))
-    .get();
-  if (!q) throw new Error(`Question ${input.questionId} not found`);
-  const correct = input.selectedIndex === q.correctIndex;
-
-  const attempt = await db
-    .insert(attempts)
-    .values({
-      questionId: input.questionId,
-      sessionId: input.sessionId,
-      mode: input.mode,
-      focus: input.focus ?? "focused",
-      selectedIndex: input.selectedIndex,
-      correct,
-      timeSeconds: input.timeSeconds,
-      confidence: input.confidence,
-    })
-    .returning()
-    .get();
-
-  if (input.mode === "redo") {
-    await applyRedoResult(q.id, correct, input.timeSeconds);
-  } else if (!correct) {
-    await enqueueMiss(q.id, attempt.id);
-  }
-
-  return { attemptId: attempt.id, correct };
+export async function logAttempt(input: LogAttemptInput): Promise<{
+  attemptId: number;
+  correct: boolean;
+  remediationResolved: boolean;
+}> {
+  return recordQuestionAttempt(input);
 }
 
 export type QuestionHistoryRow = {
@@ -221,13 +326,10 @@ export async function tagAttempt(
 
 export async function finishSession(
   sessionId: number,
-  summary: Record<string, unknown>,
+  _clientSummary: Record<string, unknown>,
 ): Promise<void> {
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, sessionId))
-    .run();
+  void _clientSummary;
+  await finishQuestionSession(sessionId);
 }
 
 // ---------------------------------------------------------------------------
@@ -257,37 +359,18 @@ export async function startTimedSet(config: {
     };
   }
   const mode = config.kind === "full" ? "section_sim" : "timed_set";
-  const session = await db
-    .insert(sessions)
-    .values({ mode, config: config as unknown as Record<string, unknown> })
-    .returning()
-    .get();
-  return { error: null, sessionId: session.id, questions: picked, mode };
+  const created = await createQuestionSession({
+    mode,
+    questions: picked,
+    config: config as unknown as Record<string, unknown>,
+  });
+  return {
+    error: null,
+    sessionId: created.session.id,
+    questions: created.questions,
+    mode,
+  };
 }
-
-export type TimedResultInput = {
-  questionId: number;
-  selectedIndex: number;
-  timeSeconds: number;
-  confidence: Confidence;
-  bookmarked: boolean;
-  timeViolation: boolean;
-};
-
-export type TimedEditInput = {
-  questionId: number;
-  fromIndex: number;
-  toIndex: number;
-  reason: EditReason;
-  justification: string;
-};
-
-export type SaveTimedResponse = {
-  attemptIdByQuestionId: Record<number, number>;
-  correctByQuestionId: Record<number, boolean>;
-  sessionEditNet: number;
-  lifetimeEditNet: number;
-};
 
 export async function saveTimedSession(input: {
   sessionId: number;
@@ -298,126 +381,7 @@ export async function saveTimedSession(input: {
   notReachedCount: number;
   focus?: SessionFocus;
 }): Promise<SaveTimedResponse> {
-  if (input.edits.length > 3) {
-    throw new Error("A section allows at most 3 edits.");
-  }
-  for (const edit of input.edits) {
-    if (edit.justification.trim().length < 20) {
-      throw new Error(
-        "Every edit needs a justification of at least 20 characters.",
-      );
-    }
-  }
-
-  const questionRows = await db
-    .select()
-    .from(questions)
-    .where(
-      inArray(
-        questions.id,
-        input.results.map((r) => r.questionId),
-      ),
-    )
-    .all();
-  const byId = new Map(questionRows.map((q) => [q.id, q]));
-
-  const attemptIdByQuestionId: Record<number, number> = {};
-  const correctByQuestionId: Record<number, boolean> = {};
-
-  await db.transaction(async (tx) => {
-    for (const result of input.results) {
-      const q = byId.get(result.questionId);
-      if (!q) throw new Error(`Question ${result.questionId} not found`);
-      const correct = result.selectedIndex === q.correctIndex;
-      correctByQuestionId[q.id] = correct;
-      const attempt = await tx
-        .insert(attempts)
-        .values({
-          questionId: q.id,
-          sessionId: input.sessionId,
-          mode: input.mode,
-          focus: input.focus ?? "focused",
-          selectedIndex: result.selectedIndex,
-          correct,
-          timeSeconds: result.timeSeconds,
-          confidence: result.confidence,
-        })
-        .returning()
-        .get();
-      attemptIdByQuestionId[q.id] = attempt.id;
-    }
-
-    for (const edit of input.edits) {
-      const q = byId.get(edit.questionId);
-      if (!q) continue;
-      await tx
-        .insert(edits)
-        .values({
-          sessionId: input.sessionId,
-          questionId: edit.questionId,
-          fromIndex: edit.fromIndex,
-          toIndex: edit.toIndex,
-          fromCorrect: edit.fromIndex === q.correctIndex,
-          toCorrect: edit.toIndex === q.correctIndex,
-          reason: edit.reason,
-          justification: edit.justification.trim(),
-        })
-        .run();
-    }
-  });
-
-  // Redo enqueue outside the transaction: it has its own dedupe logic.
-  for (const result of input.results) {
-    if (!correctByQuestionId[result.questionId]) {
-      await enqueueMiss(
-        result.questionId,
-        attemptIdByQuestionId[result.questionId],
-      );
-    }
-  }
-
-  const sessionEditNet = input.edits.reduce((net, edit) => {
-    const q = byId.get(edit.questionId);
-    if (!q) return net;
-    return (
-      net +
-      (edit.toIndex === q.correctIndex ? 1 : 0) -
-      (edit.fromIndex === q.correctIndex ? 1 : 0)
-    );
-  }, 0);
-
-  const allEdits = await db.select().from(edits).all();
-  const lifetimeEditNet = allEdits.reduce(
-    (net, e) => net + (e.toCorrect ? 1 : 0) - (e.fromCorrect ? 1 : 0),
-    0,
-  );
-
-  const correctCount = Object.values(correctByQuestionId).filter(Boolean).length;
-  const summary = {
-    total: input.results.length + input.notReachedCount,
-    answered: input.results.length,
-    correct: correctCount,
-    timeViolations: input.results.filter((r) => r.timeViolation).length,
-    sub60Wrong: input.results.filter(
-      (r) => r.timeSeconds < 60 && !correctByQuestionId[r.questionId],
-    ).length,
-    editCount: input.edits.length,
-    editNet: sessionEditNet,
-    notReached: input.notReachedCount,
-    durationSeconds: input.durationSeconds,
-  };
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, input.sessionId))
-    .run();
-
-  return {
-    attemptIdByQuestionId,
-    correctByQuestionId,
-    sessionEditNet,
-    lifetimeEditNet,
-  };
+  return saveTimedQuestionSession(input);
 }
 
 // ---------------------------------------------------------------------------
@@ -578,6 +542,150 @@ export async function saveBaselineReport(input: {
 }
 
 // ---------------------------------------------------------------------------
+// Lesson progress (curriculum spine)
+// ---------------------------------------------------------------------------
+
+/** Record that a chapter was opened. Idempotent: the first open wins,
+ *  so read_at means "first read", not "last visited". */
+export async function markLessonRead(subtopic: ChapterKey): Promise<void> {
+  if (!ALL_CHAPTER_KEYS.includes(subtopic)) return;
+  await db
+    .insert(lessonProgress)
+    .values({ subtopic, readAt: new Date(), updatedAt: new Date() })
+    .onConflictDoNothing({ target: lessonProgress.subtopic })
+    .run();
+  const row = await db
+    .select()
+    .from(lessonProgress)
+    .where(eq(lessonProgress.subtopic, subtopic))
+    .get();
+  if (row && row.readAt == null) {
+    await db
+      .update(lessonProgress)
+      .set({ readAt: new Date(), updatedAt: new Date() })
+      .where(eq(lessonProgress.subtopic, subtopic))
+      .run();
+  }
+}
+
+/** Persist the chapter's pre-drill checklist ticks (also the migration
+ *  target for pre-server progress that lived in localStorage). */
+export async function saveLessonChecklist(
+  subtopic: ChapterKey,
+  checked: number[],
+  total: number,
+): Promise<void> {
+  if (!ALL_CHAPTER_KEYS.includes(subtopic)) return;
+  const clean = [...new Set(checked)]
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < total)
+    .sort((a, b) => a - b);
+  await db
+    .insert(lessonProgress)
+    .values({
+      subtopic,
+      readAt: new Date(),
+      checklist: clean,
+      checklistTotal: total,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: lessonProgress.subtopic,
+      set: { checklist: clean, checklistTotal: total, updatedAt: new Date() },
+    })
+    .run();
+  await maybeEnrollStrategyChapter(subtopic);
+}
+
+/** Strategy chapters have no question pool and so no chapter test;
+ *  their cue/trap cards enroll when the chapter becomes prepared
+ *  (checklist ticked, all three examples committed) instead. Idempotent
+ *  — repeated calls refresh text, never scheduling. */
+async function maybeEnrollStrategyChapter(
+  subtopic: ChapterKey,
+): Promise<void> {
+  if (!STRATEGY_CHAPTERS.includes(subtopic as StrategyChapter)) return;
+  const row = await db
+    .select()
+    .from(lessonProgress)
+    .where(eq(lessonProgress.subtopic, subtopic))
+    .get();
+  if (
+    !row ||
+    row.checklistTotal === 0 ||
+    row.checklist.length < row.checklistTotal
+  ) {
+    return;
+  }
+  const examples = await db
+    .select({ exampleN: lessonExampleAttempts.exampleN })
+    .from(lessonExampleAttempts)
+    .where(eq(lessonExampleAttempts.subtopic, subtopic))
+    .all();
+  if (new Set(examples.map((e) => e.exampleN)).size < 3) return;
+  await enrollLessonCards(subtopic);
+}
+
+export type LogExampleResult = {
+  error: string | null;
+  id: number | null;
+  /** Server-graded verdict; null when the answer was not unambiguously
+   *  comparable — the card then offers a one-tap self-mark. */
+  correct: boolean | null;
+};
+
+/** A worked-example commitment: strategy + answer, logged with timing
+ *  before the solution reveals. Graded server-side against the
+ *  chapter's own answer line. */
+export async function logExampleAttempt(input: {
+  subtopic: ChapterKey;
+  exampleN: number;
+  strategy: Strategy;
+  answer: string;
+  timeSeconds: number;
+}): Promise<LogExampleResult> {
+  if (!ALL_CHAPTER_KEYS.includes(input.subtopic)) {
+    return { error: "Unknown chapter.", id: null, correct: null };
+  }
+  if (!STRATEGIES.includes(input.strategy) || !input.answer.trim()) {
+    return { error: "Commit a strategy and an answer.", id: null, correct: null };
+  }
+  const lesson = readLesson(input.subtopic);
+  const parsed = lesson ? parseLesson(lesson.body) : null;
+  const example = parsed?.examples.find((e) => e.n === input.exampleN);
+  if (!example) {
+    return { error: "Unknown example.", id: null, correct: null };
+  }
+  const correct = gradeCommitment(example.answer, input.answer);
+  const row = await db
+    .insert(lessonExampleAttempts)
+    .values({
+      subtopic: input.subtopic,
+      exampleN: input.exampleN,
+      strategy: input.strategy,
+      answer: input.answer.trim(),
+      correct,
+      timeSeconds: input.timeSeconds,
+    })
+    .returning()
+    .get();
+  await maybeEnrollStrategyChapter(input.subtopic);
+  return { error: null, id: row.id, correct };
+}
+
+/** Self-mark for commitments the grader could not score (or scored
+ *  wrongly against an approximation). One tap on reveal. */
+export async function markExampleAttempt(
+  id: number,
+  correct: boolean,
+): Promise<void> {
+  await db
+    .update(lessonExampleAttempts)
+    .set({ correct })
+    .where(eq(lessonExampleAttempts.id, id))
+    .run();
+}
+
+// ---------------------------------------------------------------------------
 // Takeaway deck grading (SRS) & content flags
 // ---------------------------------------------------------------------------
 
@@ -602,6 +710,27 @@ export async function gradeDeckCard(
   } else {
     await db.insert(deckReviews).values({ questionId, ...next, dueAt }).run();
   }
+}
+
+/** Grade a concept card (chapter cue/trap) — same SM-2-lite ladder as
+ *  the question-derived deck cards. */
+export async function gradeLessonCard(
+  id: number,
+  grade: ReviewGrade,
+): Promise<void> {
+  const existing = await db
+    .select()
+    .from(lessonReviews)
+    .where(eq(lessonReviews.id, id))
+    .get();
+  if (!existing) return;
+  const next = nextReview(existing, grade);
+  const dueAt = new Date(Date.now() + next.intervalDays * 86_400_000);
+  await db
+    .update(lessonReviews)
+    .set({ ...next, dueAt, updatedAt: new Date() })
+    .where(eq(lessonReviews.id, id))
+    .run();
 }
 
 export async function flagQuestion(input: {

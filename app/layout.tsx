@@ -21,7 +21,8 @@ const jetbrainsMono = localFont({
 
 export const metadata: Metadata = {
   title: "Q86",
-  description: "Personal GMAT Focus quant training platform",
+  description:
+    "Concept-level GMAT Quant training with an explicit Data Sufficiency bridge.",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Q86" },
   icons: { apple: "/apple-touch-icon.png" },

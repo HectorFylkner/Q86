@@ -1,8 +1,19 @@
-import { and, desc, eq, gt, lte } from "drizzle-orm";
+import { and, asc, desc, eq, gt, lte } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
-import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
+import {
+  QueueClient,
+  type ConceptActionRow,
+  type DueRow,
+  type LogRow,
+} from "@/components/queue/queue-client";
+import { buildCurriculumV3 } from "@/curriculum/v3/graph";
 import { db } from "@/lib/db";
-import { attempts, questions, redoQueue } from "@/lib/db/schema";
+import {
+  attempts,
+  conceptRemediations,
+  questions,
+  redoQueue,
+} from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,6 +25,36 @@ export default async function QueuePage({
 }) {
   const { start } = await searchParams;
   const now = new Date();
+  const conceptById = new Map(
+    buildCurriculumV3().concepts.map((concept) => [concept.id, concept]),
+  );
+
+  const conceptActions = (await db
+    .select()
+    .from(conceptRemediations)
+    .where(eq(conceptRemediations.status, "open"))
+    .orderBy(
+      asc(conceptRemediations.priority),
+      desc(conceptRemediations.createdAt),
+    )
+    .limit(100)
+    .all()).flatMap((action): ConceptActionRow[] => {
+    const concept = conceptById.get(action.conceptId);
+    if (!concept) return [];
+    return [
+      {
+        id: action.id,
+        conceptId: concept.id,
+        conceptTitle: concept.title,
+        parentSubtopic: concept.parentSubtopic,
+        misconceptionId: action.misconceptionId,
+        trigger: action.trigger,
+        actionType: action.actionType,
+        rationaleMd: action.rationaleMd,
+        createdAt: action.createdAt,
+      },
+    ];
+  });
 
   const due = (await db
     .select({
@@ -91,6 +132,7 @@ export default async function QueuePage({
         Redo queue &amp; error log
       </h1>
       <QueueClient
+        conceptActions={conceptActions}
         due={due}
         upcoming={upcoming}
         log={log}

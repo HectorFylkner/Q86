@@ -15,6 +15,48 @@
       "when": 1783242991470,
       "tag": "0001_deep_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783358619612,
+      "tag": "0002_large_captain_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1783359623581,
+      "tag": "0003_peaceful_sue_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1783360575639,
+      "tag": "0004_nice_dracula",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1784637414105,
+      "tag": "0005_question_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1784639020180,
+      "tag": "0006_concept_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1784659502667,
+      "tag": "0007_session_item_runtime",
+      "breakpoints": true
     }
   ]
 }

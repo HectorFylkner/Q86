@@ -4,6 +4,7 @@ import {
   attempts,
   edits,
   eloRatings,
+  lessonExampleAttempts,
   questions,
   redoQueue,
 } from "./db/schema.ts";
@@ -23,8 +24,10 @@ import {
   ERROR_TYPES,
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
+  STRATEGIES,
   type Confidence,
   type ErrorType,
+  type Strategy,
   type Subtopic,
 } from "./taxonomy.ts";
 
@@ -98,6 +101,21 @@ export type AnalyticsData = {
   trend: TrendPoint[];
   /** Accuracy per subtopic × difficulty (focused attempts only). */
   difficultyMatrix: DifficultyMatrixRow[];
+  /** Misses filed under one subtopic whose confirmed classification says
+   *  a different concept actually failed (attempts.error_subtag). */
+  crossAttribution: Array<{
+    filed: Subtopic;
+    really: Subtopic;
+    count: number;
+  }>;
+  /** Per-method performance on worked-example commitments. */
+  strategyStats: Array<{
+    strategy: Strategy;
+    attempts: number;
+    graded: number;
+    correct: number;
+    medianSeconds: number | null;
+  }>;
   /** Attempts per local day, most recent 84 days (includes zero days). */
   volume: VolumeDay[];
   redoCompliance: {
@@ -124,6 +142,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       timeSeconds: attempts.timeSeconds,
       confidence: attempts.confidence,
       errorType: attempts.errorType,
+      errorSubtag: attempts.errorSubtag,
       createdAt: attempts.createdAt,
       subtopic: questions.subtopic,
       skill: questions.fundamentalSkill,
@@ -309,6 +328,42 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     },
   ).filter((row) => Object.values(row.cells).some((c) => c.total > 0));
 
+  // --- cross-attribution: filed under X, really Y ----------------------------
+  const crossCounts = new Map<string, number>();
+  for (const r of rows) {
+    if (r.correct || r.errorSubtag == null || r.errorSubtag === r.subtopic)
+      continue;
+    const key = `${r.subtopic}|${r.errorSubtag}`;
+    crossCounts.set(key, (crossCounts.get(key) ?? 0) + 1);
+  }
+  const crossAttribution = [...crossCounts.entries()]
+    .map(([key, count]) => {
+      const [filed, really] = key.split("|") as [Subtopic, Subtopic];
+      return { filed, really, count };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  // --- strategy performance on worked-example commitments --------------------
+  const exampleRows = await db.select().from(lessonExampleAttempts).all();
+  const strategyStats = STRATEGIES.map((strategy) => {
+    const subset = exampleRows.filter((r) => r.strategy === strategy);
+    const graded = subset.filter((r) => r.correct != null);
+    const times = subset.map((r) => r.timeSeconds).sort((a, b) => a - b);
+    const mid = Math.floor(times.length / 2);
+    return {
+      strategy,
+      attempts: subset.length,
+      graded: graded.length,
+      correct: graded.filter((r) => r.correct).length,
+      medianSeconds:
+        times.length === 0
+          ? null
+          : times.length % 2 === 1
+            ? times[mid]
+            : (times[mid - 1] + times[mid]) / 2,
+    };
+  });
+
   // --- training volume, last 84 local days -----------------------------------
   const volume: VolumeDay[] = [];
   {
@@ -393,6 +448,8 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     calibration,
     trend,
     difficultyMatrix,
+    crossAttribution,
+    strategyStats,
     volume,
     redoCompliance,
     eloBars,

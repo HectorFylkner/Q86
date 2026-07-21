@@ -9,6 +9,10 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import {
+  attemptIsPersisted,
+  type AttemptSaveState,
+} from "@/components/drill/runner-persistence";
 import { useSessionFocus } from "@/components/use-session-focus";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
@@ -36,7 +40,8 @@ type Result = {
   timeSeconds: number;
   confidence: Confidence;
   attemptId: number | null;
-  saveFailed: boolean;
+  saveState: AttemptSaveState;
+  remediationResolved: boolean;
   errorType: ErrorType | null;
 };
 
@@ -68,7 +73,10 @@ export function QuestionRunner({
   const [hint, setHint] = useState<string | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [finishing, setFinishing] = useState(false);
+  const [finishFailed, setFinishFailed] = useState(false);
   const startRef = useRef(Date.now());
+  const submitStartedRef = useRef(false);
 
   useSessionFocus(
     phase !== "done",
@@ -77,6 +85,51 @@ export function QuestionRunner({
 
   const question = questions[index];
   const currentResult = results[index];
+
+  const persistAttempt = useCallback(
+    (result: Result, resultIndex: number) => {
+      setResults((current) =>
+        current.map((item, i) =>
+          i === resultIndex
+            ? { ...item, attemptId: null, saveState: "saving" }
+            : item,
+        ),
+      );
+      logAttempt({
+        sessionId,
+        questionId: result.questionId,
+        mode,
+        selectedIndex: result.selectedIndex,
+        timeSeconds: result.timeSeconds,
+        confidence: result.confidence,
+        focus,
+      })
+        .then(({ attemptId, remediationResolved }) => {
+          setHint(null);
+          setResults((current) =>
+            current.map((item, i) =>
+              i === resultIndex
+                ? {
+                    ...item,
+                    attemptId,
+                    saveState: "saved",
+                    remediationResolved,
+                  }
+                : item,
+            ),
+          );
+        })
+        .catch(() => {
+          setHint(null);
+          setResults((current) =>
+            current.map((item, i) =>
+              i === resultIndex ? { ...item, saveState: "failed" } : item,
+            ),
+          );
+        });
+    },
+    [sessionId, mode, focus],
+  );
 
   useEffect(() => {
     if (phase !== "answering" || timing !== "soft") return;
@@ -88,7 +141,7 @@ export function QuestionRunner({
   }, [phase, timing, index]);
 
   const submit = useCallback(() => {
-    if (phase !== "answering") return;
+    if (phase !== "answering" || submitStartedRef.current) return;
     if (selected == null) {
       setHint("Pick an answer — keys 1–5 or A–E.");
       return;
@@ -97,6 +150,7 @@ export function QuestionRunner({
       setHint("Set confidence first — G guess, L lean, K lock.");
       return;
     }
+    submitStartedRef.current = true;
     const timeSeconds = (Date.now() - startRef.current) / 1000;
     const correct = selected === question.correctIndex;
     const result: Result = {
@@ -106,36 +160,35 @@ export function QuestionRunner({
       timeSeconds,
       confidence,
       attemptId: null,
-      saveFailed: false,
+      saveState: "saving",
+      remediationResolved: false,
       errorType: null,
     };
     setResults((r) => [...r, result]);
     setPhase("revealed");
     setHint(null);
 
-    logAttempt({
-      sessionId,
-      questionId: question.id,
-      mode,
-      selectedIndex: selected,
-      timeSeconds,
-      confidence,
-      focus,
-    })
-      .then(({ attemptId }) => {
-        setResults((r) =>
-          r.map((res, i) => (i === index ? { ...res, attemptId } : res)),
-        );
-      })
-      .catch(() => {
-        setResults((r) =>
-          r.map((res, i) => (i === index ? { ...res, saveFailed: true } : res)),
-        );
-      });
-  }, [phase, selected, confidence, question, sessionId, mode, focus, index]);
+    persistAttempt(result, index);
+  }, [phase, selected, confidence, question, index, persistAttempt]);
+
+  const retryAttempt = useCallback(() => {
+    const result = results[index];
+    if (!result || result.saveState !== "failed") return;
+    setHint(null);
+    persistAttempt(result, index);
+  }, [results, index, persistAttempt]);
 
   const next = useCallback(() => {
-    if (phase !== "revealed") return;
+    if (phase !== "revealed" || finishing) return;
+    const current = results[index];
+    if (!attemptIsPersisted(current)) {
+      setHint(
+        current?.saveState === "failed"
+          ? "Retry the save before continuing."
+          : "Saving this attempt before continuing…",
+      );
+      return;
+    }
     if (index + 1 < questions.length) {
       setIndex(index + 1);
       setPhase("answering");
@@ -143,6 +196,8 @@ export function QuestionRunner({
       setConfidence(null);
       setHint(null);
       setElapsed(0);
+      setFinishFailed(false);
+      submitStartedRef.current = false;
       startRef.current = Date.now();
     } else {
       const all = results;
@@ -154,10 +209,19 @@ export function QuestionRunner({
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
       };
-      finishSession(sessionId, summary).catch(() => {});
-      setPhase("done");
+      setFinishing(true);
+      setFinishFailed(false);
+      finishSession(sessionId, summary)
+        .then(() => {
+          setPhase("done");
+          setFinishing(false);
+        })
+        .catch(() => {
+          setFinishing(false);
+          setFinishFailed(true);
+        });
     }
-  }, [phase, index, questions.length, results, sessionId]);
+  }, [phase, finishing, index, questions.length, results, sessionId]);
 
   const tagError = useCallback(
     (errorType: ErrorType) => {
@@ -300,7 +364,14 @@ export function QuestionRunner({
                 return (
                   <tr key={i} className="border-b border-grid last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
-                    <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
+                    <td className="px-3 py-2">
+                      <Link
+                        href={`/learn/${q.subtopic}`}
+                        className="hover:text-ballpoint hover:underline"
+                      >
+                        {SUBTOPIC_LABELS[q.subtopic]}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2">
                       <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
                     </td>
@@ -415,10 +486,33 @@ export function QuestionRunner({
             {hint}
           </p>
         )}
-        {currentResult?.saveFailed && (
-          <p className="mt-2 text-sm text-redpen" role="alert">
-            This attempt was not saved — check that the dev server can reach
-            ./data/q86.db.
+        {currentResult?.saveState === "saving" && (
+          <p className="mt-2 text-sm text-graphite" role="status">
+            Saving this attempt…
+          </p>
+        )}
+        {currentResult?.saveState === "failed" && (
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <p className="text-sm text-redpen" role="alert">
+              This attempt was not saved. Your answer is still here; retry to
+              continue.
+            </p>
+            <button
+              type="button"
+              onClick={retryAttempt}
+              className="rounded-control border border-redpen/40 bg-surface px-3 py-1.5 text-sm font-medium text-redpen hover:border-redpen"
+            >
+              Retry save
+            </button>
+          </div>
+        )}
+        {currentResult?.remediationResolved && (
+          <p
+            className="mt-2 rounded-control border border-ballpoint/30 bg-ballpoint/5 px-3 py-2 text-sm text-ballpoint"
+            role="status"
+          >
+            Fresh independent check passed. This remediation action is cleared;
+            mastery remains governed by the full evidence blueprint.
           </p>
         )}
       </motion.div>
@@ -426,31 +520,57 @@ export function QuestionRunner({
       {revealed && currentResult && (
         <>
           {!currentResult.correct && (
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
-              {ERROR_TYPES.map((et, i) => (
-                <button
-                  key={et}
-                  onClick={() => tagError(et)}
-                  disabled={currentResult.attemptId == null}
-                  className={cn(
-                    "rounded-control border px-2 py-1 transition-colors duration-150",
-                    currentResult.errorType === et
-                      ? "border-redpen bg-redpen/5 font-medium text-redpen"
-                      : "border-grid text-graphite hover:border-graphite/50",
-                    currentResult.attemptId == null && "opacity-50",
-                  )}
-                >
-                  <span className="mr-1 font-mono opacity-60">{i + 1}</span>
-                  {ERROR_TYPE_LABELS[et]}
-                </button>
-              ))}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-graphite">Tag the miss (keys 1–6):</span>
+                {ERROR_TYPES.map((et, i) => (
+                  <button
+                    key={et}
+                    onClick={() => tagError(et)}
+                    disabled={currentResult.attemptId == null}
+                    className={cn(
+                      "rounded-control border px-2 py-1 transition-colors duration-150",
+                      currentResult.errorType === et
+                        ? "border-redpen bg-redpen/5 font-medium text-redpen"
+                        : "border-grid text-graphite hover:border-graphite/50",
+                      currentResult.attemptId == null && "opacity-50",
+                    )}
+                  >
+                    <span className="mr-1 font-mono opacity-60">{i + 1}</span>
+                    {ERROR_TYPE_LABELS[et]}
+                  </button>
+                ))}
+              </div>
+              {currentResult.errorType === "content_gap" && (
+                <p className="text-xs">
+                  <span className="text-graphite">
+                    A content gap has a chapter:{" "}
+                  </span>
+                  <Link
+                    href={`/learn/${question.subtopic}#ideas`}
+                    className="font-medium text-ballpoint hover:underline"
+                  >
+                    Reread: {SUBTOPIC_LABELS[question.subtopic]} → The core
+                    ideas
+                  </Link>
+                  <span className="text-graphite">
+                    {" "}
+                    — it also moves this chapter up tomorrow&apos;s plan.
+                  </span>
+                </p>
+              )}
             </div>
           )}
           <SolutionPanel
             question={question}
             selectedIndex={currentResult.selectedIndex}
           />
+          {finishFailed && (
+            <p className="text-sm text-redpen" role="alert">
+              Your attempts are saved, but the session could not be closed.
+              Select Finish to retry.
+            </p>
+          )}
           <div className="flex items-center justify-between">
             <button
               onClick={gotoPostmortem}
@@ -464,10 +584,18 @@ export function QuestionRunner({
               <span className="ml-2 font-mono text-[10px] text-graphite">P</span>
             </button>
             <button
+              type="button"
               onClick={next}
-              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
+              disabled={!attemptIsPersisted(currentResult) || finishing}
+              className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {index + 1 < questions.length ? "Next question" : "Finish"}
+              {currentResult.saveState === "saving"
+                ? "Saving…"
+                : finishing
+                  ? "Finishing…"
+                  : index + 1 < questions.length
+                    ? "Next question"
+                    : "Finish"}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
             </button>
           </div>

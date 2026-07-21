@@ -16,13 +16,24 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import { MarkLessonRead } from "@/components/lesson/learn-progress";
+import {
+  ConceptChildList,
+  type ConceptChildSummary,
+} from "@/components/lesson/concept-child-list";
+import { buildCoverageLedger } from "@/curriculum/v3/coverage";
+import { buildCurriculumV3 } from "@/curriculum/v3/graph";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
+import { lessonProgressBySubtopic } from "@/lib/lesson-progress";
 import { listLessons, readLesson } from "@/lib/lessons";
 import {
-  ALL_SUBTOPICS,
+  ALL_CHAPTER_KEYS,
   SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  STRATEGY_CHAPTERS,
+  type ChapterKey,
+  type StrategyChapter,
   type Subtopic,
 } from "@/lib/taxonomy";
 
@@ -32,6 +43,7 @@ export const runtime = "nodejs";
 const RAIL: RailItem[] = [
   { id: "why", label: "Why this matters" },
   { id: "ideas", label: "The core ideas" },
+  { id: "concepts", label: "Concept segments" },
   { id: "examples", label: "Worked examples" },
   { id: "cues", label: "Trigger cues" },
   { id: "traps", label: "Trap gallery" },
@@ -45,25 +57,61 @@ export default async function LessonPage({
   params: Promise<{ subtopic: string }>;
 }) {
   const { subtopic } = await params;
-  if (!ALL_SUBTOPICS.includes(subtopic as Subtopic)) notFound();
-  const lesson = readLesson(subtopic as Subtopic);
+  if (!ALL_CHAPTER_KEYS.includes(subtopic as ChapterKey)) notFound();
+  const lesson = readLesson(subtopic as ChapterKey);
   if (!lesson) notFound();
 
+  // Strategy chapters teach cross-cutting method: no question pool, no
+  // chapter test — progress and example commitments still track.
+  const isStrategy = STRATEGY_CHAPTERS.includes(subtopic as StrategyChapter);
   const parsed = parseLesson(lesson.body);
-  const testState = (await chapterTestStates())[subtopic as Subtopic];
+  const testState = isStrategy
+    ? undefined
+    : (await chapterTestStates())[subtopic as Subtopic];
+  const progress = (await lessonProgressBySubtopic()).get(
+    subtopic as ChapterKey,
+  );
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;
   const prev = at > 0 ? chapters[at - 1] : null;
   const next = at >= 0 && at < chapters.length - 1 ? chapters[at + 1] : null;
+  const curriculum = buildCurriculumV3();
+  const coverageByConceptId = new Map(
+    buildCoverageLedger(curriculum).concepts.map((cell) => [
+      cell.conceptId,
+      cell,
+    ]),
+  );
+  const conceptChildren: ConceptChildSummary[] = curriculum.concepts
+    .filter((concept) => concept.parentSubtopic === subtopic)
+    .map((concept) => {
+      const coverage = coverageByConceptId.get(concept.id);
+      return {
+        id: concept.id,
+        parentSubtopic: concept.parentSubtopic,
+        title: concept.title,
+        objective: concept.objective,
+        lessonStatus: coverage?.lessonStatus ?? "none",
+        assessmentEligible: coverage?.assessmentEligible ?? false,
+        shortfallCount: coverage?.shortfalls.length ?? 1,
+      };
+    });
 
   const header = (
     <div>
+      <MarkLessonRead
+        subtopic={subtopic as ChapterKey}
+        alreadyRead={progress?.readAt != null}
+      />
       <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
         <Link href="/learn" className="hover:text-ink">
           Learn
         </Link>{" "}
-        · {SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
+        ·{" "}
+        {isStrategy
+          ? "Strategy"
+          : SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
       </p>
       <h1 className="mt-1 font-display text-2xl font-semibold">
         {lesson.title}
@@ -74,9 +122,17 @@ export default async function LessonPage({
             Chapter {at + 1} of {chapters.length}
           </span>
           <span>~{meta.minutes} min</span>
-          <span>3 worked examples</span>
+          {parsed && (
+            <span>
+              {parsed.examples.length} worked example
+              {parsed.examples.length === 1 ? "" : "s"}
+            </span>
+          )}
           {testState?.passed && (
-            <span className="text-ballpoint">✓ test passed</span>
+            <span className="text-ballpoint">
+              ✓ test passed · last {testState.lastCorrect}/
+              {testState.lastTotal}
+            </span>
           )}
         </p>
       )}
@@ -150,8 +206,22 @@ export default async function LessonPage({
         </SectionShell>
 
         <SectionShell
-          id="examples"
+          id="concepts"
           index={3}
+          title="Concept segments"
+          tagline="one addressable capability at a time"
+        >
+          <p className="mb-3 text-sm leading-relaxed text-graphite">
+            The chapter remains the overview. Each child below is tracked as a
+            separate teaching and assessment claim; unfinished evidence stays
+            visibly closed.
+          </p>
+          <ConceptChildList concepts={conceptChildren} />
+        </SectionShell>
+
+        <SectionShell
+          id="examples"
+          index={4}
           title="Worked examples"
           tagline="easy → exam-hard, try before revealing"
         >
@@ -159,6 +229,7 @@ export default async function LessonPage({
             {parsed.examples.map((ex, i) => (
               <ExampleCard
                 key={ex.n}
+                subtopic={subtopic as ChapterKey}
                 n={ex.n}
                 level={Math.min(i, 2) as 0 | 1 | 2}
                 question={ex.question}
@@ -171,7 +242,7 @@ export default async function LessonPage({
 
         <SectionShell
           id="cues"
-          index={4}
+          index={5}
           title="Trigger cues"
           tagline="phrase → method, memorize these"
         >
@@ -180,7 +251,7 @@ export default async function LessonPage({
 
         <SectionShell
           id="traps"
-          index={5}
+          index={6}
           title="Trap gallery"
           tagline="the classic wrong turns"
         >
@@ -189,23 +260,36 @@ export default async function LessonPage({
 
         <SectionShell
           id="speed"
-          index={6}
+          index={7}
           title="Speed moves"
           tagline="legitimate shortcuts"
         >
           <SpeedMoves moves={parsed.speed} />
         </SectionShell>
 
-        <SectionShell id="checklist" index={7} title="Before you drill">
+        <SectionShell id="checklist" index={8} title="Before you drill">
           <DrillChecklist
             subtopic={subtopic}
             items={parsed.checklist}
-            test={{
-              passed: testState?.passed ?? false,
-              lastScore: testState
-                ? `${testState.lastCorrect}/${testState.lastTotal}`
-                : null,
-            }}
+            initialChecked={progress?.checklist ?? []}
+            serverHasRow={progress != null}
+            drillHref={
+              subtopic === "data_sufficiency_discipline"
+                ? "/drill?fmt=data_sufficiency&n=8"
+                : subtopic === "choosing_fastest_path"
+                  ? "/drill?plan=1"
+                  : undefined
+            }
+            test={
+              isStrategy
+                ? undefined
+                : {
+                    passed: testState?.passed ?? false,
+                    lastScore: testState
+                      ? `${testState.lastCorrect}/${testState.lastTotal}`
+                      : null,
+                  }
+            }
           />
         </SectionShell>
 

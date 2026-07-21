@@ -12,7 +12,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test": "pnpm test:native && pnpm test:unit",
+    "test:native": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "verify": "pnpm lint && pnpm test && node --experimental-strip-types scripts/verify-bank.ts && pnpm build",
     "db:push": "node -e \"require('fs').mkdirSync('data',{recursive:true})\" && drizzle-kit push",
     "seed": "node --experimental-strip-types scripts/seed.ts",
     "backup": "node --experimental-strip-types scripts/backup.ts"
@@ -45,7 +49,8 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.3.0",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.10"
   },
   "pnpm": {
     "overrides": {

@@ -4,10 +4,22 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
-import { gradeDeckCard } from "@/lib/actions";
+import { gradeDeckCard, gradeLessonCard } from "@/lib/actions";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
 import { cn } from "@/lib/utils";
+
+/** Front/back framing per card source: question takeaways recall the
+ *  method from its cue; concept cards recall the action from a chapter
+ *  cue phrase, or the fix from a trap's wrong turn. */
+const FACE_LABELS: Record<
+  DeckCard["source"],
+  { front: string; back: string }
+> = {
+  question: { front: "Trigger cue", back: "Takeaway" },
+  cue: { front: "You see", back: "You do" },
+  trap: { front: "Trap — what goes wrong here?", back: "The fix" },
+};
 
 const GRADE_KEYS: Record<string, ReviewGrade> = {
   "1": "forgot",
@@ -29,9 +41,9 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
   const grade = useCallback(
     (g: ReviewGrade) => {
       if (!card) return;
-      const questionId = card.questionId;
+      const { source, id } = card;
       startTransition(() => {
-        void gradeDeckCard(questionId, g);
+        void (source === "question" ? gradeDeckCard(id, g) : gradeLessonCard(id, g));
       });
       setIndex((i) => i + 1);
       setFlipped(false);
@@ -117,8 +129,11 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
         )}
       >
         <p className="font-mono text-[10px] uppercase tracking-wide text-graphite">
-          {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
-          missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
+          {flipped ? FACE_LABELS[card.source].back : FACE_LABELS[card.source].front}
+          {" · "}
+          {card.subtopicLabel}
+          {card.missedAgo != null &&
+            ` · missed ${formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}`}
         </p>
         <div className="mt-2 text-[15px]">
           <Md source={flipped ? card.back : card.front} />
@@ -158,12 +173,20 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               </span>
             </button>
           </div>
-          <p className="text-center">
+          <p className="flex flex-wrap justify-center gap-x-4 text-center">
+            {card.source === "question" && (
+              <Link
+                href={`/drill?qids=${card.id}`}
+                className="text-xs font-medium text-ballpoint hover:underline"
+              >
+                Re-solve the question this came from →
+              </Link>
+            )}
             <Link
-              href={`/drill?qids=${card.questionId}`}
-              className="text-xs font-medium text-ballpoint hover:underline"
+              href={`/learn/${card.subtopic}#${card.source === "trap" ? "traps" : "cues"}`}
+              className="text-xs text-graphite hover:text-ballpoint hover:underline"
             >
-              Re-solve the question this came from →
+              Chapter: {card.subtopicLabel} →
             </Link>
           </p>
         </>

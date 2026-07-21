@@ -1,9 +1,11 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions } from "./db/schema.ts";
+import { isIndependentCorrect } from "./assessment-reliability.ts";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
+  type Confidence,
   type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
@@ -11,16 +13,43 @@ import {
 /**
  * Mastery ladders (TTP-style structure, original implementation): every
  * subtopic is a ladder of difficulty rungs D2→D5. A rung is mastered by
- * sustained accuracy — at least MIN_ATTEMPTS focused attempts in that
- * cell with ≥ MASTERY_BAR accuracy over the most recent WINDOW. Rungs
- * are never hard-locked: the ladder tells you where to work, it does
- * not forbid working elsewhere.
+ * sustained independent accuracy — at least MIN_ATTEMPTS focused attempts
+ * in that cell with ≥ MASTERY_BAR unassisted, non-guess accuracy over the
+ * most recent WINDOW — at exam pace, and mastery decays: it must answer both
+ * "still true?" and "fast enough?".
+ *
+ *   - stale: the accuracy bar is met but the newest attempt is over
+ *     STALE_DAYS old — a short confirmation set re-proves it.
+ *   - slow: accurate but the median time misses the per-difficulty pace
+ *     bar — a timed rung drill is the fix. At the Q86 level the binding
+ *     constraint is pacing on D4/D5, so accurate-but-slow must be
+ *     visible, not hidden inside "mastered".
+ *
+ * Rungs are never hard-locked: the ladder tells you where to work, it
+ * does not forbid working elsewhere.
  */
 export const MASTERY_BAR = 0.85;
 export const MIN_ATTEMPTS = 6;
 const WINDOW = 10;
+export const STALE_DAYS = 21;
 
-export type RungState = "mastered" | "working" | "untouched" | "empty";
+/** Median-time bars per rung. The exam gives 45 min for 21 questions
+ *  (~128s each); harder questions earn more room because easier ones
+ *  bank time. 2:00 at D3 scaling to 2:45 at D5. */
+export const PACE_BAR_SECONDS: Record<number, number> = {
+  2: 100,
+  3: 120,
+  4: 145,
+  5: 165,
+};
+
+export type RungState =
+  | "mastered"
+  | "stale"
+  | "slow"
+  | "working"
+  | "untouched"
+  | "empty";
 
 export type Rung = {
   difficulty: number;
@@ -29,6 +58,10 @@ export type Rung = {
   total: number;
   /** Verified questions available in this cell. */
   available: number;
+  /** Median seconds over the window; null with no attempts. */
+  medianSeconds: number | null;
+  /** Whole days since the newest attempt in this cell; null if none. */
+  daysSinceLast: number | null;
 };
 
 export type Ladder = {
@@ -40,12 +73,24 @@ export type Ladder = {
   mastered: boolean;
 };
 
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
 export async function computeLadders(): Promise<Ladder[]> {
   const rows = await db
     .select({
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
       correct: attempts.correct,
+      confidence: attempts.confidence,
+      timeSeconds: attempts.timeSeconds,
+      createdAt: attempts.createdAt,
       id: attempts.id,
     })
     .from(attempts)
@@ -69,30 +114,65 @@ export async function computeLadders(): Promise<Ladder[]> {
   }
 
   // Most recent WINDOW attempts per cell (rows arrive newest-first).
-  const cellAttempts = new Map<string, boolean[]>();
+  type CellAttempt = {
+    correct: boolean;
+    confidence: Confidence;
+    timeSeconds: number;
+  };
+  const cellAttempts = new Map<string, CellAttempt[]>();
+  const cellNewest = new Map<string, number>();
   for (const r of rows) {
     const key = `${r.subtopic}|${r.difficulty}`;
+    if (!cellNewest.has(key)) cellNewest.set(key, r.createdAt.getTime());
     const list = cellAttempts.get(key) ?? [];
     if (list.length < WINDOW) {
-      list.push(r.correct);
+      list.push({
+        correct: r.correct,
+        confidence: r.confidence,
+        timeSeconds: r.timeSeconds,
+      });
       cellAttempts.set(key, list);
     }
   }
 
+  const now = Date.now();
   return ALL_SUBTOPICS.map((subtopic) => {
     const rungs: Rung[] = [2, 3, 4, 5].map((difficulty) => {
       const key = `${subtopic}|${difficulty}`;
       const available = availableByCell.get(key) ?? 0;
       const recent = cellAttempts.get(key) ?? [];
-      const correct = recent.filter(Boolean).length;
+      // A guessed correct stays in the denominator but cannot certify the
+      // rung. Future persisted hint facts plug into the same pure predicate.
+      const correct = recent.filter(isIndependentCorrect).length;
       const total = recent.length;
+      const medianSeconds = median(recent.map((a) => a.timeSeconds));
+      const newest = cellNewest.get(key);
+      const daysSinceLast =
+        newest != null ? Math.floor((now - newest) / 86_400_000) : null;
       let state: RungState;
       if (available === 0) state = "empty";
       else if (total === 0) state = "untouched";
-      else if (total >= MIN_ATTEMPTS && correct / total >= MASTERY_BAR)
-        state = "mastered";
-      else state = "working";
-      return { difficulty, state, correct, total, available };
+      else if (total >= MIN_ATTEMPTS && correct / total >= MASTERY_BAR) {
+        if (daysSinceLast != null && daysSinceLast > STALE_DAYS) {
+          state = "stale";
+        } else if (
+          medianSeconds != null &&
+          medianSeconds > PACE_BAR_SECONDS[difficulty]
+        ) {
+          state = "slow";
+        } else {
+          state = "mastered";
+        }
+      } else state = "working";
+      return {
+        difficulty,
+        state,
+        correct,
+        total,
+        available,
+        medianSeconds,
+        daysSinceLast,
+      };
     });
     const next = rungs.find(
       (r) => r.state !== "mastered" && r.state !== "empty",

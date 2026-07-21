@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { saveLessonChecklist } from "@/lib/actions";
+import type { ChapterKey } from "@/lib/taxonomy";
 
-/** localStorage key per chapter; value {c: checked indexes, t: item count}.
- *  The Learn index reads the same keys to show readiness badges. */
+/** Legacy localStorage key per chapter; value {c: checked indexes,
+ *  t: item count}. Progress now lives server-side in lesson_progress —
+ *  this key remains only as the migration source and a write-through
+ *  cache for offline resilience. */
 export function checklistKey(subtopic: string): string {
   return `q86-learn:${subtopic}`;
 }
@@ -18,30 +22,47 @@ export type ChecklistTestState = {
 export function DrillChecklist({
   subtopic,
   items,
+  initialChecked,
+  serverHasRow,
+  drillHref,
   test,
 }: {
   subtopic: string;
   items: string[];
+  /** Override for the primary drill CTA — strategy chapters point at
+   *  a format drill or the plan block instead of a subtopic drill. */
+  drillHref?: string;
+  /** Server-persisted checked indexes (lesson_progress.checklist). */
+  initialChecked: number[];
+  /** Whether the server already tracks this chapter — when false, any
+   *  legacy localStorage state migrates up on mount. */
+  serverHasRow: boolean;
   /** Chapter-test state; when present the completed checklist promotes
    *  the test to the primary action (read → drill → prove it). */
   test?: ChecklistTestState;
 }) {
   const [checked, setChecked] = useState<boolean[]>(() =>
-    items.map(() => false),
+    items.map((_, i) => initialChecked.includes(i)),
   );
 
   useEffect(() => {
+    if (serverHasRow) return;
     try {
       const raw = localStorage.getItem(checklistKey(subtopic));
       if (!raw) return;
       const saved = JSON.parse(raw) as { c?: number[] };
-      if (Array.isArray(saved.c)) {
+      if (Array.isArray(saved.c) && saved.c.length > 0) {
         setChecked(items.map((_, i) => saved.c!.includes(i)));
+        saveLessonChecklist(
+          subtopic as ChapterKey,
+          saved.c,
+          items.length,
+        ).catch(() => {});
       }
     } catch {
-      // Corrupt storage — start unchecked.
+      // Corrupt storage — start from the server state.
     }
-  }, [subtopic, items]);
+  }, [subtopic, items, serverHasRow]);
 
   const toggle = (i: number) => {
     setChecked((prev) => {
@@ -53,8 +74,11 @@ export function DrillChecklist({
           JSON.stringify({ c, t: items.length }),
         );
       } catch {
-        // Storage full or unavailable — the ticks still work this visit.
+        // Storage full or unavailable — the server write still lands.
       }
+      saveLessonChecklist(subtopic as ChapterKey, c, items.length).catch(() => {
+        // Offline — localStorage kept the state; next save syncs it.
+      });
       return next;
     });
   };
@@ -118,7 +142,9 @@ export function DrillChecklist({
             </span>
           ) : all ? (
             <span className="font-medium text-ballpoint">
-              All checked — prove it on the test.
+              {test
+                ? "All checked — prove it on the test."
+                : "All checked — the drills will tell you if it stuck."}
             </span>
           ) : (
             <span className="text-graphite">
@@ -130,7 +156,7 @@ export function DrillChecklist({
         </p>
         <div className="flex flex-wrap gap-2">
           <Link
-            href={`/drill?sub=${subtopic}&d=3`}
+            href={drillHref ?? `/drill?sub=${subtopic}&d=3`}
             className={
               all && test
                 ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
