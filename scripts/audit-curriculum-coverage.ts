@@ -1,26 +1,34 @@
+import fs from "node:fs";
 import { buildCoverageLedger } from "../curriculum/v3/coverage.ts";
 import { buildCurriculumV3 } from "../curriculum/v3/graph.ts";
 
 const curriculum = buildCurriculumV3();
 const ledger = buildCoverageLedger(curriculum);
+const compactSnapshot = {
+  schemaVersion: ledger.schemaVersion,
+  generatedFrom: ledger.generatedFrom,
+  policy: ledger.policy,
+  summary: {
+    mappedQuestions: ledger.questionMappings.filter((item) => item.status === "mapped").length,
+    unresolvedQuestions: ledger.unresolvedQuestionIds.length,
+    productionReadyConcepts: ledger.productionReadyConceptIds.length,
+    replayablyVerifiedQuestions: new Set(
+      ledger.concepts.flatMap((item) => item.replayablyVerifiedQuestionIds),
+    ).size,
+  },
+  concepts: ledger.concepts,
+};
 
-if (process.argv.includes("--json")) {
+if (process.argv.includes("--write-snapshot")) {
+  fs.writeFileSync(
+    "curriculum/v3/coverage-ledger.json",
+    `${JSON.stringify(compactSnapshot)}\n`,
+  );
+  console.log("Updated curriculum/v3/coverage-ledger.json from the live audit.");
+} else if (process.argv.includes("--json")) {
   process.stdout.write(`${JSON.stringify(ledger, null, 2)}\n`);
 } else if (process.argv.includes("--summary-json")) {
-  process.stdout.write(`${JSON.stringify({
-    schemaVersion: ledger.schemaVersion,
-    generatedFrom: ledger.generatedFrom,
-    policy: ledger.policy,
-    summary: {
-      mappedQuestions: ledger.questionMappings.filter((item) => item.status === "mapped").length,
-      unresolvedQuestions: ledger.unresolvedQuestionIds.length,
-      productionReadyConcepts: ledger.productionReadyConceptIds.length,
-      replayablyVerifiedQuestions: new Set(
-        ledger.concepts.flatMap((item) => item.replayablyVerifiedQuestionIds),
-      ).size,
-    },
-    concepts: ledger.concepts,
-  })}\n`);
+  process.stdout.write(`${JSON.stringify(compactSnapshot)}\n`);
 } else {
 
 const byConcept = new Map(curriculum.concepts.map((concept) => [concept.id, concept]));
@@ -41,7 +49,7 @@ console.log(`- Bank questions: ${ledger.generatedFrom.bankQuestionCount}`);
 console.log(`- Pilot questions leaf-mapped: ${mapped.length} (${fallback.length} provisional fallback)`);
 console.log(`- Non-pilot questions explicitly unresolved at leaf level: ${ledger.unresolvedQuestionIds.length}`);
 console.log(`- Production-ready concepts: ${ledger.productionReadyConceptIds.length}`);
-console.log("- Replayably verified scored questions: 0 (legacy numeric checks validate a keyed value, not the stem-to-key proof)\n");
+console.log("- Replayably verified scored questions: 0 (numeric answer evidence validates a keyed value, not the stem-to-key proof)\n");
 console.log("## Evidence floors\n");
 console.log(`A production concept needs at least ${ledger.policy.minimumExamples} worked examples, ${ledger.policy.minimumGradedImmediateChecks} graded immediate checks, ${ledger.policy.minimumNamedMisconceptions} named misconceptions, ${ledger.policy.minimumReplayablyVerifiedScoredItems} replayably verified scored items, ${ledger.policy.minimumDifficultyBands} difficulty bands, and ${ledger.policy.minimumSurfaceForms} surface forms.\n`);
 console.log("## Per-concept ledger\n");

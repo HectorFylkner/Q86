@@ -7,7 +7,7 @@ Checked against the local Q86 lesson corpus and 603-question bank on 2026-07-21.
 - Existing `Subtopic` values remain the official-report and analytics parents.
 - Assessable concept IDs use `c.q86.quant.<subtopic>.<semantic-slug>`; strategy IDs use `c.q86.strategy.<chapter>.<semantic-slug>`.
 - Source-idea IDs use `idea.q86.<chapter>.<semantic-slug>`. They are derived from semantic headings rather than list positions, so reordering a lesson does not change them.
-- Question identity is a content hash over format, subtopic, normalized stem, the canonical correct answer, and the sorted canonical choice set. It is independent of bank-array and answer-choice order. The integrated first-class question UID should replace this compatibility identity when available.
+- Question identity is the immutable first-class `uid` committed with each bank item. A content hash remains available only as a compatibility audit for pre-identity fixtures; it is not a competing source of truth.
 - A repeated idea maps to one canonical owner through a `deliberate_merge` disposition; it does not create two mastery truths.
 
 ## Current vertical slice
@@ -33,7 +33,7 @@ A concept cannot be marked production-ready unless it has at least:
 - three difficulty bands; and
 - two surface forms.
 
-The source lesson checklist lines are recorded as stable self-report prompts and do not count as graded checks. Legacy `numeric_check` values establish at most that a stored expression agrees with the keyed choice; they do not replay the proof from stem to key. Consequently this snapshot truthfully reports zero production-ready concepts.
+The source lesson checklist lines are recorded as stable self-report prompts and do not count as graded checks. Current `numeric_check` values establish at most that a stored expression agrees with the keyed choice; they do not replay the proof from stem to key. Consequently this snapshot truthfully reports zero production-ready concepts.
 
 ## Question disposition
 
@@ -46,6 +46,7 @@ node --experimental-strip-types scripts/validate-curriculum-v3.ts
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts --json
 node --experimental-strip-types scripts/audit-curriculum-coverage.ts --summary-json
+node --experimental-strip-types scripts/audit-curriculum-coverage.ts --write-snapshot
 node --experimental-strip-types --test tests/curriculum-v3.test.ts
 ```
 

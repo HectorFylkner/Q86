@@ -10,7 +10,7 @@ Generated from the checked-in lesson corpus and `scripts/seed-bank.json`. This r
 - Pilot questions leaf-mapped: 78 (0 provisional fallback)
 - Non-pilot questions explicitly unresolved at leaf level: 525
 - Production-ready concepts: 0
-- Replayably verified scored questions: 0 (legacy numeric checks validate a keyed value, not the stem-to-key proof)
+- Replayably verified scored questions: 0 (numeric answer evidence validates a keyed value, not the stem-to-key proof)
 
 ## Evidence floors
 

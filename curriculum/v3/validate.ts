@@ -1,6 +1,6 @@
 import { parseLesson } from "../../lib/lesson-parse.ts";
 import { readLesson } from "../../lib/lessons.ts";
-import { buildCoverageLedger, readSeedBank, stableQuestionUid } from "./coverage.ts";
+import { bankQuestionUid, buildCoverageLedger, readSeedBank } from "./coverage.ts";
 import { buildCurriculumV3, type CurriculumV3 } from "./graph.ts";
 import { PILOT_SUBTOPICS } from "./pilot-concepts.ts";
 import type { ConceptRecord, CoverageLedger } from "./types.ts";
@@ -128,7 +128,10 @@ export function validateCurriculumV3(
     issues.push({ code: "duplicate_stable_id", message: `Duplicate stable ID ${duplicate}` });
   }
   for (const id of globallyStableIds) {
-    if (!/^(?:c|idea|method|misconception|archetype|surface|example|check|question)\.q86\.[a-z0-9._-]+$/.test(id)) {
+    if (
+      !/^(?:c|idea|method|misconception|archetype|surface|example|check|question)\.q86\.[a-z0-9._-]+$/.test(id)
+      && !/^q86-seed-[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12}$/.test(id)
+    ) {
       issues.push({ code: "invalid_stable_id", message: `Invalid stable ID ${id}` });
     }
   }
@@ -194,7 +197,7 @@ export function validateCurriculumV3(
   if (ledger.questionMappings.length !== bank.questions.length) {
     issues.push({ code: "orphan_question", message: `Expected ${bank.questions.length} question dispositions, found ${ledger.questionMappings.length}` });
   }
-  const expectedQuestionIds = new Set(bank.questions.map(stableQuestionUid));
+  const expectedQuestionIds = new Set(bank.questions.map(bankQuestionUid));
   for (const mapping of ledger.questionMappings) {
     if (!expectedQuestionIds.has(mapping.questionUid))
       issues.push({ code: "orphan_question_mapping", message: `${mapping.questionUid} is absent from the bank` });

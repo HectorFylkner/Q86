@@ -11,6 +11,8 @@ import type {
 } from "./types.ts";
 
 type BankQuestion = {
+  uid: string;
+  content_version: number;
   format: QuestionFormat;
   content_domain: string;
   context: Context;
@@ -48,7 +50,7 @@ function normalizeIdentityText(value: string): string {
 }
 
 /** Stable under bank-array reordering and canonical answer-choice reordering. */
-export function stableQuestionUid(question: BankQuestion): string {
+export function legacyQuestionUid(question: BankQuestion): string {
   const correct = normalizeIdentityText(question.choices[question.correct_index] ?? "");
   const choices = question.choices.map(normalizeIdentityText).sort();
   const identity = JSON.stringify({
@@ -59,6 +61,12 @@ export function stableQuestionUid(question: BankQuestion): string {
     choices,
   });
   return `question.q86.${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
+}
+
+/** The UID committed with the bank item is authoritative. The content-derived
+ * identifier remains only as a compatibility audit for pre-identity fixtures. */
+export function bankQuestionUid(question: BankQuestion): string {
+  return question.uid || legacyQuestionUid(question);
 }
 
 type MappingRule = {
@@ -159,13 +167,14 @@ export function buildQuestionMappings(
 ): QuestionMapping[] {
   const conceptById = new Map(curriculum.concepts.map((concept) => [concept.id, concept]));
   return bank.questions.map((question, bankIndex) => {
-    const questionUid = stableQuestionUid(question);
+    const questionUid = bankQuestionUid(question);
     const verificationStatus = question.numeric_check == null
       ? "structural_only" as const
-      : "legacy_key_check" as const;
+      : "numeric_answer_alignment" as const;
     if (!PILOT_SUBTOPICS.includes(question.subtopic as (typeof PILOT_SUBTOPICS)[number])) {
       return {
         questionUid,
+        questionContentVersion: question.content_version,
         bankIndex,
         parentSubtopic: question.subtopic,
         status: "unresolved",
@@ -185,6 +194,7 @@ export function buildQuestionMappings(
     if (!concept) throw new Error(`Classifier returned missing concept ${classification.conceptId}`);
     return {
       questionUid,
+      questionContentVersion: question.content_version,
       bankIndex,
       parentSubtopic: question.subtopic,
       status: "mapped",
@@ -217,7 +227,7 @@ export function buildCoverageLedger(
 ): CoverageLedger {
   const mappings = buildQuestionMappings(curriculum, bank);
   const questionsByUid = new Map(
-    bank.questions.map((question) => [stableQuestionUid(question), question]),
+    bank.questions.map((question) => [bankQuestionUid(question), question]),
   );
 
   const concepts: CoverageCell[] = curriculum.concepts.map((concept) => {

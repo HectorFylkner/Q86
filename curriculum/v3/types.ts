@@ -104,6 +104,7 @@ export type CheckRecord = {
 
 export type QuestionMapping = {
   questionUid: string;
+  questionContentVersion: number;
   bankIndex: number;
   parentSubtopic: Subtopic;
   status: "mapped" | "unresolved";
@@ -112,7 +113,7 @@ export type QuestionMapping = {
   archetypeId: string | null;
   surfaceFormId: string | null;
   mappingConfidence: "curated_rule" | "provisional_fallback" | "unresolved";
-  verificationStatus: "legacy_key_check" | "structural_only";
+  verificationStatus: "numeric_answer_alignment" | "structural_only";
   replayableVerification: false;
   reason: string;
 };

@@ -155,7 +155,7 @@ Integration is semantic, not a blanket merge or conflict strategy.
   the remaining 243 are additions; the current loader inserts all 603 without
   deleting history.
 - Recorded a pilot audit for exponent/root properties, algebraic translation,
-  and probability. It identifies 42 independently assessable concepts and
+  and probability. It identifies 43 independently assessable concepts and
   shows that the current bank cannot honestly meet a six-scored-item floor for
   most of them; these shortfalls will remain visible rather than being hidden
   by undersized tests.

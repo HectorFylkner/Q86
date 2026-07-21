@@ -182,4 +182,8 @@ test("question content identity is independent of bank array position", () => {
   const reverseBank = { ...bank, questions: [...bank.questions].reverse() };
   const reversed = buildQuestionMappings(curriculum, reverseBank).map((item) => item.questionUid).sort();
   assert.deepEqual(reversed, forward);
+  assert.deepEqual(
+    buildQuestionMappings(curriculum, bank).map((item) => item.questionUid),
+    bank.questions.map((question) => question.uid),
+  );
 });
