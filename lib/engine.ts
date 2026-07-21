@@ -18,6 +18,8 @@ export type QuestionFilter = {
   difficultyMin?: number;
   difficultyMax?: number;
   excludeIds?: number[];
+  /** Canonical item-family ids (question.twinOf ?? question.id) to omit. */
+  excludeVariantFamilyIds?: number[];
 };
 
 function whereFromFilter(filter: QuestionFilter): SQL | undefined {
@@ -58,9 +60,13 @@ export async function selectQuestions(
   count: number,
 ): Promise<Question[]> {
   const excluded = new Set(filter.excludeIds ?? []);
+  const excludedFamilies = new Set(filter.excludeVariantFamilyIds ?? []);
   const candidates = (
     await db.select().from(questions).where(whereFromFilter(filter)).all()
-  ).filter((q) => !excluded.has(q.id));
+  ).filter(
+    (q) =>
+      !excluded.has(q.id) && !excludedFamilies.has(q.twinOf ?? q.id),
+  );
   if (candidates.length === 0) return [];
 
   const correctRows = await db

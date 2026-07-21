@@ -1,9 +1,11 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions } from "./db/schema.ts";
+import { isIndependentCorrect } from "./assessment-reliability.ts";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
+  type Confidence,
   type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
@@ -11,10 +13,10 @@ import {
 /**
  * Mastery ladders (TTP-style structure, original implementation): every
  * subtopic is a ladder of difficulty rungs D2→D5. A rung is mastered by
- * sustained accuracy — at least MIN_ATTEMPTS focused attempts in that
- * cell with ≥ MASTERY_BAR accuracy over the most recent WINDOW — at
- * exam pace, and mastery decays: it must answer both "still true?" and
- * "fast enough?".
+ * sustained independent accuracy — at least MIN_ATTEMPTS focused attempts
+ * in that cell with ≥ MASTERY_BAR unassisted, non-guess accuracy over the
+ * most recent WINDOW — at exam pace, and mastery decays: it must answer both
+ * "still true?" and "fast enough?".
  *
  *   - stale: the accuracy bar is met but the newest attempt is over
  *     STALE_DAYS old — a short confirmation set re-proves it.
@@ -86,6 +88,7 @@ export async function computeLadders(): Promise<Ladder[]> {
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
       correct: attempts.correct,
+      confidence: attempts.confidence,
       timeSeconds: attempts.timeSeconds,
       createdAt: attempts.createdAt,
       id: attempts.id,
@@ -111,7 +114,11 @@ export async function computeLadders(): Promise<Ladder[]> {
   }
 
   // Most recent WINDOW attempts per cell (rows arrive newest-first).
-  type CellAttempt = { correct: boolean; timeSeconds: number };
+  type CellAttempt = {
+    correct: boolean;
+    confidence: Confidence;
+    timeSeconds: number;
+  };
   const cellAttempts = new Map<string, CellAttempt[]>();
   const cellNewest = new Map<string, number>();
   for (const r of rows) {
@@ -119,7 +126,11 @@ export async function computeLadders(): Promise<Ladder[]> {
     if (!cellNewest.has(key)) cellNewest.set(key, r.createdAt.getTime());
     const list = cellAttempts.get(key) ?? [];
     if (list.length < WINDOW) {
-      list.push({ correct: r.correct, timeSeconds: r.timeSeconds });
+      list.push({
+        correct: r.correct,
+        confidence: r.confidence,
+        timeSeconds: r.timeSeconds,
+      });
       cellAttempts.set(key, list);
     }
   }
@@ -130,7 +141,9 @@ export async function computeLadders(): Promise<Ladder[]> {
       const key = `${subtopic}|${difficulty}`;
       const available = availableByCell.get(key) ?? 0;
       const recent = cellAttempts.get(key) ?? [];
-      const correct = recent.filter((a) => a.correct).length;
+      // A guessed correct stays in the denominator but cannot certify the
+      // rung. Future persisted hint facts plug into the same pure predicate.
+      const correct = recent.filter(isIndependentCorrect).length;
       const total = recent.length;
       const medianSeconds = median(recent.map((a) => a.timeSeconds));
       const newest = cellNewest.get(key);

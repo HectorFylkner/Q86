@@ -24,6 +24,7 @@ import {
   CHAPTER_TEST_BAR,
   CHAPTER_TEST_SIZE,
 } from "./chapter-test-config.ts";
+import { scoreAssessment } from "./assessment-reliability.ts";
 import { gradeCommitment } from "./example-grade.ts";
 import { enrollLessonCards } from "./lesson-cards.ts";
 import { parseLesson } from "./lesson-parse.ts";
@@ -112,7 +113,13 @@ export async function startChapterTest(
     .insert(sessions)
     .values({
       mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
+      config: {
+        chapter_test: subtopic,
+        count: picked.length,
+        // The server-selected roster is the scoring contract. Completion and
+        // correctness are later recomputed from persisted attempts against it.
+        questionIds: picked.map((question) => question.id),
+      },
     })
     .returning()
     .get();
@@ -257,18 +264,37 @@ export async function finishSession(
     .from(sessions)
     .where(eq(sessions.id, sessionId))
     .get();
-  const sub = (session?.config as { chapter_test?: string } | undefined)
-    ?.chapter_test;
+  const chapterConfig = session?.config as
+    | { chapter_test?: string; questionIds?: unknown }
+    | undefined;
+  const sub = chapterConfig?.chapter_test;
   if (sub && ALL_SUBTOPICS.includes(sub as Subtopic)) {
     const rows = await db
-      .select({ correct: attempts.correct })
+      .select({
+        questionId: attempts.questionId,
+        selectedIndex: attempts.selectedIndex,
+        correctIndex: questions.correctIndex,
+        confidence: attempts.confidence,
+      })
       .from(attempts)
+      .innerJoin(questions, eq(attempts.questionId, questions.id))
       .where(eq(attempts.sessionId, sessionId))
       .all();
-    if (
-      rows.length >= CHAPTER_TEST_SIZE &&
-      rows.filter((r) => r.correct).length / rows.length >= CHAPTER_TEST_BAR
-    ) {
+    const configuredQuestionIds =
+      Array.isArray(chapterConfig?.questionIds) &&
+      chapterConfig.questionIds.every((id) => Number.isInteger(id))
+        ? (chapterConfig.questionIds as number[])
+        : null;
+    const expectedQuestionIds =
+      configuredQuestionIds ?? [...new Set(rows.map((row) => row.questionId))];
+    const score = scoreAssessment({
+      tier: "easy",
+      expectedQuestionIds,
+      attempts: rows,
+      completedAtMs: session?.endedAt?.getTime() ?? null,
+      passThresholdOverride: CHAPTER_TEST_BAR,
+    });
+    if (expectedQuestionIds.length === CHAPTER_TEST_SIZE && score.passed) {
       await enrollLessonCards(sub as Subtopic);
     }
   }
