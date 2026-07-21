@@ -68,6 +68,8 @@ audited separately.
 - Current official exam semantics are Quant = Problem Solving and Data
   Sufficiency = Data Insights. Product copy must not describe DS as a current
   Quant question type.
+- Public scope and product-pattern sources, their check date, and the no-copy
+  boundary are recorded in `docs/curriculum-v3-sources.md`.
 
 ## Feature-level integration plan
 
