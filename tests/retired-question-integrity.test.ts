@@ -99,7 +99,12 @@ test("retired questions leave training data and cannot start a redo", async (t) 
   );
 
   const deck = await todaysDeck();
-  assert.equal(deck.cards.some((card) => card.questionId === question.id), false);
+  assert.equal(
+    deck.cards.some(
+      (card) => card.source === "question" && card.id === question.id,
+    ),
+    false,
+  );
 
   const sessionCountBefore =
     (await db.select({ value: count() }).from(sessions).get())?.value ?? 0;

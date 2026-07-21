@@ -7,7 +7,7 @@ import {
   questions,
 } from "./db/schema.ts";
 import { previewIntervals, type ReviewGrade } from "./srs.ts";
-import { CHAPTER_LABELS, SUBTOPIC_LABELS, type ChapterKey, type Subtopic } from "./taxonomy.ts";
+import { CHAPTER_LABELS, SUBTOPIC_LABELS, type ChapterKey } from "./taxonomy.ts";
 
 /**
  * The takeaway deck: every missed question's one-line Takeaway becomes a
