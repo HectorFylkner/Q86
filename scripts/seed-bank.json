@@ -9720,6 +9720,2112 @@
    },
    "numeric_check": "12500*(1.02^2 - 1)",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A boutique marks a coat at $60\\%$ above its cost. The coat does not sell, so the boutique takes $25\\%$ off the marked price, and at checkout applies a further $10\\%$ off the reduced price. The coat still sells for $\\$18$ more than it cost the boutique. What did the coat cost the boutique?",
+   "choices": [
+    "$\\$72$",
+    "$\\$225$",
+    "$\\$243$",
+    "$\\$360$",
+    "$\\$450$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nWrite every step as a factor on the cost $C$. The marked price is $1.6C$; a $25\\%$ markdown multiplies by $0.75$; a further $10\\%$ off multiplies by $0.9$. The final price is therefore $1.6 \\times 0.75 \\times 0.9 \\times C = 1.08C$. The profit is $1.08C - C = 0.08C$, so $0.08C = 18$ and $C = 225$.\n\n**Trigger cue**\nA markup followed by two markdowns and a stated dollar profit — chain the factors, subtract $1$, and divide the dollar figure by what is left.\n\n**Takeaway**\nChain every percent as a factor; profit is the net factor minus one.",
+   "fastest_path_md": "$1.6 \\times 0.75 = 1.2$, and $1.2 \\times 0.9 = 1.08$. The coat sold for $8\\%$ above cost, so $C = 18 / 0.08 = 225$.",
+   "trap_map": {
+    "0": "Adds and subtracts the percents instead of multiplying factors: $+60\\% - 25\\% - 10\\% = +25\\%$, giving $18/0.25 = 72$.",
+    "2": "Solves for the cost correctly, then answers with the final selling price $1.08 \\times 225 = 243$.",
+    "3": "Solves for the cost correctly, then answers with the marked price $1.6 \\times 225 = 360$.",
+    "4": "Collapses the two markdowns into a single $35\\%$ off the marked price: $1.6 \\times 0.65 = 1.04$, giving $18/0.04 = 450$."
+   },
+   "numeric_check": "18/(1.6*0.75*0.9 - 1)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A fund grows by $20\\%$ during its first year and by $25\\%$ during its second. A flat administration fee of $\\$600$ is deducted at the end of the first year, after that year's growth is credited. At the end of the second year the account holds exactly $20\\%$ more than the amount originally invested. How much was originally invested?",
+   "choices": [
+    "$\\$1{,}500$",
+    "$\\$2{,}000$",
+    "$\\$2{,}500$",
+    "$\\$3{,}000$",
+    "$\\$3{,}750$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $P$ be the amount invested. After year one the balance is $1.2P$, and the fee leaves $1.2P - 600$. Year two multiplies that by $1.25$, giving $1.5P - 750$. Setting this equal to $1.2P$: $1.5P - 750 = 1.2P$, so $0.3P = 750$ and $P = 2500$.\n\n**Trigger cue**\nA fixed fee deducted partway through a growth chain — the fee is multiplied by every factor that comes after it, so carry it through rather than subtracting it at the end.\n\n**Takeaway**\nA mid-chain fee compounds too; multiply it by the later factors.",
+   "fastest_path_md": "The $\\$600$ fee is charged before the second year, so it costs $600 \\times 1.25 = \\$750$ by the end. Growth alone would give $1.5P$; the target is $1.2P$; the $0.3P$ gap is the $\\$750$, so $P = 2500$.",
+   "trap_map": {
+    "0": "Divides the compounded fee by the total growth $1.5 - 1 = 0.5$ instead of by the $0.3$ gap to the target: $750/0.5 = 1500$.",
+    "1": "Deducts the fee after the second year's growth rather than before it, solving $1.5P - 600 = 1.2P$ for $P = 2000$.",
+    "3": "Solves correctly, then answers with the ending balance $1.2 \\times 2500 = 3000$.",
+    "4": "Divides the compounded fee by the target's $20\\%$ rather than by the $30\\%$ gap: $750/0.2 = 3750$."
+   },
+   "numeric_check": "600*1.25/(1.2*1.25 - 1.2)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A dealer sells a bicycle at a profit of $25\\%$ of what the bicycle cost her. Had she bought the same bicycle for $20\\%$ less and sold it for $\\$12$ more than she actually did, her profit would have been $60\\%$ of that lower cost. What did the bicycle actually cost her?",
+   "choices": [
+    "$\\$80$",
+    "$\\$320$",
+    "$\\$400$",
+    "$\\$500$",
+    "$\\$512$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $C$ be the actual cost. The actual selling price is $1.25C$. In the hypothetical, the cost is $0.8C$ and the price is $1.25C + 12$, so the profit is $1.25C + 12 - 0.8C = 0.45C + 12$. That profit is $60\\%$ of the *new* cost: $0.45C + 12 = 0.6(0.8C) = 0.48C$. Hence $12 = 0.03C$ and $C = 400$.\n\n**Trigger cue**\nA restated margin whose base also moved — write both the new price and the new cost in terms of the original cost before setting the percent condition.\n\n**Takeaway**\nWhen the margin changes, check which cost the percent is taken of.",
+   "fastest_path_md": "New profit $= 0.45C + 12$, and it must equal $0.6 \\times 0.8C = 0.48C$. The $0.03C$ gap is the $\\$12$, so $C = 400$.",
+   "trap_map": {
+    "0": "Takes the $60\\%$ of the original cost instead of the reduced cost: $0.45C + 12 = 0.6C$ gives $C = 80$.",
+    "1": "Solves correctly, then answers with the hypothetical cost $0.8 \\times 400 = 320$.",
+    "3": "Solves correctly, then answers with the actual selling price $1.25 \\times 400 = 500$.",
+    "4": "Solves correctly, then answers with the hypothetical selling price $1.25 \\times 400 + 12 = 512$."
+   },
+   "numeric_check": "12/(0.6*0.8 - 0.45)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "On a certain sum invested for two years at $15\\%$ per year, the interest earned under annual compounding exceeds the interest earned under simple interest by $\\$67.50$. What is the sum?",
+   "choices": [
+    "$\\$450$",
+    "$\\$900$",
+    "$\\$1{,}500$",
+    "$\\$3{,}000$",
+    "$\\$30{,}000$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nWith principal $P$ and rate $r$, two years of compounding gives $P(1+r)^2 = P(1 + 2r + r^2)$, so the compound interest is $P(2r + r^2)$. Simple interest over the same period is $2Pr$. The gap is exactly $Pr^2$ — it is the interest earned in year two on year one's interest. So $P(0.15)^2 = 67.50$, i.e. $0.0225P = 67.50$ and $P = 3000$.\n\n**Trigger cue**\n\"Compound exceeds simple over two years by …\" — the gap is $Pr^2$, one year's interest on the first year's interest, nothing more.\n\n**Takeaway**\nTwo-year compound minus simple equals $Pr^2$ — interest on interest.",
+   "fastest_path_md": "The two-year gap is $Pr^2$. Here $r^2 = 0.0225$, so $P = 67.50/0.0225 = 3000$.",
+   "trap_map": {
+    "0": "Divides by the rate once instead of by its square: $67.50/0.15 = 450$.",
+    "1": "Halves the rate rather than squaring it: $67.50/0.075 = 900$.",
+    "2": "Doubles the squared rate, as if the two-year gap were $2Pr^2$ (one gap per year): $67.50/0.045 = 1500$.",
+    "4": "Misplaces a decimal in $r^2$, using $0.00225$ for $0.15^2$: $67.50/0.00225 = 30{,}000$."
+   },
+   "numeric_check": "67.5/0.15^2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A retailer buys $40$ identical lamps for $\\$1{,}440$ in total and marks every lamp at the same price. She expects to sell $32$ of them at the marked price and the remaining $8$ at half the marked price, and she wants the $40$ lamps together to return a profit of $25\\%$ on what she paid for them. At what price should she mark each lamp?",
+   "choices": [
+    "$\\$40$",
+    "$\\$45$",
+    "$\\$50$",
+    "$\\$52.50$",
+    "$\\$56.25$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nTotal cost is $\\$1{,}440$, so the target revenue is $1.25 \\times 1440 = \\$1{,}800$. With marked price $M$, revenue is $32M + 8(0.5M) = 32M + 4M = 36M$. The $8$ half-price lamps contribute the revenue of $4$ full-price lamps, so the lot behaves like $36$ lamps sold at $M$. Setting $36M = 1800$ gives $M = 50$.\n\n**Trigger cue**\nA mixed-price lot with an overall margin target — convert the discounted units into their full-price equivalent, then divide the target revenue by that count.\n\n**Takeaway**\nHalf-price units count as half a unit of full-price revenue.",
+   "fastest_path_md": "Target revenue $1.25 \\times 1440 = 1800$. Eight half-price lamps equal four full-price ones, so the revenue divides over $36$ effective lamps: $M = 1800/36 = 50$.",
+   "trap_map": {
+    "0": "Forgets the profit target and prices for break-even: $1440/36 = 40$.",
+    "1": "Ignores the markdown and divides the target revenue over all $40$ lamps: $1800/40 = 45$.",
+    "3": "Reads the $25\\%$ as a share of the target revenue rather than of cost, aiming at $1440 + 0.25(1800) = 1890$: $1890/36 = 52.50$.",
+    "4": "Counts only the $32$ full-price lamps as producing revenue: $1800/32 = 56.25$."
+   },
+   "numeric_check": "1.25*1440/36",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "Two shops list the same appliance at $\\$600$. The first shop offers successive discounts of $20\\%$ and then $15\\%$ off the reduced price. The second shop offers a single discount of $d\\%$ off the list price, and its final price is $\\$12$ less than the first shop's. What is $d$?",
+   "choices": [
+    "$32$",
+    "$33$",
+    "$34$",
+    "$37$",
+    "$66$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe first shop charges $600 \\times 0.80 \\times 0.85 = \\$408$. The second charges $408 - 12 = \\$396$. A price of $\\$396$ on a $\\$600$ list means the customer pays $396/600 = 0.66$ of list, so the discount is $1 - 0.66 = 0.34$, i.e. $d = 34$.\n\n**Trigger cue**\nSuccessive discounts compared with a single one — multiply the factors, never add the percents, then convert the surviving fraction back into a discount.\n\n**Takeaway**\nTwenty then fifteen off is thirty-two off, not thirty-five.",
+   "fastest_path_md": "$0.8 \\times 0.85 = 0.68$, so shop one charges $\\$408$; shop two charges $\\$396$, which is $0.66$ of list, a $34\\%$ discount.",
+   "trap_map": {
+    "0": "Reports the first shop's equivalent single discount, $1 - 0.8 \\times 0.85 = 32\\%$, rather than the second shop's.",
+    "1": "Adds the first shop's discounts to $35\\%$, then subtracts the $\\$12$ as a share of list ($2\\%$): $35 - 2 = 33$.",
+    "3": "Adds the first shop's discounts to $35\\%$, making its price $\\$390$ and the second shop's $\\$378$, a $37\\%$ discount.",
+    "4": "Reports the fraction of list the customer still pays, $396/600 = 66\\%$, instead of the discount."
+   },
+   "numeric_check": "100*(1 - (600*0.8*0.85 - 12)/600)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "An account pays $20\\%$ annual interest compounded semiannually. Nadia deposits $\\$8{,}000$ and makes no further transactions. After $18$ months, how much more interest has the account earned than it would have earned at $20\\%$ simple annual interest over the same period?",
+   "choices": [
+    "$\\$248$",
+    "$\\$2{,}400$",
+    "$\\$2{,}648$",
+    "$\\$5{,}824$",
+    "$\\$10{,}648$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nSemiannual compounding at a $20\\%$ annual rate means $10\\%$ per half-year, and $18$ months is three half-years: the balance is $8000(1.1)^3 = \\$10{,}648$, so compound interest is $\\$2{,}648$. Simple interest is $8000 \\times 0.20 \\times 1.5 = \\$2{,}400$. The difference is $2648 - 2400 = \\$248$.\n\n**Trigger cue**\nA stated annual rate with a compounding frequency — divide the rate by the number of periods per year and multiply the term by it, before touching anything else.\n\n**Takeaway**\nHalve the rate, double the periods; never compound at the annual rate.",
+   "fastest_path_md": "Three periods at $10\\%$: $8000 \\to 8800 \\to 9680 \\to 10648$, so compound interest is $\\$2{,}648$. Simple is $\\$2{,}400$. The gap is $\\$248$.",
+   "trap_map": {
+    "1": "Answers with the simple interest $8000 \\times 0.2 \\times 1.5 = \\$2{,}400$ instead of the difference.",
+    "2": "Answers with the compound interest $\\$2{,}648$ instead of the difference.",
+    "3": "Compounds three periods at the full annual $20\\%$ instead of the semiannual $10\\%$: $8000(1.2)^3 - 8000 = \\$5{,}824$.",
+    "4": "Answers with the ending balance $\\$10{,}648$ instead of any interest figure."
+   },
+   "numeric_check": "8000*1.1^3 - 8000 - 8000*0.2*1.5",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A print shop pays $\\$3{,}600$ per month in fixed costs and $\\$4$ in materials for each poster it prints. Posters sell for $\\$10$ each, except that every poster sold beyond the first $300$ in a month is sold at $30\\%$ off. How many posters must the shop sell in a month to exactly cover its costs?",
+   "choices": [
+    "$300$",
+    "$600$",
+    "$750$",
+    "$900$",
+    "$1{,}200$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nBelow the threshold each poster contributes $10 - 4 = \\$6$ of margin; $300$ of them cover $\\$1{,}800$, short of the $\\$3{,}600$ fixed cost, so break-even lies past $300$. Beyond $300$ the price is $0.7 \\times 10 = \\$7$ and the margin is $7 - 4 = \\$3$. The remaining $3600 - 1800 = \\$1{,}800$ of fixed cost needs $1800/3 = 600$ discounted posters, so the shop must sell $300 + 600 = 900$.\n\n**Trigger cue**\nA price that steps at a stated volume — check whether break-even falls before or after the step, then work in per-unit margin on each side separately.\n\n**Takeaway**\nPast a price step, recompute the margin, not just the price.",
+   "fastest_path_md": "First $300$ posters clear $\\$6$ each $= \\$1{,}800$. The rest clear $\\$3$ each, so the remaining $\\$1{,}800$ needs $600$ more. Total $900$.",
+   "trap_map": {
+    "0": "Answers with the threshold $300$, the point where the price steps, rather than break-even.",
+    "1": "Ignores the discount and applies the full $\\$6$ margin throughout: $3600/6 = 600$.",
+    "2": "Discounts the first $300$ posters instead of those beyond it, leaving a $\\$3$ margin on the first $300$ and $\\$6$ after: $300 + (3600-900)/6 = 750$.",
+    "4": "Applies the discounted $\\$3$ margin to every poster, including the first $300$: $3600/3 = 1200$."
+   },
+   "numeric_check": "300 + (3600 - 300*6)/3",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A $40$-liter tank holds a solution that is $25\\%$ acid. Some of the solution is drained off and replaced with an equal volume of a $75\\%$ acid solution, and the tank — again full at $40$ liters — is now $40\\%$ acid. How many liters were drained off?",
+   "choices": [
+    "$8$",
+    "$10$",
+    "$12$",
+    "$16$",
+    "$28$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $x$ be the liters drained. The tank starts with $0.25(40) = 10$ liters of acid; draining $x$ liters removes $0.25x$ of it, and the replacement adds $0.75x$. The final acid is $10 - 0.25x + 0.75x = 10 + 0.5x$, and it must equal $0.40(40) = 16$. So $0.5x = 6$ and $x = 12$.\n\n**Trigger cue**\n\"Drained off and replaced\" — the drained liquid carries away its own concentration, so the net change per liter swapped is the *difference* of the two concentrations, not the incoming one.\n\n**Takeaway**\nSwapping liquid changes acid by the concentration gap per liter.",
+   "fastest_path_md": "Each liter swapped raises the acid by $0.75 - 0.25 = 0.5$ liters. The tank needs $16 - 10 = 6$ more liters of acid, so $6/0.5 = 12$ liters were swapped.",
+   "trap_map": {
+    "0": "Forgets that the drained liquid carries acid out, adding only the incoming acid: $10 + 0.75x = 16$ gives $x = 8$.",
+    "1": "Answers with the tank's starting acid content, $0.25 \\times 40 = 10$ liters.",
+    "3": "Answers with the tank's final acid content, $0.40 \\times 40 = 16$ liters.",
+    "4": "Runs the alligation lever backwards — the distances $40-25=15$ and $75-40=35$ give a new-to-old ratio of $15:35$, so the swapped share is $\\tfrac{15}{50}$ of the tank, but taking $\\tfrac{35}{50}$ gives $28$."
+   },
+   "numeric_check": "(0.40*40 - 0.25*40)/(0.75 - 0.25)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A chemist has $12$ liters of a $30\\%$ alcohol solution. She adds enough of a $60\\%$ alcohol solution to bring the mixture to exactly $45\\%$ alcohol. She then boils the mixture, evaporating water only, until it is $60\\%$ alcohol. How many liters of water did she evaporate?",
+   "choices": [
+    "$3.6$",
+    "$6$",
+    "$10.8$",
+    "$12$",
+    "$18$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nStage one: adding $x$ liters of the $60\\%$ solution gives $0.30(12) + 0.60x = 0.45(12 + x)$, so $3.6 + 0.6x = 5.4 + 0.45x$, hence $0.15x = 1.8$ and $x = 12$. The mixture is now $24$ liters holding $0.45(24) = 10.8$ liters of alcohol.\n\nStage two: evaporation removes water only, so the $10.8$ liters of alcohol is fixed. If the final volume is $V$, then $10.8/V = 0.60$, so $V = 18$ and the water lost is $24 - 18 = 6$ liters.\n\n**Trigger cue**\nEvaporation or boiling in a mixture problem — the solute is conserved, so hold its amount fixed and solve for the new total volume.\n\n**Takeaway**\nEvaporating water fixes the solute; solve for the new volume.",
+   "fastest_path_md": "Alligation on stage one: $45$ sits $15$ from $30$ and $15$ from $60$, so equal parts — add $12$ liters, giving $24$ liters with $10.8$ of alcohol. At $60\\%$ that alcohol needs $18$ liters, so $6$ liters boiled away.",
+   "trap_map": {
+    "0": "Answers with the starting alcohol content, $0.30 \\times 12 = 3.6$ liters.",
+    "2": "Answers with the alcohol in the mixture, $0.45 \\times 24 = 10.8$ liters, rather than the water removed.",
+    "3": "Answers with the liters of $60\\%$ solution added — the stage-one result — instead of the water evaporated.",
+    "4": "Answers with the final volume $18$ liters instead of the $24 - 18 = 6$ liters removed."
+   },
+   "numeric_check": "24 - 10.8/0.60",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A firm employs $30$ engineers whose salaries average $\\$96{,}000$, and some number of technicians whose salaries average $\\$60{,}000$. Across all employees, the average salary is $\\$84{,}000$. How many technicians does the firm employ?",
+   "choices": [
+    "$15$",
+    "$30$",
+    "$45$",
+    "$60$",
+    "$90$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nEvery engineer sits $96 - 84 = 12$ (thousand) above the overall average, contributing $30 \\times 12 = 360$ of surplus. Every technician sits $84 - 60 = 24$ below it. The two must cancel exactly, so $24t = 360$ and $t = 15$.\n\n**Trigger cue**\nTwo groups, three averages, one unknown count — use the lever: distance from the overall average times group size must balance on both sides.\n\n**Takeaway**\nGroup size times distance from the mean balances on both sides.",
+   "fastest_path_md": "The gaps are $12$ above and $24$ below, a $1:2$ lever, so the group sitting twice as far away is half the size: $30/2 = 15$ technicians.",
+   "trap_map": {
+    "1": "Divides the engineers' surplus by the engineers' own gap instead of the technicians': $360/12 = 30$.",
+    "2": "Answers with the total headcount $30 + 15 = 45$ rather than the technician count.",
+    "3": "Runs the lever upside down, multiplying by the ratio of gaps instead of dividing: $30 \\times 24/12 = 60$.",
+    "4": "Runs the lever upside down and then reports the resulting total headcount, $30 + 60 = 90$."
+   },
+   "numeric_check": "30*(96-84)/(84-60)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A $60$-liter vat is full of pure syrup. Fifteen liters are drawn off and replaced with water, and the vat is stirred thoroughly. Fifteen liters of the resulting mixture are then drawn off and again replaced with water. How many liters of syrup are in the vat at the end?",
+   "choices": [
+    "$26.25$",
+    "$30$",
+    "$33.75$",
+    "$45$",
+    "$48.75$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nEach round removes a quarter of whatever is in the vat and replaces it with water, so the syrup is multiplied by $1 - \\tfrac{15}{60} = \\tfrac{3}{4}$ each time. After two rounds the syrup is $60 \\left(\\tfrac{3}{4}\\right)^2 = 60 \\times \\tfrac{9}{16} = 33.75$ liters.\n\n**Trigger cue**\nRepeated draw-and-replace on a fixed volume — the retained fraction multiplies, so the answer is $V(1 - k/V)^n$, never a repeated subtraction.\n\n**Takeaway**\nRepeated dilution multiplies the retained fraction; it never subtracts twice.",
+   "fastest_path_md": "Each round keeps $\\tfrac{3}{4}$ of the syrup: $60 \\to 45 \\to 33.75$.",
+   "trap_map": {
+    "0": "Answers with the water in the vat, $60 - 33.75 = 26.25$ liters, instead of the syrup.",
+    "1": "Subtracts $15$ liters of syrup twice, as if the second draw were also pure syrup: $60 - 15 - 15 = 30$.",
+    "3": "Stops after one round: $60 \\times \\tfrac{3}{4} = 45$.",
+    "4": "Counts only the syrup lost in the second draw ($\\tfrac{3}{4} \\times 15 = 11.25$) and subtracts it from the full vat: $60 - 11.25 = 48.75$."
+   },
+   "numeric_check": "60*(1 - 15/60)^2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A class of $25$ students has a mean test score of $68$. The $10$ students who attended the review session had a mean of $82$. The teacher then finds that one student who did not attend the review session was recorded as $40$ when the correct score was $70$. What is the corrected mean for the whole class?",
+   "choices": [
+    "$66.8$",
+    "$68$",
+    "$69.2$",
+    "$70$",
+    "$71$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe class total was $25 \\times 68 = 1700$. Correcting one score from $40$ to $70$ adds $30$ to that total, giving $1730$, so the corrected mean is $1730/25 = 69.2$. The review-session figure is irrelevant: the correction lands in the class total whichever subgroup the student belongs to, and the class size does not change.\n\n**Trigger cue**\nA single score corrected inside a known mean — work with totals: change the sum by the difference and divide by the unchanged count.\n\n**Takeaway**\nCorrect the sum, not the mean; divide by the whole count.",
+   "fastest_path_md": "The total rises by $70 - 40 = 30$ across $25$ students, so the mean rises by $30/25 = 1.2$: $68 + 1.2 = 69.2$.",
+   "trap_map": {
+    "0": "Flips the sign of the correction, treating $40$ as the true score and $70$ as the error: $68 - 30/25 = 66.8$.",
+    "1": "Assumes a single $30$-point correction cannot move a $25$-student mean and leaves it at $68$.",
+    "3": "Spreads the correction over only the $15$ students who missed the review: $68 + 30/15 = 70$.",
+    "4": "Spreads the correction over the $10$ review-session students: $68 + 30/10 = 71$."
+   },
+   "numeric_check": "(25*68 + (70 - 40))/25",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "stem_md": "A roaster blends three coffees costing $\\$8$, $\\$11$, and $\\$20$ per pound. The blend contains twice as many pounds of the $\\$8$ coffee as of the $\\$11$ coffee, and the finished blend costs $\\$12$ per pound. What fraction of the blend, by weight, is the $\\$20$ coffee?",
+   "choices": [
+    "$\\frac{3}{11}$",
+    "$\\frac{5}{21}$",
+    "$\\frac{8}{33}$",
+    "$\\frac{16}{33}$",
+    "$\\frac{9}{8}$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nLet the $\\$11$ coffee weigh $a$ pounds; then the $\\$8$ coffee weighs $2a$ and the $\\$20$ coffee weighs $c$. Total cost: $8(2a) + 11a + 20c = 27a + 20c$, over a total weight of $3a + c$. Setting the blend price to $\\$12$: $27a + 20c = 12(3a + c) = 36a + 12c$, so $8c = 9a$ and $c = \\tfrac{9}{8}a$. The $\\$20$ share is $\\dfrac{c}{3a + c} = \\dfrac{9/8}{3 + 9/8} = \\dfrac{9}{33} = \\dfrac{3}{11}$.\n\n**Trigger cue**\nThree components with one internal ratio — name the tied pair with a single letter, leave the free component as its own, and the blend price gives one equation in two unknowns whose *ratio* is all you need.\n\n**Takeaway**\nA blend fraction needs the ratio, never the actual weights.",
+   "fastest_path_md": "The tied pair averages $\\dfrac{2(8) + 11}{3} = \\$9$ per pound. Now it is a two-way blend of $\\$9$ and $\\$20$ landing at $\\$12$: distances $3$ and $8$, so the $\\$20$ share is $\\tfrac{3}{11}$.",
+   "trap_map": {
+    "1": "Reads the ratio as equal parts of the two cheap coffees rather than $2:1$, blending $\\$8$ and $\\$11$ to $\\$9.50$ and landing on $\\tfrac{5}{21}$.",
+    "2": "Answers with the $\\$11$ coffee's share of the blend, $\\tfrac{8}{33}$.",
+    "3": "Answers with the $\\$8$ coffee's share of the blend, $\\tfrac{16}{33}$.",
+    "4": "Answers with the ratio of $\\$20$ coffee to $\\$11$ coffee, $\\tfrac{9}{8}$, instead of its share of the whole blend."
+   },
+   "numeric_check": "(9/8)/(3 + 9/8)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "A cyclist rides from town A to town B at a steady $15$ kilometers per hour and returns along the same road at a steady $10$ kilometers per hour. The return ride takes $30$ minutes longer than the outbound ride. How many kilometers apart are the two towns?",
+   "choices": [
+    "$3$",
+    "$6$",
+    "$15$",
+    "$30$",
+    "$900$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $d$ be the one-way distance in kilometers. The times are $d/15$ and $d/10$ hours, and $30$ minutes is $\\tfrac12$ hour, so $\\dfrac{d}{10} - \\dfrac{d}{15} = \\dfrac12$. Over the common denominator $30$: $\\dfrac{3d - 2d}{30} = \\dfrac{d}{30} = \\dfrac12$, so $d = 15$.\n\n**Trigger cue**\nSame distance, two speeds, a stated *difference* in time — subtract the two time expressions; the distance factors straight out.\n\n**Takeaway**\nEqual distances, different speeds: subtract times, not speeds.",
+   "fastest_path_md": "The time gap for a distance $d$ is $d\\left(\\tfrac{1}{10} - \\tfrac{1}{15}\\right) = \\tfrac{d}{30}$ hours. Set $\\tfrac{d}{30} = \\tfrac12$: $d = 15$.",
+   "trap_map": {
+    "0": "Adds the speeds where the setup subtracts, using $\\dfrac{(0.5)(15)(10)}{15+10} = 3$.",
+    "1": "Multiplies the round-trip harmonic-mean speed $12$ by the half hour: $12 \\times 0.5 = 6$.",
+    "3": "Answers with the round-trip distance $2 \\times 15 = 30$ instead of the separation.",
+    "4": "Leaves the $30$ minutes in minutes, solving $d/30 = 30$ for $d = 900$."
+   },
+   "numeric_check": "0.5*15*10/(15-10)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "Pipe A alone fills an empty tank in $12$ hours and pipe B alone fills it in $18$ hours, while an open drain C alone empties a full tank in $24$ hours. Starting with the tank empty, all three are opened together. Exactly $4$ hours later the drain is closed and the two pipes continue. How many additional hours are needed to fill the tank?",
+   "choices": [
+    "$3.2$",
+    "$4.4$",
+    "$\\frac{44}{7}$",
+    "$\\frac{22}{3}$",
+    "$8.4$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nWork in $72$ths of a tank per hour: A contributes $6$, B contributes $4$, C removes $3$. With all three open the net rate is $7/72$ per hour, so after $4$ hours the tank holds $28/72$. That leaves $44/72$. With the drain closed the rate is $10/72$ per hour, so the remaining time is $\\dfrac{44/72}{10/72} = \\dfrac{44}{10} = 4.4$ hours.\n\n**Trigger cue**\nA rate that changes partway through — split the job at the change, compute what is done in the first stretch, and divide the remainder by the new rate.\n\n**Takeaway**\nWhen a rate changes, split the job, never the average.",
+   "fastest_path_md": "In $72$ths per hour: $6 + 4 - 3 = 7$ for four hours fills $28$; $72 - 28 = 44$ remains at $6 + 4 = 10$ per hour, so $4.4$ hours.",
+   "trap_map": {
+    "0": "Leaves the drain out of the first four hours too, filling $40/72$ and needing only $\\dfrac{32/72}{10/72} = 3.2$ hours.",
+    "2": "Leaves the drain open for the rest of the fill: $\\dfrac{44/72}{7/72} = \\dfrac{44}{7}$ hours.",
+    "3": "Finishes with pipe A alone after the drain closes: $\\dfrac{44/72}{6/72} = \\dfrac{22}{3}$ hours.",
+    "4": "Answers with the total elapsed time $4 + 4.4 = 8.4$ hours rather than the additional hours."
+   },
+   "numeric_check": "(1 - 4*(1/12 + 1/18 - 1/24))/(1/12 + 1/18)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "At $8{:}00$ a freight train leaves a station travelling east at a constant $45$ kilometers per hour. At $10{:}30$ an express leaves the same station on a parallel track, also travelling east, at a constant $75$ kilometers per hour. At what time does the express draw level with the freight?",
+   "choices": [
+    "$11{:}45$",
+    "$12{:}00$",
+    "$13{:}00$",
+    "$14{:}15$",
+    "$16{:}45$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nBy $10{:}30$ the freight has been running $2.5$ hours at $45$ km/h, so it is $112.5$ km ahead. From then on the gap closes at $75 - 45 = 30$ km/h, so it takes $112.5/30 = 3.75$ hours — three hours and forty-five minutes. Adding that to $10{:}30$ gives $14{:}15$.\n\n**Trigger cue**\nSame direction, later start — the head start is closed at the *difference* of the speeds, and the clock starts at the later departure.\n\n**Takeaway**\nSame direction closes at the speed difference, from the later start.",
+   "fastest_path_md": "Head start $2.5 \\times 45 = 112.5$ km; closing speed $30$ km/h; $112.5/30 = 3.75$ h after $10{:}30$, so $14{:}15$.",
+   "trap_map": {
+    "0": "Computes the $3.75$-hour catch-up correctly but adds it to the freight's $8{:}00$ departure instead of the express's $10{:}30$, giving $11{:}45$.",
+    "1": "Divides the head start by the express's own speed rather than the closing speed: $112.5/75 = 1.5$ hours after $10{:}30$.",
+    "2": "Divides the head start by the freight's speed: $112.5/45 = 2.5$ hours after $10{:}30$.",
+    "4": "Computes the head start at the express's speed instead of the freight's ($2.5 \\times 75 = 187.5$ km), giving $187.5/30 = 6.25$ hours after $10{:}30$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "Twelve identical machines working together at a constant rate can complete an order in $8$ days. Three days into the job, four of the machines break down and are not replaced; the remaining machines finish the order. By how many days does the order finish later than the original $8$-day schedule?",
+   "choices": [
+    "$2.5$",
+    "$4$",
+    "$7.5$",
+    "$10$",
+    "$10.5$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nMeasure the job in machine-days: $12 \\times 8 = 96$. The first three days consume $3 \\times 12 = 36$, leaving $60$ machine-days. Eight machines remain, so they need $60/8 = 7.5$ days. The order finishes on day $3 + 7.5 = 10.5$, which is $10.5 - 8 = 2.5$ days late.\n\n**Trigger cue**\nA changing crew size on a fixed job — convert the whole job into worker-days once, then spend it at whatever headcount applies.\n\n**Takeaway**\nMachine-days are conserved; spend them at the current headcount.",
+   "fastest_path_md": "The job is $96$ machine-days; $36$ are spent, $60$ remain at $8$ machines $= 7.5$ days, finishing on day $10.5$ — $2.5$ days late.",
+   "trap_map": {
+    "1": "Restarts the whole job with the reduced crew, taking $96/8 = 12$ days and calling the delay $12 - 8 = 4$.",
+    "2": "Answers with the $7.5$ days still needed after the breakdown rather than the delay.",
+    "3": "Reads \"four break down\" as \"four remain\", giving $60/4 = 15$ days and a finish on day $18$ — a delay of $10$.",
+    "4": "Answers with the order's total length $10.5$ days rather than the delay."
+   },
+   "numeric_check": "3 + (12*8 - 3*12)/8 - 8",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "A boat travels $45$ kilometers downstream and then the same $45$ kilometers back upstream, taking $8$ hours in total. The current runs at a constant $3$ kilometers per hour and the boat's engine holds a constant speed in still water. What is the boat's speed in still water, in kilometers per hour?",
+   "choices": [
+    "$8.25$",
+    "$11.25$",
+    "$12$",
+    "$14.25$",
+    "$15$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $b$ be the still-water speed. Downstream the boat makes $b + 3$ and upstream $b - 3$, so $\\dfrac{45}{b+3} + \\dfrac{45}{b-3} = 8$. Clearing denominators: $45(b-3) + 45(b+3) = 8(b^2 - 9)$, i.e. $90b = 8b^2 - 72$, so $8b^2 - 90b - 72 = 0$, or $4b^2 - 45b - 36 = 0$. The discriminant is $2025 + 576 = 2601 = 51^2$, giving $b = \\dfrac{45 + 51}{8} = 12$ (the other root is negative).\n\n**Trigger cue**\nEqual distances up and down a current with a total time — add the two time fractions, clear to a quadratic, and discard the root that makes a speed non-positive.\n\n**Takeaway**\nUp-and-down current problems add times and clear to a quadratic.",
+   "fastest_path_md": "Test the choices: $b = 12$ gives $15$ and $9$ km/h, so $45/15 + 45/9 = 3 + 5 = 8$ hours. Done.",
+   "trap_map": {
+    "0": "Splits the $8$ hours evenly, reads $45/4 = 11.25$ as the *downstream* speed, and backs out $11.25 - 3 = 8.25$.",
+    "1": "Answers with the round-trip average speed $90/8 = 11.25$, which is not the still-water speed.",
+    "3": "Splits the $8$ hours evenly, reads $45/4 = 11.25$ as the *upstream* speed, and backs out $11.25 + 3 = 14.25$.",
+    "4": "Answers with the downstream speed $12 + 3 = 15$ instead of the still-water speed."
+   },
+   "numeric_check": "(90 + sqrt(90^2 + 4*8*72))/(2*8)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "Anya works exactly $1.5$ times as fast as Ben. Working together from the start, they would finish a job in $12$ days. Instead Ben works alone for the first $10$ days, after which Anya joins him and they work together until the job is done. How many days does the job take in total?",
+   "choices": [
+    "$16$",
+    "$18$",
+    "$20$",
+    "$22$",
+    "$30$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet Ben's rate be $r$ jobs per day; Anya's is $1.5r$, so together they do $2.5r$ and $2.5r = \\tfrac{1}{12}$, giving $r = \\tfrac{1}{30}$. In $10$ days Ben alone completes $\\tfrac{10}{30} = \\tfrac13$ of the job. The remaining $\\tfrac23$ goes at the joint rate $\\tfrac{1}{12}$, taking $\\tfrac23 \\times 12 = 8$ days. Total: $10 + 8 = 18$ days.\n\n**Trigger cue**\nA speed *ratio* plus a joint completion time — the ratio splits the joint rate into its parts, so solve for the slower worker's rate first.\n\n**Takeaway**\nA speed ratio splits a joint rate; solve for one rate first.",
+   "fastest_path_md": "The pair does $\\tfrac{1}{12}$ per day and Ben is $\\tfrac{1}{2.5} = 40\\%$ of that, so Ben alone is $\\tfrac{1}{30}$: ten days is a third. Two thirds left at $\\tfrac{1}{12}$ is $8$ days. Total $18$.",
+   "trap_map": {
+    "0": "Uses Anya's rate $\\tfrac{1}{20}$ for Ben's first ten days, so half the job is done and $6$ more days finish it: $10 + 6 = 16$.",
+    "2": "Answers with the $20$ days Ben would still need alone after his first ten, ignoring that Anya joins.",
+    "3": "Adds the full $12$-day joint schedule to the $10$ days Ben already worked: $10 + 12 = 22$.",
+    "4": "Answers with Ben's solo time for the whole job, $30$ days."
+   },
+   "numeric_check": "10 + (1 - 10/30)/(1/12)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "A share price rises by $k\\%$ during January and then falls by $(k + 10)\\%$ during February, ending February $16\\%$ below where it started January. If $k$ is a positive integer, what is $k$?",
+   "choices": [
+    "$8$",
+    "$16$",
+    "$20$",
+    "$30$",
+    "$40$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWrite $t = k/100$. The two moves compose as $(1 + t)\\left(1 - t - 0.1\\right) = 0.84$. Expanding: $0.9 - 0.1t - t^2 = 0.84$, so $t^2 + 0.1t - 0.06 = 0$. Multiplying by $100$ and writing in $k$: $k^2 + 10k - 600 = 0$, which factors as $(k + 30)(k - 20) = 0$. The positive root is $k = 20$; check it: $1.20 \\times 0.70 = 0.84$.\n\n**Trigger cue**\nTwo chained changes with the *same* unknown appearing in both — set the factor product equal to the target factor and clear to a quadratic; discard roots that make a factor non-positive.\n\n**Takeaway**\nUnknown-percent chains are quadratics; verify the surviving root.",
+   "fastest_path_md": "Test the choices against $\\left(1 + \\tfrac{k}{100}\\right)\\left(1 - \\tfrac{k+10}{100}\\right) = 0.84$: $k = 20$ gives $1.2 \\times 0.7 = 0.84$ on the first try.",
+   "trap_map": {
+    "0": "Averages the $16\\%$ net decline across the two months: $16/2 = 8$.",
+    "1": "Answers with the net two-month decline $16$ rather than with $k$.",
+    "3": "Answers with February's decline $k + 10 = 30$ rather than January's rise.",
+    "4": "Drops the extra ten points, solving $(1+t)(1-t) = 0.84$ for $t^2 = 0.16$ and $k = 40$."
+   },
+   "numeric_check": "(-0.1 + sqrt(0.01 + 0.24))/2*100",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "A subscription's price was raised by $25\\%$, and the new price was later cut by $12\\%$. The price after both changes is $\\$264$. What was the price before either change?",
+   "choices": [
+    "$\\$211.20$",
+    "$\\$237.60$",
+    "$\\$240$",
+    "$\\$290.40$",
+    "$\\$300$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe chain multiplies the original by $1.25 \\times 0.88 = 1.10$. To undo a chain, divide by the net factor rather than applying the opposite percents: the original is $264/1.10 = \\$240$. Check: $240 \\times 1.25 = 300$, and $300 \\times 0.88 = 264$.\n\n**Trigger cue**\nA final figure after a chain, with the original requested — divide by the product of the factors; never subtract the percents back off.\n\n**Takeaway**\nUndo a percent chain by dividing by its net factor.",
+   "fastest_path_md": "$1.25 \\times 0.88 = 1.1$, so the original is $264/1.1 = \\$240$.",
+   "trap_map": {
+    "0": "Reverses only the $25\\%$ increase and stops: $264/1.25 = \\$211.20$.",
+    "1": "Treats the net $+10\\%$ as removable by taking $10\\%$ off the final price: $264 \\times 0.9 = \\$237.60$.",
+    "3": "Applies both changes forward instead of reversing them: $264 \\times 1.25 \\times 0.88 = \\$290.40$.",
+    "4": "Reverses only the $12\\%$ cut and stops: $264/0.88 = \\$300$."
+   },
+   "numeric_check": "264/(1.25*0.88)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "In a survey, $60\\%$ of the respondents own a car. Half of the car owners also own a bicycle, and three quarters of those who do not own a car own a bicycle. What percent of the bicycle owners do not own a car?",
+   "choices": [
+    "$30$",
+    "$40$",
+    "$50$",
+    "$60$",
+    "$75$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nTake $100$ respondents. Car owners: $60$, of whom $30$ own bicycles. Non-owners: $40$, of whom $\\tfrac34 \\times 40 = 30$ own bicycles. Bicycle owners total $30 + 30 = 60$, and $30$ of them own no car, so the answer is $30/60 = 50\\%$.\n\n**Trigger cue**\nA percentage asked *of a group that is itself computed* — build the two-way table on a base of $100$ first, then read the ratio the question actually asks for.\n\n**Takeaway**\nRead which group is the base before dividing; build the table.",
+   "fastest_path_md": "On $100$ people: $60$ car owners give $30$ cyclists; $40$ non-owners give $30$ cyclists. Half of the $60$ cyclists own no car.",
+   "trap_map": {
+    "0": "Answers with the share of *all respondents* who cycle without a car, $30\\%$, rather than the share of cyclists.",
+    "1": "Answers with the share of respondents who own no car, $40\\%$.",
+    "3": "Answers with the share of respondents who own a car, $60\\%$ — which is also the number of cyclists, making the coincidence tempting.",
+    "4": "Answers with the conditional given in the stem, $75\\%$ of non-owners, without converting the base."
+   },
+   "numeric_check": "100*(0.4*0.75)/(0.6*0.5 + 0.4*0.75)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "A town's population fell by $20\\%$ during the 1990s and then rose by $30\\%$ during the 2000s. The population at the end of the 2000s was $4{,}160$ greater than it had been at the start of the 1990s. What was the population at the start of the 1990s?",
+   "choices": [
+    "$20{,}800$",
+    "$41{,}600$",
+    "$83{,}200$",
+    "$104{,}000$",
+    "$108{,}160$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe net factor is $0.8 \\times 1.3 = 1.04$, so the population grew by $4\\%$ over the two decades. That $4\\%$ is the stated $4{,}160$ people, so the starting population is $4160/0.04 = 104{,}000$. Check: $104{,}000 \\to 83{,}200 \\to 108{,}160$, which is $4{,}160$ more than $104{,}000$.\n\n**Trigger cue**\nA percent chain plus one absolute difference — chain the factors, subtract $1$, and divide the absolute figure by the remainder.\n\n**Takeaway**\nDown twenty then up thirty is up four, not up ten.",
+   "fastest_path_md": "$0.8 \\times 1.3 = 1.04$, a net $+4\\%$, so the start was $4160/0.04 = 104{,}000$.",
+   "trap_map": {
+    "0": "Uses only the $20\\%$ decline as the net change: $4160/0.2 = 20{,}800$.",
+    "1": "Adds the percents to a net $+10\\%$: $4160/0.1 = 41{,}600$.",
+    "2": "Answers with the population at the end of the 1990s, $0.8 \\times 104{,}000 = 83{,}200$.",
+    "4": "Answers with the population at the end of the 2000s, $1.04 \\times 104{,}000 = 108{,}160$."
+   },
+   "numeric_check": "4160/(0.8*1.3 - 1)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "A retailer's annual revenue grew by $25\\%$ from 2022 to 2023 and then fell from 2023 to 2024. Over the two years combined, revenue grew by $5\\%$. By what percent did revenue fall from 2023 to 2024?",
+   "choices": [
+    "$5$",
+    "$16$",
+    "$20$",
+    "$25$",
+    "$84$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nThe two factors multiply to the net factor: $1.25 \\times f = 1.05$, so $f = 1.05/1.25 = 0.84$. A factor of $0.84$ is a decline of $1 - 0.84 = 0.16$, i.e. $16\\%$.\n\n**Trigger cue**\nOne leg of a chain unknown with the net change given — divide the net factor by the known factor, then convert the surviving factor into a percent change.\n\n**Takeaway**\nIsolate a chain's unknown leg by dividing, not subtracting.",
+   "fastest_path_md": "Start at $100$: 2023 is $125$, 2024 must be $105$. The drop is $20$ on a base of $125$, which is $16\\%$.",
+   "trap_map": {
+    "0": "Answers with the two-year net growth $5\\%$ rather than the 2024 decline.",
+    "2": "Subtracts the percents instead of dividing the factors: $25 - 5 = 20$.",
+    "3": "Answers with the first year's growth $25\\%$.",
+    "4": "Answers with 2024 revenue as a percent of 2023 revenue, $84$, instead of the decline."
+   },
+   "numeric_check": "100*(1 - 1.05/1.25)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "stem_md": "A fund lost $30\\%$ of its value during its first year. During its second year it gained $x\\%$, and at the end of the second year it stood $5\\%$ above its original value. What is $x$?",
+   "choices": [
+    "$5$",
+    "$30$",
+    "$35$",
+    "$50$",
+    "$150$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe factors multiply to the net factor: $0.7(1 + x/100) = 1.05$, so $1 + x/100 = 1.05/0.7 = 1.5$ and $x = 50$. The gain is far larger than the loss because it acts on a base that shrank to $70\\%$.\n\n**Trigger cue**\nA loss followed by a recovery past the starting point — divide the target factor by the surviving factor; the required gain always exceeds the loss.\n\n**Takeaway**\nRecovering a loss always needs a larger percent than the loss.",
+   "fastest_path_md": "Start at $100$: after the loss, $70$; the target is $105$; $105/70 = 1.5$, so a $50\\%$ gain.",
+   "trap_map": {
+    "0": "Answers with the two-year net gain $5\\%$ rather than the second year's gain.",
+    "1": "Answers with the first year's loss $30\\%$, assuming a symmetric recovery.",
+    "2": "Adds the percents to reach the net: $-30 + 35 = +5$.",
+    "4": "Reports the recovery factor $1.5$ as a $150\\%$ gain rather than a $50\\%$ gain."
+   },
+   "numeric_check": "100*(1.05/0.7 - 1)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "A jar holds red and blue marbles in the ratio $5:3$. After $20$ more blue marbles are dropped in and no red ones, the ratio of red to blue becomes $5:8$. How many red marbles are in the jar?",
+   "choices": [
+    "$4$",
+    "$12$",
+    "$20$",
+    "$32$",
+    "$52$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWrite the original counts as $5k$ red and $3k$ blue — the ratio fixes them only up to a common multiplier. After the addition: $\\dfrac{5k}{3k + 20} = \\dfrac{5}{8}$. Cross-multiplying, $40k = 15k + 100$, so $25k = 100$ and $k = 4$. The reds number $5k = 20$.\n\n**Trigger cue**\nA ratio before and after a change to one part only — introduce the multiplier $k$ immediately; the ratio alone can never give counts.\n\n**Takeaway**\nA ratio needs a multiplier before it can give a count.",
+   "fastest_path_md": "Red is unchanged, so its share of the ratio is fixed: blue goes from $3$ parts to $8$ parts of the *same* size, and those $5$ extra parts are the $20$ marbles. One part is $4$, so red $= 5 \\times 4 = 20$.",
+   "trap_map": {
+    "0": "Cross-multiplies carelessly, leaving the $20$ outside the parenthesis: $40k = 15k + 20$ gives $k = 0.8$ and $5k = 4$.",
+    "1": "Answers with the blue marbles before the addition, $3k = 12$.",
+    "3": "Answers with the blue marbles after the addition, $3k + 20 = 32$.",
+    "4": "Answers with the total after the addition, $20 + 32 = 52$."
+   },
+   "numeric_check": "5*(5*20/25)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "In a workshop the ratio of hammers to saws is $3:4$, and the ratio of saws to drills is $6:5$. There are $12$ more drills than hammers. How many saws are in the workshop?",
+   "choices": [
+    "$24$",
+    "$108$",
+    "$120$",
+    "$144$",
+    "$372$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe shared term is saws, which appears as $4$ in one ratio and $6$ in the other. Scale both to their least common multiple, $12$: hammers$:$saws $= 9:12$ and saws$:$drills $= 12:10$. So hammers$:$saws$:$drills $= 9:12:10$. Drills exceed hammers by $10 - 9 = 1$ part, and that part is $12$ items. Saws $= 12 \\times 12 = 144$.\n\n**Trigger cue**\nTwo ratios sharing one quantity — rescale both so the shared term matches before joining them; the raw numbers never line up by themselves.\n\n**Takeaway**\nMatch the shared term's value before chaining two ratios.",
+   "fastest_path_md": "Scale saws to $12$ in both: $9:12$ and $12:10$, so $9:12:10$. The drill–hammer gap is one part $= 12$, so saws $= 144$.",
+   "trap_map": {
+    "0": "Splices the two ratios without rescaling the shared term, reading $3:4:5$ and making the gap $2$ parts: $12/2 = 6$ per part, so saws $= 4 \\times 6 = 24$.",
+    "1": "Answers with the number of hammers, $9 \\times 12 = 108$.",
+    "2": "Answers with the number of drills, $10 \\times 12 = 120$.",
+    "4": "Answers with the total number of tools, $108 + 144 + 120 = 372$."
+   },
+   "numeric_check": "12*12/(10-9)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "The number of days a crew needs to finish a job varies directly with the size of the job and inversely with the number of workers on the crew. Six workers finish a $300$-unit job in $10$ days. How many days will eight workers need for a $500$-unit job?",
+   "choices": [
+    "$7.5$",
+    "$8$",
+    "$12.5$",
+    "$\\frac{50}{3}$",
+    "$\\frac{200}{9}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe relation is $d = c \\cdot \\dfrac{J}{W}$. From the given case, $10 = c \\cdot \\dfrac{300}{6}$, so $c = \\dfrac{1}{5}$. Then $d = \\dfrac{1}{5} \\cdot \\dfrac{500}{8} = 12.5$ days.\n\n**Trigger cue**\n\"Varies directly with … and inversely with …\" — build the single constant $c$ from the given case, then substitute; scaling the two ratios separately is the same thing done in two steps, and easy to invert by accident.\n\n**Takeaway**\nMultiply by the direct ratio, divide by the inverse one.",
+   "fastest_path_md": "Scale by ratios: $10 \\times \\dfrac{500}{300} \\times \\dfrac{6}{8} = 10 \\times \\dfrac53 \\times \\dfrac34 = 12.5$ days.",
+   "trap_map": {
+    "0": "Scales only for the crew and ignores the larger job: $10 \\times \\tfrac68 = 7.5$.",
+    "1": "Inverts both ratios: $10 \\times \\tfrac{300}{500} \\times \\tfrac{8}{6} = 8$.",
+    "3": "Scales only for the job and ignores the larger crew: $10 \\times \\tfrac{500}{300} = \\tfrac{50}{3}$.",
+    "4": "Treats the crew as a direct factor rather than an inverse one: $10 \\times \\tfrac{500}{300} \\times \\tfrac{8}{6} = \\tfrac{200}{9}$."
+   },
+   "numeric_check": "10*(500/300)*(6/8)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "Container A holds $40$ liters of a milk-and-water mixture in the ratio $3:1$. Container B holds $30$ liters of a milk-and-water mixture in the ratio $2:3$. Both containers are emptied into a single vat. In the combined mixture, what is the ratio of milk to water?",
+   "choices": [
+    "$2:3$",
+    "$3:2$",
+    "$5:3$",
+    "$5:4$",
+    "$23:17$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nConvert each ratio to actual liters before combining. Container A: $\\tfrac34 \\times 40 = 30$ liters of milk and $10$ of water. Container B: $\\tfrac25 \\times 30 = 12$ liters of milk and $18$ of water. Totals: $42$ liters of milk and $28$ of water, a ratio of $42:28 = 3:2$.\n\n**Trigger cue**\nTwo ratios combined at *different* volumes — ratios cannot be added or averaged; convert each to quantities, add the quantities, then re-form the ratio.\n\n**Takeaway**\nConvert ratios to amounts before combining; never add ratios.",
+   "fastest_path_md": "A gives $30$ and $10$; B gives $12$ and $18$. Totals $42$ and $28$, which is $3:2$.",
+   "trap_map": {
+    "0": "Reports water to milk instead of milk to water.",
+    "2": "Pairs A's milk with B's water only, $30:18$, ignoring the other half of each container.",
+    "3": "Adds the ratio terms directly, $(3+2):(1+3) = 5:4$, as though the volumes were irrelevant.",
+    "4": "Averages the two milk fractions as if the volumes matched: $\\tfrac12\\left(\\tfrac34 + \\tfrac25\\right) = \\tfrac{23}{40}$, giving $23:17$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "Three partners divide a profit in the ratio $2:3:5$. The largest share exceeds the smallest by $\\$4{,}500$. The middle partner then gives $20\\%$ of her share to the partner with the smallest share. How many dollars does the smallest-share partner end up with?",
+   "choices": [
+    "$\\$900$",
+    "$\\$3{,}000$",
+    "$\\$3{,}600$",
+    "$\\$3{,}900$",
+    "$\\$4{,}500$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nLet one part be $u$. The shares are $2u$, $3u$, $5u$, and $5u - 2u = 3u = 4500$, so $u = 1500$ and the shares are $\\$3{,}000$, $\\$4{,}500$, $\\$7{,}500$. The transfer is $0.20 \\times 4500 = \\$900$, so the smallest partner finishes with $3000 + 900 = \\$3{,}900$.\n\n**Trigger cue**\nA ratio pinned by the *difference* between two shares — the difference is a whole number of parts, so divide it by that count to size one part.\n\n**Takeaway**\nA stated difference between shares sizes one ratio part.",
+   "fastest_path_md": "The gap $5 - 2 = 3$ parts is $\\$4{,}500$, so a part is $\\$1{,}500$. Smallest $= \\$3{,}000$; the transfer is $20\\%$ of $\\$4{,}500 = \\$900$; total $\\$3{,}900$.",
+   "trap_map": {
+    "0": "Answers with the transfer itself, $\\$900$, rather than the resulting share.",
+    "1": "Answers with the smallest share before the transfer, $\\$3{,}000$.",
+    "2": "Answers with what the middle partner keeps, $0.8 \\times 4500 = \\$3{,}600$.",
+    "4": "Answers with the middle share $\\$4{,}500$ — numerically the same as the stated difference, which makes it doubly tempting."
+   },
+   "numeric_check": "2*(4500/3) + 0.2*3*(4500/3)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "stem_md": "A dough recipe calls for flour, sugar, and butter by weight in the ratio $8:3:2$. A baker has $5$ kilograms of flour, $1.5$ kilograms of sugar, and $1.2$ kilograms of butter, and no way to obtain more of any of them. What is the greatest weight of dough, in kilograms, that he can make?",
+   "choices": [
+    "$5$",
+    "$6.5$",
+    "$7.7$",
+    "$7.8$",
+    "$8.125$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nOne \"unit\" of the recipe is $8 + 3 + 2 = 13$ parts. Each ingredient permits a certain number of units: flour $5/8 = 0.625$, sugar $1.5/3 = 0.5$, butter $1.2/2 = 0.6$. The batch is capped by the smallest of these — sugar, at $0.5$ units — so the dough weighs $0.5 \\times 13 = 6.5$ kilograms.\n\n**Trigger cue**\nFixed supplies against a fixed recipe ratio — divide each supply by its ratio part and take the *minimum*; the binding ingredient is rarely the scarcest by weight.\n\n**Takeaway**\nDivide each supply by its ratio part; the minimum binds.",
+   "fastest_path_md": "Units available: $5/8 = 0.625$, $1.5/3 = 0.5$, $1.2/2 = 0.6$. Sugar binds at $0.5$, so the dough is $0.5 \\times 13 = 6.5$ kg.",
+   "trap_map": {
+    "0": "Answers with the flour on hand, $5$ kilograms, treating the largest supply as the batch size.",
+    "2": "Adds all three supplies, $5 + 1.5 + 1.2 = 7.7$, ignoring that the ratio forbids using them all.",
+    "3": "Scales by butter, the second-tightest ingredient: $0.6 \\times 13 = 7.8$.",
+    "4": "Scales by flour, the loosest ingredient: $0.625 \\times 13 = 8.125$."
+   },
+   "numeric_check": "13*min(5/8, 1.5/3, 1.2/2)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "stem_md": "In how many distinguishable ways can the seven letters of the word $\\text{MISSILE}$ be arranged so that the two $\\text{S}$'s are not next to each other?",
+   "choices": [
+    "$360$",
+    "$900$",
+    "$1{,}260$",
+    "$1{,}800$",
+    "$2{,}520$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nPlace the non-$\\text{S}$ letters first. They are $\\text{M}, \\text{I}, \\text{I}, \\text{L}, \\text{E}$ — five letters with the $\\text{I}$ repeated — giving $\\dfrac{5!}{2!} = 60$ distinguishable orders. Those five letters create six gaps (including the ends), and the two identical $\\text{S}$'s must occupy two different gaps: $\\binom{6}{2} = 15$ ways. Total: $60 \\times 15 = 900$.\n\nAs a check, the complement agrees: all arrangements number $\\dfrac{7!}{2!\\,2!} = 1260$, and gluing the $\\text{S}$'s into one block gives $\\dfrac{6!}{2!} = 360$, so $1260 - 360 = 900$.\n\n**Trigger cue**\n\"No two identical items adjacent\" — arrange everything else first, then choose gaps; with only one restricted pair the complement works too.\n\n**Takeaway**\nArrange the rest, then drop restricted letters into the gaps.",
+   "fastest_path_md": "$1260$ total minus $360$ with the $\\text{S}$'s glued together $= 900$.",
+   "trap_map": {
+    "0": "Counts the arrangements the question excludes — the $\\dfrac{6!}{2!} = 360$ in which the two $\\text{S}$'s are adjacent.",
+    "2": "Answers with the unrestricted total $\\dfrac{7!}{2!\\,2!} = 1{,}260$.",
+    "3": "Forgets the two $\\text{I}$'s are identical, using $5! \\times \\binom{6}{2} = 1{,}800$.",
+    "4": "Divides by only one of the two repeated pairs: $\\dfrac{7!}{2!} = 2{,}520$."
+   },
+   "numeric_check": "(5!/2!)*combinations(6,2)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "stem_md": "A committee of $5$ people is to be formed from $6$ men and $5$ women. The committee must include at least $2$ women and no more than $3$ men. How many different committees are possible?",
+   "choices": [
+    "$200$",
+    "$380$",
+    "$381$",
+    "$456$",
+    "$462$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWith $5$ seats, \"at most $3$ men\" allows $0$, $1$, $2$, or $3$ men, and each of those leaves $5$, $4$, $3$, or $2$ women — all of which already satisfy \"at least $2$ women\", so the two constraints collapse into one. Summing:\n$\\binom{6}{0}\\binom{5}{5} + \\binom{6}{1}\\binom{5}{4} + \\binom{6}{2}\\binom{5}{3} + \\binom{6}{3}\\binom{5}{2} = 1 + 30 + 150 + 200 = 381$.\n\n**Trigger cue**\nTwo constraints on a fixed committee size — translate both into bounds on the *same* variable first; they often turn out to be the same constraint stated twice.\n\n**Takeaway**\nWith a fixed total, one side's bound restates the other's.",
+   "fastest_path_md": "At most $3$ men means $0$–$3$ men, which automatically gives $2$–$5$ women. Sum $\\binom{6}{m}\\binom{5}{5-m}$ for $m = 0,1,2,3$: $1 + 30 + 150 + 200 = 381$.",
+   "trap_map": {
+    "0": "Counts only the $3$-men, $2$-women case, $\\binom{6}{3}\\binom{5}{2} = 200$, taking the constraints as exact rather than as bounds.",
+    "1": "Drops the all-women committee, treating \"no more than $3$ men\" as requiring at least one: $381 - 1 = 380$.",
+    "3": "Reads \"at least $2$ women\" as \"at least $1$ woman\", counting everything except the all-male committees: $\\binom{11}{5} - \\binom{6}{5} = 456$.",
+    "4": "Ignores both constraints: $\\binom{11}{5} = 462$."
+   },
+   "numeric_check": "combinations(6,0)*combinations(5,5) + combinations(6,1)*combinations(5,4) + combinations(6,2)*combinations(5,3) + combinations(6,3)*combinations(5,2)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "stem_md": "A courier travels on a street grid from the corner $(0,0)$ to the corner $(6,4)$, moving only one block east or one block north at a time. Roadworks have closed the intersection at $(3,2)$ entirely. How many routes are still available?",
+   "choices": [
+    "$100$",
+    "$110$",
+    "$120$",
+    "$190$",
+    "$210$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nEvery route is a sequence of $6$ easts and $4$ norths, so there are $\\binom{10}{4} = 210$ routes in all. A route through $(3,2)$ splits into an independent first leg and second leg: $\\binom{5}{2} = 10$ ways to reach $(3,2)$ and $\\binom{5}{2} = 10$ ways onward, so $10 \\times 10 = 100$ routes use the closed corner. The rest number $210 - 100 = 110$.\n\n**Trigger cue**\nA blocked point on a lattice grid — count all routes, then count those through the block as a *product* of two independent legs, and subtract.\n\n**Takeaway**\nRoutes through a point multiply; routes avoiding it subtract.",
+   "fastest_path_md": "$\\binom{10}{4} = 210$ total; $\\binom{5}{2}^2 = 100$ pass through $(3,2)$; $210 - 100 = 110$.",
+   "trap_map": {
+    "0": "Counts the routes the question excludes — the $100$ that pass through $(3,2)$.",
+    "2": "Miscounts the north moves as three rather than four, using $\\binom{10}{3} = 120$.",
+    "3": "Adds the two legs instead of multiplying them, subtracting $10 + 10 = 20$ from $210$.",
+    "4": "Ignores the closure and answers with the unrestricted total $\\binom{10}{4} = 210$."
+   },
+   "numeric_check": "combinations(10,4) - combinations(5,2)^2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "stem_md": "Eight people are to be seated around a circular table; seatings that differ only by a rotation are considered the same. Two of the eight, Ana and Bruno, insist on sitting next to each other, and a third, Carla, refuses to sit next to Ana. How many seatings satisfy both conditions?",
+   "choices": [
+    "$240$",
+    "$600$",
+    "$720$",
+    "$1{,}200$",
+    "$1{,}440$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nGlue Ana and Bruno into one block. That leaves $7$ units around a circle, which can be arranged in $(7-1)! = 720$ ways, and the block has $2$ internal orders, giving $1440$ seatings that satisfy Ana–Bruno.\n\nNow remove those where Carla sits beside Ana. Inside the block Ana has exactly one free side, so Carla adjacent to Ana means Carla occupies the unit on that side. Gluing Carla to the block leaves $6$ units, arranged in $(6-1)! = 120$ ways, and this happens for each of the $2$ internal block orders: $240$ seatings. The answer is $1440 - 240 = 1200$.\n\n**Trigger cue**\nCircular seating with a \"must sit together\" pair — glue the pair into a block, use $(n-1)!$ on the resulting units, and multiply by the block's internal orders.\n\n**Takeaway**\nGlue the pair, use $(n-1)!$, then multiply by internal orders.",
+   "fastest_path_md": "Block Ana–Bruno: $6! \\times 2 = 1440$. Carla beside Ana glues a second time: $5! \\times 2 = 240$. Answer $1440 - 240 = 1200$.",
+   "trap_map": {
+    "0": "Counts the seatings being excluded — the $240$ in which Carla sits beside Ana.",
+    "1": "Forgets that Ana and Bruno can swap inside their block, computing $720 - 120 = 600$.",
+    "2": "Answers with the bare circular count $(7-1)! = 720$, applying neither the internal order nor Carla's restriction.",
+    "4": "Applies the Ana–Bruno condition but ignores Carla entirely: $6! \\times 2 = 1{,}440$."
+   },
+   "numeric_check": "720*2 - 120*2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "A box contains $4$ red chips and $6$ blue chips. Two chips are drawn at random without replacement. Given that at least one of the two chips is red, what is the probability that both are red?",
+   "choices": [
+    "$\\frac{1}{5}$",
+    "$\\frac{2}{15}$",
+    "$\\frac{1}{3}$",
+    "$\\frac{2}{5}$",
+    "$\\frac{2}{3}$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nThere are $\\binom{10}{2} = 45$ equally likely pairs. Both red: $\\binom{4}{2} = 6$. At least one red is the complement of both blue: $45 - \\binom{6}{2} = 45 - 15 = 30$. The conditional probability restricts the sample space to those $30$: $\\dfrac{6}{30} = \\dfrac{1}{5}$.\n\n**Trigger cue**\n\"Given that …\" — the conditioning event becomes the new denominator, so count outcomes inside it rather than out of the original total.\n\n**Takeaway**\nConditioning shrinks the denominator to the given event.",
+   "fastest_path_md": "Of the $45$ pairs, $30$ contain at least one red and $6$ are all red: $6/30 = 1/5$.",
+   "trap_map": {
+    "1": "Answers with the unconditional probability that both are red, $6/45 = \\tfrac{2}{15}$, ignoring the conditioning.",
+    "2": "Answers with $P(\\text{second red} \\mid \\text{first red}) = \\tfrac{3}{9} = \\tfrac13$, conditioning on the wrong event.",
+    "3": "Answers with the probability a single chip is red, $\\tfrac{4}{10} = \\tfrac25$.",
+    "4": "Answers with the probability of the conditioning event itself, $30/45 = \\tfrac23$."
+   },
+   "numeric_check": "combinations(4,2)/(combinations(10,2) - combinations(6,2))",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "A bag holds $5$ white balls and $3$ black balls. Three balls are drawn at random without replacement. What is the probability that at least two of them are white?",
+   "choices": [
+    "$\\frac{5}{28}$",
+    "$\\frac{15}{28}$",
+    "$\\frac{5}{7}$",
+    "$\\frac{175}{256}$",
+    "$\\frac{55}{56}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThere are $\\binom{8}{3} = 56$ equally likely triples. Exactly two white: $\\binom{5}{2}\\binom{3}{1} = 10 \\times 3 = 30$. All three white: $\\binom{5}{3} = 10$. So at least two white is $\\dfrac{30 + 10}{56} = \\dfrac{40}{56} = \\dfrac57$.\n\n**Trigger cue**\n\"At least $k$\" on a small draw without replacement — enumerate the two or three cases with combinations; the complement only helps when it has fewer cases.\n\n**Takeaway**\nWithout replacement, count combinations — binomial powers do not apply.",
+   "fastest_path_md": "$\\binom52\\binom31 + \\binom53 = 30 + 10 = 40$ out of $\\binom83 = 56$, which is $\\tfrac57$.",
+   "trap_map": {
+    "0": "Counts only the all-white case, $\\binom53/\\binom83 = \\tfrac{10}{56} = \\tfrac{5}{28}$.",
+    "1": "Counts only the exactly-two case, $\\tfrac{30}{56} = \\tfrac{15}{28}$, reading \"at least two\" as \"exactly two\".",
+    "3": "Treats the draws as independent with replacement, $\\binom32 \\left(\\tfrac58\\right)^2\\tfrac38 + \\left(\\tfrac58\\right)^3 = \\tfrac{175}{256}$.",
+    "4": "Answers with \"at least *one* white\", $1 - \\binom33/\\binom83 = \\tfrac{55}{56}$."
+   },
+   "numeric_check": "(combinations(5,2)*combinations(3,1) + combinations(5,3))/combinations(8,3)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "Two integers $x$ and $y$ are chosen independently and at random, each equally likely to be any of $1, 2, 3, 4, 5, 6$. What is the probability that $x + y$ is a multiple of $4$ or that $xy$ is odd?",
+   "choices": [
+    "$\\frac{1}{9}$",
+    "$\\frac{1}{4}$",
+    "$\\frac{5}{18}$",
+    "$\\frac{7}{18}$",
+    "$\\frac{1}{2}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThere are $36$ ordered pairs. $x + y$ is a multiple of $4$ for sums $4$, $8$, and $12$: $3 + 5 + 1 = 9$ pairs. $xy$ is odd exactly when both are odd: $3 \\times 3 = 9$ pairs. The two events overlap where both are odd *and* the sum is a multiple of $4$: $(1,3), (3,1), (3,5), (5,3)$ — $4$ pairs. Inclusion–exclusion gives $9 + 9 - 4 = 14$, so the probability is $\\dfrac{14}{36} = \\dfrac{7}{18}$.\n\n**Trigger cue**\n\"$A$ or $B$\" where both can happen at once — add the counts and subtract the overlap; on a $6 \\times 6$ grid the overlap is small enough to list.\n\n**Takeaway**\nFor \"or\", add the two counts and subtract the overlap once.",
+   "fastest_path_md": "$9$ pairs give a sum divisible by $4$; $9$ pairs give an odd product; $4$ pairs do both. $\\dfrac{9 + 9 - 4}{36} = \\dfrac{7}{18}$.",
+   "trap_map": {
+    "0": "Answers with the overlap alone, $\\tfrac{4}{36} = \\tfrac19$.",
+    "1": "Counts only one of the two events, $\\tfrac{9}{36} = \\tfrac14$.",
+    "2": "Subtracts the overlap twice: $\\tfrac{9 + 9 - 8}{36} = \\tfrac{10}{36} = \\tfrac{5}{18}$.",
+    "4": "Adds the two events without removing the overlap: $\\tfrac{9 + 9}{36} = \\tfrac12$."
+   },
+   "numeric_check": "14/36",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "stem_md": "A fair coin is flipped repeatedly and stops as soon as either two heads appear in a row or four flips have been made, whichever comes first. What is the probability that the flipping stops because two heads appeared in a row?",
+   "choices": [
+    "$\\frac{1}{4}$",
+    "$\\frac{3}{8}$",
+    "$\\frac{1}{2}$",
+    "$\\frac{5}{8}$",
+    "$\\frac{3}{4}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nStopping early never changes *whether* two consecutive heads occur within four flips, so count length-four sequences: $16$ in all. Those with no two adjacent heads are the Fibonacci count $F_6 = 8$ — namely $\\text{TTTT}$, $\\text{TTTH}$, $\\text{TTHT}$, $\\text{THTT}$, $\\text{HTTT}$, $\\text{THTH}$, $\\text{HTHT}$, $\\text{HTTH}$. So $16 - 8 = 8$ sequences contain $\\text{HH}$, and the probability is $\\dfrac{8}{16} = \\dfrac12$.\n\n**Trigger cue**\nA stopping rule with a hard cap — extend every path to the cap; the stopping rule changes when you stop looking, not which paths qualify.\n\n**Takeaway**\nA capped stopping rule: enumerate to the cap and count.",
+   "fastest_path_md": "Count length-$4$ strings with no $\\text{HH}$: $8$ of $16$. So $\\text{HH}$ appears in the other $8$, a probability of $\\tfrac12$.",
+   "trap_map": {
+    "0": "Considers only the first two flips, $P(\\text{HH}) = \\tfrac14$.",
+    "1": "Stops counting after three flips: $\\tfrac14 + \\tfrac18 = \\tfrac38$.",
+    "3": "Takes the complement of that three-flip figure: $1 - \\tfrac38 = \\tfrac58$.",
+    "4": "Adds $\\tfrac14$ for each of the three adjacent positions, double-counting the overlaps: $\\tfrac34$."
+   },
+   "numeric_check": "8/16",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "The sum of the first $n$ terms of a sequence is $3n^2 + 5n$ for every positive integer $n$. What is the twelfth term of the sequence?",
+   "choices": [
+    "$68$",
+    "$72$",
+    "$74$",
+    "$80$",
+    "$492$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nA single term is the difference of consecutive partial sums: $a_{12} = S_{12} - S_{11}$. Here $S_{12} = 3(144) + 5(12) = 492$ and $S_{11} = 3(121) + 5(11) = 418$, so $a_{12} = 74$.\n\nIn general $a_n = S_n - S_{n-1} = 3n^2 + 5n - 3(n-1)^2 - 5(n-1) = 6n + 2$, confirming $a_{12} = 74$ and showing the sequence is arithmetic with common difference $6$.\n\n**Trigger cue**\nA formula for the *sum* with a single term requested — subtract consecutive partial sums; never read the sum formula as a term formula.\n\n**Takeaway**\nOne term is the difference of consecutive partial sums.",
+   "fastest_path_md": "$a_n = S_n - S_{n-1} = 6n + 2$, so $a_{12} = 74$.",
+   "trap_map": {
+    "0": "Slips one index back, computing $a_{11} = 6(11) + 2 = 68$.",
+    "1": "Drops the constant from $a_n = 6n + 2$, using $6 \\times 12 = 72$.",
+    "3": "Slips one index forward, computing $a_{13} = 6(13) + 2 = 80$.",
+    "4": "Answers with the partial sum $S_{12} = 492$ rather than the twelfth term."
+   },
+   "numeric_check": "(3*12^2 + 5*12) - (3*11^2 + 5*11)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "A sequence is defined by $a_1 = 2$ and $a_{n+1} = 3a_n - 2$ for every $n \\ge 1$. What is $a_6$?",
+   "choices": [
+    "$82$",
+    "$243$",
+    "$244$",
+    "$486$",
+    "$730$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nIterate: $a_1 = 2$, $a_2 = 4$, $a_3 = 10$, $a_4 = 28$, $a_5 = 82$, $a_6 = 244$.\n\nThe structure is visible if you shift by the fixed point: the recursion's fixed point solves $x = 3x - 2$, giving $x = 1$, and $a_{n+1} - 1 = 3(a_n - 1)$. Since $a_1 - 1 = 1$, we get $a_n - 1 = 3^{n-1}$, so $a_n = 3^{n-1} + 1$ and $a_6 = 243 + 1 = 244$.\n\n**Trigger cue**\n$a_{n+1} = ra_n + c$ — subtract the fixed point $\\dfrac{c}{1-r}$ and what remains is purely geometric.\n\n**Takeaway**\nShift a linear recursion by its fixed point to make it geometric.",
+   "fastest_path_md": "$2, 4, 10, 28, 82, 244$ — six terms of doubling-and-a-bit, or $3^{n-1} + 1$ directly.",
+   "trap_map": {
+    "0": "Stops one step early at $a_5 = 82$.",
+    "1": "Drops the $+1$ from the closed form, answering $3^5 = 243$.",
+    "3": "Treats the recursion as pure tripling, $a_n = 2 \\cdot 3^{n-1} = 486$, ignoring the $-2$.",
+    "4": "Runs one step too far to $a_7 = 730$."
+   },
+   "numeric_check": "3^5 + 1",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "What is the value of $1^2 - 2^2 + 3^2 - 4^2 + \\cdots + 99^2 - 100^2$?",
+   "choices": [
+    "$-338{,}350$",
+    "$-5{,}050$",
+    "$-50$",
+    "$50$",
+    "$5{,}050$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nPair the terms and factor each pair as a difference of squares: $(2k-1)^2 - (2k)^2 = \\left[(2k-1) - 2k\\right]\\left[(2k-1) + 2k\\right] = -(4k - 1)$. Summing over $k = 1$ to $50$ gives $-\\sum_{k=1}^{50}(4k - 1) = -(3 + 7 + \\cdots + 199)$. That is an arithmetic series of $50$ terms averaging $\\dfrac{3 + 199}{2} = 101$, so the total is $-50 \\times 101 = -5{,}050$.\n\n**Trigger cue**\nAlternating signs on consecutive squares — pair adjacent terms and factor the difference of squares; each pair collapses to a linear term.\n\n**Takeaway**\nPair alternating squares; each pair collapses to a sum.",
+   "fastest_path_md": "Each pair $(2k-1)^2 - (2k)^2 = -(4k-1)$, so the total is $-(3 + 7 + \\cdots + 199) = -50 \\times 101 = -5{,}050$.",
+   "trap_map": {
+    "0": "Subtracts every square instead of alternating: $-\\sum_{n=1}^{100} n^2 = -338{,}350$.",
+    "2": "Forgets the squares and evaluates $1 - 2 + 3 - \\cdots - 100 = -50$.",
+    "3": "Evaluates that same unsquared sum and reports it with the wrong sign.",
+    "4": "Computes $3 + 7 + \\cdots + 199 = 5{,}050$ and reports it positive, losing the sign that every pair carries."
+   },
+   "numeric_check": "-50*101",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "stem_md": "A sequence satisfies $a_1 = 5$, $a_2 = 8$, and $a_n = a_{n-1} - a_{n-2}$ for every $n \\ge 3$. What is $a_{100}$?",
+   "choices": [
+    "$-8$",
+    "$-5$",
+    "$-3$",
+    "$5$",
+    "$8$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nWrite out terms: $5, 8, 3, -5, -8, -3, 5, 8, \\ldots$ — the sequence repeats with period $6$, which is forced by the recursion for any starting pair. Since $100 = 6(16) + 4$, $a_{100} = a_4 = -5$.\n\n**Trigger cue**\n$a_n = a_{n-1} - a_{n-2}$ — this recursion is always periodic with period $6$; find the remainder of the index mod $6$ and read off that term.\n\n**Takeaway**\nSubtract-the-previous-two recursions cycle with period six.",
+   "fastest_path_md": "The cycle is $5, 8, 3, -5, -8, -3$. $100 \\bmod 6 = 4$, so $a_{100} = a_4 = -5$.",
+   "trap_map": {
+    "0": "Slips one place forward in the cycle, reading $a_5 = -8$.",
+    "2": "Treats $100$ as a multiple of the period and reads the cycle's last term, $a_6 = -3$.",
+    "3": "Mis-reads the period as $3$: $100 \\bmod 3 = 1$, giving $a_1 = 5$.",
+    "4": "Mis-reads the period as $2$: $100 \\bmod 2 = 0$, giving $a_2 = 8$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "A list of $7$ distinct positive integers has a median of $10$ and a mean of $12$. What is the greatest possible value of the largest integer in the list?",
+   "choices": [
+    "$45$",
+    "$47$",
+    "$48$",
+    "$59$",
+    "$74$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nThe seven values sum to $7 \\times 12 = 84$, and sorted, the fourth is $10$. To push the largest as high as possible, make the other six as small as the constraints allow. The three below the median must be distinct positive integers under $10$: at least $1, 2, 3$. The two between the median and the largest must be distinct and greater than $10$: at least $11, 12$. Those six plus the median total $1 + 2 + 3 + 10 + 11 + 12 = 39$, leaving $84 - 39 = 45$, which is indeed larger than $12$.\n\n**Trigger cue**\n\"Greatest possible value\" with a fixed mean — the sum is locked, so maximizing one entry means minimizing every other, subject to the ordering and distinctness the stem imposes.\n\n**Takeaway**\nA fixed mean locks the sum; maximize one by minimizing the rest.",
+   "fastest_path_md": "Sum is $84$. Minimum for the other six under the constraints: $1 + 2 + 3 + 10 + 11 + 12 = 39$. So the largest is $45$.",
+   "trap_map": {
+    "1": "Lets one of the two values above the median equal $10$, ignoring distinctness: $84 - (1+2+3+10+10+11) = 47$.",
+    "2": "Lets both values above the median equal $10$: $84 - (1+2+3+10+10+10) = 48$.",
+    "3": "Minimizes the other six as $1,2,3,4,5$ and the median, forgetting two of them must exceed the median: $84 - 25 = 59$.",
+    "4": "Subtracts only the median from the total: $84 - 10 = 74$."
+   },
+   "numeric_check": "7*12 - (1+2+3+10+11+12)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "The set $S = \\{1, 3, 5, 7, 9\\}$ has standard deviation $2\\sqrt{2}$. Every element of $S$ is multiplied by $3$ and then reduced by $4$, producing a new set. What is the standard deviation of the new set?",
+   "choices": [
+    "$2\\sqrt{2}$",
+    "$6\\sqrt{2} - 4$",
+    "$6\\sqrt{2}$",
+    "$18\\sqrt{2}$",
+    "$72$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nStandard deviation measures spread about the mean, so adding a constant to every element moves the mean by the same amount and leaves every deviation unchanged: the $-4$ does nothing. Multiplying every element by $3$ multiplies every deviation by $3$, hence the standard deviation by $|3| = 3$. The new value is $3 \\times 2\\sqrt2 = 6\\sqrt2$.\n\n**Trigger cue**\nA set transformed by $ax + b$ — the standard deviation scales by $|a|$ and ignores $b$ entirely; the *variance* scales by $a^2$.\n\n**Takeaway**\nShifts leave spread alone; scaling multiplies it by the factor.",
+   "fastest_path_md": "Adding $-4$ shifts, changing nothing; multiplying by $3$ triples the spread: $6\\sqrt2$.",
+   "trap_map": {
+    "0": "Treats both operations as shifts, leaving the standard deviation at $2\\sqrt2$.",
+    "1": "Applies the $-4$ to the standard deviation as well as the scaling: $3(2\\sqrt2) - 4$.",
+    "3": "Applies the factor of $3$ twice — once to each deviation and again to the result: $9 \\times 2\\sqrt2$.",
+    "4": "Answers with the new *variance* $9 \\times 8 = 72$ instead of the standard deviation."
+   },
+   "numeric_check": "6*sqrt(2)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "A list of $n$ numbers has an average of $32$. When the two numbers $20$ and $26$ are removed from the list, the average of the numbers that remain is $35$. What is $n$?",
+   "choices": [
+    "$3$",
+    "$6$",
+    "$8$",
+    "$10$",
+    "$24$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nWork with totals. The original total is $32n$; removing $20$ and $26$ leaves $32n - 46$ spread over $n - 2$ numbers, so $32n - 46 = 35(n - 2) = 35n - 70$. Hence $24 = 3n$ and $n = 8$.\n\nThe lever view: the two removed numbers sit $12$ and $6$ below the original mean, a deficit of $18$; removing them lifts the mean by $3$ across the $6$ remaining numbers, which is $18$ — consistent.\n\n**Trigger cue**\nAn average before and after removing known values — convert both averages to totals, since only totals can be added and subtracted.\n\n**Takeaway**\nAverages do not subtract; totals do.",
+   "fastest_path_md": "$32n - 46 = 35(n-2)$ gives $3n = 24$, so $n = 8$.",
+   "trap_map": {
+    "0": "Answers with the $35 - 32 = 3$ gap between the two averages.",
+    "1": "Answers with the count *after* the removal, $n - 2 = 6$.",
+    "3": "Adds $2$ instead of subtracting when converting back from the reduced count: $6 + 4 = 10$.",
+    "4": "Answers with the numerator $70 - 46 = 24$ without dividing by $3$."
+   },
+   "numeric_check": "(35*2 - (20+26))/(35-32)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "stem_md": "Five distinct positive integers have a mean of $15$, a median of $18$, and a range of $20$. What is the greatest possible value of the smallest of the five integers?",
+   "choices": [
+    "$5$",
+    "$6$",
+    "$15$",
+    "$18$",
+    "$25$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nSorted, call them $a < b < c < d < e$ with $c = 18$, $e = a + 20$, and $a + b + c + d + e = 75$. Substituting: $2a + b + d = 37$. Pushing $a$ up forces $b$ and $d$ down, and they are bounded below by $b \\ge a + 1$ and $d \\ge 19$. So $37 - 2a = b + d \\ge a + 20$, giving $3a \\le 17$ and $a \\le 5$. At $a = 5$: $b + d = 27$ with $d = 19$ and $b = 8$, i.e. $\\{5, 8, 18, 19, 25\\}$ — mean $15$, median $18$, range $20$, all distinct.\n\n**Trigger cue**\nMean, median and range at once — the mean fixes the sum, the median pins the middle entry, and the range ties the two ends together, collapsing five unknowns to three.\n\n**Takeaway**\nThe range ties the ends; the median pins the middle.",
+   "fastest_path_md": "Sum $75$, middle $18$, $e = a + 20$, so $2a + b + d = 37$ with $b > a$ and $d > 18$: $3a \\le 17$, so $a = 5$ via $\\{5, 8, 18, 19, 25\\}$.",
+   "trap_map": {
+    "1": "Drops the distinctness requirement, allowing $d = 18$ to tie the median and reaching $a = 6$.",
+    "2": "Answers with the mean $15$.",
+    "3": "Answers with the median $18$.",
+    "4": "Answers with the largest value of the extremal list, $25$, rather than the smallest."
+   },
+   "numeric_check": "5",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "stem_md": "Among $100$ students, $45$ study French, $52$ study German, and $38$ study Spanish. Of these, $18$ study both French and German, $15$ study both German and Spanish, and $12$ study both French and Spanish, while $6$ study all three languages. How many of the $100$ students study none of the three?",
+   "choices": [
+    "$4$",
+    "$6$",
+    "$10$",
+    "$16$",
+    "$96$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nInclusion–exclusion for three sets: $|F \\cup G \\cup S| = 45 + 52 + 38 - 18 - 15 - 12 + 6 = 96$. The triple overlap is *added back* because subtracting all three pairwise overlaps removes it three times after it was counted three times, leaving it at zero. So $100 - 96 = 4$ students study none.\n\n**Trigger cue**\nThree sets with all three pairwise overlaps *and* the triple given — apply the alternating formula; the pairwise figures already include the triple unless the stem says \"only\".\n\n**Takeaway**\nAdd the triple overlap back; the pairwise counts already contain it.",
+   "fastest_path_md": "$135 - 45 + 6 = 96$ study at least one, so $4$ study none.",
+   "trap_map": {
+    "1": "Answers with the number studying all three, $6$.",
+    "2": "Omits adding the triple overlap back, getting $90$ in the union and $10$ outside.",
+    "3": "Subtracts the triple overlap instead of adding it, getting $84$ in the union and $16$ outside.",
+    "4": "Answers with the number studying at least one language, $96$."
+   },
+   "numeric_check": "100 - (45 + 52 + 38 - 18 - 15 - 12 + 6)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "counting_sets_series_prob_stats",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "stem_md": "Of $200$ households surveyed, $140$ own a car, $95$ own a bicycle, and $30$ own neither. How many households own exactly one of the two?",
+   "choices": [
+    "$35$",
+    "$65$",
+    "$105$",
+    "$135$",
+    "$170$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nSince $30$ own neither, $200 - 30 = 170$ own at least one. Then $|C \\cup B| = |C| + |B| - |C \\cap B|$ gives $170 = 140 + 95 - |C \\cap B|$, so the overlap is $65$. \"Exactly one\" excludes the overlap from the union: $170 - 65 = 105$. Equivalently, $(140 - 65) + (95 - 65) = 75 + 30 = 105$.\n\n**Trigger cue**\n\"Exactly one\" with a \"neither\" count given — the neither count fixes the union first; the overlap then falls out, and exactly-one is the union minus the overlap.\n\n**Takeaway**\nExactly one is the union minus the overlap, counted once.",
+   "fastest_path_md": "$170$ own something, so the overlap is $140 + 95 - 170 = 65$, and exactly one is $170 - 65 = 105$.",
+   "trap_map": {
+    "0": "Computes the overlap against all $200$ households instead of the $170$ who own something: $140 + 95 - 200 = 35$.",
+    "1": "Answers with the overlap $65$ rather than the exactly-one count.",
+    "3": "Subtracts the overlap from all $200$ rather than from the $170$: $200 - 65 = 135$.",
+    "4": "Answers with the number owning at least one, $170$."
+   },
+   "numeric_check": "(200 - 30) - (140 + 95 - (200 - 30))",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "stem_md": "If $x$ and $y$ are positive integers satisfying $3x + 4y = 100$, what is the greatest possible value of $xy$?",
+   "choices": [
+    "$168$",
+    "$192$",
+    "$200$",
+    "$208$",
+    "$\\frac{625}{3}$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nSolving for $x$ gives $x = \\dfrac{100 - 4y}{3}$, which is a positive integer only when $100 - 4y \\equiv 0 \\pmod 3$. Since $100 \\equiv 1$ and $4y \\equiv y \\pmod 3$, this requires $y \\equiv 1 \\pmod 3$, so $y \\in \\{1, 4, 7, 10, 13, 16, 19, 22\\}$.\n\nTreating $y$ as continuous, $xy = \\dfrac{y(100 - 4y)}{3}$ is a downward parabola peaking at $y = 12.5$. The admissible values on either side are $y = 10$ (giving $x = 20$, $xy = 200$) and $y = 13$ (giving $x = 16$, $xy = 208$). The larger is $208$.\n\n**Trigger cue**\nA product maximized under a linear integer constraint — locate the continuous optimum, then test the *admissible* lattice points on both sides of it; the nearest integer is often not admissible.\n\n**Takeaway**\nCheck both admissible neighbours of the continuous optimum.",
+   "fastest_path_md": "The parabola peaks at $y = 12.5$, and $y$ must be $\\equiv 1 \\pmod 3$. Test $y = 13 \\Rightarrow x = 16 \\Rightarrow 208$ and $y = 10 \\Rightarrow x = 20 \\Rightarrow 200$. Answer $208$.",
+   "trap_map": {
+    "0": "Tests only a few small admissible values and stops at $y = 7$, $x = 24$, giving $168$.",
+    "1": "Tests $y = 16$, $x = 12$ and stops at $192$ without checking closer to the peak.",
+    "2": "Takes the admissible point *below* the continuous optimum, $y = 10$, without testing $y = 13$.",
+    "4": "Uses the continuous optimum $y = 12.5$, $x = \\tfrac{50}{3}$, ignoring that both must be integers."
+   },
+   "numeric_check": "16*13",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "stem_md": "A rectangular pen is to be built along a straight river wall, so that fencing is needed on only three sides — the wall forms the fourth. With exactly $60$ meters of fencing available, what is the greatest possible area of the pen, in square meters?",
+   "choices": [
+    "$225$",
+    "$400$",
+    "$450$",
+    "$900$",
+    "$1{,}800$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $w$ be each of the two sides perpendicular to the wall and $L$ the side parallel to it. The fencing constraint is $2w + L = 60$, so $L = 60 - 2w$ and the area is $A(w) = w(60 - 2w) = -2w^2 + 60w$. This parabola peaks at $w = \\dfrac{-60}{2(-2)} = 15$, giving $L = 30$ and $A = 450$.\n\nNote the shape: the optimal pen is *twice* as long as it is deep, not square — the wall side is free, so the geometry tilts toward it.\n\n**Trigger cue**\nA fixed perimeter with one side free — write the constraint with the correct number of fenced sides before optimizing; the free side changes the optimal shape.\n\n**Takeaway**\nOne free side makes the optimal rectangle twice as long as deep.",
+   "fastest_path_md": "$A = w(60 - 2w)$ peaks halfway between its roots $w = 0$ and $w = 30$, so $w = 15$, $L = 30$, $A = 450$.",
+   "trap_map": {
+    "0": "Fences all four sides, making a $15 \\times 15$ square out of a $60$-meter perimeter: $225$.",
+    "1": "Splits the fencing into three equal $20$-meter sides: $20 \\times 20 = 400$.",
+    "3": "Uses $L = 60 - w$ instead of $60 - 2w$, fencing only one side perpendicular to the wall: peak at $w = 30$, area $900$.",
+    "4": "Treats the wall side as free extra length rather than a constraint, taking $L = 60$ and $w = 30$: $1{,}800$."
+   },
+   "numeric_check": "15*(60 - 2*15)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "stem_md": "The quadratic $x^2 - 7x + k$ has two distinct positive integer roots, and $k$ is a positive integer. What is the sum of all possible values of $k$?",
+   "choices": [
+    "$6$",
+    "$12$",
+    "$22$",
+    "$28$",
+    "$56$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nIf the roots are $r$ and $s$, then $r + s = 7$ and $rs = k$. The unordered pairs of distinct positive integers summing to $7$ are $\\{1,6\\}$, $\\{2,5\\}$ and $\\{3,4\\}$, giving $k = 6$, $10$ and $12$. Their sum is $6 + 10 + 12 = 28$. (Because $7$ is odd, no pair of equal roots exists, so \"distinct\" costs nothing here.)\n\n**Trigger cue**\n\"Integer roots\" with a fixed sum — enumerate unordered pairs from the sum, not divisors from the product; $\\{r,s\\}$ and $\\{s,r\\}$ give the same $k$.\n\n**Takeaway**\nEnumerate unordered root pairs; swapping them repeats the same $k$.",
+   "fastest_path_md": "Pairs summing to $7$: $1{+}6$, $2{+}5$, $3{+}4$, with products $6$, $10$, $12$. Sum $= 28$.",
+   "trap_map": {
+    "0": "Reports only the smallest admissible $k$, $1 \\times 6 = 6$.",
+    "1": "Reports only the largest admissible $k$, $3 \\times 4 = 12$.",
+    "2": "Discards the $\\{1,6\\}$ pair as trivial: $10 + 12 = 22$.",
+    "4": "Counts $(r,s)$ and $(s,r)$ as different, doubling every value: $2 \\times 28 = 56$."
+   },
+   "numeric_check": "6 + 10 + 12",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "stem_md": "For how many integer values of $b$ does the equation $x^2 + bx + 36 = 0$ have at least one integer root?",
+   "choices": [
+    "$5$",
+    "$8$",
+    "$9$",
+    "$10$",
+    "$18$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nIf one root is an integer, so is the other, since the roots multiply to $36$ and sum to $-b$. The unordered pairs of integers with product $36$ are $\\{1,36\\}$, $\\{2,18\\}$, $\\{3,12\\}$, $\\{4,9\\}$, $\\{6,6\\}$ and their all-negative counterparts — ten pairs, with sums $37, 20, 15, 13, 12$ and $-37, -20, -15, -13, -12$. Since $b$ is the negative of the sum, that is $10$ distinct values of $b$.\n\n**Trigger cue**\n\"Integer roots\" with a fixed *product* — enumerate factor pairs of the constant, remembering the both-negative pairs and any perfect-square pair.\n\n**Takeaway**\nFactor pairs come in both signs; a square contributes one pair each.",
+   "fastest_path_md": "Factor pairs of $36$: $(1,36),(2,18),(3,12),(4,9),(6,6)$ — five, doubled by sign, so $10$ values of $b$.",
+   "trap_map": {
+    "0": "Counts only the pairs of positive roots, missing the all-negative pairs: $5$.",
+    "1": "Discards the repeated root $\\{6,6\\}$ as not being \"two roots\", leaving $8$.",
+    "2": "Counts the repeated-root case once overall rather than once per sign: $9$.",
+    "4": "Counts $(r,s)$ and $(s,r)$ as different, doubling each unequal pair: $18$."
+   },
+   "numeric_check": "10",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "stem_md": "How many positive integers $n$ satisfy $(n - 3)(n - 8)(n - 15) < 0$?",
+   "choices": [
+    "$2$",
+    "$6$",
+    "$8$",
+    "$10$",
+    "$11$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nThe three factors change sign at $3$, $8$ and $15$. To the right of $15$ all three are positive, so the product is positive; crossing each root flips the sign. Reading leftward from $n > 15$: positive, then negative on $8 < n < 15$, positive on $3 < n < 8$, negative on $n < 3$.\n\nThe strict inequality excludes the roots themselves. The positive integers in the negative regions are $n \\in \\{1, 2\\}$ — two of them — and $n \\in \\{9, 10, 11, 12, 13, 14\\}$ — six of them. Total: $8$.\n\n**Trigger cue**\nA product of linear factors compared with zero — mark the roots on a line and alternate signs from the far right; count only what the strictness allows.\n\n**Takeaway**\nSigns alternate across simple roots; strict inequalities drop them.",
+   "fastest_path_md": "Negative on $n < 3$ and on $8 < n < 15$. Positive integers: $\\{1,2\\}$ and $\\{9, \\ldots, 14\\}$, so $2 + 6 = 8$.",
+   "trap_map": {
+    "0": "Counts only the region below $3$, missing the interval between $8$ and $15$.",
+    "1": "Counts only the interval $8 < n < 15$, missing $n = 1$ and $n = 2$.",
+    "3": "Reads the inequality as $\\le$, adding the roots $n = 3$ and $n = 8$ where the product is zero.",
+    "4": "Reads the inequality as $\\le$ and includes all three roots, $3$, $8$ and $15$."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "stem_md": "If $-2 \\le x \\le 5$ and $-7 \\le y \\le 3$, what is the greatest possible value of $x^2 - xy$?",
+   "choices": [
+    "$10$",
+    "$25$",
+    "$35$",
+    "$60$",
+    "$84$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nFor any fixed $x$, the expression $x^2 - xy$ is *linear* in $y$, so its maximum over an interval of $y$ occurs at an endpoint — $y = -7$ when $x > 0$, and $y = 3$ when $x < 0$. That reduces the problem to two single-variable cases:\n\n- $x > 0$: maximize $x^2 + 7x$ on $(0, 5]$, increasing, so $x = 5$ gives $25 + 35 = 60$.\n- $x < 0$: maximize $x^2 - 3x$ on $[-2, 0)$, decreasing in $x$, so $x = -2$ gives $4 + 6 = 10$.\n\nThe greatest value is $60$.\n\n**Trigger cue**\nAn expression over independent ranges — check whether it is linear in one variable; if so, only that variable's endpoints matter, and the two terms cannot be maximized separately.\n\n**Takeaway**\nMaximize the whole expression at corners, never term by term.",
+   "fastest_path_md": "The four corners give $60$, $10$, $-10$ and $10$. The largest is $x = 5$, $y = -7$: $25 + 35 = 60$.",
+   "trap_map": {
+    "0": "Evaluates only at $x = 5$, $y = 3$: $25 - 15 = 10$.",
+    "1": "Maximizes $x^2$ alone and drops the $-xy$ term: $25$.",
+    "2": "Maximizes $-xy$ alone and drops the $x^2$ term: $-(5)(-7) = 35$.",
+    "4": "Applies $y$'s wider range to $x$ as well, taking $x^2$ up to $49$: $49 + 35 = 84$."
+   },
+   "numeric_check": "5^2 - 5*(-7)",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "If $x + y = 13$, $y + z = 21$, and $x + z = 16$, what is the value of $xyz$?",
+   "choices": [
+    "$25$",
+    "$432$",
+    "$1{,}728$",
+    "$2{,}700$",
+    "$4{,}368$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nAdding all three equations counts each variable twice: $2(x + y + z) = 13 + 21 + 16 = 50$, so $x + y + z = 25$. Each variable is then the total minus the equation that omits it: $z = 25 - 13 = 12$, $x = 25 - 21 = 4$, $y = 25 - 16 = 9$. Hence $xyz = 4 \\times 9 \\times 12 = 432$.\n\n**Trigger cue**\nEvery pair sum given but no single variable — add all the equations and halve; each variable then falls out by one subtraction, with no elimination needed.\n\n**Takeaway**\nSum all pair equations, halve, then subtract to isolate each.",
+   "fastest_path_md": "$x+y+z = 50/2 = 25$, so $z = 12$, $x = 4$, $y = 9$, and $xyz = 432$.",
+   "trap_map": {
+    "0": "Answers with $x + y + z = 25$ rather than the product.",
+    "2": "Assumes all three variables equal the largest of them, $12$, giving $12^3 = 1{,}728$.",
+    "3": "Forgets to halve, taking $x + y + z = 50$ — then $x = 50 - 21 = 29$ and the rest follow wrongly; keeping $25$ for $x$ instead gives $y = -12$, $z = -9$ and a product of $2{,}700$.",
+    "4": "Multiplies the three given sums, $13 \\times 21 \\times 16 = 4{,}368$."
+   },
+   "numeric_check": "4*9*12",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "stem_md": "A cash drawer contains only nickels (worth $5$ cents), dimes ($10$ cents), and quarters ($25$ cents) — $60$ coins in all, worth $\\$9.50$ altogether. There are twice as many dimes as nickels. How many quarters are in the drawer?",
+   "choices": [
+    "$11$",
+    "$22$",
+    "$27$",
+    "$30$",
+    "$33$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nLet $n$ be the nickels; then the dimes number $2n$ and the quarters $q = 60 - 3n$. In cents: $5n + 10(2n) + 25(60 - 3n) = 950$, so $25n + 1500 - 75n = 950$, giving $50n = 550$ and $n = 11$. Then $q = 60 - 33 = 27$. Check: $11$ nickels ($55$¢), $22$ dimes ($\\$2.20$), $27$ quarters ($\\$6.75$) — $60$ coins, $\\$9.50$.\n\n**Trigger cue**\nThree coin types with a ratio between two of them — the ratio collapses three unknowns to one, so write everything in terms of the smallest count before touching the value equation.\n\n**Takeaway**\nA ratio between two unknowns collapses three coins to one.",
+   "fastest_path_md": "With $n$ nickels, a nickel-plus-two-dimes group is worth $25$¢ — the same as a quarter. So all $60$ coins average out to $25n + 25(60-3n) = 950$, giving $n = 11$ and $q = 27$.",
+   "trap_map": {
+    "0": "Answers with the number of nickels, $11$.",
+    "1": "Answers with the number of dimes, $22$.",
+    "3": "Reads the ratio backwards as twice as many nickels as dimes, which gives $10$ dimes, $20$ nickels and $30$ quarters.",
+    "4": "Answers with the nickels and dimes together, $11 + 22 = 33$."
+   },
+   "numeric_check": "60 - 3*11",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "stem_md": "Let $f(x) = 2x - 3$ and $g(x) = x^2 + 1$. What is the sum of all real values of $x$ for which $f(g(x)) = g(f(x))$?",
+   "choices": [
+    "$-6$",
+    "$3$",
+    "$\\frac{11}{2}$",
+    "$6$",
+    "$12$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nCompose in both orders: $f(g(x)) = 2(x^2+1) - 3 = 2x^2 - 1$, while $g(f(x)) = (2x-3)^2 + 1 = 4x^2 - 12x + 10$. Setting them equal gives $2x^2 - 1 = 4x^2 - 12x + 10$, i.e. $2x^2 - 12x + 11 = 0$. Its discriminant is $144 - 88 = 56 > 0$, so there are two real roots, and by Vieta their sum is $\\dfrac{12}{2} = 6$.\n\n**Trigger cue**\n\"Sum of all values\" from a quadratic — Vieta gives $-b/a$ directly; there is no reason to compute the roots themselves.\n\n**Takeaway**\nComposition does not commute; sum the roots with Vieta.",
+   "fastest_path_md": "$2x^2 - 1 = 4x^2 - 12x + 10$ reduces to $2x^2 - 12x + 11 = 0$. The sum of the roots is $12/2 = 6$.",
+   "trap_map": {
+    "0": "Flips the sign in Vieta's sum, reporting $b/a$ instead of $-b/a$.",
+    "1": "Reports the vertex $-\\dfrac{b}{2a} = 3$, which is the *mean* of the roots rather than their sum.",
+    "2": "Reports the product of the roots, $c/a = \\tfrac{11}{2}$.",
+    "4": "Uses $-b = 12$ without dividing by the leading coefficient $a = 2$."
+   },
+   "numeric_check": "12/2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "stem_md": "A function $f$ on the positive integers satisfies $f(1) = 3$ and $f(n+1) = f(n) + 2n + 1$ for every $n \\ge 1$. What is $f(10)$?",
+   "choices": [
+    "$21$",
+    "$83$",
+    "$100$",
+    "$102$",
+    "$123$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe increments telescope: $f(n) = f(1) + \\sum_{k=1}^{n-1}(2k+1)$. That sum is $2\\cdot\\dfrac{(n-1)n}{2} + (n-1) = n^2 - 1$, so $f(n) = 3 + n^2 - 1 = n^2 + 2$. Hence $f(10) = 102$.\n\nThe shape is worth recognizing: $2n+1$ is the gap between consecutive squares, so a recursion adding $2n+1$ builds a shifted square.\n\n**Trigger cue**\nA recursion whose increment depends on $n$ — sum the increments rather than iterating; $2n+1$ in particular signals consecutive squares.\n\n**Takeaway**\nIncrements of $2n+1$ accumulate into a square.",
+   "fastest_path_md": "Adding $2n+1$ steps between consecutive squares, so $f(n) = n^2 + 2$ and $f(10) = 102$.",
+   "trap_map": {
+    "0": "Applies the increment once instead of accumulating it: $3 + 2(9) = 21$.",
+    "1": "Stops one step early at $f(9) = 81 + 2 = 83$.",
+    "2": "Drops the constant, answering $10^2 = 100$.",
+    "4": "Runs one step too far to $f(11) = 121 + 2 = 123$."
+   },
+   "numeric_check": "10^2 + 2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 5,
+   "stem_md": "At a certain office, the number of employees who commute by train is $3$ more than twice the number who commute by bicycle, and every employee does one or the other. If $5$ of the cyclists switched to the train, the number commuting by train would be exactly $4$ times the number still cycling. How many employees currently cycle?",
+   "choices": [
+    "$9$",
+    "$14$",
+    "$31$",
+    "$36$",
+    "$45$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nLet $c$ be the current cyclists; then the train riders number $t = 2c + 3$. After five people move from bicycle to train, the counts are $t + 5$ and $c - 5$, and the condition reads $t + 5 = 4(c - 5)$. Substituting: $2c + 8 = 4c - 20$, so $2c = 28$ and $c = 14$.\n\nCheck: $14$ cyclists and $31$ train riders; after the switch, $9$ and $36$, and $36 = 4 \\times 9$.\n\n**Trigger cue**\nA transfer between two groups — one group's gain is the other's loss, so both counts change in the *same* equation; write the after-state fully before setting the condition.\n\n**Takeaway**\nA transfer moves both counts; write the after-state for both.",
+   "fastest_path_md": "$2c + 3 + 5 = 4(c-5)$ gives $2c + 8 = 4c - 20$, so $c = 14$.",
+   "trap_map": {
+    "0": "Answers with the cyclists remaining *after* the switch, $14 - 5 = 9$.",
+    "2": "Answers with the current number of train riders, $2(14) + 3 = 31$.",
+    "3": "Answers with the train riders after the switch, $31 + 5 = 36$.",
+    "4": "Answers with the total number of employees, $14 + 31 = 45$."
+   },
+   "numeric_check": "(3 + 5 + 20)/2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "real",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "algebraic_translation",
+   "difficulty": 5,
+   "stem_md": "Three years ago, Marta was four times as old as her son. Seven years from now, the sum of their two ages will be $45$. How old is Marta now?",
+   "choices": [
+    "$8$",
+    "$15$",
+    "$20$",
+    "$23$",
+    "$30$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nLet $m$ and $s$ be their current ages. \"Three years ago\" applies to both: $m - 3 = 4(s - 3)$, so $m = 4s - 9$. \"Seven years from now\" also applies to both, adding $7$ to each: $(m + 7) + (s + 7) = 45$, so $m + s = 31$. Substituting, $4s - 9 + s = 31$, giving $s = 8$ and $m = 23$.\n\nCheck: three years ago they were $20$ and $5$, and $20 = 4 \\times 5$; in seven years they will be $30$ and $15$, summing to $45$.\n\n**Trigger cue**\nA time shift in an age problem — apply it to *every* person in the sentence; a sum of two ages moves by twice the shift, not once.\n\n**Takeaway**\nShift every age in the sentence, and sums shift twice.",
+   "fastest_path_md": "$m = 4s - 9$ and $m + s = 31$ give $5s = 40$, so $s = 8$ and $m = 23$.",
+   "trap_map": {
+    "0": "Answers with the son's current age, $8$.",
+    "1": "Answers with the son's age in seven years, $15$.",
+    "2": "Answers with Marta's age three years ago, $20$.",
+    "4": "Answers with Marta's age seven years from now, $30$."
+   },
+   "numeric_check": "4*8 - 9",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "stem_md": "How many integers $x$ satisfy $|x - 3| + |x + 5| = 8$?",
+   "choices": [
+    "$0$",
+    "$2$",
+    "$8$",
+    "$9$",
+    "$10$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nRead the expression as distance: $|x-3|$ is the distance from $x$ to $3$ and $|x+5|$ the distance from $x$ to $-5$. Those two points are $8$ apart, so the sum of the distances is *exactly* $8$ for every $x$ between them (inclusive) and strictly greater outside. The solution set is the whole closed interval $[-5, 3]$, which contains $3 - (-5) + 1 = 9$ integers.\n\n**Trigger cue**\n$|x - a| + |x - b|$ compared with $|a - b|$ — read it on the number line as distances; equality holds on the entire segment, never at isolated points.\n\n**Takeaway**\nA sum of two distances equalling their gap holds on the whole segment.",
+   "fastest_path_md": "The two anchors are $8$ apart, and $8$ is the stated sum, so every $x$ in $[-5,3]$ works: $9$ integers.",
+   "trap_map": {
+    "0": "Concludes there are no solutions because the two absolute values cannot both be zero at once.",
+    "1": "Solves the two boundary equations only, counting just $x = -5$ and $x = 3$.",
+    "2": "Answers with the length of the interval, $8$, instead of the number of integers on it.",
+    "4": "Counts the $8$ units of length and then adds both endpoints as extras: $8 + 2 = 10$."
+   },
+   "numeric_check": "3 - (-5) + 1",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "stem_md": "How many numbers $x$ satisfy both $|2x - 7| < 3$ and the condition that $x$ is an integer multiple of $0.5$?",
+   "choices": [
+    "$2$",
+    "$3$",
+    "$5$",
+    "$6$",
+    "$7$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n$|2x - 7| < 3$ unfolds to $-3 < 2x - 7 < 3$, so $4 < 2x < 10$ and $2 < x < 5$ — an *open* interval. The multiples of $0.5$ strictly inside it are $2.5$, $3$, $3.5$, $4$, $4.5$: five values. The endpoints $2$ and $5$ are multiples of $0.5$ but are excluded by the strict inequality.\n\n**Trigger cue**\nAn absolute-value inequality with a counting question — solve to an interval first, then check strictness at each endpoint; a strict bound that lands exactly on a countable value is the whole point of the question.\n\n**Takeaway**\nStrict inequalities exclude endpoints — check whether they were countable.",
+   "fastest_path_md": "$2 < x < 5$, open at both ends. Half-steps inside: $2.5, 3, 3.5, 4, 4.5$ — five of them.",
+   "trap_map": {
+    "0": "Counts only the integers strictly inside, $3$ and $4$.",
+    "1": "Counts the integers with the left endpoint included: $2$, $3$, $4$.",
+    "3": "Includes one endpoint, reading only one side of the inequality as strict: six values.",
+    "4": "Reads $<$ as $\\le$ and includes both endpoints: $2, 2.5, \\ldots, 5$ — seven values."
+   },
+   "numeric_check": "5",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "stem_md": "What is the remainder when $7^{100}$ is divided by $100$?",
+   "choices": [
+    "$0$",
+    "$1$",
+    "$7$",
+    "$43$",
+    "$49$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nCompute powers of $7$ modulo $100$: $7^1 = 7$, $7^2 = 49$, $7^3 = 343 \\equiv 43$, $7^4 = 7 \\times 43 = 301 \\equiv 1$. Hitting $1$ closes the cycle, so the powers repeat with period $4$. Since $100 = 4 \\times 25$ leaves remainder $0$, $7^{100} = (7^4)^{25} \\equiv 1^{25} = 1$.\n\n**Trigger cue**\nA large power modulo a small number — compute powers until the residue $1$ reappears; that closes the cycle and the exponent's remainder mod the cycle length picks the answer.\n\n**Takeaway**\nA remainder of one closes the cycle; index the exponent by it.",
+   "fastest_path_md": "$7^4 = 2401 \\equiv 1 \\pmod{100}$, and $4 \\mid 100$, so $7^{100} \\equiv 1$.",
+   "trap_map": {
+    "0": "Confuses the exponent with the modulus and concludes $100$ divides the power evenly.",
+    "2": "Indexes the four-term cycle from zero rather than one, landing on $7^1 = 7$.",
+    "3": "Slips one place in the cycle and answers with $7^3 \\equiv 43$.",
+    "4": "Slips two places in the cycle and answers with $7^2 = 49$."
+   },
+   "numeric_check": "1",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "stem_md": "What is the units digit of $3^{47} + 7^{23}$?",
+   "choices": [
+    "$0$",
+    "$2$",
+    "$4$",
+    "$6$",
+    "$10$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\nUnits digits of powers of $3$ cycle $3, 9, 7, 1$ with period $4$. Since $47 = 4(11) + 3$, the third entry applies: $3^{47}$ ends in $7$. Powers of $7$ cycle $7, 9, 3, 1$, also period $4$, and $23 = 4(5) + 3$, so $7^{23}$ ends in $3$. The sum ends in $7 + 3 = 10$, whose units digit is $0$.\n\n**Trigger cue**\nUnits digit of a *sum* of powers — take each units digit from its own cycle, add, then take the units digit again; a carry is easy to leave on the table.\n\n**Takeaway**\nAdd the units digits, then take the units digit again.",
+   "fastest_path_md": "$47 \\bmod 4 = 3 \\Rightarrow 3^{47}$ ends in $7$; $23 \\bmod 4 = 3 \\Rightarrow 7^{23}$ ends in $3$; $7 + 3 = 10$, so the units digit is $0$.",
+   "trap_map": {
+    "1": "Treats both exponents as multiples of $4$, taking units digits $1$ and $1$.",
+    "2": "Takes $3^{47}$ as ending in $1$ and $7^{23}$ as ending in $3$, slipping one place in the first cycle only.",
+    "3": "Slips one place in both cycles, using $9$ and $7$ to get $16$.",
+    "4": "Adds the two units digits and reports the sum $10$ rather than its units digit."
+   },
+   "numeric_check": "0",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "stem_md": "The sum of seven consecutive even integers is $224$. What is the largest of the seven?",
+   "choices": [
+    "$26$",
+    "$32$",
+    "$35$",
+    "$36$",
+    "$38$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\nIn any evenly spaced set with an odd number of terms, the mean equals the middle term. Here the mean is $224/7 = 32$, so the fourth term is $32$. Consecutive *even* integers step by $2$, so the largest is three steps up: $32 + 3(2) = 38$. The run is $26, 28, 30, 32, 34, 36, 38$.\n\n**Trigger cue**\nAn evenly spaced set with an odd count and a stated sum — divide to get the mean, which *is* the middle term, then step outward by the spacing.\n\n**Takeaway**\nOdd-count evenly spaced sets: the mean is the middle term.",
+   "fastest_path_md": "Mean $= 224/7 = 32$ is the middle term; the largest is $32 + 6 = 38$.",
+   "trap_map": {
+    "0": "Answers with the smallest term, $32 - 6 = 26$.",
+    "1": "Answers with the mean $32$, which is the middle term rather than the largest.",
+    "2": "Treats them as consecutive integers with spacing $1$, giving $32 + 3 = 35$.",
+    "3": "Stops one term short of the largest, at $36$."
+   },
+   "numeric_check": "224/7 + 3*2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "stem_md": "How many multiples of $6$ lie strictly between $100$ and $500$?",
+   "choices": [
+    "$33$",
+    "$65$",
+    "$66$",
+    "$67$",
+    "$68$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nThe first multiple of $6$ above $100$ is $102$ and the last below $500$ is $498$. Those endpoints and everything between form an evenly spaced set with spacing $6$, so the count is $\\dfrac{498 - 102}{6} + 1 = \\dfrac{396}{6} + 1 = 66 + 1 = 67$.\n\n**Trigger cue**\n\"How many multiples between\" — find the first and last multiple actually inside the range, then use (last − first)/spacing + 1; the $+1$ counts the first term itself.\n\n**Takeaway**\nCount evenly spaced terms as gaps plus one, not gaps.",
+   "fastest_path_md": "First $102$, last $498$: $(498 - 102)/6 + 1 = 67$.",
+   "trap_map": {
+    "0": "Counts multiples of $12$ instead of $6$: $(492 - 108)/12 + 1 = 33$.",
+    "1": "Skips one multiple at each end, using $108$ and $492$: $(492 - 108)/6 + 1 = 65$.",
+    "2": "Drops the $+1$, counting the gaps between multiples rather than the multiples.",
+    "4": "Adds one at each end, treating $100$ and $500$ as though they were multiples of $6$."
+   },
+   "numeric_check": "(498 - 102)/6 + 1",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "If $n = 2^5 \\cdot 3^4 \\cdot 5^2$, how many positive divisors of $n$ are perfect squares?",
+   "choices": [
+    "$4$",
+    "$9$",
+    "$18$",
+    "$30$",
+    "$90$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nA divisor $2^a 3^b 5^c$ is a perfect square exactly when $a$, $b$ and $c$ are all even. The admissible exponents are $a \\in \\{0, 2, 4\\}$ (three choices, capped by $5$), $b \\in \\{0, 2, 4\\}$ (three), and $c \\in \\{0, 2\\}$ (two). Multiplying: $3 \\times 3 \\times 2 = 18$.\n\n**Trigger cue**\n\"Divisors that are perfect squares\" — count the *even* exponents available for each prime, which is $\\lfloor e/2 \\rfloor + 1$; the $+1$ is the exponent zero.\n\n**Takeaway**\nSquare divisors: count even exponents, and zero is one of them.",
+   "fastest_path_md": "Even exponents available: $3$ for $2^5$, $3$ for $3^4$, $2$ for $5^2$. Product $18$.",
+   "trap_map": {
+    "0": "Forgets that exponent zero is available, using $\\lfloor e/2 \\rfloor$ instead of $\\lfloor e/2 \\rfloor + 1$: $2 \\times 2 \\times 1 = 4$.",
+    "1": "Drops the prime $5$ entirely, computing $3 \\times 3 = 9$.",
+    "3": "Computes the *total* divisor count but drops the prime $5$: $6 \\times 5 = 30$.",
+    "4": "Answers with the total number of divisors, $6 \\times 5 \\times 3 = 90$."
+   },
+   "numeric_check": "3*3*2",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "stem_md": "What is the least positive integer $k$ such that $1176k$ is the cube of an integer?",
+   "choices": [
+    "$7$",
+    "$9$",
+    "$21$",
+    "$63$",
+    "$441$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nFactor: $1176 = 2^3 \\cdot 3 \\cdot 7^2$. A perfect cube needs every exponent to be a multiple of $3$. The $2^3$ is already fine; $3^1$ needs two more threes; $7^2$ needs one more seven. So $k = 3^2 \\cdot 7 = 63$, and $1176 \\times 63 = 74088 = 42^3$.\n\n**Trigger cue**\n\"Least $k$ making a cube\" — factor, then supply each prime with exactly what its exponent needs to reach the next multiple of three; anything extra is not least.\n\n**Takeaway**\nSupply each prime only what it needs to reach a multiple of three.",
+   "fastest_path_md": "$1176 = 2^3 \\cdot 3 \\cdot 7^2$, so $k = 3^2 \\cdot 7 = 63$ and the cube is $42^3$.",
+   "trap_map": {
+    "0": "Fixes only the exponent on $7$, leaving $3^1$ short: $k = 7$.",
+    "1": "Fixes only the exponent on $3$, leaving $7^2$ short: $k = 9$.",
+    "2": "Multiplies each deficient prime just once rather than by the power it needs: $3 \\times 7 = 21$.",
+    "4": "Squares both corrections, using $3^2 \\cdot 7^2$ instead of $3^2 \\cdot 7$."
+   },
+   "numeric_check": "9*7",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $4^{x} \\cdot 8^{x-1} = 16^{x+1}$, what is the value of $x$?",
+   "choices": [
+    "$1$",
+    "$2$",
+    "$4$",
+    "$5$",
+    "$7$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\nRewrite everything on base $2$: $4^x = 2^{2x}$, $8^{x-1} = 2^{3(x-1)} = 2^{3x-3}$, and $16^{x+1} = 2^{4(x+1)} = 2^{4x+4}$. Multiplying on the left *adds* exponents: $2x + 3x - 3 = 4x + 4$, so $5x - 3 = 4x + 4$ and $x = 7$.\n\nCheck: $4^7 \\cdot 8^6 = 2^{14} \\cdot 2^{18} = 2^{32}$, and $16^8 = 2^{32}$.\n\n**Trigger cue**\nDifferent bases that are all powers of one number — convert to that common base first, and distribute the outer exponent over the whole bracket.\n\n**Takeaway**\nOne common base, then add exponents across a product.",
+   "fastest_path_md": "On base $2$: $2x + (3x - 3) = 4x + 4$, so $x = 7$.",
+   "trap_map": {
+    "0": "Flips the sign moving the $-3$ across, solving $5x + 3 = 4x + 4$ for $x = 1$.",
+    "1": "Multiplies the exponents instead of adding them across the product, solving $2x(3x-3) = 4x+4$ and taking the positive root $x = 2$.",
+    "2": "Mis-converts $8$ as $2^4$, giving $2x + 4x - 4 = 4x + 4$ and $x = 4$.",
+    "3": "Fails to distribute, expanding $8^{x-1}$ as $2^{3x-1}$: $2x + 3x - 1 = 4x + 4$ gives $x = 5$."
+   },
+   "numeric_check": "7",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "stem_md": "If $\\sqrt{x + 7} - \\sqrt{x} = 1$, what is the value of $x$?",
+   "choices": [
+    "$1$",
+    "$3$",
+    "$9$",
+    "$16$",
+    "$49$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nIsolate one radical before squaring: $\\sqrt{x+7} = 1 + \\sqrt{x}$. Squaring gives $x + 7 = 1 + 2\\sqrt{x} + x$, so $6 = 2\\sqrt{x}$ and $\\sqrt{x} = 3$, hence $x = 9$. Verify in the original: $\\sqrt{16} - \\sqrt{9} = 4 - 3 = 1$.\n\n**Trigger cue**\nA difference of two radicals set equal to a constant — move one radical across *before* squaring, so exactly one cross term survives.\n\n**Takeaway**\nIsolate one radical before squaring; squaring a difference leaves a cross term.",
+   "fastest_path_md": "$\\sqrt{x+7} = 1 + \\sqrt x$, square: $6 = 2\\sqrt x$, so $x = 9$.",
+   "trap_map": {
+    "0": "Squares term by term to $x + 7 - x = 1$, gets the false statement $7 = 1$, and answers with the right-hand side.",
+    "1": "Solves correctly but answers with $\\sqrt{x} = 3$ rather than $x$.",
+    "3": "Answers with $x + 7 = 16$, the quantity under the first radical.",
+    "4": "Squares term by term to $7 = 1$, then squares the leftover $7$ to get $49$."
+   },
+   "numeric_check": "9",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "stem_md": "Two positive integers have a least common multiple of $180$ and a greatest common factor of $6$. If one of the integers is $36$, what is the other?",
+   "choices": [
+    "$5$",
+    "$6$",
+    "$30$",
+    "$216$",
+    "$1{,}080$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\nFor any two positive integers, $\\gcd(a,b) \\times \\operatorname{lcm}(a,b) = ab$ — each prime's smaller and larger exponent, multiplied, give back both exponents. So $ab = 6 \\times 180 = 1080$, and the other integer is $1080/36 = 30$.\n\nVerify: $\\gcd(36, 30) = 6$ and $\\operatorname{lcm}(36, 30) = 180$.\n\n**Trigger cue**\nGCF and LCM both given with one number known — the product identity gives the other in one division; no factoring needed.\n\n**Takeaway**\nGCF times LCM equals the product of the two numbers.",
+   "fastest_path_md": "$ab = 6 \\times 180 = 1080$, so $b = 1080/36 = 30$.",
+   "trap_map": {
+    "0": "Divides the LCM by the known number, $180/36 = 5$, forgetting the GCF factor.",
+    "1": "Answers with the GCF itself, $6$.",
+    "3": "Multiplies the known number by the GCF instead of dividing the product: $36 \\times 6 = 216$.",
+    "4": "Answers with the product $\\gcd \\times \\operatorname{lcm} = 1{,}080$ rather than the second integer."
+   },
+   "numeric_check": "6*180/36",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "stem_md": "What is the greatest integer $n$ for which $12^{n}$ is a factor of $20!$?",
+   "choices": [
+    "$6$",
+    "$8$",
+    "$9$",
+    "$10$",
+    "$18$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n$12 = 2^2 \\cdot 3$, so $12^n$ needs $2^{2n}$ and $3^{n}$. Count each prime in $20!$ by Legendre's method — add the number of multiples of the prime, then of its square, and so on.\n\nTwos: $\\lfloor 20/2 \\rfloor + \\lfloor 20/4 \\rfloor + \\lfloor 20/8 \\rfloor + \\lfloor 20/16 \\rfloor = 10 + 5 + 2 + 1 = 18$.\nThrees: $\\lfloor 20/3 \\rfloor + \\lfloor 20/9 \\rfloor = 6 + 2 = 8$.\n\nThe twos allow $\\lfloor 18/2 \\rfloor = 9$ copies; the threes allow $8$. The binding constraint is the smaller: $n = 8$.\n\n**Trigger cue**\nA composite power dividing a factorial — count each prime in the factorial separately, divide by its exponent in the composite, and take the minimum.\n\n**Takeaway**\nCount each prime, divide by its exponent, take the minimum.",
+   "fastest_path_md": "$20!$ holds $18$ twos and $8$ threes. $12^n$ needs $2n$ twos ($n \\le 9$) and $n$ threes ($n \\le 8$). So $n = 8$.",
+   "trap_map": {
+    "0": "Counts only the multiples of $3$ up to $20$, missing that $9$ and $18$ each contribute a second three: $n = 6$.",
+    "2": "Uses only the power of $2$, taking $\\lfloor 18/2 \\rfloor = 9$ and never checking the threes.",
+    "3": "Counts the twos as just the ten even numbers up to $20$, giving $\\lfloor 10/2 \\rfloor = 5$ — then, taking the larger of the two bounds instead of the smaller, reports the ten even numbers themselves.",
+    "4": "Answers with the exponent of $2$ in $20!$ without dividing by the $2$ in $2^2$."
+   },
+   "numeric_check": "8",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "stem_md": "If $n$ is an odd integer, what is the remainder when $n^2 + 4n + 7$ is divided by $8$?",
+   "choices": [
+    "$0$",
+    "$1$",
+    "$3$",
+    "$4$",
+    "$7$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nWrite $n = 2k + 1$. Then $n^2 = 4k^2 + 4k + 1 = 4k(k+1) + 1$, and $k(k+1)$ is a product of consecutive integers, hence even — so $4k(k+1)$ is a multiple of $8$ and $n^2 \\equiv 1 \\pmod 8$. Also $4n = 4(2k+1) = 8k + 4 \\equiv 4$. Adding: $n^2 + 4n + 7 \\equiv 1 + 4 + 7 = 12 \\equiv 4 \\pmod 8$.\n\n**Trigger cue**\nA parity condition with a modulus of $8$ — substitute $2k+1$ and look for the consecutive-integer product; the square of any odd number is $1$ more than a multiple of $8$.\n\n**Takeaway**\nAn odd square is always one more than a multiple of eight.",
+   "fastest_path_md": "Odd squares are $\\equiv 1 \\pmod 8$ and $4n \\equiv 4$ for odd $n$, so the total is $1 + 4 + 7 = 12 \\equiv 4$.",
+   "trap_map": {
+    "0": "Assumes $8$ divides the whole expression because $n^2 + 4n$ looks like a multiple of $4$.",
+    "1": "Uses $n^2 \\equiv 1 \\pmod 8$ and stops there, dropping the $4n + 7$.",
+    "2": "Tests an even $n$ such as $2$, getting $19 \\equiv 3$, in violation of the stated parity.",
+    "4": "Treats $n^2 + 4n$ as divisible by $8$ and reads off the constant term $7$."
+   },
+   "numeric_check": "4",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "stem_md": "Each of $x$ and $y$ is chosen from the set $\\{-3, -2, -1, 1, 2, 3\\}$, and the pair $(x, y)$ is ordered. For how many such ordered pairs is $xy < 0$ and $x + y > 0$?",
+   "choices": [
+    "$3$",
+    "$6$",
+    "$9$",
+    "$12$",
+    "$18$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n$xy < 0$ forces opposite signs. Given opposite signs, $x + y > 0$ requires the positive one to have the larger magnitude. The magnitude pairs (positive, negative) satisfying that are $(2,1)$, $(3,1)$ and $(3,2)$ — three combinations. Each can be written with the positive value first or second, so there are $3 \\times 2 = 6$ ordered pairs: $(2,-1), (-1,2), (3,-1), (-1,3), (3,-2), (-2,3)$.\n\n**Trigger cue**\nA sign condition plus a sum condition — the sign condition sets opposite signs, and the sum condition then becomes a comparison of magnitudes.\n\n**Takeaway**\nOpposite signs: the sum's sign follows the larger magnitude.",
+   "fastest_path_md": "Opposite signs with the positive one bigger: magnitudes $(2,1), (3,1), (3,2)$, each in two orders — $6$ pairs.",
+   "trap_map": {
+    "0": "Counts unordered pairs, missing that $(2,-1)$ and $(-1,2)$ are different ordered pairs.",
+    "2": "Fixes $x$ positive and $y$ negative and drops the sum condition entirely: $3 \\times 3 = 9$.",
+    "3": "Reads $x + y > 0$ as $x + y \\ne 0$, admitting the six pairs whose sum is negative as well.",
+    "4": "Counts every opposite-sign ordered pair, ignoring the sum condition: $18$."
+   },
+   "numeric_check": "6",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 100$ is $n^2 + n + 1$ divisible by $3$?",
+   "choices": [
+    "$33$",
+    "$34$",
+    "$50$",
+    "$66$",
+    "$67$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\nOnly $n$'s residue mod $3$ matters, so test all three cases: $n \\equiv 0 \\Rightarrow 0 + 0 + 1 = 1$; $n \\equiv 1 \\Rightarrow 1 + 1 + 1 = 3 \\equiv 0$; $n \\equiv 2 \\Rightarrow 4 + 2 + 1 = 7 \\equiv 1$. So the expression is divisible by $3$ exactly when $n \\equiv 1 \\pmod 3$.\n\nThose $n$ in range are $1, 4, 7, \\ldots, 100$, an evenly spaced run: $\\dfrac{100 - 1}{3} + 1 = 34$.\n\n**Trigger cue**\nDivisibility of a polynomial over a range — test the handful of residues mod the divisor rather than any actual values; three cases settle every integer.\n\n**Takeaway**\nTest residues, not numbers; three cases decide all integers.",
+   "fastest_path_md": "Only $n \\equiv 1 \\pmod 3$ works. From $1$ to $100$ that is $(100-1)/3 + 1 = 34$ values.",
+   "trap_map": {
+    "0": "Drops the $+1$ in the evenly spaced count, reporting the $33$ gaps instead of the $34$ terms.",
+    "2": "Assumes half the integers in the range satisfy the condition.",
+    "3": "Counts the complement — the $n$ for which the expression is *not* divisible by $3$.",
+    "4": "Counts the complement using the off-by-one figure, $100 - 33 = 67$."
+   },
+   "numeric_check": "(100 - 1)/3 + 1",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "stem_md": "For how many integers $n$ with $1 \\le n \\le 60$ is $n^3 - n$ divisible by $24$?",
+   "choices": [
+    "$7$",
+    "$20$",
+    "$30$",
+    "$37$",
+    "$45$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\nFactor: $n^3 - n = (n-1)n(n+1)$, a product of three consecutive integers. One of any three consecutive integers is a multiple of $3$, so divisibility by $3$ is automatic and only the factor $8$ needs checking.\n\n- If $n$ is odd, $n-1$ and $n+1$ are *consecutive even numbers*, so one of them is a multiple of $4$ and the other of $2$: the product carries at least $8$. Every odd $n$ works — $30$ of them in range.\n- If $n$ is even, $n-1$ and $n+1$ are both odd, so all the twos come from $n$ alone: we need $8 \\mid n$. In range that is $8, 16, 24, 32, 40, 48, 56$ — $7$ values.\n\nTotal: $30 + 7 = 37$.\n\n**Trigger cue**\nA product of consecutive integers tested against a composite — split the divisor into prime powers; the consecutive structure usually settles the odd primes for free, leaving only the power of two to check.\n\n**Takeaway**\nThree consecutive integers give the three free; only the twos need work.",
+   "fastest_path_md": "$(n-1)n(n+1)$ is always divisible by $3$. Odd $n$ straddles two consecutive evens and clears $8$ automatically ($30$ values); even $n$ needs $8 \\mid n$ ($7$ values). Total $37$.",
+   "trap_map": {
+    "0": "Counts only the multiples of $8$, missing that every odd $n$ also works.",
+    "1": "Assumes divisibility by $24$ requires $3 \\mid n$ and counts the $20$ multiples of $3$.",
+    "2": "Counts only the odd $n$, missing the multiples of $8$.",
+    "4": "Counts the odd $n$ plus every multiple of $4$ rather than of $8$: $30 + 15 = 45$."
+   },
+   "numeric_check": "30 + 7",
+   "provenance": "authored + brute-force programmatic verification + computed distractor reachability"
   }
  ]
 }

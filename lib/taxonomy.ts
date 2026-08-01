@@ -10,6 +10,46 @@ export type Context = (typeof CONTEXTS)[number];
 export const FORMATS = ["problem_solving", "data_sufficiency"] as const;
 export type QuestionFormat = (typeof FORMATS)[number];
 
+/**
+ * Which section of the GMAT Focus Edition each format actually appears in.
+ *
+ * Established from primary sources before this mapping was written: the
+ * Focus Quantitative Reasoning section is 21 questions in 45 minutes and
+ * asks Problem Solving only. Data Sufficiency was moved into Data
+ * Insights, which lists it among its five question types.
+ *   - mba.com, "Exam Structure" / "Exam Content"
+ *   - gmac.com, "Details Of New GMAT Exam Revealed": the Quantitative
+ *     Reasoning section "will contain none of the data sufficiency
+ *     questions that appear in the current GMAT"; Data Insights "has
+ *     pulled in Integrated Reasoning and data sufficiency from
+ *     Quantitative Reasoning".
+ *
+ * The bank's 62 data-sufficiency items are kept, not retired: sufficiency
+ * reasoning is exactly the discipline that makes a Problem Solving item
+ * tractable inside two minutes, and they remain valid practice for the
+ * Data Insights section. They are labelled for the section they belong to
+ * and excluded from Quant-fidelity statistics, so the ambiguity is
+ * resolved in the data rather than left to the reader.
+ */
+export const EXAM_SECTIONS = ["quant", "data_insights"] as const;
+export type ExamSection = (typeof EXAM_SECTIONS)[number];
+
+export const SECTION_BY_FORMAT: Record<QuestionFormat, ExamSection> = {
+  problem_solving: "quant",
+  data_sufficiency: "data_insights",
+};
+
+export const SECTION_LABELS: Record<ExamSection, string> = {
+  quant: "Quantitative Reasoning",
+  data_insights: "Data Insights",
+};
+
+/** Formats that count toward Quant-section fidelity (timed sims, the
+ *  score-report mirror's section-accuracy read, mastery ladders). */
+export const QUANT_FORMATS: QuestionFormat[] = FORMATS.filter(
+  (f) => SECTION_BY_FORMAT[f] === "quant",
+);
+
 export const FUNDAMENTAL_SKILLS = [
   "rates_ratio_percent",
   "value_order_factors",
@@ -171,6 +211,20 @@ export const DOMAIN_LABELS: Record<ContentDomain, string> = {
 export const FORMAT_LABELS: Record<QuestionFormat, string> = {
   problem_solving: "Problem solving",
   data_sufficiency: "Data sufficiency",
+};
+
+/** Format plus the section it is actually asked in — used anywhere the
+ *  distinction changes what the number means. */
+export const FORMAT_SECTION_LABELS: Record<QuestionFormat, string> = {
+  problem_solving: "Problem solving · Quant",
+  data_sufficiency: "Data sufficiency · Data Insights",
+};
+
+export const FORMAT_NOTES: Record<QuestionFormat, string> = {
+  problem_solving:
+    "The only question type in the Focus Quant section: 21 in 45 minutes.",
+  data_sufficiency:
+    "Asked in Data Insights, not Quant, since the Focus Edition. Kept here because sufficiency reasoning is what makes a Quant item tractable in two minutes — it trains the skill, but it is not Quant-section practice.",
 };
 
 export const ERROR_TYPE_LABELS: Record<ErrorType, string> = {

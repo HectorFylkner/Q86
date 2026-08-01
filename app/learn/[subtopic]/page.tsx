@@ -16,7 +16,13 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import {
+  NamedTraps,
+  RecognitionTable,
+  TopBandCard,
+} from "@/components/lesson/transfer";
 import { chapterTestStates } from "@/lib/chapter-tests";
+import { chapterTransfer } from "@/lib/chapter-transfer";
 import { parseLesson } from "@/lib/lesson-parse";
 import { listLessons, readLesson } from "@/lib/lessons";
 import {
@@ -33,8 +39,11 @@ const RAIL: RailItem[] = [
   { id: "why", label: "Why this matters" },
   { id: "ideas", label: "The core ideas" },
   { id: "examples", label: "Worked examples" },
+  { id: "topband", label: "At the top band" },
+  { id: "recognition", label: "Recognition table" },
   { id: "cues", label: "Trigger cues" },
   { id: "traps", label: "Trap gallery" },
+  { id: "named", label: "Named traps" },
   { id: "speed", label: "Speed moves" },
   { id: "checklist", label: "Before you drill" },
 ];
@@ -50,6 +59,7 @@ export default async function LessonPage({
   if (!lesson) notFound();
 
   const parsed = parseLesson(lesson.body);
+  const transfer = await chapterTransfer(subtopic as Subtopic);
   const testState = (await chapterTestStates())[subtopic as Subtopic];
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
@@ -169,9 +179,29 @@ export default async function LessonPage({
           </div>
         </SectionShell>
 
+        {transfer.topBand && (
+          <SectionShell
+            id="topband"
+            index={4}
+            title="At the top band"
+            tagline={`the hardest D${transfer.topBand.difficulty} item in this chapter's bank`}
+          >
+            <TopBandCard example={transfer.topBand} />
+          </SectionShell>
+        )}
+
+        <SectionShell
+          id="recognition"
+          index={5}
+          title="Recognition table"
+          tagline={`${transfer.recognition.length} stem cues from the ${transfer.coverage.total} bank items behind this chapter`}
+        >
+          <RecognitionTable rows={transfer.recognition} />
+        </SectionShell>
+
         <SectionShell
           id="cues"
-          index={4}
+          index={6}
           title="Trigger cues"
           tagline="phrase → method, memorize these"
         >
@@ -180,7 +210,7 @@ export default async function LessonPage({
 
         <SectionShell
           id="traps"
-          index={5}
+          index={7}
           title="Trap gallery"
           tagline="the classic wrong turns"
         >
@@ -188,15 +218,24 @@ export default async function LessonPage({
         </SectionShell>
 
         <SectionShell
+          id="named"
+          index={8}
+          title="Named traps"
+          tagline="the post-mortem's exact words"
+        >
+          <NamedTraps traps={transfer.traps} />
+        </SectionShell>
+
+        <SectionShell
           id="speed"
-          index={6}
+          index={9}
           title="Speed moves"
           tagline="legitimate shortcuts"
         >
           <SpeedMoves moves={parsed.speed} />
         </SectionShell>
 
-        <SectionShell id="checklist" index={7} title="Before you drill">
+        <SectionShell id="checklist" index={10} title="Before you drill">
           <DrillChecklist
             subtopic={subtopic}
             items={parsed.checklist}

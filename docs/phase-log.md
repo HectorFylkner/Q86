@@ -225,6 +225,129 @@ exists, and the baseline table is above.
 
 ---
 
+### W1 — Content depth ✅
+
+**Shipped**
+
+**1. The authoring gate got a second gate: computed distractor reachability.**
+
+`scripts/author/harness.mjs` now accepts `requireTrapValues: true`. Items
+authored under it must carry `trap_values(q)`, which *computes* each wrong
+choice by committing the specific named error from `trap_map` — a sign
+flip, a part/whole inversion, an off-by-one, answering one step early —
+and the harness asserts the computed result equals that choice. A
+distractor that cannot be produced by a stated mistake fails the batch.
+
+This is the difference between asserting a distractor is tempting and
+proving it is reachable. It caught real defects on first run: a trap
+described as "halves the squared rate" that actually needed doubling; a
+`trap_map` keyed off the wrong index after a key moved; a committee trap
+whose stated error produced the correct answer, not the distractor.
+
+**2. Format fidelity resolved (decision D2 above): relabelled, not retired.**
+
+- `lib/taxonomy.ts`: `EXAM_SECTIONS`, `SECTION_BY_FORMAT`,
+  `QUANT_FORMATS`, `FORMAT_SECTION_LABELS`, `FORMAT_NOTES`, each carrying
+  the primary-source citation in a comment.
+- `lib/engine.ts` timed sims now filter on `QUANT_FORMATS` rather than a
+  hard-coded literal.
+- The runner and drill setup label DS items "DS · Data Insights" so the
+  distinction is visible where the questions are actually served.
+
+**3. Bank rebalanced — both stated targets met.**
+
+| Metric | Before | After | Target |
+| --- | --- | --- | --- |
+| Total questions | 360 | **438** | — |
+| D5 count | 72 | **150** | — |
+| **D5 share** | **20.0%** | **34.2%** | ≥ 33.3% ✅ |
+| **Smallest subtopic** | **8** (`interest_profit_discount`) | **16** (`combinatorics`) | ≥ 15 ✅ |
+| Subtopics below 15 | 15 of 24 | **0 of 24** | 0 ✅ |
+| Subtopic spread | 3.5× (8 → 28) | **1.9× (16 → 30)** | — |
+| Items with computed distractor reachability | 0 | **78** | — |
+
+Full after-distribution by difficulty: D2 36 · D3 108 · D4 144 · D5 150.
+By skill: VOF 168 · Algebra 110 · Counting/Stats 80 · Rates/Percent 80.
+
+All 78 new items are difficulty 5, allocated first to close every
+subtopic deficit and then to deepen the top band everywhere. Six batch
+files, all committed:
+
+- `scripts/author/batch-q5-interest_profit_discount.mjs` (8)
+- `scripts/author/batch-q5-mixtures-rates.mjs` (12)
+- `scripts/author/batch-q5-percent-ratios.mjs` (12)
+- `scripts/author/batch-q5-counting-stats.mjs` (18)
+- `scripts/author/batch-q5-algebra.mjs` (12)
+- `scripts/author/batch-q5-vof.mjs` (16)
+
+Every `check()` derives the answer independently of the written solution:
+brute-force scans over cents/liters/marbles, grid dynamic programming,
+exhaustive permutation and subset enumeration, BigInt factorials, marching
+integration of fill rates, bisection on sign changes. No item's key rests
+on its own prose.
+
+**4. Chapters got the transfer layer they lacked** —
+`lib/chapter-transfer.ts` + `components/lesson/transfer.tsx`, rendered as
+three new sections in every chapter:
+
+- **At the top band** — the hardest bank item for that subtopic, shown
+  whole with stem, choices, formal path, fastest path and takeaway, and a
+  one-click "drill this one cold" link. Chapters previously taught at the
+  middle of the curve; the exam does not.
+- **Recognition table** — up to 12 stem cues drawn from that chapter's
+  bank items, each mapped to the method it selects and tagged with its
+  difficulty band, hardest first.
+- **Named traps** — the exact `trap_map` sentences a post-mortem will
+  quote, classified into the platform's six-error vocabulary and spread
+  across error types so the section reads as a vocabulary rather than one
+  bucket.
+
+**Design decision: derive the transfer layer from the bank, don't
+hand-write it beside the bank.** The brief's requirement is that "reading
+a chapter and reviewing a miss speak one language". Hand-authored tables
+satisfy that on the day they are written and drift afterwards. Sourcing
+them from the installed questions makes divergence structurally
+impossible: the recognition rows, the worked example and the trap
+vocabulary *are* the strings the runner and the post-mortem show. The
+cost is that a chapter's transfer quality is capped by its bank items'
+quality — which is precisely what the authoring gate now enforces.
+
+The trap classifier is deliberately conservative: a trap that does not
+clearly match one error type is labelled "Unclassified" rather than
+guessed at, because a wrong label teaches the wrong repair.
+
+**Verification**
+
+```
+$ node --experimental-strip-types scripts/verify-bank.ts
+Bank: 438 questions — value_order_factors: 168,
+counting_sets_series_prob_stats: 80, equal_unequal_alg: 110,
+rates_ratio_percent: 80
+All bank questions pass mechanical verification.
+
+$ pnpm seed
+Seed bank loaded: 0 inserted, 438 refreshed, 0 retired, 438 verified …
+$ pnpm seed          # idempotent: second run inserts and retires nothing
+Seed bank loaded: 0 inserted, 438 refreshed, 0 retired, 438 verified …
+
+$ pnpm lint
+✖ 26 problems (0 errors, 26 warnings)   # all pre-existing unused-arg warnings
+```
+
+**Acceptance: PASSED** — `verify-bank.ts` passes over the whole bank,
+`pnpm seed` is idempotent, the before/after distribution table is above,
+and every new item's `check()` (and `trap_values()`) is in a committed
+batch file under `scripts/author/`.
+
+**Scope not taken in W1:** no new chapter markdown files were authored.
+The taxonomy's 24 subtopics already have 24 chapters — the uncovered
+pedagogy is the six-error vocabulary and the exam mechanics (Review &
+Edit, pacing), which are not subtopic chapters and belong behind Progress
+and Timed rather than Learn. Recorded as a deliberate omission, not an
+oversight; see the deliverable's "left undone" list.
+
+---
+
 ## Open risks
 
 - **R1 — Bank rebalancing is large.** Reaching D5 ≥ ⅓ and no subtopic

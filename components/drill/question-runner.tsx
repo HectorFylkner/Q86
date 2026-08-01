@@ -353,7 +353,11 @@ export function QuestionRunner({
           <Chip>{SKILL_LABELS[question.fundamentalSkill]}</Chip>
           <Chip>{SUBTOPIC_LABELS[question.subtopic]}</Chip>
           <Chip>{DIFFICULTY_LABELS[question.difficulty as Difficulty]}</Chip>
-          {question.format === "data_sufficiency" && <Chip>DS</Chip>}
+          {/* DS is a Data Insights format on the Focus Edition, not a Quant
+              one (see SECTION_BY_FORMAT); say so wherever it is served. */}
+          {question.format === "data_sufficiency" && (
+            <Chip>DS · Data Insights</Chip>
+          )}
         </div>
         {timing === "soft" && !revealed && (
           <span

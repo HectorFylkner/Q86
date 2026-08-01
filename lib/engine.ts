@@ -1,12 +1,13 @@
 import { and, count, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions, type Question } from "./db/schema.ts";
-import type {
-  ContentDomain,
-  Context,
-  FundamentalSkill,
-  QuestionFormat,
-  Subtopic,
+import {
+  QUANT_FORMATS,
+  type ContentDomain,
+  type Context,
+  type FundamentalSkill,
+  type QuestionFormat,
+  type Subtopic,
 } from "./taxonomy.ts";
 
 export type QuestionFilter = {
@@ -114,9 +115,10 @@ export async function selectTimedSet(
   singleSkill?: FundamentalSkill,
 ): Promise<Question[]> {
   // Faithful to the GMAT Focus Quant section: problem solving only. Data
-  // Sufficiency lives in the Data Insights section on the real exam, so
-  // DS questions train through drills, never inside a section sim.
-  const formats: QuestionFormat[] = ["problem_solving"];
+  // Sufficiency lives in the Data Insights section on the real exam (see
+  // SECTION_BY_FORMAT), so DS questions train through drills, never
+  // inside a section sim.
+  const formats: QuestionFormat[] = QUANT_FORMATS;
   if (singleSkill) {
     return selectQuestions({ skills: [singleSkill], formats }, total);
   }
