@@ -348,6 +348,124 @@ oversight; see the deliverable's "left undone" list.
 
 ---
 
+### W2 — Visual and information design ✅
+
+**Shipped**
+
+**1. A measured chart palette, added to `globals.css` as tokens.** The
+`dataviz` skill was loaded before any chart code was written, and every
+value below was produced by its validator, not chosen by eye:
+
+| Slot | Light | Dark | Validator result |
+| --- | --- | --- | --- |
+| Categorical (4 skills) | `#2f4fd8 #cf3b2c #0f8f7a #8a4bc9` | `#7189ea #dc6752 #18ac91 #ad74e4` | ALL CHECKS PASS both modes; worst adjacent CVD ΔE 10.9 light / 9.0 dark |
+| Status good/bad | `#1d8659 #cf3b2c` | `#2aa273 #dc6752` | ALL PASS, all-pairs; ΔE 8.1 light |
+| Sequential ramp | `#8293c3 #6076cf #3f56bd #233690` | `#5265ae #6b80cc #8598e2 #a9baf7` | ordinal checks PASS both modes |
+
+The existing three-accent set was measured first and **failed**: amber
+and red pen sat at ΔE 13.7 under normal vision, below the 15 floor. That
+is why the chart palette is a separate, wider set rather than a reuse of
+the UI accents.
+
+**2. A shared chart layer** — `components/charts/chart-kit.tsx`. Figure
+frame, axis and grid defaults, tooltip card, legend (with line/dot/ring
+keys), empty state, fixed mark specs (2px lines, 22px bar cap, 4px data
+ends, 4px markers, 2px surface rings, 10% area washes, hairline solid
+grid), and a mount-gated `ResponsiveContainer`. Recharts mints
+clip-path ids per render, so every chart in the app — including the ones
+written before this layer — was emitting a hydration mismatch; routing
+them all through `SafeResponsiveContainer` removed it.
+
+**3. Live theme tracking.** `useChartTokens` now also watches a
+`MutationObserver` on `data-theme`, so the app's own toggle repaints SVG
+marks immediately rather than on reload. HTML surfaces (the mastery grid,
+the mirror meters) were converted to CSS variables in inline styles and
+need no JS at all.
+
+**4. The four views the data had earned:**
+
+- **Mastery grid** (`components/charts/mastery-grid.tsx`) — all 24
+  subtopics × 4 difficulty bands, one screen. Fill = accuracy on the
+  sequential ramp; a red-pen ring marks cells with ≥ 6 attempts below the
+  85% bar. Filterable by skill; every cell is a deep link into that exact
+  drill; each cell's exact record is its accessible name.
+- **Pacing** (`components/charts/pacing-view.tsx`) — every attempt as
+  time × difficulty × outcome, with the rush and sink bands shaded and
+  the 129s section budget drawn, plus an accuracy-by-time-bucket bar
+  whose *shape* is the diagnosis. Outcome is double-encoded (filled dot
+  vs hollow ring) because the good/bad pair sits near the CVD floor.
+- **ELO trajectory** (`components/charts/elo-trajectory.tsx`) — nine
+  categories as small multiples on one shared scale, one hue. Nine hues
+  would require cycling the palette, which is never allowed; faceting is
+  also the better answer to the actual question ("which one is not
+  moving").
+- **Score-report mirror** (`components/charts/score-report-mirror.tsx`) —
+  total, three section scores, then skills / domains / contexts in the
+  official order, with the imported percentile and the platform accuracy
+  side by side. Deliberately **not** on a shared axis: a percentile and
+  an accuracy are different quantities, and one scale would invite an
+  invalid comparison. Platform accuracy counts Quant formats only, per
+  decision D2.
+
+**5. A real typographic scale** in `@theme`: micro / caption / body /
+lede / title / section / figure / hero, each with a stated job, replacing
+the `text-xs` + `text-sm` monoculture. Hero and figure sizes switch to
+proportional figures (`tabular-nums` makes a display number read loose).
+
+**Two design decisions worth recording**
+
+- **The mastery grid prints no number inside a cell.** A four-step
+  single-hue ramp has a middle band where *neither* ink nor paper clears
+  4.5:1 against the fill — established by measurement, not assumed. Ninety-six
+  numbers is also a number on every point, the density at which labels
+  stop working. The fill carries magnitude, the ring carries "below the
+  bar", and the exact figures live in each cell's accessible name, its
+  tooltip, and the row summary.
+- **The weak-cell ring is drawn outside the fill**, behind a 2px surface
+  gap, so it is measured against the card surface (4.84:1) instead of
+  against a blue fill (1.6:1).
+
+**Verification**
+
+```
+$ node scripts/check-contrast.mjs
+… 60 pairs measured across both themes …
+SSR fallbacks in use-chart-tokens.ts match globals.css (no drift).
+60/60 pairs meet WCAG AA (4.5:1 body, 3:1 large & non-text).
+```
+
+The check is computed from `app/globals.css` itself, so it cannot drift
+from what ships, and it exits non-zero on failure. It found and forced
+five real fixes: `amber` at 3.64:1 as body text, `good` at 4.08:1, and
+the ramp's weakest step at 2.07:1 / 2.28:1 — all of which had been in the
+build before this workstream and none of which were visible by eye.
+
+Colour-literal audit — the invariant is "no colour literal outside
+`app/globals.css`":
+
+```
+$ grep -rnoE '#[0-9a-fA-F]{3,6}' app components lib --include='*.tsx' --include='*.ts'
+app/manifest.ts:11:#FAFAF7     ← PWA manifest; cannot take a CSS variable
+app/manifest.ts:12:#FAFAF7     ← pre-existing, unchanged
+```
+
+Zero new literals. The SSR fallbacks in `components/use-chart-tokens.ts`
+(needed because SVG presentation attributes cannot take CSS variables)
+are now **asserted against `globals.css`** by the same script — it caught
+six that had drifted during this workstream.
+
+**Evidence**
+
+- Before: `screenshots/w0-baseline/` · After: `screenshots/w2-after/`
+  (72 PNGs each: 12 routes × 390/768/1280 × light/dark)
+- Contrast table: `node scripts/check-contrast.mjs` (or `--json`)
+
+**Acceptance: PASSED** — before/after pairs exist at all three widths in
+both themes; all 60 measured pairs meet WCAG AA by computation with the
+numbers recorded; zero new colour literals outside `globals.css`.
+
+---
+
 ## Open risks
 
 - **R1 — Bank rebalancing is large.** Reaching D5 ≥ ⅓ and no subtopic

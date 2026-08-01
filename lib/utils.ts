@@ -27,3 +27,21 @@ export function percent(numerator: number, denominator: number): number {
 }
 
 export const CHOICE_LETTERS = ["A", "B", "C", "D", "E"] as const;
+
+/** 1 → "1st", 2 → "2nd", 11 → "11th", 61 → "61st". Percentiles read as
+ *  ordinals on the official report, so they read as ordinals here. */
+export function ordinal(n: number): string {
+  const abs = Math.abs(Math.trunc(n));
+  const tens = abs % 100;
+  if (tens >= 11 && tens <= 13) return `${n}th`;
+  switch (abs % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}

@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions } from "./db/schema.ts";
+import { MASTERY_BAR, MASTERY_WINDOW as WINDOW, MIN_ATTEMPTS } from "./mastery-config.ts";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
@@ -16,9 +17,11 @@ import {
  * are never hard-locked: the ladder tells you where to work, it does
  * not forbid working elsewhere.
  */
-export const MASTERY_BAR = 0.85;
-export const MIN_ATTEMPTS = 6;
-const WINDOW = 10;
+export {
+  MASTERY_BAR,
+  MIN_ATTEMPTS,
+  MASTERY_WINDOW as WINDOW,
+} from "./mastery-config.ts";
 
 export type RungState = "mastered" | "working" | "untouched" | "empty";
 

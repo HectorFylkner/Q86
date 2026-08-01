@@ -10,13 +10,17 @@ import {
   LineChart,
   ReferenceArea,
   ReferenceLine,
-  ResponsiveContainer,
   Scatter,
   ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { SafeResponsiveContainer as ResponsiveContainer } from "@/components/charts/chart-kit";
+import { EloTrajectories } from "@/components/charts/elo-trajectory";
+import { MasteryGrid } from "@/components/charts/mastery-grid";
+import { PacingChart } from "@/components/charts/pacing-view";
+import { ScoreReportMirrorCard } from "@/components/charts/score-report-mirror";
 import type { AnalyticsData, MirrorBar } from "@/lib/analytics";
 import {
   EDIT_REASON_LABELS,
@@ -61,17 +65,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
   return (
     <div className="space-y-6">
-      {/* 1 — score-report mirror */}
-      <Section
-        title="Score-report mirror"
-        subtitle={`Accuracy by domain, context, and fundamental skill — same cuts as the official report. ${data.attemptCount} attempts.`}
-      >
-        <div className="grid gap-6 lg:grid-cols-3">
-          <MirrorGroup title="Content domain" bars={data.mirror.domains} />
-          <MirrorGroup title="Context" bars={data.mirror.contexts} />
-          <MirrorGroup title="Fundamental skill" bars={data.mirror.skills} />
-        </div>
-      </Section>
+      {/* 1 — the score-report mirror, laid out like the official report */}
+      <ScoreReportMirrorCard data={data.reportMirror} />
+
+      {/* 1b — the whole domain at one glance */}
+      <MasteryGrid rows={data.masteryGrid} />
+
+      {/* 1c — pacing: time against correctness against the budget */}
+      <PacingChart data={data.pacing} />
 
       {/* 2 — heatmap */}
       <Section
@@ -570,50 +571,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
         </Section>
 
-        <Section
-          title="Pattern-trainer ELO"
-          subtitle="Per-category rating; the line marks the 1200 start."
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={data.eloBars}
-              layout="vertical"
-              margin={{ top: 4, right: 40, bottom: 4, left: 8 }}
-            >
-              <CartesianGrid stroke={GRID} horizontal={false} />
-              <XAxis
-                type="number"
-                domain={[1000, 1600]}
-                tick={AXIS_TICK}
-                stroke={GRID}
-                tickLine={false}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                width={150}
-                tick={{ ...AXIS_TICK, fontSize: 10 }}
-                stroke={GRID}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={tooltipStyle} />
-              <ReferenceLine x={1200} stroke={GRAPHITE} strokeDasharray="4 3" />
-              <Bar
-                dataKey="rating"
-                name="ELO"
-                fill={BALLPOINT}
-                radius={[0, 4, 4, 0]}
-                barSize={12}
-                label={{
-                  position: "right",
-                  fill: INK,
-                  fontSize: 11,
-                }}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </Section>
       </div>
+
+      {/* ELO as small multiples: nine categories, one hue, faceted. */}
+      <EloTrajectories data={data.eloTrajectories} />
 
       <Footer />
     </div>

@@ -1,18 +1,21 @@
-import { desc, eq } from "drizzle-orm";
+import { count as sqlCount, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
+  baselineReports,
   edits,
   eloRatings,
+  patternAttempts,
   questions,
   redoQueue,
 } from "./db/schema.ts";
-import { ELO_START } from "./elo.ts";
+import { ELO_START, nextRating } from "./elo.ts";
 import {
   PATTERN_CATEGORY_KEYS,
   PATTERN_CATEGORY_LABELS,
   type PatternCategoryKey,
 } from "./generators/index.ts";
+import { RUSH_RATIO, SINK_RATIO, TIME_BENCH } from "./pacing.ts";
 import {
   ALL_SUBTOPICS,
   CONFIDENCES,
@@ -22,11 +25,31 @@ import {
   DOMAIN_LABELS,
   ERROR_TYPES,
   FUNDAMENTAL_SKILLS,
+  QUANT_FORMATS,
+  SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  SUBTOPIC_LABELS,
   type Confidence,
+  type Difficulty,
   type ErrorType,
+  type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
+
+/** 21 questions in 45 minutes — the official Quant section average. */
+export const SECTION_BUDGET_SECONDS = Math.round((45 * 60) / 21);
+
+/** The difficulty rungs the mastery grid shows (D1 is not in the bank). */
+const MASTERY_BANDS = [2, 3, 4, 5];
+
+/** Item rating the pattern trainer plays against, mirroring the runner. */
+const ELO_ITEM_RATING = 1250;
+
+const SECTION_REPORT_LABELS: Record<string, string> = {
+  quant: "Quantitative Reasoning",
+  verbal: "Verbal Reasoning",
+  data_insights: "Data Insights",
+};
 
 export type MirrorBar = { key: string; label: string; correct: number; total: number };
 
@@ -60,6 +83,96 @@ export type DifficultyMatrixRow = {
 };
 
 export type VolumeDay = { date: string; count: number };
+
+/** One cell of the 24-subtopic mastery grid. */
+export type MasteryCell = {
+  difficulty: number;
+  correct: number;
+  total: number;
+  /** Verified bank items available in this cell. */
+  available: number;
+};
+
+export type MasteryGridRow = {
+  subtopic: Subtopic;
+  skill: FundamentalSkill;
+  label: string;
+  cells: MasteryCell[];
+  /** Focused attempts across the row. */
+  total: number;
+  correct: number;
+};
+
+/** Time-on-task against the section budget. */
+export type PacingPoint = {
+  seconds: number;
+  difficulty: number;
+  correct: boolean;
+  /** Benchmark for this difficulty, from lib/pacing.ts. */
+  bench: number;
+};
+
+export type PacingBucket = {
+  /** Inclusive lower bound in seconds; the last bucket is open-ended. */
+  from: number;
+  to: number | null;
+  label: string;
+  correct: number;
+  total: number;
+};
+
+export type PacingView = {
+  points: PacingPoint[];
+  buckets: PacingBucket[];
+  /** The official section average: 21 questions in 45 minutes. */
+  budgetSeconds: number;
+  medianSeconds: number | null;
+  /** Answered wrong in under half the benchmark. */
+  rushedWrong: number;
+  /** Ran more than half again over the benchmark. */
+  timeSinks: number;
+  /** Seconds spent beyond benchmark on sinks — the recoverable time. */
+  sinkOverspendSeconds: number;
+};
+
+export type EloTrajectoryPoint = { n: number; rating: number };
+
+export type EloTrajectory = {
+  category: PatternCategoryKey;
+  label: string;
+  points: EloTrajectoryPoint[];
+  current: number;
+  /** Change over the plotted window. */
+  delta: number;
+};
+
+/** The imported report beside the platform's own numbers, same cuts. */
+export type MirrorPair = {
+  key: string;
+  label: string;
+  /** Percentile from the imported official report, when present. */
+  reported: number | null;
+  /** Platform accuracy over Quant-format items, 0..100. */
+  platform: number | null;
+  platformTotal: number;
+};
+
+export type ScoreReportMirror = {
+  reportedAt: Date | null;
+  totalScore: number | null;
+  sections: Array<{
+    section: string;
+    label: string;
+    scaledScore: number | null;
+    percentile: number | null;
+  }>;
+  skills: MirrorPair[];
+  domains: MirrorPair[];
+  contexts: MirrorPair[];
+  /** Attempts excluded from the Quant read because DS is a Data Insights
+   *  format on the Focus Edition (see SECTION_BY_FORMAT). */
+  dataInsightsExcluded: number;
+};
 
 export type AnalyticsData = {
   attemptCount: number;
@@ -107,6 +220,10 @@ export type AnalyticsData = {
     dueNow: number;
   };
   eloBars: Array<{ category: PatternCategoryKey; label: string; rating: number }>;
+  masteryGrid: MasteryGridRow[];
+  pacing: PacingView;
+  eloTrajectories: EloTrajectory[];
+  reportMirror: ScoreReportMirror;
 };
 
 /** Expected accuracy per confidence bucket for the calibration curve. */
@@ -130,6 +247,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       domain: questions.contentDomain,
       context: questions.context,
       difficulty: questions.difficulty,
+      format: questions.format,
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
@@ -351,6 +469,205 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     rating: Math.round(eloMap.get(category) ?? ELO_START),
   }));
 
+  // --- the 24-subtopic mastery grid ------------------------------------------
+  const bankCells = await db
+    .select({
+      subtopic: questions.subtopic,
+      difficulty: questions.difficulty,
+      n: sqlCount(),
+    })
+    .from(questions)
+    .where(eq(questions.verified, true))
+    .groupBy(questions.subtopic, questions.difficulty)
+    .all();
+  const availableBy = new Map<string, number>();
+  for (const c of bankCells) {
+    availableBy.set(`${c.subtopic}|${c.difficulty}`, c.n);
+  }
+  const masteryGrid: MasteryGridRow[] = ALL_SUBTOPICS.map((subtopic) => {
+    const cells: MasteryCell[] = MASTERY_BANDS.map((difficulty) => {
+      const subset = rows.filter(
+        (r) => r.subtopic === subtopic && r.difficulty === difficulty,
+      );
+      return {
+        difficulty,
+        correct: subset.filter((r) => r.correct).length,
+        total: subset.length,
+        available: availableBy.get(`${subtopic}|${difficulty}`) ?? 0,
+      };
+    });
+    const total = cells.reduce((s, c) => s + c.total, 0);
+    return {
+      subtopic,
+      skill: SKILL_BY_SUBTOPIC[subtopic],
+      label: SUBTOPIC_LABELS[subtopic],
+      cells,
+      total,
+      correct: cells.reduce((s, c) => s + c.correct, 0),
+    };
+  });
+
+  // --- pacing: time against correctness against the section budget -----------
+  const pacingRows = rows.filter((r) => r.timeSeconds > 0);
+  const points: PacingPoint[] = pacingRows.slice(0, 1200).map((r) => ({
+    seconds: Math.round(r.timeSeconds),
+    difficulty: r.difficulty,
+    correct: r.correct,
+    bench: TIME_BENCH[(r.difficulty as Difficulty) ?? 3] ?? SECTION_BUDGET_SECONDS,
+  }));
+  const bucketEdges: Array<[number, number | null, string]> = [
+    [0, 45, "< 0:45"],
+    [45, 90, "0:45–1:30"],
+    [90, 128, "1:30–2:08"],
+    [128, 180, "2:08–3:00"],
+    [180, 240, "3:00–4:00"],
+    [240, null, "> 4:00"],
+  ];
+  const buckets: PacingBucket[] = bucketEdges.map(([from, to, label]) => {
+    const subset = pacingRows.filter(
+      (r) => r.timeSeconds >= from && (to == null || r.timeSeconds < to),
+    );
+    return {
+      from,
+      to,
+      label,
+      correct: subset.filter((r) => r.correct).length,
+      total: subset.length,
+    };
+  });
+  const sortedTimes = pacingRows.map((r) => r.timeSeconds).sort((a, b) => a - b);
+  const medianSeconds =
+    sortedTimes.length > 0
+      ? Math.round(sortedTimes[Math.floor(sortedTimes.length / 2)])
+      : null;
+  let rushedWrong = 0;
+  let timeSinks = 0;
+  let sinkOverspendSeconds = 0;
+  for (const r of pacingRows) {
+    const bench = TIME_BENCH[(r.difficulty as Difficulty) ?? 3] ?? SECTION_BUDGET_SECONDS;
+    if (!r.correct && r.timeSeconds < bench * RUSH_RATIO) rushedWrong++;
+    if (r.timeSeconds > bench * SINK_RATIO) {
+      timeSinks++;
+      sinkOverspendSeconds += r.timeSeconds - bench;
+    }
+  }
+  const pacing: PacingView = {
+    points,
+    buckets,
+    budgetSeconds: SECTION_BUDGET_SECONDS,
+    medianSeconds,
+    rushedWrong,
+    timeSinks,
+    sinkOverspendSeconds: Math.round(sinkOverspendSeconds),
+  };
+
+  // --- ELO trajectory per pattern category -----------------------------------
+  const patternRows = await db
+    .select({
+      category: patternAttempts.category,
+      correct: patternAttempts.correct,
+      id: patternAttempts.id,
+    })
+    .from(patternAttempts)
+    .orderBy(patternAttempts.id)
+    .all();
+  const eloTrajectories: EloTrajectory[] = PATTERN_CATEGORY_KEYS.map(
+    (category) => {
+      const subset = patternRows.filter((r) => r.category === category);
+      let rating = ELO_START;
+      const all: EloTrajectoryPoint[] = [{ n: 0, rating: ELO_START }];
+      subset.forEach((row, i) => {
+        rating = nextRating(rating, ELO_ITEM_RATING, row.correct);
+        all.push({ n: i + 1, rating: Math.round(rating) });
+      });
+      // Thin to at most 60 points so a long history still draws cleanly.
+      const step = Math.max(1, Math.ceil(all.length / 60));
+      const points = all.filter((_, i) => i % step === 0 || i === all.length - 1);
+      return {
+        category,
+        label: PATTERN_CATEGORY_LABELS[category],
+        points,
+        current: Math.round(eloMap.get(category) ?? rating),
+        delta: Math.round(rating - ELO_START),
+      };
+    },
+  );
+
+  // --- score-report mirror ---------------------------------------------------
+  // Platform accuracy is computed over QUANT formats only: Data Sufficiency
+  // is a Data Insights format on the Focus Edition, so counting it here
+  // would make the mirror disagree with the report it mirrors.
+  const quantRows = rows.filter((r) => QUANT_FORMATS.includes(r.format));
+  const dataInsightsExcluded = rows.length - quantRows.length;
+  const latestReport = await db
+    .select()
+    .from(baselineReports)
+    .orderBy(desc(baselineReports.createdAt))
+    .limit(1)
+    .get();
+  type ReportShape = {
+    total_score?: number | null;
+    sections?: Array<{
+      section: string;
+      scaled_score: number | null;
+      percentile: number | null;
+    }>;
+    fundamental_skills?: Array<{ skill: string; percentile: number }>;
+    content_domains?: Array<{ domain: string; percentile: number }>;
+    contexts?: Array<{ context: string; percentile: number }>;
+  };
+  const report = (latestReport?.parsed ?? {}) as ReportShape;
+  const pair = <K extends string>(
+    keys: readonly K[],
+    labels: Record<K, string>,
+    of: (row: (typeof quantRows)[number]) => K,
+    reported: Map<string, number>,
+  ): MirrorPair[] =>
+    keys.map((key) => {
+      const subset = quantRows.filter((r) => of(r) === key);
+      return {
+        key,
+        label: labels[key],
+        reported: reported.get(key) ?? null,
+        platform:
+          subset.length > 0
+            ? Math.round(
+                (subset.filter((r) => r.correct).length / subset.length) * 100,
+              )
+            : null,
+        platformTotal: subset.length,
+      };
+    });
+  const reportMirror: ScoreReportMirror = {
+    reportedAt: latestReport?.createdAt ?? null,
+    totalScore: report.total_score ?? null,
+    sections: (report.sections ?? []).map((s) => ({
+      section: s.section,
+      label: SECTION_REPORT_LABELS[s.section] ?? s.section,
+      scaledScore: s.scaled_score,
+      percentile: s.percentile,
+    })),
+    skills: pair(
+      FUNDAMENTAL_SKILLS,
+      SKILL_LABELS,
+      (r) => r.skill,
+      new Map((report.fundamental_skills ?? []).map((s) => [s.skill, s.percentile])),
+    ),
+    domains: pair(
+      CONTENT_DOMAINS,
+      DOMAIN_LABELS,
+      (r) => r.domain,
+      new Map((report.content_domains ?? []).map((d) => [d.domain, d.percentile])),
+    ),
+    contexts: pair(
+      CONTEXTS,
+      CONTEXT_LABELS,
+      (r) => r.context,
+      new Map((report.contexts ?? []).map((c) => [c.context, c.percentile])),
+    ),
+    dataInsightsExcluded,
+  };
+
   return {
     attemptCount: rows.length,
     casualExcluded,
@@ -385,5 +702,9 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     volume,
     redoCompliance,
     eloBars,
+    masteryGrid,
+    pacing,
+    eloTrajectories,
+    reportMirror,
   };
 }
