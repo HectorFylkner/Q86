@@ -320,6 +320,29 @@ input[type="date"] {
   }
 }
 
+/* Touch targets. On a coarse pointer every control-shaped element gets a
+   44px minimum box, which is the one place a desktop-first layout most
+   reliably fails a phone. Dense data grids are exempt by construction —
+   see the note in components/charts/mastery-grid.tsx. */
+@media (pointer: coarse) {
+  :where(a, button, [role="button"], summary):where(
+      .rounded-control,
+      .rounded-full,
+      .rounded-card
+    ) {
+    min-height: 44px;
+  }
+  nav[aria-label="Primary"] a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  select,
+  input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]) {
+    min-height: 44px;
+  }
+}
+
 /* Thin, theme-aware scrollbars for the overflow rows (nav, tables). */
 * {
   scrollbar-width: thin;

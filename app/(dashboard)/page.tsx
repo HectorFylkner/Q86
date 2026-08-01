@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
@@ -6,8 +7,9 @@ import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
-import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
+import { daysToTest, gatherPlanInputs, selectPlanDrillIds } from "@/lib/plan-server";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
+import { findResumable, todaysQueueThenDrill } from "@/lib/resume";
 import { getSetting } from "@/lib/settings";
 import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,9 @@ export default async function TodayPage() {
     ? 0
     : cadence - (inputs.dayIndex % cadence);
   const deck = await todaysDeck();
+  const resumable = await findResumable();
+  const planDrillIds = verifiedCount > 0 ? await selectPlanDrillIds(plan) : [];
+  const today = await todaysQueueThenDrill(planDrillIds);
   const deckWaiting = deck.due + deck.fresh;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
@@ -110,6 +115,68 @@ export default async function TodayPage() {
         </section>
       )}
 
+      {resumable && (
+        <section className="rounded-card border border-amber/50 bg-amber/5 px-4 py-3 shadow-ambient">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-title font-semibold">
+                Pick up where you stopped
+              </h2>
+              <p className="mt-0.5 text-caption text-graphite">
+                A {resumable.mode === "redo" ? "redo run" : "drill"} from{" "}
+                {formatDistanceToNow(resumable.startedAt, { addSuffix: true })}{" "}
+                ended without finishing — {resumable.answered} answered,{" "}
+                {resumable.remainingCount} left. The answered ones are already
+                saved; this resumes rather than restarts.
+              </p>
+            </div>
+            <Link
+              href={`/drill?qids=${resumable.remainingIds.join(",")}`}
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-amber px-4 py-2 text-body font-medium text-paper transition-opacity hover:opacity-90"
+            >
+              Resume {resumable.remainingCount} question
+              {resumable.remainingCount === 1 ? "" : "s"} →
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {today.ids.length > 0 && (
+        <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 px-4 py-4 shadow-ambient">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-title font-semibold">
+                Start today
+              </h2>
+              <p className="mt-0.5 max-w-[62ch] text-caption text-graphite">
+                Everything the plan says today is, in order and in one run:{" "}
+                {today.dueIds.length > 0 && (
+                  <>
+                    <span className="font-medium text-ink">
+                      {today.dueIds.length} redo
+                      {today.dueIds.length === 1 ? "" : "s"} due
+                    </span>{" "}
+                    first, then{" "}
+                  </>
+                )}
+                <span className="font-medium text-ink">
+                  {today.ids.length - today.dueIds.length} weighted drill
+                  question
+                  {today.ids.length - today.dueIds.length === 1 ? "" : "s"}
+                </span>
+                . No returning to this page between blocks.
+              </p>
+            </div>
+            <Link
+              href={`/drill?qids=${today.ids.join(",")}`}
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-ballpoint px-5 py-2.5 text-body font-medium text-white transition-opacity hover:opacity-90"
+            >
+              Start today · {today.ids.length} questions →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {plan.phase && (
         <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -146,7 +213,7 @@ export default async function TodayPage() {
               <Link
                 key={key}
                 href={`/patterns?start=${key}`}
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Start round {i + 1}: {PATTERN_CATEGORY_LABELS[key]} →
               </Link>
@@ -168,7 +235,7 @@ export default async function TodayPage() {
           {verifiedCount > 0 ? (
             <Link
               href="/drill?plan=1"
-              className="text-sm font-medium text-ballpoint hover:underline"
+              className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
             >
               Start today&apos;s drill: {plan.drill.total} questions →
             </Link>
@@ -197,7 +264,7 @@ export default async function TodayPage() {
             {deckWaiting > 0 && (
               <Link
                 href="/deck"
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
               </Link>
@@ -205,14 +272,14 @@ export default async function TodayPage() {
             {plan.dueRedoCount > 0 ? (
               <Link
                 href="/queue?start=1"
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Redo all {plan.dueRedoCount} due →
               </Link>
             ) : (
               <Link
                 href="/queue"
-                className="text-sm text-graphite hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body text-graphite hover:underline"
               >
                 Open the queue →
               </Link>
@@ -236,12 +303,12 @@ export default async function TodayPage() {
           {plan.timedSetToday ? (
             <Link
               href="/timed?start=full"
-              className="text-sm font-medium text-ballpoint hover:underline"
+              className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
             >
               Start 21-question section →
             </Link>
           ) : (
-            <Link href="/timed" className="text-sm text-graphite hover:underline">
+            <Link href="/timed" className="inline-flex min-h-[44px] items-center text-body text-graphite hover:underline">
               Timed sets →
             </Link>
           )}

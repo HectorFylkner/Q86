@@ -183,7 +183,7 @@ export function MasteryGrid({ rows }: { rows: MasteryGridRow[] }) {
                           aria-label={`${row.label}, difficulty ${cell.difficulty}: ${label}. Drill this cell.`}
                           title={label}
                           className={cn(
-                            "flex h-8 w-11 items-center justify-center rounded-[3px] transition-transform hover:scale-[1.06] sm:w-14",
+                            "flex h-9 w-11 items-center justify-center rounded-[3px] transition-transform hover:scale-[1.06] sm:w-14",
                             level === 0 && "border border-dashed border-grid",
                           )}
                           style={{

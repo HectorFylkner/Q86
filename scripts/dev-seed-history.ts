@@ -447,9 +447,20 @@ async function main() {
         });
       });
 
+      // Yesterday's evening drill is left unfinished on purpose: real
+      // runs get abandoned, and the resume path needs something to
+      // resume. The session keeps its full question list in config and
+      // never gets an ended_at, which is exactly what lib/resume.ts
+      // looks for.
+      const abandoned =
+        back === 1 && planned.mode === "drill" && planned.focus === "focused";
+      const keptItems = abandoned
+        ? items.slice(0, Math.max(1, Math.floor(items.length * 0.4)))
+        : items;
+
       // Advance the ladder exactly the way lib/redo.ts does, including the
       // day-21 cold-solve gate (correct AND within 2:30, else back to +7d).
-      items.forEach((it, i) => {
+      keptItems.forEach((it, i) => {
         const ref = flatIndex + i;
         const open = ladder.get(it.q.id);
         if (planned.mode === "redo" && open && !open.cleared) {
@@ -477,9 +488,9 @@ async function main() {
           });
         }
       });
-      flatIndex += items.length;
+      flatIndex += keptItems.length;
 
-      const correctCount = items.filter((it) => it.correct).length;
+      const correctCount = keptItems.filter((it) => it.correct).length;
       sessionRows.push({
         focus: planned.focus,
         row: {
@@ -488,19 +499,22 @@ async function main() {
             synthetic: SYNTHETIC_TAG,
             focus: planned.focus,
             count: items.length,
+            questionIds: picked.map((q) => q.id),
             ...(planned.mode === "timed_set" ? { total: 21, minutes: 45 } : {}),
           } as unknown as Record<string, unknown>,
           startedAt,
-          endedAt: new Date(cursor),
-          summary: {
-            correct: correctCount,
-            total: items.length,
-          } as unknown as Record<string, unknown>,
+          endedAt: abandoned ? null : new Date(cursor),
+          summary: abandoned
+            ? null
+            : ({
+                correct: correctCount,
+                total: keptItems.length,
+              } as unknown as Record<string, unknown>),
         } as typeof sessions.$inferInsert,
-        items,
+        items: keptItems,
       });
-      totalAttempts += items.length;
-      totalMisses += items.length - correctCount;
+      totalAttempts += keptItems.length;
+      totalMisses += keptItems.length - correctCount;
     }
   }
 

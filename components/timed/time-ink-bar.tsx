@@ -71,7 +71,12 @@ export function TimeInkBar({
         })}
       </div>
       <div className="mt-3 flex justify-between font-mono text-xs text-graphite">
-        <span>{formatSeconds(remainingSeconds)} remaining</span>
+        <span
+          role="timer"
+          aria-label={`Time remaining in this section: ${Math.floor(Math.max(0, remainingSeconds) / 60)} minutes ${Math.floor(Math.max(0, remainingSeconds) % 60)} seconds`}
+        >
+          {formatSeconds(remainingSeconds)} remaining
+        </span>
       </div>
     </div>
   );

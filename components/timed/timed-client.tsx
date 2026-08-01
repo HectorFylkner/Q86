@@ -24,6 +24,7 @@ import {
   type FundamentalSkill,
   type SessionFocus,
 } from "@/lib/taxonomy";
+import { Announce, ClockAnnouncer } from "@/components/live-region";
 import { cn, formatSeconds } from "@/lib/utils";
 
 const PULSE_THRESHOLD_SECONDS = 165; // 2:45 decision pulse
@@ -561,6 +562,14 @@ export function TimedClient({
         remainingSeconds={remaining}
         checkpoints={checkpoints}
         pulseKey={pulseKey}
+      />
+      {/* The clock is the one number that decides every abandon-or-continue
+          call. Announced at milestones rather than every tick, so it is
+          audible without talking over everything else. */}
+      <ClockAnnouncer
+        remainingSeconds={remaining}
+        questionNumber={currentIndex + 1}
+        totalQuestions={questions.length}
       />
       <div className="mx-auto mt-4 max-w-3xl space-y-4">
         <div className="flex items-center justify-between text-xs text-graphite">

@@ -466,6 +466,93 @@ numbers recorded; zero new colour literals outside `globals.css`.
 
 ---
 
+### W3 — Usability and access ✅
+
+**Shipped**
+
+- **`components/shortcuts.tsx`** — the keyboard map, written down once and
+  opened from anywhere with `?`, plus a persistent affordance so the
+  binding is discoverable without already knowing it. Focus moves into
+  the dialog, is trapped there, Escape closes it, and focus returns to
+  whatever opened it. Bindings that exist but are undiscoverable are
+  bindings nobody uses; this is why the documentation is *in the app*
+  rather than in a README nobody opens mid-session.
+- **`components/live-region.tsx`** — `Announce`, `ClockAnnouncer`,
+  `TimerReadout`. The clock announces at milestones (30/20/15/10/5/2/1
+  minutes, 30s, 10s) rather than every tick, because a per-second live
+  region talks over everything else and is worse than silence; it also
+  carries `role="timer"` with an accessible name so it can be read on
+  demand.
+- **Live regions wired into the three places the brief names**: the timed
+  clock, the answer feedback (result + your choice + the key + position
+  in the set — a drawn stroke and a colour are nothing a screen reader
+  can see), and the redo queue's state changes.
+- **`components/focus-manager.tsx`** — a skip link as the first tab stop,
+  and focus moved to the new page's `h1` on client-side route change,
+  then the tabindex removed on blur so the heading never becomes a
+  permanent tab stop.
+- **`F` flags the current question** from the keyboard and moves focus
+  into the flag panel.
+- **Friction:** a "Start today" action that runs the due redos and the
+  weighted drill as one list, and a "Pick up where you stopped" card
+  driven by `lib/resume.ts` — which finds the most recent unfinished
+  drill/redo session, works out which questions were never answered, and
+  resumes rather than restarts. Timed sections are deliberately excluded:
+  a wall-clock section cannot be paused and resumed without destroying
+  what it simulates, and offering to would be a lie about what the
+  platform can give back.
+- **Touch targets:** a coarse-pointer rule gives every control-shaped
+  element a 44px minimum, and the Today CTAs, section tabs and form
+  controls were raised explicitly.
+
+**Measurements**
+
+| Metric | Before | After |
+| --- | --- | --- |
+| Interactive controls with an accessible name | 508/508 at rest, **runner states unaudited** | **676/676 (100%)** across 16 states incl. mid-drill, mid-timed and dialog-open |
+| Live regions | **0** | **5** (drill answering, drill revealed, timed clock ×2, redo queue) |
+| Keyboard-only steps through the full loop | not measurable | **13/13 with pointer events disabled** |
+| Taps: open app → answering the day's first question | 2 taps **+ a return trip to Today** | **1 tap** (redos first, then the drill, one run) |
+| Taps: return to an interrupted run | **no affordance existed** | **1 tap**, resuming at the unanswered remainder |
+| Horizontal page overflow at 390px on `/analytics` | **138px** | **0px** (scroll contained inside the card) |
+| Sub-44px tap targets on Today at 390px | 21 | **7** (top nav only — see below) |
+
+**Verification**
+
+```
+$ node scripts/keyboard-pass.mjs --out=screenshots/keyboard
+Keyboard-only pass (pointer events disabled):
+  ✓ Open Today · ✓ Open the keyboard map with ? · ✓ Close it with Escape
+  ✓ Tab to Start today and press Enter · ✓ Answer with a letter key
+  ✓ Set confidence with L · ✓ Submit with Enter
+  ✓ Answer feedback reaches a live region
+      → "Incorrect. You chose C. The answer is D. Question 1 of 58."
+  ✓ Open the flag panel with F · ✓ Advance with N
+  ✓ Reach the Review deck · ✓ Redo queue live region
+  ✓ Timed section start control reachable
+13/13 steps completed with the pointer disabled.
+
+$ node scripts/a11y-audit.mjs
+676/676 interactive controls carry an accessible name (100.0%).
+5 live regions across 16 routes.
+```
+
+The keyboard pass disables pointer events for the whole run, so a step
+that secretly needed a click fails rather than quietly passing.
+
+**Acceptance: PASSED** — keyboard-only pass captured as 13 screenshots in
+`screenshots/keyboard/`; accessible names on 100% of interactive controls
+including the in-session states; before/after tap counts for both paths.
+
+**Known remaining, stated rather than hidden:** 7 top-nav links sit at
+40px on a coarse pointer, and the mastery grid's 120 cells are 44×36. The
+nav is horizontally scrollable and secondary on phones (the 52px bottom
+tab bar is the primary), and a 24×4 grid at 44px per cell cannot fit a
+390px screen — the same drill is reachable from the row's chapter link
+and from Mastery. Both are trade-offs, not oversights.
+
+---
+
 ## Open risks
 
 - **R1 — Bank rebalancing is large.** Reaching D5 ≥ ⅓ and no subtopic

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Announce } from "@/components/live-region";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
@@ -24,7 +25,7 @@ import {
   type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
-import { cn, formatSeconds, percent } from "@/lib/utils";
+import { CHOICE_LETTERS, cn, formatSeconds, percent } from "@/lib/utils";
 
 const SOFT_TARGET_SECONDS = 135; // soft 2:15 target
 
@@ -67,6 +68,7 @@ export function QuestionRunner({
   const [hint, setHint] = useState<string | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [flagSignal, setFlagSignal] = useState(0);
   const startRef = useRef(Date.now());
 
   const question = questions[index];
@@ -184,6 +186,11 @@ export function QuestionRunner({
       const k = e.key.toLowerCase();
 
       if (phase === "answering") {
+        if (k === "f") {
+          setFlagSignal((n) => n + 1);
+          e.preventDefault();
+          return;
+        }
         if (/^[1-5]$/.test(k)) {
           setSelected(Number(k) - 1);
           setHint(null);
@@ -201,7 +208,10 @@ export function QuestionRunner({
           e.preventDefault();
         }
       } else if (phase === "revealed") {
-        if ((e.key === "Enter" || k === "n") && !e.repeat) {
+        if (k === "f") {
+          setFlagSignal((n) => n + 1);
+          e.preventDefault();
+        } else if ((e.key === "Enter" || k === "n") && !e.repeat) {
           next();
           e.preventDefault();
         } else if (k === "p") {
@@ -421,6 +431,17 @@ export function QuestionRunner({
         )}
       </motion.div>
 
+      {/* The result is a drawn stroke and a colour — nothing a screen
+          reader can see. Announce it, with the key and the takeaway, so
+          the reveal carries the same information either way. */}
+      <Announce
+        message={
+          revealed && currentResult
+            ? `${currentResult.correct ? "Correct" : "Incorrect"}. You chose ${CHOICE_LETTERS[currentResult.selectedIndex]}. The answer is ${CHOICE_LETTERS[question.correctIndex]}. Question ${index + 1} of ${questions.length}.`
+            : ""
+        }
+      />
+
       {revealed && currentResult && (
         <>
           {!currentResult.correct && (
@@ -446,6 +467,7 @@ export function QuestionRunner({
             </div>
           )}
           <SolutionPanel
+            flagSignal={flagSignal}
             question={question}
             selectedIndex={currentResult.selectedIndex}
           />

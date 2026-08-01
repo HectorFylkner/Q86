@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { flagQuestion } from "@/lib/actions";
 import {
   FLAG_REASONS,
@@ -11,8 +11,26 @@ import { cn } from "@/lib/utils";
 
 /** Compact content-QC control: flag the current question with a reason
  *  and optional note. Flags land in the review list on Analytics. */
-export function FlagButton({ questionId }: { questionId: number }) {
+export function FlagButton({
+  questionId,
+  openSignal = 0,
+}: {
+  questionId: number;
+  /** Bumped by the runner's `f` binding to open this panel from the
+   *  keyboard; focus follows into the panel so the flow continues. */
+  openSignal?: number;
+}) {
   const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (openSignal > 0) setOpen(true);
+  }, [openSignal]);
+
+  useEffect(() => {
+    if (!open) return;
+    panelRef.current?.querySelector<HTMLElement>("button, select")?.focus();
+  }, [open]);
   const [reason, setReason] = useState<FlagReason | null>(null);
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
@@ -20,7 +38,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
 
   if (sent) {
     return (
-      <p className="text-xs text-graphite">
+      <p role="status" className="text-caption text-graphite">
         Flagged — it&apos;s waiting in the review list on Analytics.
       </p>
     );
@@ -31,16 +49,21 @@ export function FlagButton({ questionId }: { questionId: number }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs text-graphite transition-colors hover:text-redpen"
+        className="text-caption text-graphite transition-colors hover:text-redpen"
       >
-        Something wrong with this question? Flag it
+        Something wrong with this question? Flag it{" "}
+        <kbd className="ml-0.5 font-mono text-micro opacity-70">F</kbd>
       </button>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-1.5">
+    <div ref={panelRef} className="space-y-2">
+      <div
+        className="flex flex-wrap gap-1.5"
+        role="group"
+        aria-label="Why are you flagging this question?"
+      >
         {FLAG_REASONS.map((r) => (
           <button
             key={r}

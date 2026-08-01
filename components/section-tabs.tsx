@@ -39,7 +39,7 @@ export function SectionTabs({
             href={tab.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 pb-2 text-sm transition-colors",
+              "-mb-px inline-flex min-h-[44px] items-end border-b-2 pb-2 text-body transition-colors",
               active
                 ? "border-ballpoint font-medium text-ink"
                 : "border-transparent text-graphite hover:text-ink",

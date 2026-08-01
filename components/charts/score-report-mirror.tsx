@@ -145,7 +145,10 @@ function MirrorSection({
           </span>
         </p>
       </div>
-      <table className="w-full border-collapse text-left">
+      {/* The meters have a hard minimum width; contain their scroll inside
+          the card rather than letting the page scroll sideways. */}
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[440px] border-collapse text-left">
         <caption className="sr-only">
           {heading}: the imported report&apos;s percentile and the
           platform&apos;s accuracy over Quant-format attempts, per category.
@@ -181,6 +184,7 @@ function MirrorSection({
           ))}
         </tbody>
       </table>
+      </div>
     </section>
   );
 }
