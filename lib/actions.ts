@@ -17,6 +17,8 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { selectDiagnostic } from "./diagnostic.ts";
+import { TIER_MIN_SIZE, type ChapterTier } from "./chapter-test-config.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -32,6 +34,8 @@ import {
   type QuestionFilter,
 } from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
+import { attributeError, type Attribution } from "./error-inference.ts";
+import { FUNDAMENTAL_SKILLS } from "./taxonomy.ts";
 import type {
   Confidence,
   EditReason,
@@ -77,14 +81,17 @@ export async function startDrill(config: {
   return { error: null, sessionId: session.id, questions: picked };
 }
 
-/** Chapter test: the pass-bar gate behind a Learn chapter. */
+/** Chapter test: the pass-bar gate behind a Learn chapter, one tier at a
+ *  time. The tier is recorded on the session so a pass credits the tier
+ *  it was actually taken at. */
 export async function startChapterTest(
   subtopic: Subtopic,
+  tier: ChapterTier = "foundation",
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
-  if (picked.length < 4) {
+  const picked = await selectChapterTest(subtopic, tier);
+  if (picked.length < TIER_MIN_SIZE) {
     return {
-      error: "Not enough verified questions in this chapter for a test.",
+      error: "Not enough verified questions in this chapter for that tier.",
       sessionId: null,
       questions: [],
     };
@@ -93,7 +100,36 @@ export async function startChapterTest(
     .insert(sessions)
     .values({
       mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
+      config: {
+        chapter_test: subtopic,
+        chapter_tier: tier,
+        count: picked.length,
+      },
+    })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: picked };
+}
+
+/**
+ * The placement diagnostic: sixteen questions, four per fundamental
+ * skill, interleaved. Recorded with `diagnostic: true` so the planner can
+ * weight against it until an official score report arrives.
+ */
+export async function startDiagnostic(): Promise<StartDrillResult> {
+  const picked = await selectDiagnostic();
+  if (picked.length < FUNDAMENTAL_SKILLS.length) {
+    return {
+      error: "Not enough verified questions for a diagnostic yet.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const session = await db
+    .insert(sessions)
+    .values({
+      mode: "drill",
+      config: { diagnostic: true, count: picked.length },
     })
     .returning()
     .get();
@@ -236,6 +272,64 @@ export async function tagAttempt(
   },
 ): Promise<void> {
   await db.update(attempts).set(patch).where(eq(attempts.id, attemptId)).run();
+}
+
+/**
+ * What the platform thinks went wrong, and why it thinks so.
+ *
+ * An untagged miss teaches nothing: it never reaches the heatmap, never
+ * shapes the plan, never names a repair. Auto-tagging on a hunch is
+ * worse — a misdiagnosed miss trains the wrong repair. So this returns a
+ * ranked suggestion *with its evidence*, which the runner shows for the
+ * user to confirm or override in one keystroke.
+ */
+export async function suggestErrorType(input: {
+  attemptId: number;
+}): Promise<Attribution | null> {
+  const row = await db
+    .select({
+      correct: attempts.correct,
+      timeSeconds: attempts.timeSeconds,
+      confidence: attempts.confidence,
+      selectedIndex: attempts.selectedIndex,
+      correctIndex: questions.correctIndex,
+      trapMap: questions.trapMap,
+      difficulty: questions.difficulty,
+      subtopic: questions.subtopic,
+    })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.id, input.attemptId))
+    .get();
+  if (!row || row.correct) return null;
+
+  // Recent record in this subtopic, focused attempts only — the same
+  // window the mastery ladder uses, so the two never disagree.
+  const history = await db
+    .select({ correct: attempts.correct })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(
+      and(eq(questions.subtopic, row.subtopic), eq(attempts.focus, "focused")),
+    )
+    .orderBy(desc(attempts.id))
+    .limit(20)
+    .all();
+
+  return attributeError({
+    correct: false,
+    timeSeconds: row.timeSeconds,
+    difficulty: row.difficulty as 1 | 2 | 3 | 4 | 5,
+    confidence: row.confidence,
+    selectedIndex: row.selectedIndex,
+    correctIndex: row.correctIndex,
+    chosenTrap: row.trapMap?.[String(row.selectedIndex)] ?? null,
+    subtopicAccuracy:
+      history.length > 0
+        ? history.filter((h) => h.correct).length / history.length
+        : null,
+    subtopicAttempts: history.length,
+  });
 }
 
 export async function finishSession(

@@ -2,15 +2,24 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { missBridgeHref } from "@/lib/miss-bridge";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Announce } from "@/components/live-region";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
+import { ErrorAttribution } from "@/components/drill/error-attribution";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
-import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
+import {
+  CHAPTER_TIERS,
+  TIER_SPEC,
+  tierBarCount,
+  tierPassed,
+  type ChapterTier,
+} from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import {
   DIFFICULTY_LABELS,
@@ -24,7 +33,7 @@ import {
   type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
-import { cn, formatSeconds, percent } from "@/lib/utils";
+import { CHOICE_LETTERS, cn, formatSeconds, percent } from "@/lib/utils";
 
 const SOFT_TARGET_SECONDS = 135; // soft 2:15 target
 
@@ -46,6 +55,7 @@ export function QuestionRunner({
   timing,
   focus = "focused",
   test,
+  tier = "foundation",
   onRestart,
 }: {
   sessionId: number;
@@ -55,6 +65,8 @@ export function QuestionRunner({
   focus?: SessionFocus;
   /** Set when this run is a chapter test for the given subtopic. */
   test?: Subtopic | null;
+  /** Which tier of that chapter test. */
+  tier?: ChapterTier;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -67,6 +79,7 @@ export function QuestionRunner({
   const [hint, setHint] = useState<string | null>(null);
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [flagSignal, setFlagSignal] = useState(0);
   const startRef = useRef(Date.now());
 
   const question = questions[index];
@@ -140,6 +153,17 @@ export function QuestionRunner({
       startRef.current = Date.now();
     } else {
       const all = results;
+      // Per-skill counts so a diagnostic can be read back as a baseline.
+      // Harmless on an ordinary drill and required on a diagnostic, so it
+      // is always written rather than branched on.
+      const bySkill: Record<string, { correct: number; total: number }> = {};
+      all.forEach((r, i) => {
+        const skill = questions[i]?.fundamentalSkill;
+        if (!skill) return;
+        const cell = (bySkill[skill] ??= { correct: 0, total: 0 });
+        cell.total += 1;
+        if (r.correct) cell.correct += 1;
+      });
       const summary = {
         total: all.length,
         correct: all.filter((r) => r.correct).length,
@@ -147,11 +171,12 @@ export function QuestionRunner({
           all.length > 0
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
+        bySkill,
       };
       finishSession(sessionId, summary).catch(() => {});
       setPhase("done");
     }
-  }, [phase, index, questions.length, results, sessionId]);
+  }, [phase, index, questions, results, sessionId]);
 
   const tagError = useCallback(
     (errorType: ErrorType) => {
@@ -184,6 +209,11 @@ export function QuestionRunner({
       const k = e.key.toLowerCase();
 
       if (phase === "answering") {
+        if (k === "f") {
+          setFlagSignal((n) => n + 1);
+          e.preventDefault();
+          return;
+        }
         if (/^[1-5]$/.test(k)) {
           setSelected(Number(k) - 1);
           setHint(null);
@@ -201,7 +231,10 @@ export function QuestionRunner({
           e.preventDefault();
         }
       } else if (phase === "revealed") {
-        if ((e.key === "Enter" || k === "n") && !e.repeat) {
+        if (k === "f") {
+          setFlagSignal((n) => n + 1);
+          e.preventDefault();
+        } else if ((e.key === "Enter" || k === "n") && !e.repeat) {
           next();
           e.preventDefault();
         } else if (k === "p") {
@@ -222,9 +255,10 @@ export function QuestionRunner({
     const avg =
       results.reduce((s, r) => s + r.timeSeconds, 0) /
       Math.max(1, results.length);
-    const passed =
-      test != null && correct / Math.max(1, results.length) >= CHAPTER_TEST_BAR;
-    const bar = Math.ceil(results.length * CHAPTER_TEST_BAR);
+    const passed = test != null && tierPassed(tier, correct, results.length);
+    const bar = tierBarCount(tier, results.length);
+    const tierIndex = CHAPTER_TIERS.indexOf(tier);
+    const unlockedNext = passed ? CHAPTER_TIERS[tierIndex + 1] : undefined;
     return (
       <div className="space-y-4">
         {test != null && (
@@ -236,12 +270,17 @@ export function QuestionRunner({
                 : "border-amber/50 bg-amber/5",
             )}
           >
+            <p className="font-mono text-[11px] uppercase tracking-wider text-graphite">
+              {TIER_SPEC[tier].label}
+            </p>
             <h2 className="font-display text-lg font-semibold">
-              {passed ? "Chapter test passed" : "Not passed yet"}
+              {passed ? `${TIER_SPEC[tier].label} passed` : "Not passed yet"}
             </h2>
             <p className="mt-1 text-sm text-graphite">
               {passed
-                ? `${correct}/${results.length} — this chapter now shows as passed on the Learn index. Keep it warm with drills; retakes can't demote you.`
+                ? unlockedNext
+                  ? `${correct}/${results.length}, and the bar was ${bar}. ${TIER_SPEC[unlockedNext].label} is now unlocked.`
+                  : `${correct}/${results.length}, and the bar was ${bar}. Every tier of this chapter is cleared.`
                 : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
@@ -251,9 +290,17 @@ export function QuestionRunner({
               >
                 Back to the chapter
               </Link>
+              {passed && unlockedNext && (
+                <Link
+                  href={`/drill?test=${test}&tier=${unlockedNext}`}
+                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                >
+                  {TIER_SPEC[unlockedNext].label} →
+                </Link>
+              )}
               {!passed && (
                 <Link
-                  href={`/drill?test=${test}`}
+                  href={`/drill?test=${test}&tier=${tier}`}
                   className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
                 >
                   Retake with fresh questions →
@@ -294,7 +341,21 @@ export function QuestionRunner({
                 return (
                   <tr key={i} className="border-b border-grid last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
-                    <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
+                    <td className="px-3 py-2">
+                      {r.correct ? (
+                        SUBTOPIC_LABELS[q.subtopic]
+                      ) : (
+                        // A miss is the moment the chapter is worth
+                        // re-opening, so the subtopic itself is the way
+                        // back to it.
+                        <Link
+                          href={missBridgeHref(q.subtopic, r.errorType)}
+                          className="hover:text-ballpoint hover:underline"
+                        >
+                          {SUBTOPIC_LABELS[q.subtopic]}
+                        </Link>
+                      )}
+                    </td>
                     <td className="px-3 py-2">
                       <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
                     </td>
@@ -353,7 +414,11 @@ export function QuestionRunner({
           <Chip>{SKILL_LABELS[question.fundamentalSkill]}</Chip>
           <Chip>{SUBTOPIC_LABELS[question.subtopic]}</Chip>
           <Chip>{DIFFICULTY_LABELS[question.difficulty as Difficulty]}</Chip>
-          {question.format === "data_sufficiency" && <Chip>DS</Chip>}
+          {/* DS is a Data Insights format on the Focus Edition, not a Quant
+              one (see SECTION_BY_FORMAT); say so wherever it is served. */}
+          {question.format === "data_sufficiency" && (
+            <Chip>DS · Data Insights</Chip>
+          )}
         </div>
         {timing === "soft" && !revealed && (
           <span
@@ -417,31 +482,29 @@ export function QuestionRunner({
         )}
       </motion.div>
 
+      {/* The result is a drawn stroke and a colour — nothing a screen
+          reader can see. Announce it, with the key and the takeaway, so
+          the reveal carries the same information either way. */}
+      <Announce
+        message={
+          revealed && currentResult
+            ? `${currentResult.correct ? "Correct" : "Incorrect"}. You chose ${CHOICE_LETTERS[currentResult.selectedIndex]}. The answer is ${CHOICE_LETTERS[question.correctIndex]}. Question ${index + 1} of ${questions.length}.`
+            : ""
+        }
+      />
+
       {revealed && currentResult && (
         <>
           {!currentResult.correct && (
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
-              {ERROR_TYPES.map((et, i) => (
-                <button
-                  key={et}
-                  onClick={() => tagError(et)}
-                  disabled={currentResult.attemptId == null}
-                  className={cn(
-                    "rounded-control border px-2 py-1 transition-colors duration-150",
-                    currentResult.errorType === et
-                      ? "border-redpen bg-redpen/5 font-medium text-redpen"
-                      : "border-grid text-graphite hover:border-graphite/50",
-                    currentResult.attemptId == null && "opacity-50",
-                  )}
-                >
-                  <span className="mr-1 font-mono opacity-60">{i + 1}</span>
-                  {ERROR_TYPE_LABELS[et]}
-                </button>
-              ))}
-            </div>
+            <ErrorAttribution
+              attemptId={currentResult.attemptId}
+              value={currentResult.errorType ?? null}
+              onChange={tagError}
+              disabled={currentResult.attemptId == null}
+            />
           )}
           <SolutionPanel
+            flagSignal={flagSignal}
             question={question}
             selectedIndex={currentResult.selectedIndex}
           />

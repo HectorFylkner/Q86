@@ -1,5 +1,8 @@
-# Fly.io config for a personal Q86 instance. See DEPLOY.md for the
-# three-command setup. The volume holds ./data (SQLite + scratch photos);
+# Fly.io config for a personal Q86 instance — one of two supported
+# deployments. This one needs flyctl and a Fly account: `fly launch --no-deploy`,
+# `fly volumes create q86_data`, `fly deploy`. DEPLOY.md documents the other
+# path (Vercel + Turso), which needs no terminal at all.
+# The volume holds ./data (SQLite + scratch photos);
 # auto-stop keeps cost near zero when you are not training.
 app = "q86"
 primary_region = "arn"

@@ -16,9 +16,12 @@ import { CHOICE_LETTERS, cn } from "@/lib/utils";
 export function SolutionPanel({
   question,
   selectedIndex,
+  flagSignal = 0,
 }: {
   question: Question;
   selectedIndex: number | null;
+  /** Bumped by the runner's `f` binding. */
+  flagSignal?: number;
 }) {
   const traps = Object.entries(question.trapMap ?? {})
     .map(([k, v]) => ({ index: Number(k), text: v }))
@@ -92,7 +95,7 @@ export function SolutionPanel({
       )}
 
       <section className="border-t border-grid pt-3">
-        <FlagButton questionId={question.id} />
+        <FlagButton questionId={question.id} openSignal={flagSignal} />
       </section>
 
       {priorAttempts.length > 0 && (

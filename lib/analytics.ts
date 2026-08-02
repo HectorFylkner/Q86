@@ -1,18 +1,30 @@
-import { desc, eq } from "drizzle-orm";
+import { count as sqlCount, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import {
   attempts,
+  baselineReports,
   edits,
   eloRatings,
+  patternAttempts,
   questions,
   redoQueue,
 } from "./db/schema.ts";
-import { ELO_START } from "./elo.ts";
+import { ELO_START, nextRating } from "./elo.ts";
 import {
   PATTERN_CATEGORY_KEYS,
   PATTERN_CATEGORY_LABELS,
   type PatternCategoryKey,
 } from "./generators/index.ts";
+import {
+  accuracyPct,
+  bucketByTime,
+  calibration as calibrationRows,
+  calibrationError,
+  median,
+  type TimeBucketEdge,
+} from "./analytics-math.ts";
+import { recentMissChains, type MissChainSummary } from "./miss-chain.ts";
+import { RUSH_RATIO, SINK_RATIO, TIME_BENCH } from "./pacing.ts";
 import {
   ALL_SUBTOPICS,
   CONFIDENCES,
@@ -22,11 +34,31 @@ import {
   DOMAIN_LABELS,
   ERROR_TYPES,
   FUNDAMENTAL_SKILLS,
+  QUANT_FORMATS,
+  SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  SUBTOPIC_LABELS,
   type Confidence,
+  type Difficulty,
   type ErrorType,
+  type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
+
+/** 21 questions in 45 minutes — the official Quant section average. */
+export const SECTION_BUDGET_SECONDS = Math.round((45 * 60) / 21);
+
+/** The difficulty rungs the mastery grid shows (D1 is not in the bank). */
+const MASTERY_BANDS = [2, 3, 4, 5];
+
+/** Item rating the pattern trainer plays against, mirroring the runner. */
+const ELO_ITEM_RATING = 1250;
+
+const SECTION_REPORT_LABELS: Record<string, string> = {
+  quant: "Quantitative Reasoning",
+  verbal: "Verbal Reasoning",
+  data_insights: "Data Insights",
+};
 
 export type MirrorBar = { key: string; label: string; correct: number; total: number };
 
@@ -61,6 +93,96 @@ export type DifficultyMatrixRow = {
 
 export type VolumeDay = { date: string; count: number };
 
+/** One cell of the 24-subtopic mastery grid. */
+export type MasteryCell = {
+  difficulty: number;
+  correct: number;
+  total: number;
+  /** Verified bank items available in this cell. */
+  available: number;
+};
+
+export type MasteryGridRow = {
+  subtopic: Subtopic;
+  skill: FundamentalSkill;
+  label: string;
+  cells: MasteryCell[];
+  /** Focused attempts across the row. */
+  total: number;
+  correct: number;
+};
+
+/** Time-on-task against the section budget. */
+export type PacingPoint = {
+  seconds: number;
+  difficulty: number;
+  correct: boolean;
+  /** Benchmark for this difficulty, from lib/pacing.ts. */
+  bench: number;
+};
+
+export type PacingBucket = {
+  /** Inclusive lower bound in seconds; the last bucket is open-ended. */
+  from: number;
+  to: number | null;
+  label: string;
+  correct: number;
+  total: number;
+};
+
+export type PacingView = {
+  points: PacingPoint[];
+  buckets: PacingBucket[];
+  /** The official section average: 21 questions in 45 minutes. */
+  budgetSeconds: number;
+  medianSeconds: number | null;
+  /** Answered wrong in under half the benchmark. */
+  rushedWrong: number;
+  /** Ran more than half again over the benchmark. */
+  timeSinks: number;
+  /** Seconds spent beyond benchmark on sinks — the recoverable time. */
+  sinkOverspendSeconds: number;
+};
+
+export type EloTrajectoryPoint = { n: number; rating: number };
+
+export type EloTrajectory = {
+  category: PatternCategoryKey;
+  label: string;
+  points: EloTrajectoryPoint[];
+  current: number;
+  /** Change over the plotted window. */
+  delta: number;
+};
+
+/** The imported report beside the platform's own numbers, same cuts. */
+export type MirrorPair = {
+  key: string;
+  label: string;
+  /** Percentile from the imported official report, when present. */
+  reported: number | null;
+  /** Platform accuracy over Quant-format items, 0..100. */
+  platform: number | null;
+  platformTotal: number;
+};
+
+export type ScoreReportMirror = {
+  reportedAt: Date | null;
+  totalScore: number | null;
+  sections: Array<{
+    section: string;
+    label: string;
+    scaledScore: number | null;
+    percentile: number | null;
+  }>;
+  skills: MirrorPair[];
+  domains: MirrorPair[];
+  contexts: MirrorPair[];
+  /** Attempts excluded from the Quant read because DS is a Data Insights
+   *  format on the Focus Edition (see SECTION_BY_FORMAT). */
+  dataInsightsExcluded: number;
+};
+
 export type AnalyticsData = {
   attemptCount: number;
   /** Attempts tagged casual at session start, excluded from every number here. */
@@ -94,19 +216,19 @@ export type AnalyticsData = {
     expected: number;
     actual: number | null;
     total: number;
+    /** expected − actual, in points. Positive is overconfidence. */
+    gap: number | null;
   }>;
+  /** Attempt-weighted mean absolute calibration gap, in points. */
+  calibrationMeanError: number | null;
   trend: TrendPoint[];
   /** Accuracy per subtopic × difficulty (focused attempts only). */
   difficultyMatrix: DifficultyMatrixRow[];
   /** Attempts per local day, most recent 84 days (includes zero days). */
   volume: VolumeDay[];
-  redoCompliance: {
-    open: number;
-    overdue: number;
-    cleared: number;
-    dueNow: number;
-  };
-  eloBars: Array<{ category: PatternCategoryKey; label: string; rating: number }>;
+  pacing: PacingView;
+  reportMirror: ScoreReportMirror;
+  missChains: MissChainSummary;
 };
 
 /** Expected accuracy per confidence bucket for the calibration curve. */
@@ -130,6 +252,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       domain: questions.contentDomain,
       context: questions.context,
       difficulty: questions.difficulty,
+      format: questions.format,
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
@@ -236,20 +359,19 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   ).length;
 
   // --- calibration -----------------------------------------------------------
-  const calibration = CONFIDENCES.map((confidence) => {
-    const subset = rows.filter((r) => r.confidence === confidence);
-    return {
-      confidence,
-      expected: EXPECTED_BY_CONFIDENCE[confidence],
-      actual:
-        subset.length > 0
-          ? Math.round(
-              (subset.filter((r) => r.correct).length / subset.length) * 100,
-            )
-          : null,
-      total: subset.length,
-    };
-  });
+  const calibrationDetail = calibrationRows(
+    rows,
+    EXPECTED_BY_CONFIDENCE,
+    CONFIDENCES,
+  );
+  const calibration = calibrationDetail.map((r) => ({
+    confidence: r.bucket as Confidence,
+    expected: r.expected,
+    actual: r.actual,
+    total: r.total,
+    gap: r.gap,
+  }));
+  const calibrationMeanError = calibrationError(calibrationDetail);
 
   // --- rolling 7-day accuracy per skill, last 30 days -------------------------
   const trend: TrendPoint[] = [];
@@ -324,32 +446,120 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     }
   }
 
-  // --- redo compliance ---------------------------------------------------------
-  const redoRows = await db.select().from(redoQueue).all();
-  const nowMs = Date.now();
-  const redoCompliance = {
-    open: redoRows.filter((r) => !r.cleared).length,
-    overdue: redoRows.filter(
-      (r) => !r.cleared && new Date(r.dueAt).getTime() < nowMs,
-    ).length,
-    cleared: redoRows.filter((r) => r.cleared).length,
-    dueNow: redoRows.filter(
-      (r) => !r.cleared && new Date(r.dueAt).getTime() <= nowMs,
-    ).length,
+  // --- pacing: time against correctness against the section budget -----------
+  const pacingRows = rows.filter((r) => r.timeSeconds > 0);
+  const points: PacingPoint[] = pacingRows.slice(0, 1200).map((r) => ({
+    seconds: Math.round(r.timeSeconds),
+    difficulty: r.difficulty,
+    correct: r.correct,
+    bench: TIME_BENCH[(r.difficulty as Difficulty) ?? 3] ?? SECTION_BUDGET_SECONDS,
+  }));
+  const bucketEdges: TimeBucketEdge[] = [
+    { from: 0, to: 45, label: "< 0:45" },
+    { from: 45, to: 90, label: "0:45–1:30" },
+    { from: 90, to: 128, label: "1:30–2:08" },
+    { from: 128, to: 180, label: "2:08–3:00" },
+    { from: 180, to: 240, label: "3:00–4:00" },
+    { from: 240, to: null, label: "> 4:00" },
+  ];
+  const buckets: PacingBucket[] = bucketByTime(pacingRows, bucketEdges);
+  const medianRaw = median(pacingRows.map((r) => r.timeSeconds));
+  const medianSeconds = medianRaw == null ? null : Math.round(medianRaw);
+  let rushedWrong = 0;
+  let timeSinks = 0;
+  let sinkOverspendSeconds = 0;
+  for (const r of pacingRows) {
+    const bench = TIME_BENCH[(r.difficulty as Difficulty) ?? 3] ?? SECTION_BUDGET_SECONDS;
+    if (!r.correct && r.timeSeconds < bench * RUSH_RATIO) rushedWrong++;
+    if (r.timeSeconds > bench * SINK_RATIO) {
+      timeSinks++;
+      sinkOverspendSeconds += r.timeSeconds - bench;
+    }
+  }
+  const pacing: PacingView = {
+    points,
+    buckets,
+    budgetSeconds: SECTION_BUDGET_SECONDS,
+    medianSeconds,
+    rushedWrong,
+    timeSinks,
+    sinkOverspendSeconds: Math.round(sinkOverspendSeconds),
   };
 
-  // --- pattern ELO ---------------------------------------------------------------
-  const eloMap = new Map(
-    (await db.select().from(eloRatings).all()).map((r) => [
-      r.category,
-      r.rating,
-    ]),
-  );
-  const eloBars = PATTERN_CATEGORY_KEYS.map((category) => ({
-    category,
-    label: PATTERN_CATEGORY_LABELS[category],
-    rating: Math.round(eloMap.get(category) ?? ELO_START),
-  }));
+  // --- score-report mirror ---------------------------------------------------
+  // Platform accuracy is computed over QUANT formats only: Data Sufficiency
+  // is a Data Insights format on the Focus Edition, so counting it here
+  // would make the mirror disagree with the report it mirrors.
+  const quantRows = rows.filter((r) => QUANT_FORMATS.includes(r.format));
+  const dataInsightsExcluded = rows.length - quantRows.length;
+  const latestReport = await db
+    .select()
+    .from(baselineReports)
+    .orderBy(desc(baselineReports.createdAt))
+    .limit(1)
+    .get();
+  type ReportShape = {
+    total_score?: number | null;
+    sections?: Array<{
+      section: string;
+      scaled_score: number | null;
+      percentile: number | null;
+    }>;
+    fundamental_skills?: Array<{ skill: string; percentile: number }>;
+    content_domains?: Array<{ domain: string; percentile: number }>;
+    contexts?: Array<{ context: string; percentile: number }>;
+  };
+  const report = (latestReport?.parsed ?? {}) as ReportShape;
+  const pair = <K extends string>(
+    keys: readonly K[],
+    labels: Record<K, string>,
+    of: (row: (typeof quantRows)[number]) => K,
+    reported: Map<string, number>,
+  ): MirrorPair[] =>
+    keys.map((key) => {
+      const subset = quantRows.filter((r) => of(r) === key);
+      return {
+        key,
+        label: labels[key],
+        reported: reported.get(key) ?? null,
+        platform:
+          subset.length > 0
+            ? Math.round(
+                (subset.filter((r) => r.correct).length / subset.length) * 100,
+              )
+            : null,
+        platformTotal: subset.length,
+      };
+    });
+  const reportMirror: ScoreReportMirror = {
+    reportedAt: latestReport?.createdAt ?? null,
+    totalScore: report.total_score ?? null,
+    sections: (report.sections ?? []).map((s) => ({
+      section: s.section,
+      label: SECTION_REPORT_LABELS[s.section] ?? s.section,
+      scaledScore: s.scaled_score,
+      percentile: s.percentile,
+    })),
+    skills: pair(
+      FUNDAMENTAL_SKILLS,
+      SKILL_LABELS,
+      (r) => r.skill,
+      new Map((report.fundamental_skills ?? []).map((s) => [s.skill, s.percentile])),
+    ),
+    domains: pair(
+      CONTENT_DOMAINS,
+      DOMAIN_LABELS,
+      (r) => r.domain,
+      new Map((report.content_domains ?? []).map((d) => [d.domain, d.percentile])),
+    ),
+    contexts: pair(
+      CONTEXTS,
+      CONTEXT_LABELS,
+      (r) => r.context,
+      new Map((report.contexts ?? []).map((c) => [c.context, c.percentile])),
+    ),
+    dataInsightsExcluded,
+  };
 
   return {
     attemptCount: rows.length,
@@ -380,10 +590,12 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       })),
     },
     calibration,
+    calibrationMeanError,
     trend,
     difficultyMatrix,
     volume,
-    redoCompliance,
-    eloBars,
+    pacing,
+    reportMirror,
+    missChains: await recentMissChains(),
   };
 }

@@ -15,8 +15,36 @@
   --graphite: #5e6268;
   --ballpoint: #2239c4;
   --redpen: #c63b2f;
-  --amber: #b7791f;
+  --amber: #a16a1b;
   --highlight: #f5efd9;
+
+  /* ---- Chart palette ------------------------------------------------
+     Every value below was measured, not chosen by eye, with the dataviz
+     validator (OKLCH lightness band, chroma floor, Machado-Oliveira-
+     Fernandes CVD separation at severity 1.0, normal-vision floor, and
+     contrast against this mode's chart surface). Recorded results are in
+     docs/phase-log.md. Do not substitute a value here without re-running
+     the validator for BOTH modes.
+
+     Categorical — four slots, one per fundamental skill, assigned in
+     fixed order and never cycled. Pen colours on exam paper: ballpoint,
+     red pen, marker teal, highlighter violet. */
+  --series-1: #2f4fd8;
+  --series-2: #cf3b2c;
+  --series-3: #0f8f7a;
+  --series-4: #8a4bc9;
+
+  /* Status — outcome only. Never reused as a series colour, and never
+     shipped as colour alone: every use carries a shape or a label. */
+  --good: #1d8659;
+  --bad: #cf3b2c;
+
+  /* Sequential — one hue, four monotone steps, light to dark. Magnitude
+     (mastery, volume, density). The zero level is the surface itself. */
+  --ramp-1: #8293c3;
+  --ramp-2: #6076cf;
+  --ramp-3: #3f56bd;
+  --ramp-4: #233690;
 }
 
 /* Night desk: dark graphite paper, warm ink, ballpoint lifted for contrast. */
@@ -31,6 +59,19 @@
     --redpen: #e0705f;
     --amber: #d9a050;
     --highlight: #2b2820;
+
+    /* Dark-mode chart palette — selected against #1c1e24, not flipped.
+       Same hues, re-stepped; all checks re-run in dark mode. */
+    --series-1: #7189ea;
+    --series-2: #dc6752;
+    --series-3: #18ac91;
+    --series-4: #ad74e4;
+    --good: #2aa273;
+    --bad: #dc6752;
+    --ramp-1: #5265ae;
+    --ramp-2: #6b80cc;
+    --ramp-3: #8598e2;
+    --ramp-4: #a9baf7;
   }
 }
 :root[data-theme="dark"] {
@@ -43,6 +84,19 @@
   --redpen: #e0705f;
   --amber: #d9a050;
   --highlight: #2b2820;
+
+  /* Dark-mode chart palette — selected against #1c1e24, not flipped.
+     Same hues, re-stepped; all checks re-run in dark mode. */
+  --series-1: #7189ea;
+  --series-2: #dc6752;
+  --series-3: #18ac91;
+  --series-4: #ad74e4;
+  --good: #2aa273;
+  --bad: #dc6752;
+  --ramp-1: #5265ae;
+  --ramp-2: #6b80cc;
+  --ramp-3: #8598e2;
+  --ramp-4: #a9baf7;
 }
 
 /* KaTeX inherits currentColor, but its rules/fraction bars use borders that
@@ -59,11 +113,53 @@
   --color-amber: var(--amber);
   --color-highlight: var(--highlight);
 
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+  --color-series-4: var(--series-4);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --color-ramp-1: var(--ramp-1);
+  --color-ramp-2: var(--ramp-2);
+  --color-ramp-3: var(--ramp-3);
+  --color-ramp-4: var(--ramp-4);
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
     sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
     monospace;
+
+  /* ---- Typographic scale --------------------------------------------
+     The app previously compressed nearly everything into text-xs and
+     text-sm, so a number that mattered and a caption that did not looked
+     alike. These are the only sizes; each one has a job.
+
+       micro    mono tags, axis ticks, provenance
+       caption  supporting prose under a heading
+       body     the reading size for prose and table cells
+       lede     the opening paragraph of a section
+       title    card and section headings
+       section  page headings
+       figure   a stat tile's value
+       hero     the one number a view leads with
+  */
+  --text-micro: 11px;
+  --text-micro--line-height: 1.45;
+  --text-caption: 12.5px;
+  --text-caption--line-height: 1.5;
+  --text-body: 14.5px;
+  --text-body--line-height: 1.6;
+  --text-lede: 16px;
+  --text-lede--line-height: 1.65;
+  --text-title: 19px;
+  --text-title--line-height: 1.3;
+  --text-section: 25px;
+  --text-section--line-height: 1.2;
+  --text-figure: 30px;
+  --text-figure--line-height: 1.1;
+  --text-hero: 48px;
+  --text-hero--line-height: 1;
 
   --radius-card: 10px;
   --radius-control: 6px;
@@ -75,6 +171,14 @@
 html {
   /* Tabular figures everywhere — timers, tables, counters never wobble. */
   font-variant-numeric: tabular-nums;
+}
+
+/* …except a large standalone number. Tabular figures give every digit the
+   width of a zero, which reads loose at display sizes; a hero figure or a
+   stat-tile value is not in a column and does not need to align. */
+.text-hero,
+.text-figure {
+  font-variant-numeric: proportional-nums;
 }
 
 body {
@@ -213,6 +317,29 @@ input[type="date"] {
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) input[type="date"] {
     color-scheme: dark;
+  }
+}
+
+/* Touch targets. On a coarse pointer every control-shaped element gets a
+   44px minimum box, which is the one place a desktop-first layout most
+   reliably fails a phone. Dense data grids are exempt by construction —
+   see the note in components/charts/mastery-grid.tsx. */
+@media (pointer: coarse) {
+  :where(a, button, [role="button"], summary):where(
+      .rounded-control,
+      .rounded-full,
+      .rounded-card
+    ) {
+    min-height: 44px;
+  }
+  nav[aria-label="Primary"] a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  select,
+  input:where([type="text"], [type="password"], [type="number"], [type="date"], [type="email"]) {
+    min-height: 44px;
   }
 }
 

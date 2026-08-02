@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { TIER_SPEC, type ChapterTier } from "@/lib/chapter-test-config";
 
 /** localStorage key per chapter; value {c: checked indexes, t: item count}.
  *  The Learn index reads the same keys to show readiness badges. */
@@ -10,18 +11,35 @@ export function checklistKey(subtopic: string): string {
   return `q86-learn:${subtopic}`;
 }
 
-export type ChecklistTestState = {
+export type ChecklistTierState = {
+  tier: ChapterTier;
   passed: boolean;
-  lastScore: string | null; // "6/8" from the most recent take
+  unlocked: boolean;
+  available: boolean;
+  /** The difficulties this tier actually serves, e.g. "D3–D4". */
+  range: string;
+  size: number;
+  /** "5/6" from the most recent take of this tier. */
+  lastScore: string | null;
+};
+
+export type ChecklistTestState = {
+  /** Every required tier cleared. */
+  passed: boolean;
+  tiers: ChecklistTierState[];
 };
 
 export function DrillChecklist({
   subtopic,
   items,
+  drill,
   test,
 }: {
   subtopic: string;
   items: string[];
+  /** Where "go prove it" leads. A content chapter drills its subtopic; a
+   *  technique chapter drills the items whose fastest path uses it. */
+  drill: { href: string; label: string };
   /** Chapter-test state; when present the completed checklist promotes
    *  the test to the primary action (read → drill → prove it). */
   test?: ChecklistTestState;
@@ -114,45 +132,99 @@ export function DrillChecklist({
         <p className="text-sm">
           {test?.passed ? (
             <span className="font-medium text-ballpoint">
-              Test passed ✓{test.lastScore ? ` · last ${test.lastScore}` : ""}
+              Chapter passed ✓
             </span>
           ) : all ? (
             <span className="font-medium text-ballpoint">
-              All checked — prove it on the test.
+              {test ? "All checked — prove it on the test." : "All checked — go prove it."}
             </span>
           ) : (
             <span className="text-graphite">
-              {test?.lastScore
-                ? `Last test: ${test.lastScore} — the bar is 6/8.`
-                : "The drill will tell you if the ticks were honest."}
+              The drill will tell you if the ticks were honest.
             </span>
           )}
         </p>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/drill?sub=${subtopic}&d=3`}
-            className={
-              all && test
-                ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-                : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-            }
-          >
-            Drill this now →
-          </Link>
-          {test && (
-            <Link
-              href={`/drill?test=${subtopic}`}
-              className={
-                all
-                  ? "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
-                  : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
-              }
-            >
-              {test.passed ? "Retake the test" : "Chapter test →"}
-            </Link>
-          )}
-        </div>
+        <Link
+          href={drill.href}
+          className={
+            all && test
+              ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+              : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+          }
+        >
+          {drill.label}
+        </Link>
       </div>
+
+      {/* The tier ladder. Progression is the point: attempting the top
+          band on unproved foundations produces a score that teaches
+          nothing, so each rung stays locked until the one below clears. */}
+      {test && (
+        <div className="border-t border-grid px-4 py-3 sm:px-5">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-graphite">
+            Chapter test · three tiers
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {test.tiers.map((t, i) => {
+              const spec = TIER_SPEC[t.tier];
+              const below = i > 0 ? TIER_SPEC[test.tiers[i - 1].tier] : null;
+              return (
+                <li
+                  key={t.tier}
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      <span
+                        className={`text-sm font-medium ${
+                          t.unlocked ? "" : "text-graphite"
+                        }`}
+                      >
+                        {spec.label}
+                      </span>
+                      <span className="font-mono text-[11px] text-graphite">
+                        {t.size} · {t.range}
+                      </span>
+                      {t.passed && (
+                        <span className="font-mono text-[11px] text-ballpoint">
+                          ✓ passed
+                        </span>
+                      )}
+                      {!t.passed && t.lastScore && (
+                        <span className="font-mono text-[11px] text-amber">
+                          last {t.lastScore}
+                        </span>
+                      )}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-snug text-graphite">
+                      {!t.available
+                        ? "Not enough verified questions in this chapter yet."
+                        : t.unlocked
+                          ? spec.blurb
+                          : `Clear ${below ? below.label : "the previous tier"} first.`}
+                    </span>
+                  </span>
+                  {t.available && t.unlocked ? (
+                    <Link
+                      href={`/drill?test=${subtopic}&tier=${t.tier}`}
+                      className="inline-flex min-h-[44px] shrink-0 items-center rounded-control border border-grid px-3 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+                    >
+                      {t.passed ? "Retake" : "Take it →"}
+                    </Link>
+                  ) : (
+                    <span
+                      className="inline-flex min-h-[44px] shrink-0 items-center px-3 py-2 font-mono text-[11px] text-graphite"
+                      aria-hidden
+                    >
+                      {t.available ? "locked" : "—"}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

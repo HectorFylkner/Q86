@@ -15,6 +15,19 @@
  *   { kind: "index", index: number }  — for DS / expression-choice items,
  *     the check itself must derive the correct index programmatically.
  *
+ * DISTRACTOR REACHABILITY (the second gate, added in the quality pass).
+ * A wrong choice nobody would pick is a wasted choice. Items authored
+ * with `{ requireTrapValues: true }` must also carry
+ *
+ *   trap_values(q) -> { "0": <number|string>, ... }   one per wrong index
+ *
+ * which *computes* each distractor by committing the specific named error
+ * from trap_map — a sign flip, a part/whole inversion, an off-by-one, a
+ * stop one step early — and the harness asserts the computed result equals
+ * that choice. A distractor that cannot be produced by a stated mistake
+ * fails the batch. Numbers are compared against the parsed choice value;
+ * strings against the raw choice text (for algebraic-expression choices).
+ *
  * Usage: write a batch file next to this one (see example-batch.mjs),
  * then run it with `node --experimental-strip-types scripts/author/your-batch.mjs`
  * (the flag is needed below Node 22.18 — this file imports the app's .ts
@@ -32,7 +45,10 @@ import { DS_CHOICES } from "../../lib/taxonomy.ts";
 
 const BANK = path.join(import.meta.dirname, "..", "seed-bank.json");
 
-export function verifyAndAppend(items, { dryRun = false } = {}) {
+export function verifyAndAppend(
+  items,
+  { dryRun = false, requireTrapValues = false } = {},
+) {
   const failures = [];
   const fail = (i, msg) => failures.push(`[${i}] ${items[i].subtopic ?? "?"}: ${msg}`);
 
@@ -79,6 +95,33 @@ export function verifyAndAppend(items, { dryRun = false } = {}) {
     } else if (result.kind === "index") {
       if (result.index !== q.correct_index) return fail(i, `check derived index ${result.index}, keyed ${q.correct_index}`);
     } else fail(i, "check() must return {kind:value|index}");
+
+    // --- distractor reachability -------------------------------------------
+    if (requireTrapValues && typeof q.trap_values !== "function") {
+      fail(i, "missing trap_values() — every distractor must be computed from its named error");
+    }
+    if (typeof q.trap_values === "function") {
+      let traps;
+      try { traps = q.trap_values(q); } catch (e) { return fail(i, `trap_values threw: ${e}`); }
+      for (const w of wrong) {
+        const produced = traps[String(w)];
+        if (produced === undefined) { fail(i, `trap_values missing ${w}`); continue; }
+        if (typeof produced === "string") {
+          if (produced.trim() !== q.choices[w].trim())
+            fail(i, `trap ${w} produced "${produced}", choice is "${q.choices[w]}"`);
+          continue;
+        }
+        if (typeof produced !== "number" || !Number.isFinite(produced)) {
+          fail(i, `trap ${w} produced non-finite ${produced}`);
+          continue;
+        }
+        const expr = latexChoiceToExpression(q.choices[w]);
+        const value = expr == null ? null : evaluateExpression(expr);
+        if (value == null) { fail(i, `trap ${w}: choice unparseable "${q.choices[w]}"`); continue; }
+        if (!numbersAgree(produced, value))
+          fail(i, `trap ${w}: named error computes ${produced}, choice is ${value}`);
+      }
+    }
   });
 
   if (failures.length) {
@@ -92,8 +135,16 @@ export function verifyAndAppend(items, { dryRun = false } = {}) {
   let added = 0, dupes = 0;
   for (const q of items) {
     if (stems.has(q.stem_md)) { dupes++; continue; }
-    const fields = { ...q, provenance: q.provenance ?? "authored + brute-force programmatic verification" };
+    const fields = {
+      ...q,
+      provenance:
+        q.provenance ??
+        (typeof q.trap_values === "function"
+          ? "authored + brute-force programmatic verification + computed distractor reachability"
+          : "authored + brute-force programmatic verification"),
+    };
     delete fields.check;
+    delete fields.trap_values;
     bank.questions.push(fields);
     stems.add(q.stem_md);
     added++;

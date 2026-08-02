@@ -1,14 +1,22 @@
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
+import { PlanEvidence } from "@/components/dashboard/plan-evidence";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
-import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
+import { daysToTest, gatherPlanInputs, selectPlanDrillIds } from "@/lib/plan-server";
+import {
+  DIAGNOSTIC_PER_SKILL,
+  DIAGNOSTIC_SIZE,
+  latestDiagnostic,
+} from "@/lib/diagnostic";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
-import { getSetting } from "@/lib/settings";
+import { findResumable, todaysQueueThenDrill } from "@/lib/resume";
+import { baselineWeakness, getSetting } from "@/lib/settings";
 import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +40,18 @@ export default async function TodayPage() {
     ? 0
     : cadence - (inputs.dayIndex % cadence);
   const deck = await todaysDeck();
+  const resumable = await findResumable();
+  const planDrillIds = verifiedCount > 0 ? await selectPlanDrillIds(plan) : [];
+  const today = await todaysQueueThenDrill(planDrillIds);
   const deckWaiting = deck.due + deck.fresh;
+  const baselineSource: "report" | "diagnostic" | null =
+    (await getSetting("test_date")) !== undefined && inputs.baselineWeakness
+      ? (await baselineWeakness())
+        ? "report"
+        : (await latestDiagnostic())
+          ? "diagnostic"
+          : null
+      : null;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
@@ -62,9 +81,28 @@ export default async function TodayPage() {
 
       {firstRun && (
         <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-5 shadow-ambient">
+          {/* Placement first. Until something measures where you stand,
+              the weighted plan below is uniform across all four skills,
+              which is the one weighting guaranteed to be wrong. Sixteen
+              questions is the cheapest way to stop guessing. */}
           <h2 className="font-display text-base font-semibold">
-            New here? The loop is simple.
+            Start with a placement diagnostic
           </h2>
+          <p className="mt-1 max-w-[62ch] text-sm text-graphite">
+            {DIAGNOSTIC_SIZE} questions, {DIAGNOSTIC_PER_SKILL} from each
+            fundamental skill, mixed together the way the exam mixes them.
+            It takes about half an hour and it is what today&apos;s plan
+            weights against until you import a real score report.
+          </p>
+          <Link
+            href="/drill?diagnostic=1"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+          >
+            Take the diagnostic →
+          </Link>
+          <h3 className="mt-5 font-display text-sm font-semibold">
+            Or start reading — the loop is simple.
+          </h3>
           <ol className="mt-2 space-y-1.5 text-sm">
             <li>
               <span className="font-mono text-xs text-ballpoint">1</span>{" "}
@@ -110,6 +148,68 @@ export default async function TodayPage() {
         </section>
       )}
 
+      {resumable && (
+        <section className="rounded-card border border-amber/50 bg-amber/5 px-4 py-3 shadow-ambient">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-title font-semibold">
+                Pick up where you stopped
+              </h2>
+              <p className="mt-0.5 text-caption text-graphite">
+                A {resumable.mode === "redo" ? "redo run" : "drill"} from{" "}
+                {formatDistanceToNow(resumable.startedAt, { addSuffix: true })}{" "}
+                ended without finishing — {resumable.answered} answered,{" "}
+                {resumable.remainingCount} left. The answered ones are already
+                saved; this resumes rather than restarts.
+              </p>
+            </div>
+            <Link
+              href={`/drill?qids=${resumable.remainingIds.join(",")}`}
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-amber px-4 py-2 text-body font-medium text-paper transition-opacity hover:opacity-90"
+            >
+              Resume {resumable.remainingCount} question
+              {resumable.remainingCount === 1 ? "" : "s"} →
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {today.ids.length > 0 && (
+        <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 px-4 py-4 shadow-ambient">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-title font-semibold">
+                Start today
+              </h2>
+              <p className="mt-0.5 max-w-[62ch] text-caption text-graphite">
+                Everything the plan says today is, in order and in one run:{" "}
+                {today.dueIds.length > 0 && (
+                  <>
+                    <span className="font-medium text-ink">
+                      {today.dueIds.length} redo
+                      {today.dueIds.length === 1 ? "" : "s"} due
+                    </span>{" "}
+                    first, then{" "}
+                  </>
+                )}
+                <span className="font-medium text-ink">
+                  {today.ids.length - today.dueIds.length} weighted drill
+                  question
+                  {today.ids.length - today.dueIds.length === 1 ? "" : "s"}
+                </span>
+                . No returning to this page between blocks.
+              </p>
+            </div>
+            <Link
+              href={`/drill?qids=${today.ids.join(",")}`}
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-ballpoint px-5 py-2.5 text-body font-medium text-white transition-opacity hover:opacity-90"
+            >
+              Start today · {today.ids.length} questions →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {plan.phase && (
         <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -117,6 +217,17 @@ export default async function TodayPage() {
               {PHASE_LABELS[plan.phase]}
             </span>
             <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
+            {/* What the weighting is actually based on. A plan that
+                cannot say where its weights came from is asking to be
+                trusted on nothing. */}
+            <p className="font-mono text-[11px] text-graphite">
+              weighted against{" "}
+              {baselineSource === "report"
+                ? "your imported score report"
+                : baselineSource === "diagnostic"
+                  ? "your placement diagnostic"
+                  : "nothing yet — all four skills equal"}
+            </p>
             {plan.mock && (
               <p className={plan.mock.today ? "text-sm font-medium text-ballpoint" : "text-sm text-graphite"}>
                 {plan.mock.today
@@ -146,7 +257,7 @@ export default async function TodayPage() {
               <Link
                 key={key}
                 href={`/patterns?start=${key}`}
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Start round {i + 1}: {PATTERN_CATEGORY_LABELS[key]} →
               </Link>
@@ -168,7 +279,7 @@ export default async function TodayPage() {
           {verifiedCount > 0 ? (
             <Link
               href="/drill?plan=1"
-              className="text-sm font-medium text-ballpoint hover:underline"
+              className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
             >
               Start today&apos;s drill: {plan.drill.total} questions →
             </Link>
@@ -197,7 +308,7 @@ export default async function TodayPage() {
             {deckWaiting > 0 && (
               <Link
                 href="/deck"
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
               </Link>
@@ -205,14 +316,14 @@ export default async function TodayPage() {
             {plan.dueRedoCount > 0 ? (
               <Link
                 href="/queue?start=1"
-                className="text-sm font-medium text-ballpoint hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
               >
                 Redo all {plan.dueRedoCount} due →
               </Link>
             ) : (
               <Link
                 href="/queue"
-                className="text-sm text-graphite hover:underline"
+                className="inline-flex min-h-[44px] items-center text-body text-graphite hover:underline"
               >
                 Open the queue →
               </Link>
@@ -236,52 +347,25 @@ export default async function TodayPage() {
           {plan.timedSetToday ? (
             <Link
               href="/timed?start=full"
-              className="text-sm font-medium text-ballpoint hover:underline"
+              className="inline-flex min-h-[44px] items-center text-body font-medium text-ballpoint hover:underline"
             >
               Start 21-question section →
             </Link>
           ) : (
-            <Link href="/timed" className="text-sm text-graphite hover:underline">
+            <Link href="/timed" className="inline-flex min-h-[44px] items-center text-body text-graphite hover:underline">
               Timed sets →
             </Link>
           )}
         </PlanCard>
       </div>
 
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
-          Skill weights driving today&apos;s mix
-        </h2>
-        <p className="mt-0.5 text-xs text-graphite">
-          Rolling last-30-attempt accuracy blended 50/50 with the imported
-          baseline; 5% floor keeps every skill in rotation.
-        </p>
-        <div className="mt-3 space-y-2">
-          {plan.drill.bySkill.map(({ skill }) => {
-            const weight = plan.weights[skill];
-            const record = inputs.skillAccuracy[skill];
-            return (
-              <div key={skill} className="flex items-center gap-3 text-sm">
-                <span className="w-64 shrink-0">{SKILL_LABELS[skill]}</span>
-                <div className="h-2 flex-1 rounded-full bg-grid">
-                  <div
-                    className={cn("h-2 rounded-full bg-ballpoint")}
-                    style={{ width: `${Math.round(weight * 100)}%` }}
-                  />
-                </div>
-                <span className="w-12 text-right font-mono text-xs">
-                  {Math.round(weight * 100)}%
-                </span>
-                <span className="w-24 text-right font-mono text-xs text-graphite">
-                  {record.total > 0
-                    ? `${record.correct}/${record.total} recent`
-                    : "no data"}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <PlanEvidence
+        plan={plan}
+        skillAccuracy={inputs.skillAccuracy}
+        baselineWeakness={inputs.baselineWeakness}
+        weightOverrides={inputs.weightOverrides}
+        daysToTest={days}
+      />
     </div>
   );
 }

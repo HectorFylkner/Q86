@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import { RouteFocus, SkipLink } from "@/components/focus-manager";
 import { BottomTabs, Nav } from "@/components/nav";
+import { ShortcutsOverlay } from "@/components/shortcuts";
 import { Providers } from "@/components/providers";
 
 const inter = localFont({
@@ -49,9 +51,14 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <Providers>
+          <SkipLink />
+          <RouteFocus />
           <Nav />
           <BottomTabs />
-          <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-6 sm:px-6 sm:pb-16">
+          <main
+            id="main"
+            className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-6 sm:px-6 sm:pb-16"
+          >
             {children}
           </main>
           <footer className="mx-auto w-full max-w-[1120px] px-4 pb-24 sm:px-6 sm:pb-8">
@@ -60,6 +67,7 @@ export default function RootLayout({
               platform trains; official mocks measure.
             </p>
           </footer>
+          <ShortcutsOverlay />
         </Providers>
       </body>
     </html>

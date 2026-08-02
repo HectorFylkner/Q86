@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Download } from "lucide-react";
 import { QuestionRunner } from "@/components/drill/question-runner";
+import { Announce } from "@/components/live-region";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
@@ -77,6 +78,9 @@ export function QueueClient({
   } | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The redo queue changes state without the focused element changing:
+  // a run starts, a run ends, items leave the due list. Say so.
+  const [queueStatus, setQueueStatus] = useState("");
   const autoStartedRef = useRef(false);
 
   const [skillFilter, setSkillFilter] = useState<FundamentalSkill | "all">(
@@ -96,6 +100,9 @@ export function QueueClient({
         setError(res.error ?? "Could not start the redo run.");
       } else {
         setRunner({ sessionId: res.sessionId, questions: res.questions });
+        setQueueStatus(
+          `Redo run started: ${res.questions.length} question${res.questions.length === 1 ? "" : "s"} due.`,
+        );
       }
     } catch {
       setError("Could not start the redo run — the server did not respond.");
@@ -177,6 +184,8 @@ export function QueueClient({
 
   if (runner) {
     return (
+      <>
+      <Announce message={queueStatus} />
       <QuestionRunner
         sessionId={runner.sessionId}
         mode="redo"
@@ -184,14 +193,19 @@ export function QueueClient({
         timing="soft"
         onRestart={() => {
           setRunner(null);
+          setQueueStatus(
+            "Redo run finished. The queue has been rescheduled: cleared items move to the next stage, missed items return in two days.",
+          );
           router.refresh();
         }}
       />
+      </>
     );
   }
 
   return (
     <div className="space-y-6">
+      <Announce message={queueStatus} />
       {error && (
         <p className="rounded-control border border-redpen/40 bg-redpen/5 px-3 py-2 text-sm text-redpen">
           {error}

@@ -8,6 +8,8 @@ import {
 } from "./db/schema.ts";
 import { ELO_START } from "./elo.ts";
 import { selectQuestions } from "./engine.ts";
+import { diagnosticWeakness, latestDiagnostic } from "./diagnostic.ts";
+import { interleave } from "./interleave.ts";
 import {
   PATTERN_CATEGORY_KEYS,
   type PatternCategoryKey,
@@ -84,7 +86,7 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   return {
     daysToTest: await daysToTest(),
     skillAccuracy: await skillAccuracy(),
-    baselineWeakness: await baselineWeakness(),
+    baselineWeakness: await planBaseline(),
     weightOverrides: await weightOverrides(),
     dueRedoCount: await dueRedoCount(),
     cadenceDays:
@@ -94,20 +96,47 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   };
 }
 
+/**
+ * The baseline the plan weights against.
+ *
+ * An imported official score report wins — it is the real exam's reading
+ * of the same four skills, and nothing this platform produces beats it.
+ * Failing that, the placement diagnostic. Failing both, null, and the
+ * planner falls back to uniform weights as it always did.
+ */
+async function planBaseline(): Promise<Record<FundamentalSkill, number> | null> {
+  const imported = await baselineWeakness();
+  if (imported) return imported;
+  const diagnostic = await latestDiagnostic();
+  return diagnostic ? diagnosticWeakness(diagnostic) : null;
+}
+
 export async function todaysPlan(): Promise<DailyPlan> {
   return computeDailyPlan(await gatherPlanInputs());
 }
 
-/** Pick the concrete questions for today's weighted drill block. */
+/**
+ * Pick the concrete questions for today's weighted drill block, then
+ * interleave them.
+ *
+ * The weights decide *how many* of each skill; the round-robin decides
+ * the order they arrive in. Those are separate decisions and the old
+ * version conflated them — it emitted every question of one skill before
+ * the next, which is blocked practice and measurably the worst order to
+ * learn in. See lib/interleave.ts for the evidence.
+ */
 export async function selectPlanDrillIds(plan: DailyPlan): Promise<number[]> {
-  const ids: number[] = [];
+  const picked: number[] = [];
+  const bySkill: number[][] = [];
   for (const { skill, count } of plan.drill.bySkill) {
     if (count <= 0) continue;
-    const picked = await selectQuestions(
-      { skills: [skill], excludeIds: ids },
+    const questions = await selectQuestions(
+      { skills: [skill], excludeIds: picked },
       count,
     );
-    ids.push(...picked.map((q) => q.id));
+    const ids = questions.map((q) => q.id);
+    picked.push(...ids);
+    bySkill.push(ids);
   }
-  return ids;
+  return interleave(bySkill);
 }
