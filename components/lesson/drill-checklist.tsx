@@ -18,10 +18,14 @@ export type ChecklistTestState = {
 export function DrillChecklist({
   subtopic,
   items,
+  drill,
   test,
 }: {
   subtopic: string;
   items: string[];
+  /** Where "go prove it" leads. A content chapter drills its subtopic; a
+   *  technique chapter drills the items whose fastest path uses it. */
+  drill: { href: string; label: string };
   /** Chapter-test state; when present the completed checklist promotes
    *  the test to the primary action (read → drill → prove it). */
   test?: ChecklistTestState;
@@ -118,7 +122,7 @@ export function DrillChecklist({
             </span>
           ) : all ? (
             <span className="font-medium text-ballpoint">
-              All checked — prove it on the test.
+              {test ? "All checked — prove it on the test." : "All checked — go prove it."}
             </span>
           ) : (
             <span className="text-graphite">
@@ -130,14 +134,14 @@ export function DrillChecklist({
         </p>
         <div className="flex flex-wrap gap-2">
           <Link
-            href={`/drill?sub=${subtopic}&d=3`}
+            href={drill.href}
             className={
               all && test
                 ? "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
                 : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
             }
           >
-            Drill this now →
+            {drill.label}
           </Link>
           {test && (
             <Link

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
 import { chapterTestStates } from "@/lib/chapter-tests";
-import { listLessons } from "@/lib/lessons";
+import { listLessons, listTechniques } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +16,7 @@ const METHOD = [
 
 export default async function LearnPage() {
   const lessons = listLessons();
+  const techniques = listTechniques();
   const tests = await chapterTestStates();
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
@@ -26,14 +27,20 @@ export default async function LearnPage() {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="font-display text-xl font-semibold">Learn</h1>
           <p className="text-xs text-graphite">
-            {lessons.length} concept chapters, one per drillable subtopic
+            {techniques.length} technique chapters and {lessons.length} concept
+            chapters, one per drillable subtopic
             {passedCount > 0 &&
               ` — ${passedCount} test${passedCount === 1 ? "" : "s"} passed`}
             .
           </p>
         </div>
         <div className="mt-1">
-          <LearnPrepared subtopics={lessons.map((l) => l.subtopic)} />
+          <LearnPrepared
+            subtopics={[
+              ...techniques.map((t) => t.slug),
+              ...lessons.map((l) => l.subtopic),
+            ]}
+          />
         </div>
       </div>
 
@@ -54,10 +61,52 @@ export default async function LearnPage() {
         ))}
       </div>
 
-      {lessons.length === 0 && (
+      {lessons.length === 0 && techniques.length === 0 && (
         <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
           Chapters are being written — check back shortly.
         </p>
+      )}
+
+      {/* Technique before content. The subtopic chapters teach what a
+          question is about; these teach what to do with it, and reading
+          them first is what stops the algebra reflex from setting. */}
+      {techniques.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-baseline gap-2">
+            <h2 className="font-display text-sm font-semibold">Technique</h2>
+            <span className="font-mono text-[11px] text-graphite">
+              read these first
+            </span>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {techniques.map((technique, i) => (
+              <Link
+                key={technique.slug}
+                href={`/learn/${technique.slug}`}
+                className="group flex items-start gap-3 rounded-card border border-grid border-l-2 border-l-ballpoint/60 bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
+              >
+                <span className="mt-0.5 font-mono text-[11px] text-ballpoint">
+                  T{i + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium transition-colors group-hover:text-ballpoint">
+                    {technique.title}
+                  </span>
+                  <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
+                    <span>~{technique.minutes} min</span>
+                    <ReadBadge subtopic={technique.slug} />
+                  </span>
+                </span>
+                <span
+                  className="mt-0.5 text-graphite/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  aria-hidden
+                >
+                  →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {FUNDAMENTAL_SKILLS.map((skill) => {

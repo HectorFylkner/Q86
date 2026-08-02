@@ -24,7 +24,14 @@ import {
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { chapterTransfer } from "@/lib/chapter-transfer";
 import { parseLesson } from "@/lib/lesson-parse";
-import { listLessons, readLesson } from "@/lib/lessons";
+import {
+  isTechniqueSlug,
+  listLessons,
+  listTechniques,
+  readLesson,
+  readTechnique,
+  techniqueDrillHref,
+} from "@/lib/lessons";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
@@ -48,24 +55,65 @@ const RAIL: RailItem[] = [
   { id: "checklist", label: "Before you drill" },
 ];
 
+/** Sections built from the question bank rather than from the markdown.
+ *  A technique chapter has no subtopic, so it has none of them. */
+const BANK_SECTIONS = new Set(["topband", "recognition", "named"]);
+
 export default async function LessonPage({
   params,
 }: {
   params: Promise<{ subtopic: string }>;
 }) {
   const { subtopic } = await params;
-  if (!ALL_SUBTOPICS.includes(subtopic as Subtopic)) notFound();
-  const lesson = readLesson(subtopic as Subtopic);
+  const technique = isTechniqueSlug(subtopic);
+  if (!technique && !ALL_SUBTOPICS.includes(subtopic as Subtopic)) notFound();
+
+  const lesson = technique
+    ? readTechnique(subtopic)
+    : readLesson(subtopic as Subtopic);
   if (!lesson) notFound();
 
   const parsed = parseLesson(lesson.body);
-  const transfer = await chapterTransfer(subtopic as Subtopic);
-  const testState = (await chapterTestStates())[subtopic as Subtopic];
+  // Technique chapters have no subtopic of their own, so no bank-derived
+  // transfer layer and no chapter test — they teach an approach, not a
+  // slice of the taxonomy.
+  const transfer = technique
+    ? null
+    : await chapterTransfer(subtopic as Subtopic);
+  const testState = technique
+    ? undefined
+    : (await chapterTestStates())[subtopic as Subtopic];
+  // The rail is the section list, so deriving the numbering from it keeps
+  // "05" in the margin and the fifth rail entry describing the same
+  // section — including when a chapter's bank has no top-band item.
+  const rail = RAIL.filter((item) => {
+    if (!BANK_SECTIONS.has(item.id)) return true;
+    if (!transfer) return false;
+    return item.id !== "topband" || transfer.topBand !== null;
+  });
+  const n = (id: string) => rail.findIndex((item) => item.id === id) + 1;
+
+  const techniques = listTechniques();
   const chapters = listLessons();
-  const at = chapters.findIndex((c) => c.subtopic === subtopic);
+  const techniqueAt = technique
+    ? techniques.findIndex((t) => t.slug === subtopic)
+    : -1;
+  const at = technique ? -1 : chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;
-  const prev = at > 0 ? chapters[at - 1] : null;
-  const next = at >= 0 && at < chapters.length - 1 ? chapters[at + 1] : null;
+  const prev = technique
+    ? techniqueAt > 0
+      ? { subtopic: techniques[techniqueAt - 1].slug, title: techniques[techniqueAt - 1].title }
+      : null
+    : at > 0
+      ? chapters[at - 1]
+      : null;
+  const next = technique
+    ? techniqueAt >= 0 && techniqueAt < techniques.length - 1
+      ? { subtopic: techniques[techniqueAt + 1].slug, title: techniques[techniqueAt + 1].title }
+      : null
+    : at >= 0 && at < chapters.length - 1
+      ? chapters[at + 1]
+      : null;
 
   const header = (
     <div>
@@ -73,11 +121,23 @@ export default async function LessonPage({
         <Link href="/learn" className="hover:text-ink">
           Learn
         </Link>{" "}
-        · {SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
+        ·{" "}
+        {technique
+          ? "Technique"
+          : SKILL_LABELS[SKILL_BY_SUBTOPIC[subtopic as Subtopic]]}
       </p>
       <h1 className="mt-1 font-display text-2xl font-semibold">
         {lesson.title}
       </h1>
+      {technique && (
+        <p className="mt-1.5 flex flex-wrap gap-x-3 font-mono text-[11px] text-graphite">
+          <span>
+            Technique {techniqueAt + 1} of {techniques.length}
+          </span>
+          <span>~{techniques[techniqueAt]?.minutes ?? 6} min</span>
+          <span>3 worked examples</span>
+        </p>
+      )}
       {meta && (
         <p className="mt-1.5 flex flex-wrap gap-x-3 font-mono text-[11px] text-graphite">
           <span>
@@ -146,13 +206,13 @@ export default async function LessonPage({
       <div className="min-w-0 space-y-9 lg:max-w-3xl">
         {header}
 
-        <SectionShell id="why" index={1} title="Why this matters">
+        <SectionShell id="why" index={n("why")} title="Why this matters">
           <WhyLede source={parsed.why} />
         </SectionShell>
 
         <SectionShell
           id="ideas"
-          index={2}
+          index={n("ideas")}
           title="The core ideas"
           tagline="the complete toolkit"
         >
@@ -161,9 +221,13 @@ export default async function LessonPage({
 
         <SectionShell
           id="examples"
-          index={3}
+          index={n("examples")}
           title="Worked examples"
-          tagline="easy → exam-hard, try before revealing"
+          tagline={
+            technique
+              ? "recognize it, then run it"
+              : "easy → exam-hard, try before revealing"
+          }
         >
           <div className="space-y-3">
             {parsed.examples.map((ex, i) => (
@@ -179,10 +243,10 @@ export default async function LessonPage({
           </div>
         </SectionShell>
 
-        {transfer.topBand && (
+        {transfer?.topBand && (
           <SectionShell
             id="topband"
-            index={4}
+            index={n("topband")}
             title="At the top band"
             tagline={`the hardest D${transfer.topBand.difficulty} item in this chapter's bank`}
           >
@@ -190,18 +254,20 @@ export default async function LessonPage({
           </SectionShell>
         )}
 
-        <SectionShell
-          id="recognition"
-          index={5}
-          title="Recognition table"
-          tagline={`${transfer.recognition.length} stem cues from the ${transfer.coverage.total} bank items behind this chapter`}
-        >
-          <RecognitionTable rows={transfer.recognition} />
-        </SectionShell>
+        {transfer && (
+          <SectionShell
+            id="recognition"
+            index={n("recognition")}
+            title="Recognition table"
+            tagline={`${transfer.recognition.length} stem cues from the ${transfer.coverage.total} bank items behind this chapter`}
+          >
+            <RecognitionTable rows={transfer.recognition} />
+          </SectionShell>
+        )}
 
         <SectionShell
           id="cues"
-          index={6}
+          index={n("cues")}
           title="Trigger cues"
           tagline="phrase → method, memorize these"
         >
@@ -210,41 +276,56 @@ export default async function LessonPage({
 
         <SectionShell
           id="traps"
-          index={7}
+          index={n("traps")}
           title="Trap gallery"
           tagline="the classic wrong turns"
         >
           <TrapGallery traps={parsed.traps} />
         </SectionShell>
 
-        <SectionShell
-          id="named"
-          index={8}
-          title="Named traps"
-          tagline="the post-mortem's exact words"
-        >
-          <NamedTraps traps={transfer.traps} />
-        </SectionShell>
+        {transfer && (
+          <SectionShell
+            id="named"
+            index={n("named")}
+            title="Named traps"
+            tagline="the post-mortem's exact words"
+          >
+            <NamedTraps traps={transfer.traps} />
+          </SectionShell>
+        )}
 
         <SectionShell
           id="speed"
-          index={9}
+          index={n("speed")}
           title="Speed moves"
           tagline="legitimate shortcuts"
         >
           <SpeedMoves moves={parsed.speed} />
         </SectionShell>
 
-        <SectionShell id="checklist" index={10} title="Before you drill">
+        <SectionShell
+          id="checklist"
+          index={n("checklist")}
+          title="Before you drill"
+        >
           <DrillChecklist
             subtopic={subtopic}
             items={parsed.checklist}
-            test={{
-              passed: testState?.passed ?? false,
-              lastScore: testState
-                ? `${testState.lastCorrect}/${testState.lastTotal}`
-                : null,
-            }}
+            drill={
+              technique
+                ? techniqueDrillHref(subtopic)
+                : { href: `/drill?sub=${subtopic}&d=3`, label: "Drill this now →" }
+            }
+            test={
+              technique
+                ? undefined
+                : {
+                    passed: testState?.passed ?? false,
+                    lastScore: testState
+                      ? `${testState.lastCorrect}/${testState.lastTotal}`
+                      : null,
+                  }
+            }
           />
         </SectionShell>
 
@@ -253,7 +334,7 @@ export default async function LessonPage({
 
       <aside className="hidden lg:block">
         <div className="sticky top-20">
-          <LessonRail items={RAIL} />
+          <LessonRail items={rail} />
         </div>
       </aside>
     </div>

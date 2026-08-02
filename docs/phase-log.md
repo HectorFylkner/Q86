@@ -740,6 +740,157 @@ artifacts, and both sides are reproducible from the same fixture
    that seven top-level sections is the settled number — this needs a
    decision about the group's internal tabs rather than a refactor.
 
+## W5 — Technique, not just content (second brief)
+
+**Brief:** "Continue improving the content of the platform. I think you
+have to dig quite thoroughly into GMAT Ninja, TTP, etc, and to make sure
+that you are closely resembling their learning techniques, segmentation,
+etc."
+
+### Research
+
+`WebFetch` returns 403 from both `blog.targettestprep.com` and
+`gmatninja.com`, so the research went through `WebSearch` against
+published descriptions of both curricula and against the official Focus
+Edition section format. What the two share, and Q86 did not have:
+
+- **Technique is taught as its own subject, not as a footnote.** Both
+  curricula spend a large share of their material on *how to attack a
+  question* — backsolving, picking numbers, estimating, when to abandon —
+  independently of what the question is about. Q86's entire taxonomy is
+  content (domains → contexts → skills → subtopics → error types),
+  mirroring the score report. That is the right spine for analytics and
+  an incomplete one for teaching.
+- **Segmentation is by approach as well as by topic.** TTP drills a
+  concept in isolation and then drills the approach; Ninja's central
+  claim is that reaching for algebra by reflex is what ruins timing.
+- **Pacing is taught as a rehearsed system**, with checkpoints, not as
+  "watch the clock".
+
+### The measured deficit
+
+`lib/solution-strategy.ts` classifies every bank item's
+`fastest_path_md` into six named strategies. Against the shipped bank of
+438 verified items:
+
+| Strategy | Items | Share |
+| --- | ---: | ---: |
+| Set up and solve (structural) | 361 | 82.4% |
+| Eliminate | 24 | 5.5% |
+| Pattern | 20 | 4.6% |
+| Backsolve | 18 | 4.1% |
+| Pick numbers | 13 | 3.0% |
+| Estimate | 2 | 0.5% |
+
+Only **17.6%** of the bank teaches a non-algebraic technique, and
+estimation — the technique with the best return per minute on a
+no-calculator section — is present in two items out of 438.
+
+Two things were checked before treating that as a content finding rather
+than a classifier artefact:
+
+1. The first run reported 87.7% structural. That was the classifier
+   measuring LaTeX delimiters, not prose: the bank writes maths inline,
+   so `Test $(x, y) = (-1, 2)$` reached the matcher as `Test $(`. Adding
+   `normalize()` (strip macros and `${}\`) moved it to 82.4%.
+2. Sixteen structural-classified paths were then read by hand. Two were
+   genuine misses, which widened three signatures (`test the standard
+   set`, `test x =`; `each pair`, `pairing the terms`; `kills`,
+   `survives`). The remaining fourteen were correctly structural.
+
+So the fix is authoring, not loosening the classifier. Loosening it would
+have made the number look better and taught the wrong habit.
+
+### W5a — the technique dimension (commit: technique layer)
+
+- `lib/solution-strategy.ts` — six strategies, a conservative classifier
+  over each item's fastest path, and per-strategy teaching notes. An
+  unrecognized path is `structural`, never a guess at something more
+  exotic; a wrong technique label would train a wrong reflex.
+- `lib/strategy-math.ts` — the pure half: medians, per-strategy accuracy,
+  and the "unreached" rule. No database, so it is tested directly.
+- `lib/strategy-server.ts` — classifies the bank once per process,
+  builds technique drill blocks, and joins the classification to attempt
+  history.
+- `/drill?strat=<strategy>` — a ten-item technique drill, round-robined
+  across subtopics so *recognition* has to happen fresh each time rather
+  than being given away by the set being all one topic.
+- `components/analytics/technique-card.tsx` — the panel. It compares each
+  technique's median time against **the user's own** structural median,
+  not an absolute target, because "you are slower where a shortcut
+  existed" is evidence the shortcut is not being taken, while absolute
+  times would just re-measure overall speed.
+
+**Why time and not accuracy.** The failure mode this is built to catch is
+invisible to every other chart on the page: a student who grinds the
+algebra correctly scores fine and runs out of clock. Accuracy says they
+know the material. Only the clock says they are doing it the long way.
+
+**What it cannot see, stated plainly:** the classifier knows which
+technique was *available*, not which one the user chose. The panel's
+claim is therefore inferential, and it is worded that way in the UI.
+
+Acceptance: `pnpm test` 94/94 across 11 suites (was 73/9). Two new
+suites — 11 classifier tests pinning the conservatism and the LaTeX
+normalization, 10 panel-maths tests pinning the attempt floor, the
+tie-counts-as-unreached rule, and that `structural` is never itself
+called unreached.
+
+### W5b — technique chapters (commit: technique chapters)
+
+Four chapters under `content/techniques/`, rendered through the *same*
+`parseLesson()` contract and the same section components as the 24
+content chapters, on the same `/learn/[slug]` route. **No new top-level
+nav** — the slugs are disjoint from the subtopic keys, so nothing
+collides, and Learn gained a "Technique — read these first" group above
+the four skill groups.
+
+1. `technique-backsolve` — Backsolving: The Answer Is Already On The Screen
+2. `technique-pick-numbers` — Picking Numbers: Turn Algebra Into Arithmetic
+3. `technique-estimate` — Estimation And Bounding: Compute Only What The Choices Demand
+4. `technique-bail` — Strategic Guessing: The Skill That Protects Every Other One
+
+Four, not six: `pattern` and `eliminate` are classified and shown in
+analytics but are already taught inside the content chapters that own
+them, and a chapter restating that material would be duplication rather
+than coverage. That decision lives in `STRATEGY_CHAPTER`, which
+`lib/lessons.ts` inverts so the chapter→strategy and strategy→chapter
+directions cannot drift.
+
+A technique chapter has no subtopic, so it has no bank-derived transfer
+layer and no chapter test. The three bank-built sections (top band,
+recognition table, named traps) are skipped and the section numbering is
+now derived from the rail rather than hardcoded — a technique chapter
+reads 01–07, a content chapter still reads 01–10. That also fixed a
+pre-existing mismatch: a content chapter whose bank has no top-band item
+previously showed "At the top band" in the rail with no section to
+match, and numbered the rest as though it were there.
+
+Its "prove it" button goes to the technique drill
+(`/drill?strat=backsolve`); `technique-bail` has no strategy — it is
+about the clock, not a solution path — so its button runs a timed
+section instead.
+
+**Two mathematical defects were caught and fixed before shipping**, both
+in material I wrote this session:
+
+- `technique-backsolve` Example 3 asked for the least $n > 10$ with
+  $(n^2+5n+6)/(n+4)$ an integer. It has **no answer**: $n^2+5n+6 =
+  (n+4)(n+1)+2$, so the remainder is always 2. Replaced with a correct
+  "which must be an integer" question whose answer is
+  $(x^2+x)/2$ — which also teaches the technique's boundary, since
+  expression choices mean it is *not* a backsolve.
+- The pacing checkpoints were written as 36 / 27 / 18 / 9 minutes. The
+  actual values of $45 - n \times 45/21$ for $n = 4, 8, 13, 17$ are
+  36.43 / 27.86 / 17.14 / 8.57, so the correct rounded set is
+  **36 / 28 / 17 / 9**. Corrected in three places.
+
+Acceptance: all four chapters satisfy `parseLesson()`; `/learn` and all
+four technique routes return 200; section ids render as
+why/ideas/examples/cues/traps/speed/checklist for a technique and the
+full ten for a content chapter; `npx tsc --noEmit` clean; `pnpm lint` 0
+errors; `check-contrast` 60/60.
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance
