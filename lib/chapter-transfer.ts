@@ -1,9 +1,9 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { questions } from "./db/schema.ts";
+import { classifyTrap, trapLabel } from "./trap-classify.ts";
 import {
   ERROR_TYPES,
-  ERROR_TYPE_LABELS,
   type ErrorType,
   type Subtopic,
 } from "./taxonomy.ts";
@@ -116,39 +116,6 @@ function splitCue(cue: string): { see: string; method: string | null } {
   return { see: tidy(flat), method: null };
 }
 
-/**
- * Map a trap sentence onto the six-error vocabulary the platform uses
- * everywhere else. The phrasing is the author's; the classification is
- * keyword-driven and deliberately conservative — a trap that does not
- * clearly belong to one bucket stays unlabelled rather than being
- * mislabelled, because a wrong label teaches the wrong repair.
- */
-const TRAP_SIGNATURES: Array<[ErrorType, RegExp]> = [
-  [
-    "misread",
-    /\b(answers with|reports|reads?|instead of the|rather than the|mis-?reads?|reading|asked for|one step early)\b/i,
-  ],
-  [
-    "setup_error",
-    /\b(sets? up|solv(es|ing)\b.*\bfor\b|treats?|assumes?|ignor(es|ing)|forgets? (that|to include)|applies|backwards?|inverts?|reversed?|upside down|wrong base|omits)\b/i,
-  ],
-  [
-    "calculation_error",
-    /\b(arithmetic|slips?|off by|drops? (a|the) (sign|factor|term|constant|decimal)|misplaces|sign flip|flips the sign|carel|divides? by|multiplies? by)\b/i,
-  ],
-  [
-    "content_gap",
-    /\b(adds? the percents|does not know|never|formula|identity|property|distinctness|complement)\b/i,
-  ],
-];
-
-function classifyTrap(text: string): ErrorType | null {
-  for (const [type, pattern] of TRAP_SIGNATURES) {
-    if (pattern.test(text)) return type;
-  }
-  return null;
-}
-
 /** Rank so the most instructive rows sit at the top: hardest first. */
 function byDifficultyDesc<T extends { difficulty: number }>(a: T, b: T) {
   return b.difficulty - a.difficulty;
@@ -231,7 +198,7 @@ export async function chapterTransfer(
         questionId: r.id,
         difficulty: r.difficulty,
         errorType,
-        errorLabel: errorType ? ERROR_TYPE_LABELS[errorType] : "Unclassified",
+        errorLabel: trapLabel(errorType),
         text,
       });
     }

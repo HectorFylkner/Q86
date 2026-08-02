@@ -15,6 +15,15 @@ import {
   PATTERN_CATEGORY_LABELS,
   type PatternCategoryKey,
 } from "./generators/index.ts";
+import {
+  accuracyPct,
+  bucketByTime,
+  calibration as calibrationRows,
+  calibrationError,
+  median,
+  type TimeBucketEdge,
+} from "./analytics-math.ts";
+import { recentMissChains, type MissChainSummary } from "./miss-chain.ts";
 import { RUSH_RATIO, SINK_RATIO, TIME_BENCH } from "./pacing.ts";
 import {
   ALL_SUBTOPICS,
@@ -207,7 +216,11 @@ export type AnalyticsData = {
     expected: number;
     actual: number | null;
     total: number;
+    /** expected − actual, in points. Positive is overconfidence. */
+    gap: number | null;
   }>;
+  /** Attempt-weighted mean absolute calibration gap, in points. */
+  calibrationMeanError: number | null;
   trend: TrendPoint[];
   /** Accuracy per subtopic × difficulty (focused attempts only). */
   difficultyMatrix: DifficultyMatrixRow[];
@@ -224,6 +237,7 @@ export type AnalyticsData = {
   pacing: PacingView;
   eloTrajectories: EloTrajectory[];
   reportMirror: ScoreReportMirror;
+  missChains: MissChainSummary;
 };
 
 /** Expected accuracy per confidence bucket for the calibration curve. */
@@ -354,20 +368,19 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   ).length;
 
   // --- calibration -----------------------------------------------------------
-  const calibration = CONFIDENCES.map((confidence) => {
-    const subset = rows.filter((r) => r.confidence === confidence);
-    return {
-      confidence,
-      expected: EXPECTED_BY_CONFIDENCE[confidence],
-      actual:
-        subset.length > 0
-          ? Math.round(
-              (subset.filter((r) => r.correct).length / subset.length) * 100,
-            )
-          : null,
-      total: subset.length,
-    };
-  });
+  const calibrationDetail = calibrationRows(
+    rows,
+    EXPECTED_BY_CONFIDENCE,
+    CONFIDENCES,
+  );
+  const calibration = calibrationDetail.map((r) => ({
+    confidence: r.bucket as Confidence,
+    expected: r.expected,
+    actual: r.actual,
+    total: r.total,
+    gap: r.gap,
+  }));
+  const calibrationMeanError = calibrationError(calibrationDetail);
 
   // --- rolling 7-day accuracy per skill, last 30 days -------------------------
   const trend: TrendPoint[] = [];
@@ -515,31 +528,17 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     correct: r.correct,
     bench: TIME_BENCH[(r.difficulty as Difficulty) ?? 3] ?? SECTION_BUDGET_SECONDS,
   }));
-  const bucketEdges: Array<[number, number | null, string]> = [
-    [0, 45, "< 0:45"],
-    [45, 90, "0:45–1:30"],
-    [90, 128, "1:30–2:08"],
-    [128, 180, "2:08–3:00"],
-    [180, 240, "3:00–4:00"],
-    [240, null, "> 4:00"],
+  const bucketEdges: TimeBucketEdge[] = [
+    { from: 0, to: 45, label: "< 0:45" },
+    { from: 45, to: 90, label: "0:45–1:30" },
+    { from: 90, to: 128, label: "1:30–2:08" },
+    { from: 128, to: 180, label: "2:08–3:00" },
+    { from: 180, to: 240, label: "3:00–4:00" },
+    { from: 240, to: null, label: "> 4:00" },
   ];
-  const buckets: PacingBucket[] = bucketEdges.map(([from, to, label]) => {
-    const subset = pacingRows.filter(
-      (r) => r.timeSeconds >= from && (to == null || r.timeSeconds < to),
-    );
-    return {
-      from,
-      to,
-      label,
-      correct: subset.filter((r) => r.correct).length,
-      total: subset.length,
-    };
-  });
-  const sortedTimes = pacingRows.map((r) => r.timeSeconds).sort((a, b) => a - b);
-  const medianSeconds =
-    sortedTimes.length > 0
-      ? Math.round(sortedTimes[Math.floor(sortedTimes.length / 2)])
-      : null;
+  const buckets: PacingBucket[] = bucketByTime(pacingRows, bucketEdges);
+  const medianRaw = median(pacingRows.map((r) => r.timeSeconds));
+  const medianSeconds = medianRaw == null ? null : Math.round(medianRaw);
   let rushedWrong = 0;
   let timeSinks = 0;
   let sinkOverspendSeconds = 0;
@@ -697,6 +696,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       })),
     },
     calibration,
+    calibrationMeanError,
     trend,
     difficultyMatrix,
     volume,
@@ -706,5 +706,6 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     pacing,
     eloTrajectories,
     reportMirror,
+    missChains: await recentMissChains(),
   };
 }

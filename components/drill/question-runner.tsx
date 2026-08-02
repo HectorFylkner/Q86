@@ -8,6 +8,7 @@ import { Announce } from "@/components/live-region";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
+import { ErrorAttribution } from "@/components/drill/error-attribution";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
@@ -445,26 +446,12 @@ export function QuestionRunner({
       {revealed && currentResult && (
         <>
           {!currentResult.correct && (
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
-              {ERROR_TYPES.map((et, i) => (
-                <button
-                  key={et}
-                  onClick={() => tagError(et)}
-                  disabled={currentResult.attemptId == null}
-                  className={cn(
-                    "rounded-control border px-2 py-1 transition-colors duration-150",
-                    currentResult.errorType === et
-                      ? "border-redpen bg-redpen/5 font-medium text-redpen"
-                      : "border-grid text-graphite hover:border-graphite/50",
-                    currentResult.attemptId == null && "opacity-50",
-                  )}
-                >
-                  <span className="mr-1 font-mono opacity-60">{i + 1}</span>
-                  {ERROR_TYPE_LABELS[et]}
-                </button>
-              ))}
-            </div>
+            <ErrorAttribution
+              attemptId={currentResult.attemptId}
+              value={currentResult.errorType ?? null}
+              onChange={tagError}
+              disabled={currentResult.attemptId == null}
+            />
           )}
           <SolutionPanel
             flagSignal={flagSignal}

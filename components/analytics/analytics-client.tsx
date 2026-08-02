@@ -17,6 +17,8 @@ import {
   YAxis,
 } from "recharts";
 import { SafeResponsiveContainer as ResponsiveContainer } from "@/components/charts/chart-kit";
+import { CalibrationChart } from "@/components/charts/calibration";
+import { MissChainCard } from "@/components/charts/miss-chain";
 import { EloTrajectories } from "@/components/charts/elo-trajectory";
 import { MasteryGrid } from "@/components/charts/mastery-grid";
 import { PacingChart } from "@/components/charts/pacing-view";
@@ -73,6 +75,9 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 1c — pacing: time against correctness against the budget */}
       <PacingChart data={data.pacing} />
+
+      {/* 1d — the loop from a miss to mastery, link by link */}
+      <MissChainCard data={data.missChains} />
 
       {/* 2 — heatmap */}
       <Section
@@ -420,63 +425,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
       </Section>
 
       {/* 5 — calibration */}
-      <Section
-        title="Calibration"
-        subtitle="Accuracy by pre-answer confidence: expected vs. actual."
-      >
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart
-            data={data.calibration.map((c) => ({
-              bucket: `${c.confidence[0].toUpperCase()}${c.confidence.slice(1)} (${c.total})`,
-              expected: c.expected,
-              actual: c.actual ?? 0,
-            }))}
-            margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
-            barCategoryGap="28%"
-            barGap={2}
-          >
-            <CartesianGrid stroke={GRID} vertical={false} />
-            <XAxis
-              dataKey="bucket"
-              tick={AXIS_TICK}
-              stroke={GRID}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[0, 100]}
-              unit="%"
-              tick={AXIS_TICK}
-              stroke={GRID}
-              tickLine={false}
-            />
-            <Tooltip
-              contentStyle={tooltipStyle}
-              formatter={(value: number, name: string) => [
-                `${value}%`,
-                name === "expected" ? "Expected" : "Actual",
-              ]}
-            />
-            <Bar
-              dataKey="expected"
-              name="Expected"
-              fill={GRAPHITE}
-              fillOpacity={0.35}
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar
-              dataKey="actual"
-              name="Actual"
-              fill={BALLPOINT}
-              radius={[4, 4, 0, 0]}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: 12 }}
-              iconSize={9}
-              formatter={(value) => <span style={{ color: INK }}>{value}</span>}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </Section>
+      <CalibrationChart
+        rows={data.calibration}
+        meanError={data.calibrationMeanError}
+      />
 
       {/* 6 — rolling trend */}
       <Section

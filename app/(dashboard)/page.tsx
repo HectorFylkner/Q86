@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
+import { PlanEvidence } from "@/components/dashboard/plan-evidence";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
@@ -315,40 +316,13 @@ export default async function TodayPage() {
         </PlanCard>
       </div>
 
-      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">
-          Skill weights driving today&apos;s mix
-        </h2>
-        <p className="mt-0.5 text-xs text-graphite">
-          Rolling last-30-attempt accuracy blended 50/50 with the imported
-          baseline; 5% floor keeps every skill in rotation.
-        </p>
-        <div className="mt-3 space-y-2">
-          {plan.drill.bySkill.map(({ skill }) => {
-            const weight = plan.weights[skill];
-            const record = inputs.skillAccuracy[skill];
-            return (
-              <div key={skill} className="flex items-center gap-3 text-sm">
-                <span className="w-64 shrink-0">{SKILL_LABELS[skill]}</span>
-                <div className="h-2 flex-1 rounded-full bg-grid">
-                  <div
-                    className={cn("h-2 rounded-full bg-ballpoint")}
-                    style={{ width: `${Math.round(weight * 100)}%` }}
-                  />
-                </div>
-                <span className="w-12 text-right font-mono text-xs">
-                  {Math.round(weight * 100)}%
-                </span>
-                <span className="w-24 text-right font-mono text-xs text-graphite">
-                  {record.total > 0
-                    ? `${record.correct}/${record.total} recent`
-                    : "no data"}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <PlanEvidence
+        plan={plan}
+        skillAccuracy={inputs.skillAccuracy}
+        baselineWeakness={inputs.baselineWeakness}
+        weightOverrides={inputs.weightOverrides}
+        daysToTest={days}
+      />
     </div>
   );
 }

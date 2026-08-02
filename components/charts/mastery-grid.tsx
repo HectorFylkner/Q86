@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Figure } from "@/components/charts/chart-kit";
 import type { MasteryGridRow } from "@/lib/analytics";
+import { masteryLevel, needsWork, type MasteryLevel } from "@/lib/analytics-math";
 import { MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery-config";
 import { SKILL_LABELS, SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -33,16 +34,10 @@ const BANDS = [2, 3, 4, 5];
  * Untouched and empty cells are the surface itself, so absence of
  * evidence never looks like weakness.
  */
-type Level = 0 | 1 | 2 | 3 | 4;
+type Level = MasteryLevel;
 
-function levelOf(cell: { correct: number; total: number }): Level {
-  if (cell.total === 0) return 0;
-  const acc = cell.correct / cell.total;
-  if (acc < 0.5) return 1;
-  if (acc < 0.7) return 2;
-  if (acc < MASTERY_BAR) return 3;
-  return 4;
-}
+const levelOf = (cell: { correct: number; total: number }) =>
+  masteryLevel(cell, MASTERY_BAR);
 
 export function MasteryGrid({ rows }: { rows: MasteryGridRow[] }) {
   const [skill, setSkill] = useState<FundamentalSkill | "all">("all");
@@ -56,9 +51,7 @@ export function MasteryGrid({ rows }: { rows: MasteryGridRow[] }) {
   const weakCells = rows.reduce(
     (s, r) =>
       s +
-      r.cells.filter(
-        (c) => c.total >= MIN_ATTEMPTS && c.correct / c.total < MASTERY_BAR,
-      ).length,
+      r.cells.filter((c) => needsWork(c, MASTERY_BAR, MIN_ATTEMPTS)).length,
     0,
   );
 
@@ -163,9 +156,7 @@ export function MasteryGrid({ rows }: { rows: MasteryGridRow[] }) {
                   </th>
                   {row.cells.map((cell) => {
                     const level = levelOf(cell);
-                    const weak =
-                      cell.total >= MIN_ATTEMPTS &&
-                      cell.correct / cell.total < MASTERY_BAR;
+                    const weak = needsWork(cell, MASTERY_BAR, MIN_ATTEMPTS);
                     const pct =
                       cell.total > 0
                         ? Math.round((cell.correct / cell.total) * 100)

@@ -32,6 +32,7 @@ import {
   type QuestionFilter,
 } from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
+import { attributeError, type Attribution } from "./error-inference.ts";
 import type {
   Confidence,
   EditReason,
@@ -236,6 +237,64 @@ export async function tagAttempt(
   },
 ): Promise<void> {
   await db.update(attempts).set(patch).where(eq(attempts.id, attemptId)).run();
+}
+
+/**
+ * What the platform thinks went wrong, and why it thinks so.
+ *
+ * An untagged miss teaches nothing: it never reaches the heatmap, never
+ * shapes the plan, never names a repair. Auto-tagging on a hunch is
+ * worse — a misdiagnosed miss trains the wrong repair. So this returns a
+ * ranked suggestion *with its evidence*, which the runner shows for the
+ * user to confirm or override in one keystroke.
+ */
+export async function suggestErrorType(input: {
+  attemptId: number;
+}): Promise<Attribution | null> {
+  const row = await db
+    .select({
+      correct: attempts.correct,
+      timeSeconds: attempts.timeSeconds,
+      confidence: attempts.confidence,
+      selectedIndex: attempts.selectedIndex,
+      correctIndex: questions.correctIndex,
+      trapMap: questions.trapMap,
+      difficulty: questions.difficulty,
+      subtopic: questions.subtopic,
+    })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.id, input.attemptId))
+    .get();
+  if (!row || row.correct) return null;
+
+  // Recent record in this subtopic, focused attempts only — the same
+  // window the mastery ladder uses, so the two never disagree.
+  const history = await db
+    .select({ correct: attempts.correct })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(
+      and(eq(questions.subtopic, row.subtopic), eq(attempts.focus, "focused")),
+    )
+    .orderBy(desc(attempts.id))
+    .limit(20)
+    .all();
+
+  return attributeError({
+    correct: false,
+    timeSeconds: row.timeSeconds,
+    difficulty: row.difficulty as 1 | 2 | 3 | 4 | 5,
+    confidence: row.confidence,
+    selectedIndex: row.selectedIndex,
+    correctIndex: row.correctIndex,
+    chosenTrap: row.trapMap?.[String(row.selectedIndex)] ?? null,
+    subtopicAccuracy:
+      history.length > 0
+        ? history.filter((h) => h.correct).length / history.length
+        : null,
+    subtopicAttempts: history.length,
+  });
 }
 
 export async function finishSession(

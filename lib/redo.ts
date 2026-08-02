@@ -3,13 +3,39 @@ import { db } from "./db/index.ts";
 import { redoQueue } from "./db/schema.ts";
 
 /** Stage 0|1|2 → due +2d / +7d / +21d after the scheduling event. */
-const STAGE_DELAY_DAYS = [2, 7, 21] as const;
+export const STAGE_DELAY_DAYS = [2, 7, 21] as const;
 
 /** Day-21 cold-solve gate: correct, unaided, within 2:30. */
 export const COLD_SOLVE_LIMIT_SECONDS = 150;
 
 function dueAt(stage: 0 | 1 | 2): Date {
   return new Date(Date.now() + STAGE_DELAY_DAYS[stage] * 24 * 60 * 60 * 1000);
+}
+
+export type RedoStage = 0 | 1 | 2;
+export type RedoTransition =
+  | { kind: "reschedule"; stage: RedoStage; inDays: number }
+  | { kind: "cleared" };
+
+/**
+ * The +2d / +7d / +21d ladder as a pure function.
+ *
+ * The database version below applies exactly this; keeping the rule
+ * itself free of the clock and the connection is what lets it be tested,
+ * and this schedule is load-bearing — a silent change to it corrupts
+ * months of spacing without any visible symptom.
+ */
+export function nextRedoState(
+  stage: RedoStage,
+  correct: boolean,
+  timeSeconds: number,
+): RedoTransition {
+  if (!correct) return { kind: "reschedule", stage: 0, inDays: STAGE_DELAY_DAYS[0] };
+  if (stage === 0) return { kind: "reschedule", stage: 1, inDays: STAGE_DELAY_DAYS[1] };
+  if (stage === 1) return { kind: "reschedule", stage: 2, inDays: STAGE_DELAY_DAYS[2] };
+  // Stage 2 clears only through the cold-solve gate: right AND fast.
+  if (timeSeconds <= COLD_SOLVE_LIMIT_SECONDS) return { kind: "cleared" };
+  return { kind: "reschedule", stage: 1, inDays: STAGE_DELAY_DAYS[1] };
 }
 
 /** Enqueue a miss at stage 0 (+2d). If the question is already queued

@@ -553,6 +553,95 @@ and from Mastery. Both are trade-offs, not oversights.
 
 ---
 
+### W4 — Diagnostic power ✅
+
+**Shipped**
+
+**1. `pnpm test` — 73 tests, 9 suites, `node --test` with no new runner
+dependency.**
+
+| Suite | What it pins |
+| --- | --- |
+| `tests/elo.test.ts` | Symmetry, the 400-point 10:1 expectation, K bounds, that a win-loss pair drifts *toward* the item rather than back to the start, and that a 500-win streak has strictly shrinking steps and stays bounded |
+| `tests/srs.test.ts` | The 1d → 3d → ×ease ladder, the 1.3 ease floor, that a floored card can still grow (never daily-forever), that no grade ever produces a sub-1-day interval, and that the preview on the buttons is what the grade actually does |
+| `tests/plan.test.ts` | Weights always sum to 1, the weaker skill always outweighs, the 5% maintenance floor holds in every corner (including all-perfect and all-zero), the 50/50 baseline blend, manual override precedence, largest-remainder counts summing to the stated total, the phase arc boundaries, the Speed-phase override and the Peak-week backoff, and that the plan is a pure function of its inputs |
+| `tests/pacing.test.ts` | Monotone benchmarks straddling 128s, the sink boundary being strict, that "rushed" counts only wrong answers, that sinks rank by *ratio* not absolute time, and that no item is ever both rushed and a sink |
+| `tests/redo.test.ts` | The exact +2d/+7d/+21d shape, reset-to-stage-0 on any miss, that stage 2 clears only when correct **and** inside the 150s cold-solve limit, that right-but-slow falls back to +7d, and that the fastest possible clearance is 30 days |
+| `tests/analytics-math.test.ts` | Half-open time buckets (no attempt counted twice, none lost), empty accuracy being null and never zero, even-length medians, mastery bands, the min-attempts gate, trailing-window boundaries, calibration gap signs, and attempt-weighted calibration error |
+| `tests/error-inference.test.ts` | That a time *sink* is never attributed to time pressure (the repairs are opposite), that thin history is ignored, that an evidence-free miss reports uncertainty instead of a label, and that every candidate carries its evidence |
+
+Two of my own assertions failed first and were wrong, not the code: ELO
+win-then-loss drifts toward the item rating, and a long streak's steps
+shrink without reaching zero. Both are now stated as the properties that
+actually hold.
+
+**2. Error attribution that is better than a guess, and correctable.**
+`lib/error-inference.ts` ranks candidates from five independent signals
+and returns each with its evidence:
+
+- **the distractor chosen** — the strongest signal, and new: since W1
+  every wrong choice is *proved* to be what a specific named mistake
+  produces, so which wrong answer was picked is a direct observation
+  about which mistake was made
+- declared confidence (a locked-in miss is a wrong belief, not a slip)
+- time against benchmark — with the explicit rule that a **time sink is
+  never time pressure**, because those two repairs are opposites
+- the subtopic's recent record (weak → content gap; strong → execution)
+- how near the chosen answer sits to the key
+
+It never auto-tags silently: `components/drill/error-attribution.tsx`
+shows the suggestion, its percentage of the signal, an expandable list of
+every candidate's evidence, and six one-key overrides. Below 40% of the
+signal it says so — "the evidence leans toward X, but only just. Your
+call." A misdiagnosis the user can see is one they can fix.
+
+**3. A defensible plan.** `components/dashboard/plan-evidence.tsx`
+replaces the weights bar chart. Each skill's share expands to the
+observations that produced it: the rolling record with its actual counts,
+the imported percentile and the fact that the two are blended half and
+half, the manual override when one is set, and an explicit note when a
+skill is pinned at the 5% floor. Disagreement can now be on grounds.
+
+**4. The miss→mastery chain, shown rather than asserted.**
+`lib/miss-chain.ts` queries five links independently per miss —
+classified, chapter, deck card, redo ladder, revisited — and reports each
+as done or broken. On the current fixture it immediately surfaced real
+breaks: **Classified 6/8, Deck card 4/8, Revisited 0/8**. An untagged
+miss looks like nothing is wrong anywhere else in the app; here it is a
+visible gap.
+
+**5. Calibration as a diagnosis, not a table.**
+`components/charts/calibration.tsx` draws each bar *from* the claimed
+accuracy *to* the actual one, so the direction of the error is the shape
+of the mark and not only its colour, and names the repair each direction
+implies: overconfidence means abandon sooner, underconfidence means you
+are rushing away from questions you can do. The headline is an
+attempt-weighted mean gap, so a 40-point miss on two attempts cannot
+outshout a 10-point miss on two hundred.
+
+**6. The tested math is the shipped math.** `lib/analytics-math.ts` is
+used by `lib/analytics.ts` and the mastery grid rather than existing
+only for the tests, and `lib/trap-classify.ts` is shared by the chapter
+transfer layer and the error inference, so the chapter and the
+post-mortem cannot drift apart in vocabulary.
+
+**Verification**
+
+```
+$ pnpm test
+# tests 73
+# suites 9
+# pass 73
+# fail 0
+```
+
+**Acceptance: PASSED** — `pnpm test` passes and covers plan weighting,
+ELO, SRS intervals and pacing (plus the redo ladder, analytics
+aggregation and error inference). Each new diagnostic surface is
+reachable in the running app and captured in `screenshots/w4-after/`.
+
+---
+
 ## Open risks
 
 - **R1 — Bank rebalancing is large.** Reaching D5 ≥ ⅓ and no subtopic
