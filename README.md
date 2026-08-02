@@ -3,6 +3,14 @@
 Local-first, single-user training platform for GMAT Focus Edition
 Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
+- 28-chapter curriculum: 24 concept chapters, one per drillable subtopic,
+  plus 4 technique chapters (backsolving, picking numbers, estimation,
+  strategic guessing) — each with worked examples, trigger cues, a trap
+  gallery and a tiered chapter test
+- Tiered chapter tests — Foundation / Exam level / Top band, each locked
+  until the one below it clears, with the highest bar on the easiest tier
+- Placement diagnostic: 16 questions, 4 per fundamental skill, that the
+  daily plan weights against until you import a real score report
 - AI question engine with independent verification — no generated question
   is ever served unless a second, blind solver agreed with its key
 - Drill mode and full-section simulation with the official Review & Edit
@@ -10,9 +18,14 @@ Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
   card that names the exact line where the work went wrong
 - Spaced redo queue (+2d → +7d → +21d, day-21 cold-solve gate)
+- Interleaved daily blocks — the plan's weights decide how many of each
+  skill, and the questions are spread so you never get a run of one
+- Every miss links back to the exact chapter section that addresses the
+  error type you made
 - Deterministic rapid-fire pattern trainer with per-category ELO
 - Analytics mirroring the official score-report format, plus a
-  deterministic daily plan
+  deterministic daily plan and a technique panel that compares your time
+  on shortcut-available questions against your own algebraic baseline
 - Session focus tags: mark a drill or timed set "casual" and it stays
   out of analytics, calibration, and the daily plan — misses still
   join the redo queue
@@ -24,7 +37,7 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-180-question bank into it — offline, no API key:
+474-question bank into it — offline, no API key:
 
 ```sh
 pnpm install
@@ -35,7 +48,7 @@ pnpm dev
 
 Open http://localhost:3000. The full training loop — drill, timed sets,
 redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 180-question bank ships in `scripts/seed-bank.json`, every
+key: the 474-question bank ships in `scripts/seed-bank.json`, every
 question verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
@@ -55,7 +68,7 @@ cp .env.example .env.local
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed 474-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
