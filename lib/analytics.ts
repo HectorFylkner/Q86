@@ -226,16 +226,7 @@ export type AnalyticsData = {
   difficultyMatrix: DifficultyMatrixRow[];
   /** Attempts per local day, most recent 84 days (includes zero days). */
   volume: VolumeDay[];
-  redoCompliance: {
-    open: number;
-    overdue: number;
-    cleared: number;
-    dueNow: number;
-  };
-  eloBars: Array<{ category: PatternCategoryKey; label: string; rating: number }>;
-  masteryGrid: MasteryGridRow[];
   pacing: PacingView;
-  eloTrajectories: EloTrajectory[];
   reportMirror: ScoreReportMirror;
   missChains: MissChainSummary;
 };
@@ -455,71 +446,6 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     }
   }
 
-  // --- redo compliance ---------------------------------------------------------
-  const redoRows = await db.select().from(redoQueue).all();
-  const nowMs = Date.now();
-  const redoCompliance = {
-    open: redoRows.filter((r) => !r.cleared).length,
-    overdue: redoRows.filter(
-      (r) => !r.cleared && new Date(r.dueAt).getTime() < nowMs,
-    ).length,
-    cleared: redoRows.filter((r) => r.cleared).length,
-    dueNow: redoRows.filter(
-      (r) => !r.cleared && new Date(r.dueAt).getTime() <= nowMs,
-    ).length,
-  };
-
-  // --- pattern ELO ---------------------------------------------------------------
-  const eloMap = new Map(
-    (await db.select().from(eloRatings).all()).map((r) => [
-      r.category,
-      r.rating,
-    ]),
-  );
-  const eloBars = PATTERN_CATEGORY_KEYS.map((category) => ({
-    category,
-    label: PATTERN_CATEGORY_LABELS[category],
-    rating: Math.round(eloMap.get(category) ?? ELO_START),
-  }));
-
-  // --- the 24-subtopic mastery grid ------------------------------------------
-  const bankCells = await db
-    .select({
-      subtopic: questions.subtopic,
-      difficulty: questions.difficulty,
-      n: sqlCount(),
-    })
-    .from(questions)
-    .where(eq(questions.verified, true))
-    .groupBy(questions.subtopic, questions.difficulty)
-    .all();
-  const availableBy = new Map<string, number>();
-  for (const c of bankCells) {
-    availableBy.set(`${c.subtopic}|${c.difficulty}`, c.n);
-  }
-  const masteryGrid: MasteryGridRow[] = ALL_SUBTOPICS.map((subtopic) => {
-    const cells: MasteryCell[] = MASTERY_BANDS.map((difficulty) => {
-      const subset = rows.filter(
-        (r) => r.subtopic === subtopic && r.difficulty === difficulty,
-      );
-      return {
-        difficulty,
-        correct: subset.filter((r) => r.correct).length,
-        total: subset.length,
-        available: availableBy.get(`${subtopic}|${difficulty}`) ?? 0,
-      };
-    });
-    const total = cells.reduce((s, c) => s + c.total, 0);
-    return {
-      subtopic,
-      skill: SKILL_BY_SUBTOPIC[subtopic],
-      label: SUBTOPIC_LABELS[subtopic],
-      cells,
-      total,
-      correct: cells.reduce((s, c) => s + c.correct, 0),
-    };
-  });
-
   // --- pacing: time against correctness against the section budget -----------
   const pacingRows = rows.filter((r) => r.timeSeconds > 0);
   const points: PacingPoint[] = pacingRows.slice(0, 1200).map((r) => ({
@@ -559,38 +485,6 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     timeSinks,
     sinkOverspendSeconds: Math.round(sinkOverspendSeconds),
   };
-
-  // --- ELO trajectory per pattern category -----------------------------------
-  const patternRows = await db
-    .select({
-      category: patternAttempts.category,
-      correct: patternAttempts.correct,
-      id: patternAttempts.id,
-    })
-    .from(patternAttempts)
-    .orderBy(patternAttempts.id)
-    .all();
-  const eloTrajectories: EloTrajectory[] = PATTERN_CATEGORY_KEYS.map(
-    (category) => {
-      const subset = patternRows.filter((r) => r.category === category);
-      let rating = ELO_START;
-      const all: EloTrajectoryPoint[] = [{ n: 0, rating: ELO_START }];
-      subset.forEach((row, i) => {
-        rating = nextRating(rating, ELO_ITEM_RATING, row.correct);
-        all.push({ n: i + 1, rating: Math.round(rating) });
-      });
-      // Thin to at most 60 points so a long history still draws cleanly.
-      const step = Math.max(1, Math.ceil(all.length / 60));
-      const points = all.filter((_, i) => i % step === 0 || i === all.length - 1);
-      return {
-        category,
-        label: PATTERN_CATEGORY_LABELS[category],
-        points,
-        current: Math.round(eloMap.get(category) ?? rating),
-        delta: Math.round(rating - ELO_START),
-      };
-    },
-  );
 
   // --- score-report mirror ---------------------------------------------------
   // Platform accuracy is computed over QUANT formats only: Data Sufficiency
@@ -700,11 +594,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     trend,
     difficultyMatrix,
     volume,
-    redoCompliance,
-    eloBars,
-    masteryGrid,
     pacing,
-    eloTrajectories,
     reportMirror,
     missChains: await recentMissChains(),
   };

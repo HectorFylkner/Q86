@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
-import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
+import { MasteryGrid } from "@/components/charts/mastery-grid";
+import {
+  computeLadders,
+  masteryGridRows,
+  MASTERY_BAR,
+  MIN_ATTEMPTS,
+} from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
@@ -13,6 +19,7 @@ export const runtime = "nodejs";
 
 export default async function MasteryPage() {
   const ladders = await computeLadders();
+  const grid = await masteryGridRows();
   const masteredCount = ladders.filter((l) => l.mastered).length;
 
   return (
@@ -26,6 +33,11 @@ export default async function MasteryPage() {
           {ladders.length} ladders fully climbed.
         </p>
       </div>
+
+      {/* The whole domain at one glance, then the ladders underneath it.
+          This used to sit on the report as well, which put the same
+          question on two routes in the same nav group. */}
+      <MasteryGrid rows={grid} />
 
       {FUNDAMENTAL_SKILLS.map((skill) => (
         <section

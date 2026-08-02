@@ -1,5 +1,5 @@
 import { desc } from "drizzle-orm";
-import { SectionTabs } from "@/components/section-tabs";
+import Link from "next/link";
 import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
 import { db } from "@/lib/db";
@@ -18,7 +18,12 @@ export default async function ImportPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTabs group="progress" />
+      <p className="font-mono text-[11px] uppercase tracking-wide text-graphite">
+        <Link href="/analytics" className="hover:text-ink">
+          Progress
+        </Link>{" "}
+        · Import &amp; backup
+      </p>
       <h1 className="font-display text-xl font-semibold">
         Score-report import
       </h1>

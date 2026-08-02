@@ -5,32 +5,38 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
-/** Seven destinations; grouped sections carry their own tab bars.
- *  `routes` lists every path that should light the entry up. */
+/**
+ * Five destinations, one verb each, identical on desktop and on a phone.
+ *
+ * It was seven, and the header and the phone tab bar disagreed about
+ * which — the bar carried a "Stats" entry the header called "Progress",
+ * and it had no Learn at all, so on a phone the curriculum could only be
+ * reached by scrolling up into a horizontally-scrolling header. One list
+ * used twice removes both problems.
+ *
+ * The cut follows what every durable study tool converges on: a short set
+ * of verbs, with variants as tabs *inside* a destination rather than as
+ * more destinations. Drill, timed sections and the two trainers are all
+ * "answer questions under some condition", so they are one place with
+ * four ways in. Import and backup is housekeeping, not a daily verb, so
+ * it left the nav entirely and is linked from the two places that
+ * actually need it.
+ *
+ * `routes` lists every path that should light the entry up.
+ */
 const LINKS = [
   { href: "/", label: "Today", routes: ["/"] },
   { href: "/learn", label: "Learn", routes: ["/learn"] },
-  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
-  { href: "/timed", label: "Timed", routes: ["/timed"] },
+  {
+    href: "/drill",
+    label: "Practice",
+    routes: ["/drill", "/timed", "/patterns", "/decide", "/postmortem"],
+  },
   { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
-  { href: "/patterns", label: "Trainers", routes: ["/patterns", "/decide"] },
   {
     href: "/mastery",
     label: "Progress",
     routes: ["/mastery", "/analytics", "/import"],
-  },
-];
-
-/** The daily loop, thumb-reachable on phones. */
-const TAB_LINKS = [
-  { href: "/", label: "Today", routes: ["/"] },
-  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
-  { href: "/timed", label: "Timed", routes: ["/timed"] },
-  { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
-  {
-    href: "/analytics",
-    label: "Stats",
-    routes: ["/analytics", "/mastery", "/import"],
   },
 ];
 
@@ -57,7 +63,7 @@ export function Nav() {
         </Link>
         <nav
           aria-label="Primary"
-          className="flex flex-1 items-center gap-1 overflow-x-auto"
+          className="hidden flex-1 items-center gap-1 sm:flex"
         >
           {LINKS.map((link) => {
             const active = isActive(link.routes, pathname);
@@ -65,6 +71,7 @@ export function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors duration-150",
                   active
@@ -77,37 +84,40 @@ export function Nav() {
             );
           })}
         </nav>
-        <ThemeToggle />
+        <div className="flex flex-1 justify-end sm:flex-none">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
 }
 
-/** Phone-only fixed bottom tab bar. Rendered outside the sticky header:
- *  backdrop-filter on an ancestor would turn position:fixed into
+/** The same five, thumb-reachable on phones. Rendered outside the sticky
+ *  header: backdrop-filter on an ancestor would turn position:fixed into
  *  header-relative positioning. */
 export function BottomTabs() {
   const pathname = usePathname();
   return (
-      <nav
-        aria-label="Quick access"
-        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
-      >
-        {TAB_LINKS.map((link) => {
-          const active = isActive(link.routes, pathname);
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex min-h-[52px] flex-1 items-center justify-center text-[13px]",
-                active ? "font-semibold text-ballpoint" : "text-graphite",
-              )}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
+    <nav
+      aria-label="Primary"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
+    >
+      {LINKS.map((link) => {
+        const active = isActive(link.routes, pathname);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "flex min-h-[52px] flex-1 items-center justify-center text-[13px]",
+              active ? "font-semibold text-ballpoint" : "text-graphite",
+            )}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

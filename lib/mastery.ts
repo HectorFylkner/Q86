@@ -1,10 +1,18 @@
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { attempts, questions } from "./db/schema.ts";
-import { MASTERY_BAR, MASTERY_WINDOW as WINDOW, MIN_ATTEMPTS } from "./mastery-config.ts";
+import {
+  MASTERY_BAR,
+  MASTERY_BANDS,
+  MASTERY_WINDOW as WINDOW,
+  MIN_ATTEMPTS,
+  type MasteryCell,
+  type MasteryGridRow,
+} from "./mastery-config.ts";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
+  SUBTOPIC_LABELS,
   type FundamentalSkill,
   type Subtopic,
 } from "./taxonomy.ts";
@@ -104,6 +112,66 @@ export async function computeLadders(): Promise<Ladder[]> {
       rungs,
       currentRung: next?.difficulty ?? null,
       mastered: next == null,
+    };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * The 24-subtopic × 4-difficulty grid.
+ *
+ * This used to be computed inside `gatherAnalytics` and rendered on the
+ * report, which put two views of "where am I strong and weak by subtopic"
+ * on two routes inside the same nav group. It lives here now, on the page
+ * the nav already promises for exactly this question.
+ */
+export async function masteryGridRows(): Promise<MasteryGridRow[]> {
+  const rows = await db
+    .select({
+      subtopic: questions.subtopic,
+      difficulty: questions.difficulty,
+      correct: attempts.correct,
+    })
+    .from(attempts)
+    .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(eq(attempts.focus, "focused"))
+    .all();
+
+  const bankCells = await db
+    .select({
+      subtopic: questions.subtopic,
+      difficulty: questions.difficulty,
+      n: count(),
+    })
+    .from(questions)
+    .where(eq(questions.verified, true))
+    .groupBy(questions.subtopic, questions.difficulty)
+    .all();
+  const availableBy = new Map<string, number>();
+  for (const c of bankCells) {
+    availableBy.set(`${c.subtopic}|${c.difficulty}`, c.n);
+  }
+
+  return ALL_SUBTOPICS.map((subtopic) => {
+    const cells: MasteryCell[] = MASTERY_BANDS.map((difficulty) => {
+      const subset = rows.filter(
+        (r) => r.subtopic === subtopic && r.difficulty === difficulty,
+      );
+      return {
+        difficulty,
+        correct: subset.filter((r) => r.correct).length,
+        total: subset.length,
+        available: availableBy.get(`${subtopic}|${difficulty}`) ?? 0,
+      };
+    });
+    return {
+      subtopic,
+      skill: SKILL_BY_SUBTOPIC[subtopic],
+      label: SUBTOPIC_LABELS[subtopic],
+      cells,
+      total: cells.reduce((s, c) => s + c.total, 0),
+      correct: cells.reduce((s, c) => s + c.correct, 0),
     };
   });
 }

@@ -1,5 +1,6 @@
 import { count, eq } from "drizzle-orm";
 import { DrillClient } from "@/components/drill/drill-client";
+import { SectionTabs } from "@/components/section-tabs";
 import type { CountRow } from "@/components/drill/drill-setup";
 import {
   CHAPTER_TIERS,
@@ -87,6 +88,7 @@ export default async function DrillPage({
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="practice" />
       <h1 className="font-display text-xl font-semibold">
         {autoStartTest
           ? `Chapter test · ${TIER_SPEC[autoStartTier].label}`

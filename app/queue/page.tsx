@@ -1,8 +1,12 @@
-import { and, desc, eq, gt, lte } from "drizzle-orm";
+import { and, count, desc, eq, gt, lte } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
 import { db } from "@/lib/db";
 import { attempts, questions, redoQueue } from "@/lib/db/schema";
+
+/** A redo is "overdue" once a full day past its due date — the same
+ *  day-grain the +2/+7/+21 schedule is written in. */
+const DAY_MS = 86_400_000;
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -71,12 +75,35 @@ export default async function QueuePage({
     .limit(500)
     .all()) as LogRow[];
 
+  // Compliance belongs here rather than on the report: this is the page
+  // that can act on it. It used to be duplicated on /analytics, which
+  // could only tell you the number.
+  const cleared =
+    (
+      await db
+        .select({ n: count() })
+        .from(redoQueue)
+        .where(eq(redoQueue.cleared, true))
+        .get()
+    )?.n ?? 0;
+  const overdue = due.filter((r) => r.dueAt.getTime() < now.getTime() - DAY_MS)
+    .length;
+
   return (
     <div className="space-y-4">
       <SectionTabs group="review" />
-      <h1 className="font-display text-xl font-semibold">
-        Redo queue &amp; error log
-      </h1>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 className="font-display text-xl font-semibold">
+          Redo queue &amp; error log
+        </h1>
+        <p className="font-mono text-[11px] text-graphite">
+          {due.length} due ·{" "}
+          <span className={overdue > 0 ? "text-amber" : undefined}>
+            {overdue} overdue
+          </span>{" "}
+          · {cleared} cleared by cold solve
+        </p>
+      </div>
       <QueueClient
         due={due}
         upcoming={upcoming}

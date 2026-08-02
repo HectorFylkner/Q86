@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Line, LineChart, ReferenceLine, YAxis } from "recharts";
 import { Figure, Plot } from "@/components/charts/chart-kit";
 import { useChartTokens } from "@/components/use-chart-tokens";
-import type { EloTrajectory } from "@/lib/analytics";
+import type { EloTrajectory } from "@/lib/pattern-stats";
 import { ELO_START } from "@/lib/elo";
 
 /**

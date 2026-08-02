@@ -1,5 +1,6 @@
 import { count, eq } from "drizzle-orm";
 import { TimedClient } from "@/components/timed/timed-client";
+import { SectionTabs } from "@/components/section-tabs";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 
@@ -23,6 +24,7 @@ export default async function TimedPage({
 
   return (
     <div className="space-y-4">
+      <SectionTabs group="practice" />
       <h1 className="font-display text-xl font-semibold">Timed sets</h1>
       <TimedClient
         verifiedTotal={verifiedTotal}

@@ -1,4 +1,5 @@
 import { count } from "drizzle-orm";
+import { EloTrajectories } from "@/components/charts/elo-trajectory";
 import { SectionTabs } from "@/components/section-tabs";
 import { PatternsClient, type CategoryStats } from "@/components/patterns/patterns-client";
 import { db } from "@/lib/db";
@@ -9,6 +10,7 @@ import {
   bestRoundScore,
   computeCategoryStreak,
   computeDayStreak,
+  eloTrajectories,
 } from "@/lib/pattern-stats";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +56,7 @@ export default async function PatternsPage({
 
   return (
     <div className="space-y-4">
-      <SectionTabs group="trainers" />
+      <SectionTabs group="practice" />
       <h1 className="font-display text-xl font-semibold">Pattern trainer</h1>
       <PatternsClient
         stats={stats}
@@ -62,6 +64,10 @@ export default async function PatternsPage({
         mixedBest={await bestRoundScore("mixed")}
         autoStart={autoStart}
       />
+      {/* Rating history sits beside the trainers that produce it. It used
+          to be drawn on the report, which mentioned the feature nowhere
+          else. */}
+      <EloTrajectories data={await eloTrajectories()} />
     </div>
   );
 }

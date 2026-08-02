@@ -19,8 +19,6 @@ import {
 import { SafeResponsiveContainer as ResponsiveContainer } from "@/components/charts/chart-kit";
 import { CalibrationChart } from "@/components/charts/calibration";
 import { MissChainCard } from "@/components/charts/miss-chain";
-import { EloTrajectories } from "@/components/charts/elo-trajectory";
-import { MasteryGrid } from "@/components/charts/mastery-grid";
 import { PacingChart } from "@/components/charts/pacing-view";
 import { ScoreReportMirrorCard } from "@/components/charts/score-report-mirror";
 import type { AnalyticsData, MirrorBar } from "@/lib/analytics";
@@ -69,9 +67,6 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
     <div className="space-y-6">
       {/* 1 — the score-report mirror, laid out like the official report */}
       <ScoreReportMirrorCard data={data.reportMirror} />
-
-      {/* 1b — the whole domain at one glance */}
-      <MasteryGrid rows={data.masteryGrid} />
 
       {/* 1c — pacing: time against correctness against the budget */}
       <PacingChart data={data.pacing} />
@@ -501,32 +496,6 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </LineChart>
         </ResponsiveContainer>
       </Section>
-
-      {/* 7 — redo compliance + pattern ELO */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section
-          title="Redo-queue compliance"
-          subtitle="Spaced redos: what's open, overdue, and cleared."
-        >
-          <div className="flex flex-wrap gap-4">
-            <ZoneStat label="Open" value={data.redoCompliance.open} />
-            <ZoneStat
-              label="Overdue"
-              value={data.redoCompliance.overdue}
-              tone={data.redoCompliance.overdue > 0 ? "amber" : undefined}
-            />
-            <ZoneStat
-              label="Cleared (cold-solved)"
-              value={data.redoCompliance.cleared}
-              tone="blue"
-            />
-          </div>
-        </Section>
-
-      </div>
-
-      {/* ELO as small multiples: nine categories, one hue, faceted. */}
-      <EloTrajectories data={data.eloTrajectories} />
 
       <Footer />
     </div>

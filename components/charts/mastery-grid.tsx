@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Figure } from "@/components/charts/chart-kit";
-import type { MasteryGridRow } from "@/lib/analytics";
+import type { MasteryGridRow } from "@/lib/mastery-config";
 import { masteryLevel, needsWork, type MasteryLevel } from "@/lib/analytics-math";
 import { MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery-config";
 import { SKILL_LABELS, SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";

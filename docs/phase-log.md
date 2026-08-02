@@ -1062,6 +1062,98 @@ legacy-credit rule. 72/72 tiers fill six questions; `verify-bank` 474/474;
 `a11y-audit` 740/740 named with 5 live regions; `keyboard-pass` 13/13;
 `check-contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors.
 
+## W6 — Cutting the navigation back
+
+**Brief:** "Make sure that the site isn't unnecessarily complex and with
+abundant tabs and such. Truly maximize inspiration from proven concepts
+and best practices."
+
+### What the audit found
+
+Three separate navigation systems, and they disagreed with each other:
+
+1. Desktop header — **7** entries.
+2. Phone bottom bar — **5** entries, with *different labels* ("Stats" for
+   what the header called "Progress") and **no Learn at all**. On a phone
+   the entire curriculum could only be reached by scrolling to the top and
+   using a horizontally-scrolling header.
+3. Section tab bars — 3 groups, 7 tabs.
+
+Twelve destinations, two vocabularies, one unreachable section.
+
+Page weight told the second half of the story. Cards per route, measured:
+`/analytics` **29**, `/learn` 64 (legitimate — 28 chapters), everything
+else in single digits. And three of the report's surfaces answered a
+question a dedicated route in the *same nav group* already owned:
+
+| Surface on /analytics | Route that already owns it |
+| --- | --- |
+| Mastery grid | `/mastery` |
+| Redo-queue compliance | `/queue` |
+| ELO trajectories | `/patterns` |
+
+### The cut
+
+**Seven top-level entries → five, identical on desktop and phone.**
+
+`Today · Learn · Practice · Review · Progress`
+
+- **Practice** absorbs Drill, Timed, Mental math and Decision triage.
+  They are all "answer questions under some condition", so they are one
+  destination with four tabs rather than two top-level slots and a tab
+  group. The trainers in particular held a whole nav slot for two
+  mini-drills.
+- **Import & backup left the nav entirely.** It is housekeeping, not a
+  daily verb, and carrying it made Progress read as three equal things
+  when it is two views and a settings page. It is now linked from the
+  score-report card — the data it actually feeds, in both the
+  imported and not-yet-imported states — so it is reachable exactly where
+  someone would want it.
+- **One list, used twice.** The header and the phone bar now render the
+  same array, so they cannot drift again and Learn is reachable with a
+  thumb.
+
+**Duplicated surfaces moved rather than deleted.** One home per fact:
+
+- The mastery grid moved to `/mastery`, above the ladders. Its types went
+  into `lib/mastery-config.ts` rather than `lib/mastery.ts` — the chart is
+  a client component, and importing the query module would drag the
+  database into the browser bundle, which is the same trap `mastery-config`
+  was extracted to avoid in W2.
+- ELO history moved to `/patterns`, beside the trainers that generate it.
+  The report had been drawing a chart about a feature it mentioned
+  nowhere else.
+- Redo compliance moved to `/queue` as a header line — and improved in the
+  move. The report could only state the number; the queue can act on it.
+  "Overdue" is now *a full day* past due rather than merely past due
+  (which on that page was every row and told you nothing), matching the
+  day-grain the +2/+7/+21 schedule is written in.
+
+Their data left `gatherAnalytics` entirely, so it is no longer computed
+and serialized into a page that does not render it.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Top-level nav entries | 7 | **5** |
+| Nav vocabularies | 2 (disagreeing) | **1** |
+| Sections unreachable on a phone | 1 (Learn) | **0** |
+| Total destinations | 12 | **10** |
+| `/analytics` cards | 29 | **23** |
+| `/analytics` HTML | 441 kB | **360 kB** |
+
+Nothing was removed from the product: every fact that left the report
+gained a better home. `/mastery` 233→297 kB and `/patterns` 53→69 kB are
+that content arriving where it belongs.
+
+Acceptance: all 11 routes 200; header renders exactly 5 entries and the
+phone bar the same 5; `/drill` shows the four practice tabs and
+`/analytics` the two progress tabs; `pnpm test` 122/122 across 14 suites;
+`a11y-audit` 738/738 named across 16 routes with 5 live regions;
+`keyboard-pass` 13/13; `check-contrast` 60/60; `tsc` clean; `pnpm lint`
+0 errors.
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance

@@ -37,7 +37,12 @@ export function ScoreReportMirrorCard({ data }: { data: ScoreReportMirror }) {
           {hasReport ? (
             <>
               Imported{" "}
-              {format(new Date(data.reportedAt as unknown as Date), "d MMM yyyy")}.
+              {format(new Date(data.reportedAt as unknown as Date), "d MMM yyyy")}{" "}
+              —{" "}
+              <Link href="/import" className="text-ballpoint hover:underline">
+                import another or back up
+              </Link>
+              .
             </>
           ) : (
             <>
