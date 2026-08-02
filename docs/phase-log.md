@@ -1154,6 +1154,136 @@ phone bar the same 5; `/drill` shows the four practice tabs and
 `keyboard-pass` 13/13; `check-contrast` 60/60; `tsc` clean; `pnpm lint`
 0 errors.
 
+## W7 — Research pass: GMAT FE, SAT, and the learning-science literature
+
+**Brief:** "Could you further research GMAT FE Prep material, as well as
+other similar styles of test prep material such as SATs, and incorporate
+various best practices, content wise, structure wise, design wise."
+
+### What the research said
+
+**Official GMAT Focus Edition mechanics** confirmed what Q86 already
+implements: unlimited bookmarking, a maximum of three answer changes per
+section within the section's remaining time, question-level adaptivity,
+and a free score report carrying section scores (60–90) and percentiles.
+No change needed — the Review & Edit mechanic is faithful.
+
+**Khan Academy's official SAT course** produced two findings that Q86
+failed:
+
+1. *Every skill is taught at three levels — Foundations, Medium,
+   Advanced.* This independently validates the W5e tier design
+   (Foundation / Exam level / Top band), which was derived from TTP. Two
+   unrelated curricula converging on three tiers is about as strong a
+   signal as this kind of design decision gets.
+2. *"Take a diagnostic first to establish your baseline; the
+   recommendations calibrate off it."* **Q86 had no diagnostic.**
+3. *From a question you got wrong, jump straight to the lesson covering
+   the skill you need.* **Q86 had no such link** — the only route from a
+   result to a chapter was on the chapter test, which is the one place
+   you were already in the chapter.
+
+**The interleaving literature** produced the largest single finding. In
+the most-cited classroom comparison, students taught in blocked order
+scored **42%** on a delayed test thirty days later; students taught the
+identical material interleaved scored **74%**. The mechanism is that
+under blocked practice the method stays live in working memory between
+questions, so the reader never retrieves the decision "which method is
+this?" — which is precisely the decision the exam tests, because on the
+exam the questions arrive in no order.
+
+**Q86's daily drill block was blocked practice.** `selectPlanDrillIds`
+emitted every question of one skill before starting the next.
+
+### W7a — Interleaving (commit: interleave)
+
+`lib/interleave.ts`, pure and question-agnostic. The weights still decide
+*how many* of each skill; the new code decides the *order*, which the old
+version conflated with selection.
+
+Plain round-robin was written first and is wrong at the tail: once the
+small groups empty, the largest supplies every remaining slot, so
+`[8,1,1]` comes out `a b c a a a a a a a` — seven consecutive, most of the
+session. Measured, not assumed: the first implementation produced exactly
+that and the test caught it.
+
+The shipped version gives each item a position at the centre of its share
+of the sequence — item *j* of a group of *n* sits at (j+½)/n — and sorts.
+A group of 2 lands at ¼ and ¾; a group of 10 lands every tenth. Each
+group spreads across the *whole* block regardless of size, and the result
+is deterministic, so a resumed session is not reshuffled underneath the
+reader.
+
+Measured on the real daily plan (weights 4/2/4/4):
+
+- before: `R R R R V V E E E E C C C C` — longest same-skill run **4**
+- after: `R E C V R E C R E C V R E C` — longest same-skill run **1**
+
+`minPossibleRun()` computes the theoretical floor from the group sizes, so
+the tests compare the achieved run against what was actually achievable
+rather than against a 1 the input may forbid.
+
+### W7b — The miss → lesson bridge (commit: miss bridge)
+
+`lib/miss-bridge.ts`. Khan's version sends you to the lesson; this one is
+sharper, because Q86 knows something Khan's does not — *why* the question
+was missed. The six error types map to different chapter sections, and
+sending a calculation error to the trap gallery wastes the trip:
+
+| Error type | Lands on | Because |
+| --- | --- | --- |
+| Content gap | The core ideas | the rule itself was missing |
+| Setup error | Trigger cues | read right, wrong method chosen |
+| Calculation error | Speed moves | method right, arithmetic broke |
+| Misread | Trap gallery | this is the shape misreads are built to cause |
+| Time pressure | Speed moves | the shortcut that would have bought the time |
+| Guess | The core ideas | the chapter has not landed yet |
+
+Rendered in the two places a miss is actually seen: the post-mortem
+(as a card that explains the routing, and follows the *reclassified*
+subtopic if the reader corrects it) and the drill result table (the
+subtopic of a missed row becomes the link).
+
+### W7c — The placement diagnostic (commit: diagnostic)
+
+16 questions, 4 per fundamental skill, at D3, interleaved.
+
+Q86 had two ways to acquire a baseline and neither worked on day one: an
+imported score report requires having sat the exam, and the weighted plan
+requires history it does not have. A new user's plan was uniform across
+all four skills — the one weighting certainly wrong.
+
+- **D3, not a spread.** A diagnostic exists to *discriminate*, and items
+  nearly everyone gets right or wrong discriminate nothing.
+- **Interleaved**, so it also measures what the exam measures: whether
+  you can pick the method when the order gives nothing away.
+- **Consumed through the existing path.** `diagnosticWeakness()` emits
+  the same 0–1 weights an imported report produces, so the planner grew
+  no second code path. An imported report still wins — it is the real
+  exam's reading of the same four skills.
+- **An unmeasured skill is 0.5, never 1.** Guessing that an unasked skill
+  is weak would be the diagnostic inventing data, which is the one thing
+  a baseline must not do. A test pins this.
+- Today now states **what the plan is weighted against** — imported
+  report, diagnostic, or "nothing yet, all four skills equal". A plan
+  that cannot say where its weights came from is asking to be trusted on
+  nothing.
+
+Acceptance: `pnpm test` **139/139 across 16 suites** (was 122/14) — 10
+interleaving tests including the floor comparison, 7 diagnostic tests.
+Real daily block longest same-skill run 4 → 1; diagnostic selects 16/16 at
+D3 with run 1. `verify-bank` 474/474; `a11y-audit` 737/737 named;
+`keyboard-pass` 13/13; `check-contrast` 60/60; `tsc` clean; `pnpm lint`
+0 errors.
+
+### Sources
+
+- GMAT Focus Edition format and score report: gmatclub.com, e-gmat.com
+- Khan Academy official SAT practice design: satsuite.collegeboard.org,
+  blog.khanacademy.org, makon.ai
+- Interleaving vs blocked practice: pocketprep.com, the-learning-agency-lab.com,
+  PMC8476370, ScienceDirect S0959475222000044
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance

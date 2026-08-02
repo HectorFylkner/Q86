@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { missBridge, missBridgeHref } from "@/lib/miss-bridge";
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
@@ -55,6 +56,7 @@ export function PostmortemClient({
   const [errorSubtag, setErrorSubtag] = useState<Subtopic | null>(
     attempt.errorSubtag ?? null,
   );
+  const bridge = missBridge(errorType);
   const [notes, setNotes] = useState(attempt.userNotes ?? "");
   const [confirmState, setConfirmState] = useState<
     "unsaved" | "saving" | "saved" | "error"
@@ -353,6 +355,32 @@ export function PostmortemClient({
                 Saving failed — retry.
               </span>
             )}
+          </div>
+
+          {/* The bridge back to the chapter. Classifying the miss is only
+              half the loop; the other half is going and fixing it, and
+              the error type says which section to fix it in. */}
+          <div className="mt-3 border-t border-grid pt-3">
+            <p className="text-xs text-graphite">
+              {errorType ? (
+                <>
+                  A {ERROR_TYPE_LABELS[errorType].toLowerCase()} on this
+                  question means {bridge.because}.
+                </>
+              ) : (
+                <>Classify the miss and this points at the right section.</>
+              )}
+            </p>
+            <Link
+              href={missBridgeHref(
+                errorSubtag ?? question.subtopic,
+                errorType,
+              )}
+              className="mt-1.5 inline-flex min-h-[44px] items-center rounded-control border border-grid px-3 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+            >
+              {bridge.section} ·{" "}
+              {SUBTOPIC_LABELS[errorSubtag ?? question.subtopic]} →
+            </Link>
           </div>
         </section>
       )}

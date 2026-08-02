@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   startChapterTest,
+  startDiagnostic,
   startDrill,
   startDrillWithQuestions,
   type DrillTiming,
@@ -32,12 +33,14 @@ export function DrillClient({
   autoStartRung,
   autoStartTest,
   autoStartTier,
+  autoStartDiagnostic,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
   autoStartRung?: { subtopic: string; difficulty: number } | null;
   autoStartTest?: Subtopic | null;
   autoStartTier?: ChapterTier;
+  autoStartDiagnostic?: boolean;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
@@ -88,6 +91,33 @@ export function DrillClient({
         }),
       );
   }, [autoStartTest, autoStartTier]);
+
+  // The placement diagnostic arrives as /drill?diagnostic=1
+  useEffect(() => {
+    if (!autoStartDiagnostic || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    setStage({ kind: "loading" });
+    startDiagnostic()
+      .then((res) => {
+        if (res.error != null || res.sessionId == null) {
+          setStage({ kind: "setup", error: res.error ?? "Could not start." });
+        } else {
+          setStage({
+            kind: "running",
+            sessionId: res.sessionId,
+            questions: res.questions,
+            timing: "soft",
+            focus: "focused",
+          });
+        }
+      })
+      .catch(() =>
+        setStage({
+          kind: "setup",
+          error: "Could not start the diagnostic — the server did not respond.",
+        }),
+      );
+  }, [autoStartDiagnostic]);
 
   // Twin drills and coach prescriptions arrive as /drill?qids=…
   useEffect(() => {

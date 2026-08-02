@@ -30,9 +30,11 @@ export default async function DrillPage({
     test?: string;
     tier?: string;
     strat?: string;
+    diagnostic?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, test, tier, strat } = await searchParams;
+  const { qids, plan, sub, d, test, tier, strat, diagnostic } =
+    await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -90,7 +92,9 @@ export default async function DrillPage({
     <div className="space-y-4">
       <SectionTabs group="practice" />
       <h1 className="font-display text-xl font-semibold">
-        {autoStartTest
+        {diagnostic === "1"
+          ? "Placement diagnostic"
+          : autoStartTest
           ? `Chapter test · ${TIER_SPEC[autoStartTier].label}`
           : strategy
             ? `Technique drill · ${STRATEGY_LABELS[strategy]}`
@@ -102,6 +106,7 @@ export default async function DrillPage({
         autoStartRung={autoStartRung}
         autoStartTest={autoStartTest}
         autoStartTier={autoStartTier}
+        autoStartDiagnostic={diagnostic === "1"}
       />
     </div>
   );

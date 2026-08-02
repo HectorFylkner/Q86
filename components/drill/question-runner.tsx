@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { missBridgeHref } from "@/lib/miss-bridge";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Announce } from "@/components/live-region";
@@ -152,6 +153,17 @@ export function QuestionRunner({
       startRef.current = Date.now();
     } else {
       const all = results;
+      // Per-skill counts so a diagnostic can be read back as a baseline.
+      // Harmless on an ordinary drill and required on a diagnostic, so it
+      // is always written rather than branched on.
+      const bySkill: Record<string, { correct: number; total: number }> = {};
+      all.forEach((r, i) => {
+        const skill = questions[i]?.fundamentalSkill;
+        if (!skill) return;
+        const cell = (bySkill[skill] ??= { correct: 0, total: 0 });
+        cell.total += 1;
+        if (r.correct) cell.correct += 1;
+      });
       const summary = {
         total: all.length,
         correct: all.filter((r) => r.correct).length,
@@ -159,11 +171,12 @@ export function QuestionRunner({
           all.length > 0
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
+        bySkill,
       };
       finishSession(sessionId, summary).catch(() => {});
       setPhase("done");
     }
-  }, [phase, index, questions.length, results, sessionId]);
+  }, [phase, index, questions, results, sessionId]);
 
   const tagError = useCallback(
     (errorType: ErrorType) => {
@@ -328,7 +341,21 @@ export function QuestionRunner({
                 return (
                   <tr key={i} className="border-b border-grid last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
-                    <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
+                    <td className="px-3 py-2">
+                      {r.correct ? (
+                        SUBTOPIC_LABELS[q.subtopic]
+                      ) : (
+                        // A miss is the moment the chapter is worth
+                        // re-opening, so the subtopic itself is the way
+                        // back to it.
+                        <Link
+                          href={missBridgeHref(q.subtopic, r.errorType)}
+                          className="hover:text-ballpoint hover:underline"
+                        >
+                          {SUBTOPIC_LABELS[q.subtopic]}
+                        </Link>
+                      )}
+                    </td>
                     <td className="px-3 py-2">
                       <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
                     </td>

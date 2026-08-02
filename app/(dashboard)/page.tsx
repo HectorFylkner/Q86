@@ -9,9 +9,14 @@ import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs, selectPlanDrillIds } from "@/lib/plan-server";
+import {
+  DIAGNOSTIC_PER_SKILL,
+  DIAGNOSTIC_SIZE,
+  latestDiagnostic,
+} from "@/lib/diagnostic";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
 import { findResumable, todaysQueueThenDrill } from "@/lib/resume";
-import { getSetting } from "@/lib/settings";
+import { baselineWeakness, getSetting } from "@/lib/settings";
 import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +44,14 @@ export default async function TodayPage() {
   const planDrillIds = verifiedCount > 0 ? await selectPlanDrillIds(plan) : [];
   const today = await todaysQueueThenDrill(planDrillIds);
   const deckWaiting = deck.due + deck.fresh;
+  const baselineSource: "report" | "diagnostic" | null =
+    (await getSetting("test_date")) !== undefined && inputs.baselineWeakness
+      ? (await baselineWeakness())
+        ? "report"
+        : (await latestDiagnostic())
+          ? "diagnostic"
+          : null
+      : null;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
@@ -68,9 +81,28 @@ export default async function TodayPage() {
 
       {firstRun && (
         <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-5 shadow-ambient">
+          {/* Placement first. Until something measures where you stand,
+              the weighted plan below is uniform across all four skills,
+              which is the one weighting guaranteed to be wrong. Sixteen
+              questions is the cheapest way to stop guessing. */}
           <h2 className="font-display text-base font-semibold">
-            New here? The loop is simple.
+            Start with a placement diagnostic
           </h2>
+          <p className="mt-1 max-w-[62ch] text-sm text-graphite">
+            {DIAGNOSTIC_SIZE} questions, {DIAGNOSTIC_PER_SKILL} from each
+            fundamental skill, mixed together the way the exam mixes them.
+            It takes about half an hour and it is what today&apos;s plan
+            weights against until you import a real score report.
+          </p>
+          <Link
+            href="/drill?diagnostic=1"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+          >
+            Take the diagnostic →
+          </Link>
+          <h3 className="mt-5 font-display text-sm font-semibold">
+            Or start reading — the loop is simple.
+          </h3>
           <ol className="mt-2 space-y-1.5 text-sm">
             <li>
               <span className="font-mono text-xs text-ballpoint">1</span>{" "}
@@ -185,6 +217,17 @@ export default async function TodayPage() {
               {PHASE_LABELS[plan.phase]}
             </span>
             <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
+            {/* What the weighting is actually based on. A plan that
+                cannot say where its weights came from is asking to be
+                trusted on nothing. */}
+            <p className="font-mono text-[11px] text-graphite">
+              weighted against{" "}
+              {baselineSource === "report"
+                ? "your imported score report"
+                : baselineSource === "diagnostic"
+                  ? "your placement diagnostic"
+                  : "nothing yet — all four skills equal"}
+            </p>
             {plan.mock && (
               <p className={plan.mock.today ? "text-sm font-medium text-ballpoint" : "text-sm text-graphite"}>
                 {plan.mock.today

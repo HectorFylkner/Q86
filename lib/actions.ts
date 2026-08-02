@@ -17,6 +17,7 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { selectDiagnostic } from "./diagnostic.ts";
 import { TIER_MIN_SIZE, type ChapterTier } from "./chapter-test-config.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
@@ -34,6 +35,7 @@ import {
 } from "./engine.ts";
 import { applyRedoResult, enqueueMiss } from "./redo.ts";
 import { attributeError, type Attribution } from "./error-inference.ts";
+import { FUNDAMENTAL_SKILLS } from "./taxonomy.ts";
 import type {
   Confidence,
   EditReason,
@@ -103,6 +105,31 @@ export async function startChapterTest(
         chapter_tier: tier,
         count: picked.length,
       },
+    })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: picked };
+}
+
+/**
+ * The placement diagnostic: sixteen questions, four per fundamental
+ * skill, interleaved. Recorded with `diagnostic: true` so the planner can
+ * weight against it until an official score report arrives.
+ */
+export async function startDiagnostic(): Promise<StartDrillResult> {
+  const picked = await selectDiagnostic();
+  if (picked.length < FUNDAMENTAL_SKILLS.length) {
+    return {
+      error: "Not enough verified questions for a diagnostic yet.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const session = await db
+    .insert(sessions)
+    .values({
+      mode: "drill",
+      config: { diagnostic: true, count: picked.length },
     })
     .returning()
     .get();
