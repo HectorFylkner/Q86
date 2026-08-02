@@ -17,6 +17,8 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { selectCumulativeReview } from "./cumulative.ts";
+import { REVIEW_MIN_CHAPTERS, REVIEW_PER_CHAPTER } from "./cumulative-config.ts";
 import { selectDiagnostic } from "./diagnostic.ts";
 import { TIER_MIN_SIZE, type ChapterTier } from "./chapter-test-config.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
@@ -103,6 +105,38 @@ export async function startChapterTest(
       config: {
         chapter_test: subtopic,
         chapter_tier: tier,
+        count: picked.length,
+      },
+    })
+    .returning()
+    .get();
+  return { error: null, sessionId: session.id, questions: picked };
+}
+
+/**
+ * Cumulative interleaved review: two questions from each chapter whose
+ * spacing interval has elapsed, interleaved. Recorded with
+ * `cumulative_review: true` and the chapters it covered, so each chapter's
+ * rung can be advanced from its own slice of the result.
+ */
+export async function startCumulativeReview(): Promise<StartDrillResult> {
+  const { questions: picked, chapters } = await selectCumulativeReview();
+  if (chapters.length < REVIEW_MIN_CHAPTERS || picked.length === 0) {
+    return {
+      error:
+        "No chapters are due for review yet. Pass a chapter test, and the chapter comes back in two days.",
+      sessionId: null,
+      questions: [],
+    };
+  }
+  const session = await db
+    .insert(sessions)
+    .values({
+      mode: "drill",
+      config: {
+        cumulative_review: true,
+        chapters,
+        per_chapter: REVIEW_PER_CHAPTER,
         count: picked.length,
       },
     })

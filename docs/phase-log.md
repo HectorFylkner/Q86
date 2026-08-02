@@ -1499,7 +1499,157 @@ suites; `pnpm build` 21 routes; `check:a11y` 100% named with 5 live
 regions; `check:keyboard` 13/13; `check:contrast` 60/60; `tsc` clean;
 `pnpm lint` 0 errors.
 
+## W10 — Cumulative interleaved review
+
+### The gap
+
+Q86 could prove you knew a chapter and then never ask again. A chapter
+test is a gate, and a gate measures the moment you walk through it —
+nothing in the platform re-opened a chapter three weeks later to find out
+whether it was still there. The redo ladder covers *missed questions*; the
+deck covers *takeaways*; neither covers *a chapter you passed*.
+
+The evidence is the same evidence behind `lib/interleave.ts`: blocked
+practice 42% on a delayed test at thirty days, interleaved 74% on
+identical material. A cumulative review applies that at curriculum scale
+rather than session scale.
+
+### D4 — composed from what exists, not invented
+
+Every part of this is an existing mechanism at a new grain:
+
+| Part | Reused from |
+| --- | --- |
+| Spacing | `lib/redo.ts` — the +2d/+7d/+21d ladder, at chapter grain |
+| Ordering | `lib/interleave.ts` — unchanged |
+| Difficulty ceiling | W8's tier bands |
+| Persistence | the `sessions` table, as chapter tests and diagnostics already do |
+
+**No schema migration.** State is derived: a review session records
+`{cumulative_review: true, chapters: [...]}` in `config`, and each
+chapter's rung is replayed from the `bySubtopic` slice of the summary.
+`question-runner.tsx` now writes `bySubtopic` beside the `bySkill` it
+already wrote — always, not branched on — which is the only change to an
+existing write path. The database is untouched structurally, so nothing
+about the training record is at risk.
+
+A test asserts `CHAPTER_REVIEW_STAGE_DAYS` is literally the same array as
+`STAGE_DELAY_DAYS`, so a chapter and a question cannot end up on two
+different schedules.
+
+### Where it differs from redo, and why
+
+The redo ladder resets to stage 0 on any miss. Cumulative review does not:
+
+| Slice result | Rung |
+| --- | --- |
+| all correct | up one (never two) |
+| some correct | **hold** — same interval, no penalty |
+| none correct | back to stage 0 (+2d) |
+
+A redo item is scheduled *because it was missed*, so a second miss is
+strong evidence. A cumulative review asks about material already cleared
+at the exam tier, where one slip across two questions is as likely to be
+noise as decay. Resetting 21 days of spacing on it would make the ladder
+unclimbable.
+
+### Design decisions
+
+- **Two questions per chapter, 2–5 chapters, so 4–10 questions.** It has
+  to be short enough to sit *before* a new chapter rather than replace it.
+  Its job is to detect decay, not to re-teach.
+- **A single due chapter is not a review.** Two questions from one chapter
+  in a row is blocked practice with extra steps; the interleaving is the
+  point, so `REVIEW_MIN_CHAPTERS` is 2.
+- **Most overdue first.** Sorted by *how long* a chapter has been due, not
+  by its due date — 30 days past a 2-day interval outranks an hour past a
+  21-day one, which is the ordering that matters when there are 5 slots.
+- **Drawn from the whole chapter up to the ceiling, not from the band of
+  the tier it passed.** A review is not a re-run of the test: the
+  foundations are part of what may have decayed, and on a chapter whose
+  band is exactly test-sized, drawing from the band would literally
+  re-serve the test. Questions attempted in the last 7 days are skipped
+  unless that would shorten the review.
+- **The ceiling is the top of the band of the highest tier cleared.**
+  Reviewing above the tier you cleared measures something you never
+  claimed.
+- **Surfaced on the Learn index, above the chapter list, only when due.**
+  That is where the decision it interrupts gets made. A permanent card
+  reading "nothing due" is furniture.
+
+### Verified end to end, not only unit-tested
+
+The review was driven through the real UI in a headless browser against
+the production build: the card rendered on `/learn`, "Start review"
+launched `/drill?review=1`, six questions were answered, and the database
+was then read back.
+
+Served set (interleaved, one per chapter in rotation):
+
+```
+1. divisibility_gcf_lcm   D4      4. divisibility_gcf_lcm   D4
+2. percent_change_chains  D5      5. percent_change_chains  D3
+3. rates_speed_work       D3      6. rates_speed_work       D5
+```
+
+Session written:
+
+```json
+config  {"cumulative_review":true,
+         "chapters":["divisibility_gcf_lcm","percent_change_chains","rates_speed_work"],
+         "per_chapter":2,"count":6}
+summary {"total":6,"correct":3,
+         "bySubtopic":{"divisibility_gcf_lcm":{"correct":0,"total":2},
+                       "percent_change_chains":{"correct":2,"total":2},
+                       "rates_speed_work":{"correct":1,"total":2}}}
+```
+
+Rungs after, read back from `chapterReviewStates()` — **each chapter moved
+on its own slice**, which is the property the whole design turns on:
+
+| Chapter | Slice | Rung | Next |
+| --- | --- | --- | --- |
+| `percent_change_chains` | 2/2 | 0 → **1** | 7 days |
+| `rates_speed_work` | 1/2 | 0 → **0** (held) | 2 days |
+| `divisibility_gcf_lcm` | 0/2 | 0 → **0** (reset) | 2 days |
+
+And `reviewPlan()` then reported `available: false, waiting: 3` — the
+review correctly stopped offering itself.
+
+An abandoned session from an earlier run (no `endedAt`, null summary) was
+present in the same table and correctly ignored.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Ways a passed chapter is revisited | **0** | 1 (spaced, interleaved) |
+| Chapters in the review rotation (seeded fixture) | — | 3 of 3 passed |
+| Longest same-chapter run in a served review | — | **1** (floor for [2,2,2] is 1) |
+| Questions above the tier their chapter cleared | — | **0** |
+| Schema migrations required | — | **0** |
+
+Acceptance: `pnpm check:review` PASS — INTERLEAVED run 1 against a floor
+of 1, CEILING 0 above, DISTINCT 6/6, SIZE 6/6, LADDER 2d → 7d → 21d.
+`pnpm test` **159/159 across 18 suites** (was 146/17) — 13 new tests
+covering the shared ladder, due-ness at each rung, one-rung-at-a-time
+promotion, the hold rule, the empty-slice no-op, overdue ordering and its
+stability, the two-chapter minimum, the five-chapter cap, and that
+intervals grow. `pnpm build` 21 routes; `verify:bank` 511/511;
+`check:tiers` PASS; `check:a11y` 692/692 named (100%) with 5 live regions;
+`check:keyboard` 13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint`
+0 errors.
+
+*(The a11y control count is data-dependent — it counts the controls a
+populated database renders, and `dev-seed-history` produces a different
+number of redo-queue rows on each run. 100% named and 5 live regions are
+the invariants; the absolute count is not.)*
+
 ## Next action
 
-W10 — cumulative interleaved review (finding 4): a short quiz drawn from
-chapters already passed, before starting a new one.
+Finding 5 — fit the error-inference weights to the user's own
+post-mortem corrections. Still blocked on override data that does not
+exist yet; the mechanism records it, but no real overrides have
+accumulated. Finding 7 (`/analytics` First Load JS, 233 kB) and finding 3
+(the 62 Data Sufficiency items) are both untouched this session and are
+described in the ranked list above.

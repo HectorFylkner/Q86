@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   startChapterTest,
+  startCumulativeReview,
   startDiagnostic,
   startDrill,
   startDrillWithQuestions,
@@ -34,6 +35,7 @@ export function DrillClient({
   autoStartTest,
   autoStartTier,
   autoStartDiagnostic,
+  autoStartReview,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
@@ -41,6 +43,7 @@ export function DrillClient({
   autoStartTest?: Subtopic | null;
   autoStartTier?: ChapterTier;
   autoStartDiagnostic?: boolean;
+  autoStartReview?: boolean;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
@@ -91,6 +94,33 @@ export function DrillClient({
         }),
       );
   }, [autoStartTest, autoStartTier]);
+
+  // A cumulative review arrives as /drill?review=1
+  useEffect(() => {
+    if (!autoStartReview || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    setStage({ kind: "loading" });
+    startCumulativeReview()
+      .then((res) => {
+        if (res.error != null || res.sessionId == null) {
+          setStage({ kind: "setup", error: res.error ?? "Could not start." });
+        } else {
+          setStage({
+            kind: "running",
+            sessionId: res.sessionId,
+            questions: res.questions,
+            timing: "soft",
+            focus: "focused",
+          });
+        }
+      })
+      .catch(() =>
+        setStage({
+          kind: "setup",
+          error: "Could not start the review — the server did not respond.",
+        }),
+      );
+  }, [autoStartReview]);
 
   // The placement diagnostic arrives as /drill?diagnostic=1
   useEffect(() => {

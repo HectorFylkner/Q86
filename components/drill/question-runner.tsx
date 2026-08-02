@@ -157,12 +157,23 @@ export function QuestionRunner({
       // Harmless on an ordinary drill and required on a diagnostic, so it
       // is always written rather than branched on.
       const bySkill: Record<string, { correct: number; total: number }> = {};
+      // Per-subtopic counts for the same reason, one level down: a
+      // cumulative review covers several chapters at once and each
+      // chapter's rung moves on its own slice of the result.
+      const bySubtopic: Record<string, { correct: number; total: number }> = {};
       all.forEach((r, i) => {
-        const skill = questions[i]?.fundamentalSkill;
-        if (!skill) return;
-        const cell = (bySkill[skill] ??= { correct: 0, total: 0 });
-        cell.total += 1;
-        if (r.correct) cell.correct += 1;
+        const q = questions[i];
+        if (!q) return;
+        if (q.fundamentalSkill) {
+          const cell = (bySkill[q.fundamentalSkill] ??= { correct: 0, total: 0 });
+          cell.total += 1;
+          if (r.correct) cell.correct += 1;
+        }
+        if (q.subtopic) {
+          const cell = (bySubtopic[q.subtopic] ??= { correct: 0, total: 0 });
+          cell.total += 1;
+          if (r.correct) cell.correct += 1;
+        }
       });
       const summary = {
         total: all.length,
@@ -172,6 +183,7 @@ export function QuestionRunner({
             ? all.reduce((s, r) => s + r.timeSeconds, 0) / all.length
             : 0,
         bySkill,
+        bySubtopic,
       };
       finishSession(sessionId, summary).catch(() => {});
       setPhase("done");

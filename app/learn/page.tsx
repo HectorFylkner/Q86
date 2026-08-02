@@ -5,6 +5,7 @@ import {
   type ChapterTestState,
 } from "@/lib/chapter-tests";
 import { CHAPTER_TIERS, TIER_SPEC } from "@/lib/chapter-test-config";
+import { daysOverdue, reviewPlan } from "@/lib/cumulative";
 import { listLessons, listTechniques } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
@@ -54,6 +55,15 @@ export default async function LearnPage() {
   const techniques = listTechniques();
   const tests = await chapterTestStates();
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
+  const review = await reviewPlan();
+  // Chapter titles are "Topic: tagline". On a metadata line the tagline is
+  // noise and three of them wrap into an unreadable run, so only the topic
+  // half is used here.
+  const titleOf = (subtopic: string) =>
+    (lessons.find((l) => l.subtopic === subtopic)?.title ?? subtopic).split(
+      ":",
+    )[0];
+  const now = Date.now();
   let chapterNo = 0;
 
   return (
@@ -95,6 +105,54 @@ export default async function LearnPage() {
           </div>
         ))}
       </div>
+
+      {/* Cumulative review sits above the chapter list because that is
+          where the decision it interrupts gets made: the moment you are
+          choosing the next chapter is the moment to check the last ones
+          are still there. Shown only when it is due — a permanent card
+          reading "nothing due" is furniture. */}
+      {review.available && (
+        <section
+          aria-labelledby="cumulative-review-heading"
+          className="rounded-card border border-grid border-l-2 border-l-amber bg-surface px-4 py-3.5 shadow-ambient sm:px-5"
+        >
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+            <div className="min-w-0">
+              <h2
+                id="cumulative-review-heading"
+                className="font-display text-sm font-semibold"
+              >
+                Cumulative review
+              </h2>
+              <p className="mt-0.5 text-xs leading-snug text-graphite">
+                {review.questions} questions from {review.chapters.length}{" "}
+                chapters you have already passed, interleaved. Passing a
+                chapter measures the day you passed it; this measures whether
+                it is still there.
+              </p>
+            </div>
+            <Link
+              href="/drill?review=1"
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+            >
+              Start review
+            </Link>
+          </div>
+          <ul className="mt-2.5 grid gap-x-6 gap-y-1 border-t border-grid pt-2.5 font-mono text-[11px] text-graphite sm:grid-cols-2 lg:grid-cols-3">
+            {review.chapters.map((c) => {
+              const over = daysOverdue(c, now);
+              return (
+                <li key={c.subtopic} className="truncate">
+                  {titleOf(c.subtopic)}
+                  <span className="text-graphite/70">
+                    {` · ${over === 0 ? "due today" : `${over}d overdue`} · ≤D${c.ceiling}`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {lessons.length === 0 && techniques.length === 0 && (
         <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">

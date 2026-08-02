@@ -31,9 +31,10 @@ export default async function DrillPage({
     tier?: string;
     strat?: string;
     diagnostic?: string;
+    review?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, test, tier, strat, diagnostic } =
+  const { qids, plan, sub, d, test, tier, strat, diagnostic, review } =
     await searchParams;
   let autoStartIds =
     qids
@@ -94,6 +95,8 @@ export default async function DrillPage({
       <h1 className="font-display text-xl font-semibold">
         {diagnostic === "1"
           ? "Placement diagnostic"
+          : review === "1"
+          ? "Cumulative review"
           : autoStartTest
           ? `Chapter test · ${TIER_SPEC[autoStartTier].label}`
           : strategy
@@ -107,6 +110,7 @@ export default async function DrillPage({
         autoStartTest={autoStartTest}
         autoStartTier={autoStartTier}
         autoStartDiagnostic={diagnostic === "1"}
+        autoStartReview={review === "1"}
       />
     </div>
   );
