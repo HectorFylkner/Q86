@@ -992,6 +992,76 @@ its edges, and that a later checkpoint always leaves less time.
 `keyboard-pass` 13/13; `check-contrast` 60/60; `tsc` clean; `pnpm lint`
 0 errors.
 
+### W5e — tiered chapter tests (commit: chapter tiers)
+
+**Why change something that worked.** The chapter test was one
+eight-question set spanning D2–D5 at a single 75% bar. That measures the
+*average* of a chapter and hides both ends of it: a student shaky on the
+basics but lucky on two hard items passes, and a student solid on the
+basics but not yet ready for the top band gets the same
+undifferentiated "not passed". Chapter tests are not on the brief's
+load-bearing list, but they are the gate behind every chapter, so the
+reasoning is recorded here before the change rather than after.
+
+Three tiers, each locked until the one below it clears:
+
+| Tier | Window | Size | Bar |
+| --- | --- | ---: | ---: |
+| Foundation | D2–D3 | 6 | 5 of 6 |
+| Exam level | D3–D4 | 6 | 4 of 6 |
+| Top band | D4–D5 | 6 | 4 of 6 |
+
+**The bar is highest where the questions are easiest**, which is the part
+people get backwards. Missing a foundation question is a defect to
+repair; missing a top-band question is a normal outcome on an exam whose
+hardest items are meant to be missed by most test-takers. A chapter reads
+as passed on the two required tiers — the top band is a stretch mark, not
+a requirement.
+
+**Bars are fractions, not counts, because subtopic depth is uneven.**
+`interest_profit_discount` has a single item below D4;
+`min_max_optimization` has none at D4 at all. A rigid blend would leave
+those chapters with no runnable tier. Selection fills from the tier's own
+window, then widens outward, and the bar scales to what was actually
+served. Measured across all 24 chapters × 3 tiers: **72/72 tiers fill six
+questions**, none unavailable.
+
+Widening creates an honesty problem, and it is handled rather than
+ignored: where the bank is thin the tier's *label* and its *questions*
+diverge — `interest_profit_discount`'s "Foundation" tier is really D3–D4.
+The ladder therefore prints each tier's actual range next to its name
+(`Foundation · 6 · D3–D4`), so the label describes rather than claims.
+
+**No user's record is demoted.** Sessions recorded before tiers carry
+`chapter_test` with no `chapter_tier`. They are judged against the 75%
+bar they were actually taken under — never re-judged against a tier bar
+they were never shown — and a legacy pass credits both required tiers.
+This matters concretely: a legacy 6/8 pass re-judged against the
+foundation bar would need 7/8 and would silently un-pass a chapter the
+user had cleared. A test asserts exactly that case.
+
+`scripts/dev-seed-history.ts` now seeds a partly-climbed ladder (six
+chapters at different rungs plus two pre-tier rows) so every state is
+visible in the UI and the legacy path runs against real rows, not only in
+unit tests. Verified end to end: `divisibility_gcf_lcm` (legacy 6/8) →
+chapter passed; `exponents_roots_properties` (legacy 5/8) → nothing
+credited; `parity_signs` (4/6 then 6/6) → passed with the retake folded;
+`ratios_proportions` → foundation passed, exam last 3/6, top band shows
+"Clear Exam level first · locked".
+
+*Note on the reseed:* the guard in `dev-seed-history.ts` correctly refused
+to run, reporting 4 attempts it had not created. Those were artifacts of
+the `keyboard-pass.mjs` runs earlier in this session (timestamps and
+`questionIds` matched the script's two drill steps). `pnpm backup` was
+taken first, as the guard advises, then `--force`.
+
+Acceptance: `pnpm test` **122/122 across 14 suites** (was 109/13) — 13 new
+tests covering the bar ordering, scaling to short tiers, one-rung-at-a-time
+unlocking, the refusal to unlock from a skipped tier, and the
+legacy-credit rule. 72/72 tiers fill six questions; `verify-bank` 474/474;
+`a11y-audit` 740/740 named with 5 live regions; `keyboard-pass` 13/13;
+`check-contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors.
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance

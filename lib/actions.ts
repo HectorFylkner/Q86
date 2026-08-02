@@ -17,6 +17,7 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { TIER_MIN_SIZE, type ChapterTier } from "./chapter-test-config.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -78,14 +79,17 @@ export async function startDrill(config: {
   return { error: null, sessionId: session.id, questions: picked };
 }
 
-/** Chapter test: the pass-bar gate behind a Learn chapter. */
+/** Chapter test: the pass-bar gate behind a Learn chapter, one tier at a
+ *  time. The tier is recorded on the session so a pass credits the tier
+ *  it was actually taken at. */
 export async function startChapterTest(
   subtopic: Subtopic,
+  tier: ChapterTier = "foundation",
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
-  if (picked.length < 4) {
+  const picked = await selectChapterTest(subtopic, tier);
+  if (picked.length < TIER_MIN_SIZE) {
     return {
-      error: "Not enough verified questions in this chapter for a test.",
+      error: "Not enough verified questions in this chapter for that tier.",
       sessionId: null,
       questions: [],
     };
@@ -94,7 +98,11 @@ export async function startChapterTest(
     .insert(sessions)
     .values({
       mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
+      config: {
+        chapter_test: subtopic,
+        chapter_tier: tier,
+        count: picked.length,
+      },
     })
     .returning()
     .get();

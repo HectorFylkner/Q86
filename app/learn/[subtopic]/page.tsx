@@ -21,7 +21,13 @@ import {
   RecognitionTable,
   TopBandCard,
 } from "@/components/lesson/transfer";
-import { chapterTestStates } from "@/lib/chapter-tests";
+import type { ChecklistTierState } from "@/components/lesson/drill-checklist";
+import {
+  chapterTestStates,
+  tierShape,
+  tierUnlocked,
+} from "@/lib/chapter-tests";
+import { CHAPTER_TIERS, type ChapterTier } from "@/lib/chapter-test-config";
 import { chapterTransfer } from "@/lib/chapter-transfer";
 import { parseLesson } from "@/lib/lesson-parse";
 import {
@@ -83,6 +89,31 @@ export default async function LessonPage({
   const testState = technique
     ? undefined
     : (await chapterTestStates())[subtopic as Subtopic];
+  // Tier availability is a bank fact, so it is resolved on the server
+  // rather than guessed in the browser: a chapter too thin for a tier
+  // shows the tier as unavailable instead of offering a broken test.
+  const passedTiers = Object.fromEntries(
+    CHAPTER_TIERS.map((t) => [t, testState?.tiers[t]?.passed === true]),
+  ) as Record<ChapterTier, boolean>;
+  const tierStates: ChecklistTierState[] = technique
+    ? []
+    : await Promise.all(
+        CHAPTER_TIERS.map(async (t) => {
+          const state = testState?.tiers[t];
+          const shape = await tierShape(subtopic as Subtopic, t);
+          return {
+            tier: t,
+            passed: passedTiers[t],
+            unlocked: tierUnlocked(t, passedTiers),
+            available: shape.available,
+            range: shape.range,
+            size: shape.size,
+            lastScore: state?.lastTotal
+              ? `${state.lastCorrect}/${state.lastTotal}`
+              : null,
+          };
+        }),
+      );
   // The rail is the section list, so deriving the numbering from it keeps
   // "05" in the margin and the fifth rail entry describing the same
   // section — including when a chapter's bank has no top-band item.
@@ -319,12 +350,7 @@ export default async function LessonPage({
             test={
               technique
                 ? undefined
-                : {
-                    passed: testState?.passed ?? false,
-                    lastScore: testState
-                      ? `${testState.lastCorrect}/${testState.lastTotal}`
-                      : null,
-                  }
+                : { passed: testState?.passed ?? false, tiers: tierStates }
             }
           />
         </SectionShell>

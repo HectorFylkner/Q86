@@ -12,7 +12,13 @@ import { ErrorAttribution } from "@/components/drill/error-attribution";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
 import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
-import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
+import {
+  CHAPTER_TIERS,
+  TIER_SPEC,
+  tierBarCount,
+  tierPassed,
+  type ChapterTier,
+} from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import {
   DIFFICULTY_LABELS,
@@ -48,6 +54,7 @@ export function QuestionRunner({
   timing,
   focus = "focused",
   test,
+  tier = "foundation",
   onRestart,
 }: {
   sessionId: number;
@@ -57,6 +64,8 @@ export function QuestionRunner({
   focus?: SessionFocus;
   /** Set when this run is a chapter test for the given subtopic. */
   test?: Subtopic | null;
+  /** Which tier of that chapter test. */
+  tier?: ChapterTier;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -233,9 +242,10 @@ export function QuestionRunner({
     const avg =
       results.reduce((s, r) => s + r.timeSeconds, 0) /
       Math.max(1, results.length);
-    const passed =
-      test != null && correct / Math.max(1, results.length) >= CHAPTER_TEST_BAR;
-    const bar = Math.ceil(results.length * CHAPTER_TEST_BAR);
+    const passed = test != null && tierPassed(tier, correct, results.length);
+    const bar = tierBarCount(tier, results.length);
+    const tierIndex = CHAPTER_TIERS.indexOf(tier);
+    const unlockedNext = passed ? CHAPTER_TIERS[tierIndex + 1] : undefined;
     return (
       <div className="space-y-4">
         {test != null && (
@@ -247,12 +257,17 @@ export function QuestionRunner({
                 : "border-amber/50 bg-amber/5",
             )}
           >
+            <p className="font-mono text-[11px] uppercase tracking-wider text-graphite">
+              {TIER_SPEC[tier].label}
+            </p>
             <h2 className="font-display text-lg font-semibold">
-              {passed ? "Chapter test passed" : "Not passed yet"}
+              {passed ? `${TIER_SPEC[tier].label} passed` : "Not passed yet"}
             </h2>
             <p className="mt-1 text-sm text-graphite">
               {passed
-                ? `${correct}/${results.length} — this chapter now shows as passed on the Learn index. Keep it warm with drills; retakes can't demote you.`
+                ? unlockedNext
+                  ? `${correct}/${results.length}, and the bar was ${bar}. ${TIER_SPEC[unlockedNext].label} is now unlocked.`
+                  : `${correct}/${results.length}, and the bar was ${bar}. Every tier of this chapter is cleared.`
                 : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
@@ -262,9 +277,17 @@ export function QuestionRunner({
               >
                 Back to the chapter
               </Link>
+              {passed && unlockedNext && (
+                <Link
+                  href={`/drill?test=${test}&tier=${unlockedNext}`}
+                  className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
+                >
+                  {TIER_SPEC[unlockedNext].label} →
+                </Link>
+              )}
               {!passed && (
                 <Link
-                  href={`/drill?test=${test}`}
+                  href={`/drill?test=${test}&tier=${tier}`}
                   className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
                 >
                   Retake with fresh questions →

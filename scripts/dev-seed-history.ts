@@ -49,6 +49,7 @@ import {
   type Difficulty,
   type ErrorType,
   type FundamentalSkill,
+  type Subtopic,
 } from "../lib/taxonomy.ts";
 
 if (process.env.NODE_ENV === "production") {
@@ -672,6 +673,45 @@ async function main() {
         .run();
     }
   }
+  // --- chapter tests: a partly-climbed tier ladder ------------------------
+  // Six chapters at different rungs, plus two rows in the pre-tier shape,
+  // so the Learn index shows the whole range of states and the legacy
+  // crediting path runs against real rows rather than only in tests.
+  const LADDER: Array<[Subtopic, Array<[string | null, number, number, number]>]> =
+    [
+      // subtopic, [tier | null for legacy, correct, total, days ago]
+      ["rates_speed_work", [["foundation", 6, 6, 26], ["exam", 5, 6, 19], ["top_band", 4, 6, 8]]],
+      ["percent_change_chains", [["foundation", 6, 6, 24], ["exam", 4, 6, 15]]],
+      ["ratios_proportions", [["foundation", 5, 6, 21], ["exam", 3, 6, 11]]],
+      ["parity_signs", [["foundation", 4, 6, 17], ["foundation", 6, 6, 6]]],
+      ["must_be_true_testing", [["foundation", 3, 6, 9]]],
+      // Pre-tier rows: no chapter_tier, judged at the 75% bar they were
+      // taken under. The first passed and must credit both required
+      // tiers; the second did not and must credit neither.
+      ["divisibility_gcf_lcm", [[null, 6, 8, 30]]],
+      ["exponents_roots_properties", [[null, 5, 8, 28]]],
+    ];
+  for (const [subtopic, takes] of LADDER) {
+    for (const [tier, correct, total, back] of takes) {
+      const startedAt = atDay(back, randInt(rng, 8, 20));
+      await db
+        .insert(sessions)
+        .values({
+          mode: "drill",
+          config: {
+            synthetic: SYNTHETIC_TAG,
+            chapter_test: subtopic,
+            ...(tier ? { chapter_tier: tier } : {}),
+            count: total,
+          } as unknown as Record<string, unknown>,
+          startedAt,
+          endedAt: new Date(startedAt.getTime() + total * 95_000),
+          summary: { correct, total } as unknown as Record<string, unknown>,
+        })
+        .run();
+    }
+  }
+
   for (let i = 0; i < patternRows.length; i += 400) {
     await db.insert(patternAttempts).values(patternRows.slice(i, i + 400)).run();
   }

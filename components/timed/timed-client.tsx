@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Bookmark } from "lucide-react";
@@ -392,12 +393,12 @@ export function TimedClient({
             <p className="mt-1 text-xs leading-snug text-graphite">
               Within {CHECKPOINT_BAND_SECONDS / 60} minutes of target you are
               on pace — change nothing.{" "}
-              <a
+              <Link
                 href="/learn/technique-bail"
                 className="text-ballpoint hover:underline"
               >
                 How to use them →
-              </a>
+              </Link>
             </p>
             <button
               onClick={() => handleStart("full")}

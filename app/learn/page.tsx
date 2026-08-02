@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
-import { chapterTestStates } from "@/lib/chapter-tests";
+import {
+  chapterTestStates,
+  type ChapterTestState,
+} from "@/lib/chapter-tests";
+import { CHAPTER_TIERS, TIER_SPEC } from "@/lib/chapter-test-config";
 import { listLessons, listTechniques } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
@@ -13,6 +17,37 @@ const METHOD = [
   { step: "Tick", detail: "the pre-drill checklist honestly" },
   { step: "Drill", detail: "the same subtopic while it's warm" },
 ];
+
+/** Which rung of the ladder this chapter stands on. Names the tier rather
+ *  than showing a bare score, because "5/6 on the foundation tier" and
+ *  "5/6 on the top band" mean opposite things. */
+function TierBadge({ state }: { state?: ChapterTestState }) {
+  if (!state) return null;
+  const cleared = CHAPTER_TIERS.filter((t) => state.tiers[t]?.passed);
+  if (cleared.length === CHAPTER_TIERS.length) {
+    return <span className="text-ballpoint">✓ all tiers</span>;
+  }
+  if (state.passed) {
+    return <span className="text-ballpoint">✓ passed</span>;
+  }
+  if (cleared.length > 0) {
+    const top = cleared[cleared.length - 1];
+    return (
+      <span className="text-ballpoint">
+        ✓ {TIER_SPEC[top].label.toLowerCase()}
+      </span>
+    );
+  }
+  const attempted = CHAPTER_TIERS.map((t) => state.tiers[t]).find(Boolean);
+  if (attempted?.lastTotal) {
+    return (
+      <span className="text-amber">
+        foundation {attempted.lastCorrect}/{attempted.lastTotal}
+      </span>
+    );
+  }
+  return null;
+}
 
 export default async function LearnPage() {
   const lessons = listLessons();
@@ -140,14 +175,7 @@ export default async function LearnPage() {
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
                         <span>~{lesson.minutes} min</span>
-                        {tests[lesson.subtopic]?.passed ? (
-                          <span className="text-ballpoint">✓ test passed</span>
-                        ) : tests[lesson.subtopic] ? (
-                          <span className="text-amber">
-                            test {tests[lesson.subtopic]!.lastCorrect}/
-                            {tests[lesson.subtopic]!.lastTotal}
-                          </span>
-                        ) : null}
+                        <TierBadge state={tests[lesson.subtopic]} />
                         <ReadBadge subtopic={lesson.subtopic} />
                       </span>
                     </span>

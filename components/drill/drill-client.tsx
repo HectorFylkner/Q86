@@ -7,6 +7,7 @@ import {
   startDrillWithQuestions,
   type DrillTiming,
 } from "@/lib/actions";
+import type { ChapterTier } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import type { SessionFocus, Subtopic } from "@/lib/taxonomy";
 import { DrillSetup, type CountRow, type DrillConfigValue } from "./drill-setup";
@@ -22,6 +23,7 @@ type Stage =
       timing: DrillTiming;
       focus: SessionFocus;
       test?: Subtopic;
+      tier?: ChapterTier;
     };
 
 export function DrillClient({
@@ -29,11 +31,13 @@ export function DrillClient({
   autoStartIds,
   autoStartRung,
   autoStartTest,
+  autoStartTier,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
   autoStartRung?: { subtopic: string; difficulty: number } | null;
   autoStartTest?: Subtopic | null;
+  autoStartTier?: ChapterTier;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
@@ -55,12 +59,13 @@ export function DrillClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStartRung]);
 
-  // Chapter tests arrive as /drill?test=<subtopic>
+  // Chapter tests arrive as /drill?test=<subtopic>&tier=<tier>
   useEffect(() => {
     if (!autoStartTest || autoStartedRef.current) return;
     autoStartedRef.current = true;
+    const tier = autoStartTier ?? "foundation";
     setStage({ kind: "loading" });
-    startChapterTest(autoStartTest)
+    startChapterTest(autoStartTest, tier)
       .then((res) => {
         if (res.error != null || res.sessionId == null) {
           setStage({ kind: "setup", error: res.error ?? "Could not start." });
@@ -72,6 +77,7 @@ export function DrillClient({
             timing: "soft",
             focus: "focused",
             test: autoStartTest,
+            tier,
           });
         }
       })
@@ -81,7 +87,7 @@ export function DrillClient({
           error: "Could not start the test — the server did not respond.",
         }),
       );
-  }, [autoStartTest]);
+  }, [autoStartTest, autoStartTier]);
 
   // Twin drills and coach prescriptions arrive as /drill?qids=…
   useEffect(() => {
@@ -152,6 +158,7 @@ export function DrillClient({
         timing={stage.timing}
         focus={stage.focus}
         test={stage.test}
+        tier={stage.tier}
         onRestart={() => setStage({ kind: "setup", error: null })}
       />
     );

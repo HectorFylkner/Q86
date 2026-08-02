@@ -1,6 +1,11 @@
 import { count, eq } from "drizzle-orm";
 import { DrillClient } from "@/components/drill/drill-client";
 import type { CountRow } from "@/components/drill/drill-setup";
+import {
+  CHAPTER_TIERS,
+  TIER_SPEC,
+  type ChapterTier,
+} from "@/lib/chapter-test-config";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import {
@@ -22,10 +27,11 @@ export default async function DrillPage({
     sub?: string;
     d?: string;
     test?: string;
+    tier?: string;
     strat?: string;
   }>;
 }) {
-  const { qids, plan, sub, d, test, strat } = await searchParams;
+  const { qids, plan, sub, d, test, tier, strat } = await searchParams;
   let autoStartIds =
     qids
       ?.split(",")
@@ -68,17 +74,22 @@ export default async function DrillPage({
       ? { subtopic: sub, difficulty: rungDifficulty }
       : null;
 
-  // Chapter-test deep link from a Learn chapter: /drill?test=<subtopic>
+  // Chapter-test deep link from a Learn chapter:
+  // /drill?test=<subtopic>&tier=<foundation|exam|top_band>
   const autoStartTest =
     test && ALL_SUBTOPICS.includes(test as Subtopic)
       ? (test as Subtopic)
       : null;
+  const autoStartTier: ChapterTier =
+    tier && (CHAPTER_TIERS as readonly string[]).includes(tier)
+      ? (tier as ChapterTier)
+      : "foundation";
 
   return (
     <div className="space-y-4">
       <h1 className="font-display text-xl font-semibold">
         {autoStartTest
-          ? "Chapter test"
+          ? `Chapter test · ${TIER_SPEC[autoStartTier].label}`
           : strategy
             ? `Technique drill · ${STRATEGY_LABELS[strategy]}`
             : "Drill"}
@@ -88,6 +99,7 @@ export default async function DrillPage({
         autoStartIds={autoStartIds?.length ? autoStartIds : null}
         autoStartRung={autoStartRung}
         autoStartTest={autoStartTest}
+        autoStartTier={autoStartTier}
       />
     </div>
   );
