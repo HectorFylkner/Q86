@@ -38,6 +38,7 @@ const ROUTES = [
   ["today", "/"],
   ["learn", "/learn"],
   ["learn-chapter", "/learn/percent_change_chains"],
+  ["learn-technique", "/learn/technique-backsolve"],
   ["drill", "/drill"],
   ["timed", "/timed"],
   ["deck", "/deck"],
