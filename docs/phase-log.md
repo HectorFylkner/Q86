@@ -891,6 +891,60 @@ why/ideas/examples/cues/traps/speed/checklist for a technique and the
 full ten for a content chapter; `npx tsc --noEmit` clean; `pnpm lint` 0
 errors; `check-contrast` 60/60.
 
+### W5c — closing the measured gap by authoring (commit: technique bank)
+
+The 82.4%-structural finding is a content deficit, so the fix is items,
+not a looser classifier. Thirty-six new items in three batches, each one
+gated by `scripts/author/harness.mjs`:
+
+| Strategy | Before | After | Share |
+| --- | ---: | ---: | ---: |
+| Backsolve | 18 | **30** | 6.3% |
+| Pick numbers | 13 | **25** | 5.3% |
+| Estimate | 2 | **14** | 3.0% |
+| Pattern | 20 | 20 | 4.2% |
+| Eliminate | 24 | 24 | 5.1% |
+| Set up and solve | 361 | 361 | 76.2% |
+
+Bank 438 → 474 verified items. **Non-algebraic technique coverage
+17.6% → 23.8%.** All three chaptered techniques now fill a full ten-item
+drill block spanning at least five subtopics; before this, the estimation
+chapter's "prove it" button opened a two-question session.
+
+**Verification.** Every item carries `check()` — an independent
+brute-force recomputation from the stem's raw data, never from the
+written solution — and the distractor gate. Two adaptations of the gate
+were needed and are documented in the batch headers:
+
+- *"Closest to" items.* Elsewhere a distractor is reachable when a named
+  error computes it exactly; here the correct choice is itself rounded.
+  The standard used is that the named error produces a raw value
+  **strictly nearest** to its distractor and to no other choice
+  (`landsOn()`), so rounding can never rescue a distractor the stated
+  error does not reach. `nearestIndex()` additionally throws on a tie, so
+  no shipped "closest to" item is ambiguous.
+- *Universal-claim items ("must be true").* The choices are claims, not
+  values, so the analogue of a computed distractor is a counterexample.
+  `soleSurvivor()` sweeps every choice across a wide range of admissible
+  values and requires that **exactly one** holds throughout and that each
+  of the other four is **falsified by some value in the sweep** — which
+  also rules out a "wrong" choice that is quietly true.
+
+Three defects were caught by the gate and fixed before shipping: an
+unparseable percent-sign choice, a cents-scaled brute force whose
+floating-point rounding manufactured five spurious solutions, and a
+distractor whose stated error landed on a different choice than claimed.
+
+`tests/technique-coverage.test.ts` makes the gap non-reopenable: it reads
+the seed bank directly and fails if a chaptered technique falls below a
+full drill block, spans fewer than five subtopics, or if shortcut
+coverage drops below 20% of the bank.
+
+Acceptance: `verify-bank` 474/474; `pnpm test` **98/98 across 12 suites**
+(was 94/11); `pnpm seed` 474 verified; every technique drill block
+returns 10 items; `tsc` clean; `pnpm lint` 0 errors and 35 warnings, the
+same pre-existing count as before this workstream.
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance

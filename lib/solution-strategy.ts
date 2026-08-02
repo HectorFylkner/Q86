@@ -78,6 +78,13 @@ export const STRATEGY_NOTES: Record<SolutionStrategy, string> = {
     "Rule choices out on a property — sign, parity, magnitude, units digit — rather than working the question forward. Often finishes a question you cannot fully solve, which is exactly when it is worth the most.",
 };
 
+/** A technique drill is a full drill block, not a test — long enough to
+ *  build the reflex, short enough to finish in a sitting. Every strategy
+ *  with a chapter must have at least this many bank items behind it, or
+ *  the chapter's "prove it" button leads somewhere too thin to prove
+ *  anything; `tests/technique-coverage.test.ts` enforces that. */
+export const STRATEGY_DRILL_SIZE = 10;
+
 /**
  * The technique chapter that teaches each strategy, where one exists.
  * Single source of truth: lib/lessons.ts inverts this rather than keeping

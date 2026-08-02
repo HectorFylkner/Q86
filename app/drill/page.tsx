@@ -4,14 +4,11 @@ import type { CountRow } from "@/components/drill/drill-setup";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import {
+  STRATEGY_DRILL_SIZE,
   STRATEGY_LABELS,
   isSolutionStrategy,
 } from "@/lib/solution-strategy";
 import { ALL_SUBTOPICS, type Subtopic } from "@/lib/taxonomy";
-
-/** A technique drill is a full drill block, not a test — long enough to
- *  build the reflex, short enough to finish in a sitting. */
-const STRATEGY_DRILL_SIZE = 10;
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
