@@ -1,7 +1,7 @@
 import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "./db/index.ts";
 import { sessions, type Question } from "./db/schema.ts";
-import { selectQuestions } from "./engine.ts";
+import { listQuestions, selectQuestions } from "./engine.ts";
 import { ALL_SUBTOPICS, type Subtopic } from "./taxonomy.ts";
 
 /**
@@ -20,6 +20,7 @@ import {
   TIER_MIN_SIZE,
   TIER_SPEC,
   REQUIRED_TIERS,
+  assignBands,
   tierPassed,
   type ChapterTier,
 } from "./chapter-test-config.ts";
@@ -27,6 +28,8 @@ import {
 export {
   CHAPTER_TIERS,
   TIER_SPEC,
+  assignBands,
+  bandSizes,
   tierBarCount,
   tierPassed,
   tierUnlocked,
@@ -35,83 +38,80 @@ export {
 } from "./chapter-test-config.ts";
 
 /**
- * Build one tier. Fills from the tier's own difficulty window first,
- * round-robin so the tier is not three questions of one difficulty, then
- * widens into the fallback difficulties only if the bank is too thin.
+ * The chapter's verified questions cut into the three tier bands.
  *
- * Widening is why bars are fractions. Subtopic depth is genuinely uneven
- * — `interest_profit_discount` has a single item below D4, and
- * `min_max_optimization` has none at D4 — so a rigid blend would leave
- * some chapters with no runnable foundation tier at all. A short tier
- * that says how many it served beats a tier that refuses to run.
+ * One query per chapter, then a pure partition — the disjointness of the
+ * tiers is a property of `assignBands`, not of how many times this is
+ * called or in what order, which is what the previous per-tier fill got
+ * wrong (each tier was filled in ignorance of the others).
+ */
+export async function chapterBands(
+  subtopic: Subtopic,
+): Promise<Record<ChapterTier, Question[]>> {
+  return assignBands(await listQuestions({ subtopics: [subtopic] }));
+}
+
+/**
+ * Build one tier: draw its whole band, or a full-size test from within it
+ * when the band is deeper than a test.
+ *
+ * The band is fixed; which of its questions a given run serves is not, so
+ * a retake of a deep chapter is a different test while still being drawn
+ * from the same rung of the ladder. Where the band is exactly test-sized
+ * (any chapter under 18 verified questions) the retake is the same six —
+ * that is bank depth, not selection, and 3 non-overlapping tests of 6 need
+ * 18 items to exist at all.
  */
 export async function selectChapterTest(
   subtopic: Subtopic,
   tier: ChapterTier = "foundation",
 ): Promise<Question[]> {
-  const spec = TIER_SPEC[tier];
-  const picked: Question[] = [];
-
-  const drawFrom = async (difficulty: number, want: number) => {
-    if (want <= 0) return;
-    picked.push(
-      ...(await selectQuestions(
-        {
-          subtopics: [subtopic],
-          difficultyMin: difficulty,
-          difficultyMax: difficulty,
-          excludeIds: picked.map((q) => q.id),
-        },
-        want,
-      )),
-    );
-  };
-
-  // Even split across the window, remainder to the harder end so a tier
-  // never skews easy.
-  const per = Math.floor(spec.size / spec.window.length);
-  for (let i = 0; i < spec.window.length; i++) {
-    const extra = i >= spec.window.length - (spec.size % spec.window.length);
-    await drawFrom(spec.window[i], per + (extra ? 1 : 0));
-  }
-  // Whatever the window could not supply, take from the window again
-  // (a difficulty may have had more than its share) and then outward.
-  for (const difficulty of [...spec.window, ...spec.fallback]) {
-    if (picked.length >= spec.size) break;
-    await drawFrom(difficulty, spec.size - picked.length);
-  }
-
-  return picked
-    .slice(0, spec.size)
-    .sort((a, b) => a.difficulty - b.difficulty || a.id - b.id);
+  const band = (await chapterBands(subtopic))[tier];
+  if (band.length === 0) return [];
+  const want = Math.min(TIER_SPEC[tier].size, band.length);
+  const picked = await selectQuestions({ ids: band.map((q) => q.id) }, want);
+  return picked.sort((a, b) => a.difficulty - b.difficulty || a.id - b.id);
 }
 
 export type TierShape = {
   available: boolean;
   size: number;
-  /** The difficulties this tier actually draws, as "D3–D4" — the tier's
-   *  *label* is a promise about where a chapter sits in the curriculum,
-   *  and where the bank is thin the promise and the questions diverge.
-   *  Two subtopics do diverge today: interest_profit_discount has one
-   *  item below D4, so its foundation tier is D3–D4, and
-   *  min_max_optimization has no D4 at all, so its top band is D3/D5.
-   *  Printing the range is what keeps the label from lying. */
+  /** The difficulty range of this tier's *band* — the pool the test is
+   *  drawn from, so it is a stable property of the chapter rather than of
+   *  one draw. The tier label is a promise about where a chapter sits in
+   *  the curriculum, and where the bank has no easy items the promise and
+   *  the questions diverge: `interest_profit_discount` has one item below
+   *  D4, so its foundation band is D3–D4. Printing the range is what keeps
+   *  the label from lying. */
   range: string;
 };
+
+function rangeOf(ds: number[]): string {
+  if (ds.length === 0) return "—";
+  const lo = Math.min(...ds);
+  const hi = Math.max(...ds);
+  return lo === hi ? `D${lo}` : `D${lo}–D${hi}`;
+}
 
 /** What a tier would actually serve for this chapter. */
 export async function tierShape(
   subtopic: Subtopic,
   tier: ChapterTier,
 ): Promise<TierShape> {
-  const picked = await selectChapterTest(subtopic, tier);
-  const ds = picked.map((q) => q.difficulty);
-  const lo = Math.min(...ds);
-  const hi = Math.max(...ds);
+  return tierShapeFromBands((await chapterBands(subtopic))[tier], tier);
+}
+
+/** The same read, when the caller already holds the chapter's bands — the
+ *  chapter page needs all three and should not re-query for each. */
+export function tierShapeFromBands(
+  band: Question[],
+  tier: ChapterTier,
+): TierShape {
+  const size = Math.min(TIER_SPEC[tier].size, band.length);
   return {
-    available: picked.length >= TIER_MIN_SIZE,
-    size: picked.length,
-    range: ds.length === 0 ? "—" : lo === hi ? `D${lo}` : `D${lo}–D${hi}`,
+    available: size >= TIER_MIN_SIZE,
+    size,
+    range: rangeOf(band.map((q) => q.difficulty)),
   };
 }
 

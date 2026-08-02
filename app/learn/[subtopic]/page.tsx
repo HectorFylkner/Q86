@@ -23,8 +23,9 @@ import {
 } from "@/components/lesson/transfer";
 import type { ChecklistTierState } from "@/components/lesson/drill-checklist";
 import {
+  chapterBands,
   chapterTestStates,
-  tierShape,
+  tierShapeFromBands,
   tierUnlocked,
 } from "@/lib/chapter-tests";
 import { CHAPTER_TIERS, type ChapterTier } from "@/lib/chapter-test-config";
@@ -95,25 +96,26 @@ export default async function LessonPage({
   const passedTiers = Object.fromEntries(
     CHAPTER_TIERS.map((t) => [t, testState?.tiers[t]?.passed === true]),
   ) as Record<ChapterTier, boolean>;
-  const tierStates: ChecklistTierState[] = technique
-    ? []
-    : await Promise.all(
-        CHAPTER_TIERS.map(async (t) => {
-          const state = testState?.tiers[t];
-          const shape = await tierShape(subtopic as Subtopic, t);
-          return {
-            tier: t,
-            passed: passedTiers[t],
-            unlocked: tierUnlocked(t, passedTiers),
-            available: shape.available,
-            range: shape.range,
-            size: shape.size,
-            lastScore: state?.lastTotal
-              ? `${state.lastCorrect}/${state.lastTotal}`
-              : null,
-          };
-        }),
-      );
+  // One partition, read three times — the tiers are bands of a single
+  // ordering, so asking for them separately is what let them overlap.
+  const bands = technique ? null : await chapterBands(subtopic as Subtopic);
+  const tierStates: ChecklistTierState[] = bands
+    ? CHAPTER_TIERS.map((t) => {
+        const state = testState?.tiers[t];
+        const shape = tierShapeFromBands(bands[t], t);
+        return {
+          tier: t,
+          passed: passedTiers[t],
+          unlocked: tierUnlocked(t, passedTiers),
+          available: shape.available,
+          range: shape.range,
+          size: shape.size,
+          lastScore: state?.lastTotal
+            ? `${state.lastCorrect}/${state.lastTotal}`
+            : null,
+        };
+      })
+    : [];
   // The rail is the section list, so deriving the numbering from it keeps
   // "05" in the margin and the fifth rail entry describing the same
   // section — including when a chapter's bank has no top-band item.

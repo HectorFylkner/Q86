@@ -19,10 +19,16 @@ export type QuestionFilter = {
   difficultyMin?: number;
   difficultyMax?: number;
   excludeIds?: number[];
+  /** Draw from exactly these ids. Used by the chapter-test bands, which
+   *  decide membership themselves and then want the usual
+   *  seen-it-twice-already weighting applied inside that set. An empty
+   *  array means an empty pool, never "no filter". */
+  ids?: number[];
 };
 
 function whereFromFilter(filter: QuestionFilter): SQL | undefined {
   const conds: SQL[] = [eq(questions.verified, true)];
+  if (filter.ids) conds.push(inArray(questions.id, filter.ids));
   if (filter.skills?.length)
     conds.push(inArray(questions.fundamentalSkill, filter.skills));
   if (filter.subtopics?.length)
@@ -50,6 +56,21 @@ export async function countQuestions(filter: QuestionFilter): Promise<number> {
 }
 
 /**
+ * Every question matching the filter, in a stable order (id ascending).
+ * Unlike `selectQuestions` this is deterministic and unweighted — it is
+ * for code that needs to reason about a pool rather than draw from one.
+ */
+export async function listQuestions(
+  filter: QuestionFilter,
+): Promise<Question[]> {
+  if (filter.ids?.length === 0) return [];
+  const excluded = new Set(filter.excludeIds ?? []);
+  return (await db.select().from(questions).where(whereFromFilter(filter)).all())
+    .filter((q) => !excluded.has(q.id))
+    .sort((a, b) => a.id - b.id);
+}
+
+/**
  * Weighted-random selection without repeats. `verified = true` is a hard
  * gate. Questions already answered correctly twice or more are
  * deprioritized (weight 0.15 vs 1).
@@ -58,6 +79,7 @@ export async function selectQuestions(
   filter: QuestionFilter,
   count: number,
 ): Promise<Question[]> {
+  if (filter.ids?.length === 0) return [];
   const excluded = new Set(filter.excludeIds ?? []);
   const candidates = (
     await db.select().from(questions).where(whereFromFilter(filter)).all()

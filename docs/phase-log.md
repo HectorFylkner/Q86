@@ -1284,7 +1284,131 @@ D3 with run 1. `verify-bank` 474/474; `a11y-audit` 737/737 named;
 - Interleaving vs blocked practice: pocketprep.com, the-learning-agency-lab.com,
   PMC8476370, ScienceDirect S0959475222000044
 
+---
+
+# Session 3 — the tier gate, the foundation band, cumulative review
+
+**Goal.** Repair the live defect in the tier ladder, then fix the bank
+depth that half-caused it, then build the cumulative interleaved review
+that was identified last session and never made.
+
+## W8 — The tier gate leaked in every chapter
+
+### The measurement that started it
+
+The handoff reported the leak in three chapters (`functions_sequences`
+5 of 6, `min_max_optimization` 3 of 6, `rates_speed_work` 1 of 6). Before
+changing anything, `scripts/check-tiers.ts` was written to measure the
+property directly — every chapter, every tier pair, five independent draws
+— and the defect is much larger than the sample suggested.
+
+**Before** (`pnpm check:tiers`, at commit `0df0072`):
+
+```
+DISJOINT  chapters with any shared question: 24/24
+          worst single-pair overlap: 5 of 6
+          total shared slots across all pairs: 149
+MONOTONE  chapters where a tier reaches past the one above: 9/24
+```
+
+Every chapter leaked. `foundation×exam` shared 2–5 questions in all 24;
+`exam×top_band` shared 1–3 in 23 of 24. And a second defect nobody had
+looked for: in 9 chapters the *foundation* tier served a D4 item while the
+*exam* tier above it started at D3, so the ladder ran backwards.
+
+### Root cause
+
+Not a missing `excludeIds`. `selectChapterTest` excluded ids *within* one
+tier's fill, which is all it could do — it was called once per tier, and a
+tier had no way to know what the other two had taken. Disjointness is a
+property of the three tiers together; the old design expressed each tier
+alone, as a difficulty *window* with a widening fallback:
+
+| Tier | Window | Fallback |
+| --- | --- | --- |
+| Foundation | D2, D3 | D4, D5 |
+| Exam level | D3, D4 | D5, D2 |
+| Top band | D4, D5 | D3, D2 |
+
+The windows overlap at D3 and D4 by construction, and the fallbacks widen
+*downward as well as upward*, which is where the backwards ladders came
+from. No amount of exclusion bookkeeping fixes a model that cannot say
+"these three sets partition that pool".
+
+### D3 — tiers are bands of one ordering, not three windows
+
+**Changing a load-bearing behaviour, so the reason is stated first.** The
+tier ladder is a shipped mechanic and this changes which questions each
+rung serves. The reason is that the previous rule could not hold the
+invariant the rungs exist for.
+
+Sort a chapter's verified questions by `(difficulty, id)` and cut three
+contiguous bands. Foundation is the easiest band, top band the hardest,
+exam the middle. Two invariants then hold *by construction* rather than by
+care:
+
+- **DISJOINT** — contiguous slices of one array share no element.
+- **MONOTONE** — in a sorted array every element of a lower slice is ≤
+  every element of a higher one, so a tier cannot reach past the tier
+  above it.
+
+`assignBands()` and `bandSizes()` are pure and live in
+`lib/chapter-test-config.ts` (no database), so both invariants are tested
+directly on synthetic chapters as well as measured on the real bank.
+
+**Band sizes.** Three non-overlapping tests of 6 need 18 items. Above 18
+the surplus splits evenly and the remainder goes to the required tiers in
+ladder order, so extra depth becomes retake variety. Below 18 something
+must give and it is the **top band first** — the one tier a chapter does
+not need to pass — each tier shrinking only to `TIER_MIN_SIZE` before the
+next is touched. `bandSizes(16) = {6, 6, 4}`; `bandSizes(32) = {11, 11, 10}`.
+
+**What this costs, stated plainly.** "Foundation" no longer promises
+D2–D3 in the abstract; it promises the easiest third of *this* chapter.
+Where a chapter has no easy items that is a bank fact and the chapter page
+prints the band's true range — and unlike the old sampled range, which
+re-drew on every page load, it is now a stable property of the chapter.
+The second cost is variety: in a chapter under 18 items the band is
+exactly test-sized, so a retake is the same six. That is arithmetic, not
+selection, and W9 is the answer to it.
+
+**Also changed:** `tierShape` no longer runs a random draw to describe a
+tier, and the chapter page reads one partition instead of making three
+independent draws (`app/learn/[subtopic]/page.tsx`). `listQuestions()` and
+a `ids` filter were added to `lib/engine.ts` so a band can be drawn from
+with the existing seen-it-twice deprioritization intact.
+
+### Measured after
+
+```
+DISJOINT  chapters with any shared question: 0/24
+          worst single-pair overlap: 0 of 6
+          total shared slots across all pairs: 0
+MONOTONE  chapters where a tier reaches past the one above: 0/24
+SIZE      chapters with a tier below the 4-question minimum: 0/24
+```
+
+| | Before | After |
+| --- | ---: | ---: |
+| Chapters sharing questions between rungs | 24/24 | **0/24** |
+| Total shared slots | 149 | **0** |
+| Worst single-pair overlap | 5 of 6 | **0 of 6** |
+| Chapters with a backwards ladder | 9/24 | **0/24** |
+
+The same audit also reports a number that is *not* a gate, because it is a
+bank problem rather than a selection one: **14 of 24 chapters have a
+foundation band that still reaches D4**. That is finding 2, now measured
+per chapter, and it is W9's target.
+
+Acceptance: `pnpm check:tiers` PASS (was FAIL); `pnpm test` **146/146
+across 17 suites** (was 139/16) — 8 new tests covering band tiling at
+every pool size 0–60, disjointness, monotonicity on six real chapter
+shapes including one with no D4 at all, order-independence, and the
+thin-chapter shrink order. `pnpm build` 21 routes; `verify:bank` 474/474;
+`check:a11y` 739/739 named (100%) with 5 live regions; `check:keyboard`
+13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors.
+
 ## Next action
 
-None outstanding — all five workstreams closed with passing acceptance
-checks. The ranked list above is the next session's agenda.
+W9 — deepen the foundation band. 14 of 24 chapters draw a D4 item into
+their easiest tier.

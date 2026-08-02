@@ -19,7 +19,8 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:a11y": "node scripts/a11y-audit.mjs",
     "check:keyboard": "node scripts/keyboard-pass.mjs --out=screenshots/keyboard",
-    "verify:bank": "node --experimental-strip-types scripts/verify-bank.ts"
+    "verify:bank": "node --experimental-strip-types scripts/verify-bank.ts",
+    "check:tiers": "node --experimental-strip-types scripts/check-tiers.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",
