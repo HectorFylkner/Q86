@@ -642,19 +642,105 @@ reachable in the running app and captured in `screenshots/w4-after/`.
 
 ---
 
+## Deliverable — before/after across every baseline metric
+
+| Metric | Before (`5004caf`) | After (`03318d2`) |
+| --- | --- | --- |
+| **Bank size** | 360 | **438** |
+| **D5 share** | 20.0% (72) | **34.2% (150)** |
+| Difficulty spread | D2 36 · D3 108 · D4 144 · D5 72 | D2 36 · D3 108 · D4 144 · **D5 150** |
+| **Smallest subtopic** | **8** (`interest_profit_discount`) | **16** (`combinatorics`) |
+| Subtopics below 15 items | 15 of 24 | **0 of 24** |
+| Subtopic spread | 3.5× | **1.9×** |
+| Items with computed distractor reachability | 0 | **78** |
+| Format fidelity | 62 DS items, unresolved | **Resolved from primary sources**; DS labelled Data Insights, excluded from Quant-fidelity stats |
+| **`aria-*` attributes** | 31 | **90** |
+| **Accessible names on controls** | unmeasured (508/508 at rest; runner states never audited) | **721/721 (100%)** across 16 states incl. mid-drill and mid-timed |
+| **Live regions** | 0 | **5** |
+| Components with keyboard handlers | 5 | 7, plus a global map on `?` |
+| **Keyboard-only loop** | not measurable | **13/13 steps, pointer disabled** |
+| **Files using Recharts** | 1 | **6** (behind one shared chart layer) |
+| **Distinct chart/data views** | 3 (bar, line, scatter) | **9** (+ mastery grid, pacing scatter + buckets, ELO small multiples, score-report mirror, calibration, miss-chain) |
+| Colour tokens in `globals.css` | 9 | **19** (10 added, every one validator-measured) |
+| **WCAG AA pairs measured** | 0 | **60/60 pass, both themes** |
+| `text-xs` + `text-sm` vs larger | 350 : 39 (9.0 : 1) | a named 8-step scale with a stated job per size |
+| **Test script** | none | **`pnpm test`** |
+| **Automated tests** | 0 | **73, in 9 suites** |
+| Checks that run | `tsc`, `eslint` | + `pnpm test`, `verify:bank`, `check:contrast`, `check:a11y`, `check:keyboard` |
+| Taps: open app → answering | 2 + a return trip | **1** |
+| Taps: resume an interrupted run | no affordance | **1** |
+| 390px horizontal overflow (`/analytics`) | 138px | **0px** |
+| `/analytics` First Load JS | 221 kB | 232 kB (+11 kB for five new views) |
+| `/` First Load JS | 147 kB | 151 kB |
+| `/postmortem` First Load JS | 251 kB | 251 kB |
+
+### Evidence paths
+
+| What | Where |
+| --- | --- |
+| Before screenshots | `screenshots/w0-baseline/` (72 PNGs) |
+| After screenshots | `screenshots/w4-after/` (72 PNGs); `screenshots/w2-after/` is the W2 checkpoint |
+| Keyboard-only pass | `screenshots/keyboard/` (13 PNGs, pointer disabled) |
+| Contrast measurements | `pnpm check:contrast` (add `--json` for the raw table) |
+| Accessible-name audit | `pnpm check:a11y` |
+| Bank verification | `pnpm verify:bank` |
+| Loop arithmetic | `pnpm test` |
+
+All screenshot directories are gitignored — they are instruments, not
+artifacts, and both sides are reproducible from the same fixture
+(`scripts/dev-seed-history.ts --seed=8686`, 42 days).
+
+---
+
 ## Open risks
 
-- **R1 — Bank rebalancing is large.** Reaching D5 ≥ ⅓ and no subtopic
-  below 15 from the baseline requires roughly 120+ new verified items,
-  every one carrying an independent `check()`. Volume is the risk, not
-  method.
-- **R2 — Screenshot capture depends on a populated database.** After/before
-  comparisons are only fair if both sides run the same seed. All captures
-  use `--seed=8686`, 42 days.
-- **R3 — `/analytics` first-load JS is 221 kB, 112 kB of it route code.**
-  W2 adds chart surfaces; without a shared layer this grows further.
+- **R1 — RESOLVED.** Bank rebalancing landed: 78 new D5 items, both
+  targets met, whole bank re-verified.
+- **R2 — Screenshot comparisons depend on a matching fixture.** Both
+  sides use `scripts/dev-seed-history.ts --seed=8686`, 42 days. Running
+  `scripts/a11y-audit.mjs` or `scripts/keyboard-pass.mjs` writes real
+  attempts, so re-run the seeder before a comparison capture.
+- **R3 — `/analytics` first-load JS is 232 kB**, up 11 kB from baseline
+  for five new views. Acceptable for a local-first single-user app, but
+  it is the one number that moved the wrong way; splitting the route by
+  view is the obvious next step if it grows again.
+- **R4 — The trap classifier is keyword-driven.** It is deliberately
+  conservative (returns null rather than guessing), so its failure mode
+  is an unlabelled trap, not a wrong one. But new authoring vocabulary
+  will need new signatures, and nothing currently warns when the
+  "Unclassified" share rises.
+- **R5 — The error-inference weights are hand-set, not fitted.** They
+  encode defensible reasoning and are tested for the properties that
+  matter (a time sink is never time pressure; thin evidence reports
+  uncertainty), but the specific numbers have never been checked against
+  the user's own corrections. Once enough overrides accumulate, they are
+  the data that should set them.
+
+## Highest-value work left undone, ranked
+
+1. **Fit the error-inference weights to the user's own corrections.**
+   Every override is a labelled training example, and the panel already
+   records them. The inference would go from defensible to measured, and
+   it is the one place in the platform where a wrong number silently
+   trains the wrong repair. Left because it needs override data that
+   does not exist yet — this session created the mechanism, not the
+   history.
+2. **New chapters for the pedagogy the taxonomy has and Learn does not:**
+   the six-error vocabulary as a chapter in its own right, and the exam
+   mechanics (Review & Edit, pacing triage, abandon rules). All 24
+   subtopics have chapters; these are the cross-cutting skills that
+   decide points at the margin and currently live only in tooltips.
+   Left because it is prose authoring at chapter length, and the bank
+   and the instruments were the higher-leverage spend.
+3. **Split `/analytics` by view.** It is now nine surfaces on one route
+   at 232 kB and 9,300 px tall at 1280. The Progress group already has
+   tabs; moving the mirror, the grid, pacing, and the diagnostics into
+   their own views would cut the payload and make each one findable.
+   Left because it is a navigation change, and the brief is explicit
+   that seven top-level sections is the settled number — this needs a
+   decision about the group's internal tabs rather than a refactor.
 
 ## Next action
 
-W1 — content depth. Format-fidelity resolution (D2) lands first as a
-schema-free relabelling, then bank authoring by subtopic deficit.
+None outstanding — all five workstreams closed with passing acceptance
+checks. The ranked list above is the next session's agenda.
