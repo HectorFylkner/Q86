@@ -6,7 +6,7 @@ import { Bookmark } from "lucide-react";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
-import { TimeInkBar, type Checkpoint } from "@/components/timed/time-ink-bar";
+import { TimeInkBar } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
 import { MarkingSummary } from "@/components/timed/marking-summary";
 import {
@@ -17,6 +17,14 @@ import {
   type TimedKind,
 } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import {
+  CHECKPOINT_BAND_SECONDS,
+  FULL_CHECKPOINT_QUESTIONS,
+  MINI_CHECKPOINT_QUESTIONS,
+  paceVerdict,
+  sectionCheckpoints,
+  type SectionCheckpoint,
+} from "@/lib/pacing";
 import {
   FUNDAMENTAL_SKILLS,
   SKILL_LABELS,
@@ -82,16 +90,24 @@ export function TimedClient({
   const totalSeconds = kind === "full" ? 45 * 60 : 15 * 60;
   const questionCount = kind === "full" ? 21 : 7;
 
-  const checkpoints: Checkpoint[] =
-    kind === "full"
-      ? [
-          { remainingTarget: 30 * 60, label: "Q7 · 30:00" },
-          { remainingTarget: 15 * 60, label: "Q14 · 15:00" },
-        ]
-      : [
-          { remainingTarget: 10 * 60, label: "Q3 · 10:00" },
-          { remainingTarget: 5 * 60, label: "Q5 · 5:00" },
-        ];
+  // Derived from the section format rather than hardcoded: the target on
+  // entering question q is total - (q-1) * total/count. The old Q7·30:00
+  // was two minutes off even pacing and told a student who hit it exactly
+  // that they were on time.
+  const checkpoints: SectionCheckpoint[] = sectionCheckpoints(
+    totalSeconds,
+    questionCount,
+    kind === "full" ? FULL_CHECKPOINT_QUESTIONS : MINI_CHECKPOINT_QUESTIONS,
+  );
+  // Shown only ON a checkpoint question, never continuously. Four checks
+  // per section is the whole system; a permanent pace readout is a clock
+  // you watch on every question, which is the habit it exists to replace.
+  const atCheckpoint =
+    checkpoints.find((cp) => cp.question === currentIndex + 1) ?? null;
+  const verdict = atCheckpoint ? paceVerdict(remaining, atCheckpoint) : null;
+  const paceDelta = atCheckpoint
+    ? Math.round(remaining - atCheckpoint.remainingTarget)
+    : 0;
 
   // One-click launch from the daily plan (/timed?start=full|mini).
   useEffect(() => {
@@ -363,6 +379,26 @@ export function TimedClient({
               Faithful mechanics: answer to advance, B bookmarks, review
               screen with up to 3 edits if time remains.
             </p>
+            <p className="mt-2 font-mono text-[11px] text-graphite">
+              Checkpoints{" "}
+              {sectionCheckpoints(
+                45 * 60,
+                21,
+                FULL_CHECKPOINT_QUESTIONS,
+              )
+                .map((cp) => cp.label)
+                .join("  ·  ")}
+            </p>
+            <p className="mt-1 text-xs leading-snug text-graphite">
+              Within {CHECKPOINT_BAND_SECONDS / 60} minutes of target you are
+              on pace — change nothing.{" "}
+              <a
+                href="/learn/technique-bail"
+                className="text-ballpoint hover:underline"
+              >
+                How to use them →
+              </a>
+            </p>
             <button
               onClick={() => handleStart("full")}
               disabled={!enough(21)}
@@ -571,10 +607,42 @@ export function TimedClient({
         questionNumber={currentIndex + 1}
         totalQuestions={questions.length}
       />
+      {atCheckpoint && verdict && (
+        <Announce
+          message={
+            verdict === "on_pace"
+              ? `Checkpoint ${atCheckpoint.label}. On pace, within ${CHECKPOINT_BAND_SECONDS} seconds of target. Change nothing.`
+              : `Checkpoint ${atCheckpoint.label}. ${formatSeconds(Math.abs(paceDelta))} ${verdict}. ${
+                  verdict === "behind"
+                    ? "Take one deliberate guess on the next expensive question."
+                    : "Hold the pace and keep the buffer."
+                }`
+          }
+        />
+      )}
       <div className="mx-auto mt-4 max-w-3xl space-y-4">
         <div className="flex items-center justify-between text-xs text-graphite">
-          <span className="font-mono">
-            Question {currentIndex + 1} of {questions.length}
+          <span className="flex items-center gap-3">
+            <span className="font-mono">
+              Question {currentIndex + 1} of {questions.length}
+            </span>
+            {atCheckpoint && verdict && (
+              <span
+                className={cn(
+                  "rounded-control border px-2 py-1 font-mono text-[11px]",
+                  verdict === "on_pace"
+                    ? "border-grid text-graphite"
+                    : verdict === "behind"
+                      ? "border-amber/60 text-amber"
+                      : "border-ballpoint/50 text-ballpoint",
+                )}
+              >
+                {atCheckpoint.label} ·{" "}
+                {verdict === "on_pace"
+                  ? "on pace"
+                  : `${formatSeconds(Math.abs(paceDelta))} ${verdict}`}
+              </span>
+            )}
           </span>
           <span className="flex items-center gap-3">
             {showTimer && (

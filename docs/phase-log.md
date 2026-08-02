@@ -945,6 +945,53 @@ Acceptance: `verify-bank` 474/474; `pnpm test` **98/98 across 12 suites**
 returns 10 items; `tsc` clean; `pnpm lint` 0 errors and 35 warnings, the
 same pre-existing count as before this workstream.
 
+### W5d — pacing checkpoints matched to even pacing (commit: checkpoints)
+
+**A live defect, not a refinement.** The timed runner's checkpoints were
+`Q7 · 30:00` and `Q14 · 15:00`. Entering question 7 means six questions
+are done, which on an even split of 45 minutes across 21 questions
+consumes 12.86 minutes and leaves **32:09**. A student who hit the
+displayed 30:00 exactly was two minutes behind and being told they were
+on time — and the same at Q14, where even pacing leaves 17:08, not 15:00.
+Both errors ran in the same direction, so the section quietly taught a
+student to bank time they did not have.
+
+`lib/pacing.ts` now derives them: the target on entering question $q$ is
+$\text{total} - (q-1) \times \text{total}/\text{count}$, rounded to the
+nearest minute. For the full section that is **Q5 · 36:00, Q9 · 28:00,
+Q14 · 17:00, Q18 · 9:00** — the same four numbers the `technique-bail`
+chapter teaches, now because both compute them rather than because they
+were typed to match.
+
+Four decisions worth recording:
+
+- **Four checkpoints, not twenty-one.** The chip appears *only* on a
+  checkpoint question, never continuously. A permanent pace readout is a
+  clock you watch on every question, which is the habit the system exists
+  to replace.
+- **A ±90-second band.** Inside it the verdict is "on pace" and the
+  instruction is to change nothing. Without a band a checkpoint reads as
+  a deadline and manufactures the rushing it exists to prevent.
+- **Rounding is bounded by the band.** Rounding to the minute moves a
+  target by at most 30 seconds — a third of the band — so it can never
+  flip a verdict. A test asserts this rather than trusting it.
+- **The verdict is announced.** Screen-reader users get the checkpoint,
+  the deficit and the *instruction* ("take one deliberate guess on the
+  next expensive question") through the existing live region.
+
+The timed setup screen now prints the four checkpoints before the section
+starts and links to the chapter that explains them, so the system is
+learnable before it is needed rather than discovered at Q5.
+
+Acceptance: `pnpm test` **109/109 across 13 suites** (was 98/12) — 11 new
+tests pinning the derivation rather than the numbers, including that
+rounding stays inside a third of the band, that the band is exclusive at
+its edges, and that a later checkpoint always leaves less time.
+`/timed` renders `Q5 · 36:00 · Q9 · 28:00 · Q14 · 17:00 · Q18 · 9:00`;
+`a11y-audit` 752/752 named across 16 routes with 5 live regions;
+`keyboard-pass` 13/13; `check-contrast` 60/60; `tsc` clean; `pnpm lint`
+0 errors.
+
 ## Next action
 
 None outstanding — all five workstreams closed with passing acceptance
