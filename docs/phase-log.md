@@ -1408,7 +1408,98 @@ thin-chapter shrink order. `pnpm build` 21 routes; `verify:bank` 474/474;
 `check:a11y` 739/739 named (100%) with 5 live regions; `check:keyboard`
 13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors.
 
+## W9 — Making the foundation tier foundational
+
+### The measurement
+
+W8's audit ended with a number that was honest and bad: **14 of 24
+chapters had a foundation band that reached D4**. The tier that carries the
+highest bar in the ladder (5 of 6, because a miss on the mechanics is a
+defect rather than a normal exam outcome) was in more than half the
+curriculum made partly of exam-level items.
+
+That is the shape of the whole bank. Before this workstream: D2 **36**,
+D3 124, D4 163, D5 151 — D4+D5 was **66%** of 474 items, and nine
+subtopics had no D2 item at all. `interest_profit_discount` was the
+extreme: **one** item below D4 out of nineteen.
+
+### The target, computed rather than guessed
+
+Adding an easy item also grows the foundation band, since the bands are
+thirds — so the deficit does not close one-for-one. For each chapter the
+requirement is `easy(n + k) ≥ bandSizes(n + k).foundation`, solved for the
+least *k*. Summed over the 14 chapters: **37 items**, from 1
+(`combinatorics`, `probability`, `linear_systems`,
+`abs_value_number_line_decimals`) to 8 (`interest_profit_discount`).
+
+### What was authored
+
+37 items at D2–D3 through `scripts/author/harness.mjs`, in four batches by
+fundamental skill:
+
+| Batch | Chapters | Items |
+| --- | --- | ---: |
+| `batch-foundation-rates.mjs` | interest_profit_discount 8, ratios_proportions 4, mixtures_weighted_avg 3 | 15 |
+| `batch-foundation-vof.mjs` | exponents_roots 3, divisibility_gcf_lcm 3, remainders_units 2, abs_value 1 | 9 |
+| `batch-foundation-counting.mjs` | series_patterns 3, statistics 2, combinatorics 1, probability 1 | 7 |
+| `batch-foundation-algebra.mjs` | algebraic_translation 3, functions_sequences 2, linear_systems 1 | 6 |
+
+**A foundation item is not a small hard item.** Each one makes a single
+mechanic fail loudly when it is absent — one markup applied to the wrong
+base, one off-by-one between terms and steps, one exponent binding to the
+wrong factor — rather than being a reduced version of a multi-step
+question. The distractors are the named versions of that one mistake.
+
+**Every check computes the answer a different way from the solution.**
+Percent items are recomputed in integer cents by adding one percent at a
+time, never by the composed multiplier the solution teaches; powers by
+repeated multiplication; remainders by repeated subtraction; roots and
+GCFs by search over the integers; medians by stripping the extremes in
+pairs; translation items by searching for the value that satisfies the
+*stated scenario*, since on a translation item the failure mode is the
+translation and a check built on it would inherit the error.
+
+**The gate caught one defect**, as designed: the GCF item's `24`
+distractor was labelled "divides 48 but not 60", and the rule that
+computes it returns 48, not 24 — 24 has no clean derivation from a single
+named error. It was replaced with `4` ("takes only the shared power of 2
+and drops the shared 3"), which does.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Bank size | 474 | **511** |
+| D2 items | 36 | **58** |
+| D3 items | 124 | **139** |
+| D2+D3 share | 33.8% | **38.6%** |
+| D4+D5 share | 66.2% | **61.4%** |
+| Chapters whose foundation band reaches past D3 | **14/24** | **0/24** |
+| Subtopics below 18 items (3 disjoint tiers of 6) | 3 | **3** |
+| Data Sufficiency share | 13.1% | 12.1% |
+
+Every chapter's foundation tier is now drawn entirely from D2–D3. The
+audit's `FOUNDATION` line was a report in W8 and is **a gate now that it
+is satisfied**: it fails the batch if a future authoring pass pushes a D4
+back into an easiest band. That deliberately constrains authoring —
+adding hard items to a thin chapter grows its foundation band and can pull
+a D4 in — and the remedy is to add an easy item alongside, which is the
+balance the ladder is supposed to have.
+
+**Not fixed:** `min_max_optimization` and `quadratics_factoring` still
+hold 16 items each, so their top band ships 4 questions rather than 6 and
+a retake of any of their tiers is the same set. Closing that needs D4/D5
+authoring, not D2/D3, and it does not affect either W8 invariant or the
+foundation gate. `functions_sequences` reached 18 and now fills all three
+tiers.
+
+Acceptance: `pnpm check:tiers` PASS with FOUNDATION 0/24 (was 14/24);
+`verify:bank` **511/511** (was 474/474); `pnpm test` 146/146 across 17
+suites; `pnpm build` 21 routes; `check:a11y` 100% named with 5 live
+regions; `check:keyboard` 13/13; `check:contrast` 60/60; `tsc` clean;
+`pnpm lint` 0 errors.
+
 ## Next action
 
-W9 — deepen the foundation band. 14 of 24 chapters draw a D4 item into
-their easiest tier.
+W10 — cumulative interleaved review (finding 4): a short quiz drawn from
+chapters already passed, before starting a new one.

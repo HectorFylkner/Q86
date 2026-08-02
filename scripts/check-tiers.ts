@@ -154,18 +154,30 @@ for (const r of short) {
   console.log(`          · ${r.subtopic}: ${detail}`);
 }
 
-// Not a gate — a report. A foundation band that reaches D4 is honest about
-// itself (the range is printed on the chapter page) but it is still a
-// chapter with no easy items to teach the mechanics on.
-const foundationTooHard = rows.filter((r) => r.ranges.foundation.includes("D4"));
+// A gate, not a report. The foundation tier carries the highest bar in the
+// ladder because a miss there is a defect to repair — that argument only
+// holds if the tier is actually made of foundational items. This started at
+// 14 of 24 and is a gate now that it is 0.
+//
+// It also constrains authoring, deliberately: adding hard items to a thin
+// chapter grows its foundation band and can pull a D4 into it, which fails
+// here. The remedy is to add an easy item alongside, which is the balance
+// the ladder is supposed to have.
+const foundationTooHard = rows.filter(
+  (r) => r.ranges.foundation.includes("D4") || r.ranges.foundation.includes("D5"),
+);
 console.log(
-  `FOUNDATION chapters whose easiest band still reaches D4: ${foundationTooHard.length}/${rows.length}`,
+  `FOUNDATION chapters whose easiest band reaches past D3: ${foundationTooHard.length}/${rows.length}`,
 );
 for (const r of foundationTooHard) {
   console.log(`          · ${r.subtopic}: ${r.ranges.foundation}`);
 }
 
-const fail = overlapping.length > 0 || nonMonotone.length > 0 || short.length > 0;
+const fail =
+  overlapping.length > 0 ||
+  nonMonotone.length > 0 ||
+  short.length > 0 ||
+  foundationTooHard.length > 0;
 console.log("");
 console.log(fail ? "FAIL" : "PASS");
 process.exit(fail ? 1 : 0);
