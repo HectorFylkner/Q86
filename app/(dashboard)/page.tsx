@@ -44,14 +44,19 @@ export default async function TodayPage() {
   const planDrillIds = verifiedCount > 0 ? await selectPlanDrillIds(plan) : [];
   const today = await todaysQueueThenDrill(planDrillIds);
   const deckWaiting = deck.due + deck.fresh;
-  const baselineSource: "report" | "diagnostic" | null =
-    (await getSetting("test_date")) !== undefined && inputs.baselineWeakness
-      ? (await baselineWeakness())
-        ? "report"
-        : (await latestDiagnostic())
-          ? "diagnostic"
-          : null
-      : null;
+  // What the weighting is based on. This used to be gated on a test date
+  // being set, which has nothing to do with where the weights came from:
+  // a new user who sat the diagnostic before setting a test date saw no
+  // acknowledgement that it had landed at all. Observed end to end on a
+  // clean database — see the W11 note in docs/phase-log.md.
+  const baselineSource: "report" | "diagnostic" | null = !inputs
+    .baselineWeakness
+    ? null
+    : (await baselineWeakness())
+      ? "report"
+      : (await latestDiagnostic())
+        ? "diagnostic"
+        : null;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
 
@@ -210,13 +215,22 @@ export default async function TodayPage() {
         </section>
       )}
 
-      {plan.phase && (
+      {/* The phase chip needs a test date; the weighting line does not, and
+          gating both on the phase hid the one fact a day-one user most
+          needs after sitting the diagnostic. */}
+      {(plan.phase || baselineSource) && (
         <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
-              {PHASE_LABELS[plan.phase]}
-            </span>
-            <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
+            {plan.phase && (
+              <>
+                <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
+                  {PHASE_LABELS[plan.phase]}
+                </span>
+                <p className="text-sm text-graphite">
+                  {PHASE_NOTES[plan.phase]}
+                </p>
+              </>
+            )}
             {/* What the weighting is actually based on. A plan that
                 cannot say where its weights came from is asking to be
                 trusted on nothing. */}
@@ -363,6 +377,7 @@ export default async function TodayPage() {
         plan={plan}
         skillAccuracy={inputs.skillAccuracy}
         baselineWeakness={inputs.baselineWeakness}
+        baselineSource={baselineSource}
         weightOverrides={inputs.weightOverrides}
         daysToTest={days}
       />

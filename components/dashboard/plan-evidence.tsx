@@ -25,16 +25,26 @@ export function PlanEvidence({
   plan,
   skillAccuracy,
   baselineWeakness,
+  baselineSource,
   weightOverrides,
   daysToTest,
 }: {
   plan: DailyPlan;
   skillAccuracy: Record<FundamentalSkill, SkillRecord>;
   baselineWeakness: Record<FundamentalSkill, number> | null;
+  /** Which baseline produced those numbers. The panel used to name the
+   *  imported score report unconditionally, so a user weighted against a
+   *  placement diagnostic — or against nothing — was told the plan came
+   *  from a report they had never imported. */
+  baselineSource: "report" | "diagnostic" | null;
   weightOverrides: Partial<Record<FundamentalSkill, number>> | null;
   daysToTest: number | null;
 }) {
   const [open, setOpen] = useState(false);
+  const baselineName =
+    baselineSource === "diagnostic"
+      ? "your placement diagnostic"
+      : "the imported score report";
 
   const rows = FUNDAMENTAL_SKILLS.map((skill) => {
     const weight = plan.weights[skill];
@@ -61,7 +71,7 @@ export function PlanEvidence({
     }
     if (baseline != null && override == null) {
       because.push(
-        `The imported score report puts this skill's weakness at ${baseline.toFixed(2)}; the two are blended half and half.`,
+        `${baselineSource === "diagnostic" ? "Your placement diagnostic" : "The imported score report"} puts this skill's weakness at ${baseline.toFixed(2)}; the two are blended half and half.`,
       );
     }
     if (weight <= 0.0501) {
@@ -99,8 +109,10 @@ export function PlanEvidence({
         </button>
       </div>
       <p className="mt-0.5 max-w-[72ch] text-caption text-graphite">
-        {totalReason} The mix comes from rolling accuracy blended with the
-        imported report, with a 5% floor per skill.{" "}
+        {totalReason}{" "}
+        {baselineSource
+          ? `The mix comes from rolling accuracy blended with ${baselineName}, with a 5% floor per skill.`
+          : "The mix comes from rolling accuracy alone — nothing has measured a baseline yet — with a 5% floor per skill."}{" "}
         <Link href="/analytics" className="text-ballpoint hover:underline">
           The numbers behind it are on Analytics
         </Link>

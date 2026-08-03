@@ -1645,6 +1645,111 @@ populated database renders, and `dev-seed-history` produces a different
 number of redo-queue rows on each run. 100% named and 5 live regions are
 the invariants; the absolute count is not.)*
 
+## W11 — Sitting the placement diagnostic, and what that found
+
+Finding 6 said the diagnostic's write-back was "unit-tested, not
+observed". That distinction earned its keep: sitting one end to end found
+**two live defects that no unit test could have caught**, because both are
+in what the page says rather than in what the function returns.
+
+### The observation
+
+A clean database — no history, no test date, no imported report, which is
+the exact fixture the diagnostic exists for — then the whole flow driven
+through the real UI against the production build.
+
+**Before the diagnostic:**
+
+```
+imported report baseline : null
+latest diagnostic        : null
+planner baselineWeakness : null
+drill block              : rates 3 · VOF 3 · algebra 3 · counting 3
+```
+
+Uniform across all four skills — the one weighting guaranteed to be wrong.
+
+**The diagnostic:** 16 questions served, 16 answered, 5 correct.
+
+```
+rates_ratio_percent              0/4
+value_order_factors              2/4
+equal_unequal_alg                1/4
+counting_sets_series_prob_stats  2/4
+```
+
+**After:**
+
+```
+diagnosticWeakness()     {rates 1.00, VOF 0.50, algebra 0.75, counting 0.50}
+planner baselineWeakness {rates 1.00, VOF 0.50, algebra 0.75, counting 0.50}
+drill block              rates 5 · algebra 3 · VOF 2 · counting 2
+```
+
+The weakest skill went from 3 questions to 5; the two strongest dropped to
+2 each; the ordering matches the weights exactly. **The write-back
+reaches the daily plan — observed, not inferred.**
+
+### Defect 1 — the plan would not say what it was weighted against
+
+`baselineSource` on the Today page was gated on
+`getSetting("test_date") !== undefined`, which has nothing to do with
+where the weights came from. Worse, the line that reports it lived inside
+a section rendered only when `plan.phase` is set, which also requires a
+test date.
+
+So a new user — no test date yet, because setting one is a separate step —
+sat a sixteen-question diagnostic, had their plan silently re-weighted by
+it, and was told **nothing at all**. The one surface that exists to say
+"here is what this plan is based on" was unreachable in precisely the
+situation the diagnostic was built to serve.
+
+Fixed: `baselineSource` now derives only from which baselines exist, and
+the card renders when there is a phase *or* a baseline, with the phase
+chip conditional inside it. Verified in both directions — a clean database
+with a diagnostic now reads "weighted against your placement diagnostic";
+the seeded fixture with an imported report still reads "weighted against
+your imported score report".
+
+### Defect 2 — the evidence panel named a source that did not exist
+
+`components/dashboard/plan-evidence.tsx` hardcoded the imported score
+report in two places: the summary line ("the mix comes from rolling
+accuracy blended with the imported report") and the per-skill reason ("the
+imported score report puts this skill's weakness at 0.75"). Both are
+wrong when the baseline is a diagnostic, and the first is wrong again when
+there is no baseline at all — it claimed a blend with something that was
+never there.
+
+This is the worse of the two. The panel exists so the plan can be argued
+with; a panel that cites a document the user has never imported is not
+merely unhelpful, it invites them to go looking for a mistake that is not
+theirs. It now takes `baselineSource` and names whichever source actually
+produced the numbers, or says plainly that nothing has measured a baseline
+yet.
+
+Both defects predate this session; neither is reachable from a unit test,
+because `diagnosticWeakness()` was correct the whole time.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Day-one drill weighting | 3/3/3/3 uniform | **5/3/2/2**, tracking the diagnostic |
+| Diagnostic acknowledged on Today without a test date | **never** | always |
+| Plan-evidence panel naming a source the user has | when a report existed | always |
+| Diagnostic → plan path | unit-tested | **observed end to end** |
+
+Acceptance: `pnpm build` 21 routes; `pnpm test` 159/159 across 18 suites;
+`verify:bank` 511/511; `check:tiers` PASS; `check:review` PASS;
+`check:a11y` 692/692 named (100%) with 5 live regions; `check:keyboard`
+13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors.
+
+*(No unit test was added for these. Both are copy conditional on render
+state, and the honest check is the one that found them — sitting the flow.
+`scripts/check-review.ts` and `scripts/check-tiers.ts` guard the
+mechanisms; the wording is guarded by having looked at it in both states.)*
+
 ## Next action
 
 Finding 5 — fit the error-inference weights to the user's own
