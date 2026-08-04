@@ -2,8 +2,10 @@ import { AnalyticsClient } from "@/components/analytics/analytics-client";
 import { SectionTabs } from "@/components/section-tabs";
 import { FlagsCard } from "@/components/analytics/flags-card";
 import { TechniqueCard } from "@/components/analytics/technique-card";
+import { InferenceCard } from "@/components/analytics/inference-card";
 import { gatherAnalytics } from "@/lib/analytics";
 import { strategyReport } from "@/lib/strategy-server";
+import { suggestionAgreement } from "@/lib/inference-audit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,6 +13,7 @@ export const runtime = "nodejs";
 export default async function AnalyticsPage() {
   const data = await gatherAnalytics();
   const strategies = await strategyReport();
+  const inference = await suggestionAgreement();
 
   return (
     <div className="space-y-4">
@@ -27,6 +30,7 @@ export default async function AnalyticsPage() {
       </div>
       {data.attemptCount > 0 && <TechniqueCard report={strategies} />}
       <AnalyticsClient data={data} />
+      <InferenceCard data={inference} />
       <FlagsCard />
     </div>
   );

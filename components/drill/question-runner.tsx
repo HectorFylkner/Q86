@@ -94,6 +94,12 @@ export function QuestionRunner({
     return () => clearInterval(t);
   }, [phase, timing, index]);
 
+  /** What the attribution panel last displayed, and for which attempt. */
+  const shownSuggestion = useRef<{
+    attemptId: number;
+    suggestion: { errorType: ErrorType; confidence: number } | null;
+  } | null>(null);
+
   const submit = useCallback(() => {
     if (phase !== "answering") return;
     if (selected == null) {
@@ -191,13 +197,27 @@ export function QuestionRunner({
   }, [phase, index, questions, results, sessionId]);
 
   const tagError = useCallback(
-    (errorType: ErrorType) => {
+    (
+      errorType: ErrorType,
+      suggestion: { errorType: ErrorType; confidence: number } | null = null,
+    ) => {
       const res = results[index];
       if (!res || res.attemptId == null) return;
+      // Keys 1–6 are the primary path and the panel owns the suggestion, so
+      // fall back to what it last reported for *this* attempt rather than
+      // letting the server recompute against a history that has since moved.
+      const shown =
+        suggestion ??
+        (shownSuggestion.current?.attemptId === res.attemptId
+          ? shownSuggestion.current.suggestion
+          : null);
       setResults((r) =>
         r.map((item, i) => (i === index ? { ...item, errorType } : item)),
       );
-      tagAttempt(res.attemptId, { errorType }).catch(() => {});
+      // The suggestion travels with the tag: agreeing and overriding have to
+      // be distinguishable afterwards, and only the caller knows what was
+      // on screen when the key was pressed.
+      tagAttempt(res.attemptId, { errorType, suggestion: shown }).catch(() => {});
     },
     [results, index],
   );
@@ -512,6 +532,9 @@ export function QuestionRunner({
               attemptId={currentResult.attemptId}
               value={currentResult.errorType ?? null}
               onChange={tagError}
+              onSuggestion={(attemptId, suggestion) => {
+                shownSuggestion.current = { attemptId, suggestion };
+              }}
               disabled={currentResult.attemptId == null}
             />
           )}

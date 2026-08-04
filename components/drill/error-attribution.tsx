@@ -22,11 +22,26 @@ export function ErrorAttribution({
   attemptId,
   value,
   onChange,
+  onSuggestion,
   disabled,
 }: {
   attemptId: number | null;
   value: ErrorType | null;
-  onChange: (errorType: ErrorType) => void;
+  /**
+   * Receives the chosen type *and* the suggestion that was on screen when it
+   * was chosen, so the caller can persist the pair. A tag stored without the
+   * suggestion it agreed or disagreed with is not a labelled example.
+   */
+  onChange: (
+    errorType: ErrorType,
+    suggestion: { errorType: ErrorType; confidence: number } | null,
+  ) => void;
+  /** Reports what was displayed, so a tag made from the keyboard — which
+   *  never passes through this component — records it too. */
+  onSuggestion?: (
+    attemptId: number,
+    suggestion: { errorType: ErrorType; confidence: number } | null,
+  ) => void;
   disabled?: boolean;
 }) {
   const [attribution, setAttribution] = useState<Attribution | null>(null);
@@ -41,7 +56,14 @@ export function ErrorAttribution({
     setShowEvidence(false);
     void suggestErrorType({ attemptId })
       .then((result) => {
-        if (!cancelled) setAttribution(result);
+        if (cancelled) return;
+        setAttribution(result);
+        onSuggestion?.(
+          attemptId,
+          result?.best
+            ? { errorType: result.best.errorType, confidence: result.best.confidence }
+            : null,
+        );
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -49,11 +71,18 @@ export function ErrorAttribution({
     return () => {
       cancelled = true;
     };
+    // `onSuggestion` is intentionally not a dependency: it is a reporting
+    // channel, and re-running the query because the parent re-rendered would
+    // recompute the suggestion the reader is currently looking at.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attemptId]);
 
   const best = attribution?.best ?? null;
   const suggested = best?.errorType ?? null;
   const uncertain = attribution?.uncertain ?? true;
+  const shown = best
+    ? { errorType: best.errorType, confidence: best.confidence }
+    : null;
 
   return (
     <section
@@ -145,7 +174,7 @@ export function ErrorAttribution({
             <button
               key={et}
               type="button"
-              onClick={() => onChange(et)}
+              onClick={() => onChange(et, shown)}
               disabled={disabled}
               aria-pressed={isChosen}
               className={cn(

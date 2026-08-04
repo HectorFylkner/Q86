@@ -1934,3 +1934,156 @@ never exceed measured precision, that a named rule outranks an inferred one
 on the same sentence, and that no test sentence appears in the training
 split. `verify:bank` 511/511; `check:tiers` PASS; `check:review` PASS;
 `tsc` clean; `pnpm lint` 0 errors and no new warnings.
+
+## W13 — The suggestion is written down, so an override is recoverable
+
+### The blocker was never what the ranked list said it was
+
+The ranked list has carried "fit the error-inference weights to the user's
+own corrections" at number one for three sessions, blocked on override data
+that had not accumulated yet. Session 3 corrected the stated reason —
+"the panel already records them" is false — and the correction was right,
+but the item still read as *waiting*. It was not waiting. `suggestErrorType()`
+computed the ranked suggestion on demand and handed it to the runner;
+`tagAttempt()` persisted `errorType` and nothing else. **Every override was
+destroyed at the moment it was created**, and no amount of further use would
+have produced one.
+
+### D6 — the suggestion is recorded once, and never rewritten
+
+**A schema change, so the reason is stated first.** Three columns on
+`attempts`, all nullable, all additive:
+
+| Column | Holds |
+| --- | --- |
+| `suggested_error_type` | the platform's top candidate when the tag was made |
+| `suggested_confidence` | its share of the signal, 0–1 |
+| `tagged_at` | when the tag was written |
+
+Shipped as `drizzle/0002_neat_karma.sql` (three `ALTER TABLE ADD COLUMN`,
+nothing dropped or rewritten) and mirrored in `evolveSchema()` behind a
+`pragma table_info` read, since SQLite has no `add column if not exists` and
+databases created by `pnpm db:push` have no migration ledger. Verified on the
+populated fixture: all **1,268 attempts** survived, and every pre-existing
+column is still present. Existing rows read null, which is exactly "this tag
+predates the suggestion being recorded" and is what the audit reports it as —
+never silently folded into the denominator.
+
+**Written once.** A later re-tag of the same attempt leaves the stored
+suggestion alone. The labelled example is what the reader was shown *when
+they first decided*; overwriting it with a suggestion recomputed weeks later
+against a moved subtopic history would corrupt the record while looking like
+an update. `scripts/check-inference.ts` drives that case against the real
+write path rather than asserting it.
+
+**"Looked and found nothing" is not "nobody looked."** A miss where the
+inference has no candidate stores `suggested_confidence = 0` with a null
+type. Without that distinction the audit cannot tell a dropped example from
+an empty one, and its gate would either miss real losses or cry wolf on every
+evidence-free miss.
+
+### D7 — `lib/tagging.ts`, so the audit drives the code that runs
+
+`lib/actions.ts` is `"use server"` and imports `next/cache`, so nothing
+outside the Next runtime can call it — an audit script could only ever assert
+*about* the write path. `recordTag()` and `attributionForAttempt()` moved to
+`lib/tagging.ts`; the two server actions are now three-line wrappers. This is
+the difference between a check that tests the shipped behaviour and one that
+tests a copy of it.
+
+### The suggestion the panel showed is the suggestion that is stored
+
+The panel computes the attribution; the runner writes the tag; keys 1–6 are
+the primary path and never pass through the panel's click handler. So the
+panel reports what it displayed through `onSuggestion`, the runner keeps it in
+a ref keyed by attempt id, and both paths send it with the tag. Only when a
+caller genuinely has none — the post-mortem tags without showing the panel —
+does the server compute one.
+
+### Verified by sitting it, not by unit test
+
+`scripts/observe-override.mjs` drives the production build in a real browser:
+start a drill, answer wrong, read the suggestion **off the page**, press a
+different error-type key, then read the row back out of SQLite.
+
+```
+  ✓ opened /drill
+  ✓ answered the first question
+  ✓ the attribution panel appeared
+  ✓ read the suggestion off the page — Setup error
+  ✓ overrode it with "Content gap" (key 1)
+
+  stored row:
+    id                       3805
+    error_type               content_gap
+    suggested_error_type     setup_error
+    suggested_confidence     0.279
+    tagged_at                2026-08-04T11:17:21.325Z
+
+  ✓ the final tag is the override
+  ✓ the suggestion on screen is the suggestion stored — page "Setup error" → db "setup_error"
+  ✓ the row reads as an override, not a first-time tag
+  ✓ the tag is timestamped
+PASS
+```
+
+That is the first recoverable labelled example this platform has ever
+produced.
+
+### What the reader gets
+
+`components/analytics/inference-card.tsx` on Progress — "Is the suggestion any
+good?" It answers a question the reader should be able to ask (*should I read
+the evidence, or can I tap through?*) and **refuses to answer it on thin
+data**: below 25 labelled examples it prints the count and says why there is no
+percentage. Above it, the agreement rate, the split between the suggestions the
+platform called confident and those it flagged uncertain, and the single
+repeating disagreement — because a confusion with a shape names a weight to
+change, where scattered disagreement names nothing.
+
+Both render branches were read off the running production build, not inferred
+from the code — the same discipline that caught W11's two live copy defects:
+
+```
+  < 25:  "1 of your tags has been compared against what was suggested.
+          Below 25 the rate is noise, so no percentage is shown — the count
+          is the honest number until then."
+  ≥ 25:  "You kept the suggestion on 0 of 1 tagged misses — 0%.
+          The other 1 was you correcting it."
+```
+
+### The circularity trap, avoided deliberately
+
+`dev-seed-history.ts` now records suggestions too — computed by
+`attributeError()` from each seeded attempt's **observable features** (time,
+confidence, chosen distractor), exactly as the live panel would, and
+deliberately *not* derived from the `errorType` the script generates. `trapMap`
+was added to the seeder's question query so the fixture exercises the
+distractor signal rather than only the timing half.
+
+Even so, the fixture number is not a finding, and both the script and this log
+say so: the seeder draws most error types from a weighted random mix, so
+agreement against them sits near chance (1 in 6) **by construction** and would
+stay there however good the weights were. It measured **25.7% over 374**.
+`suggestionAgreement()` therefore excludes synthetic sessions by default, so
+the reader-facing card counts only their own corrections; `check:inference`
+prints the fixture block separately and labelled.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Overrides recoverable from history | **0, and not persistable** | every tag, from the first one |
+| Tags carrying the suggestion they were made against | **0** | **1,268 of 1,268** on the fixture |
+| Tags written since the change with no suggestion | — | **0** (gated) |
+| Ways to tell an override from a first-time tag | **none** | `suggested_error_type ≠ error_type` |
+| Places the reader can see whether to trust the suggestion | **0** | 1, gated at 25 examples |
+| Schema migrations | — | 1, additive; 1,268 attempts intact |
+
+Acceptance: **`pnpm check:inference` PASS** — RECORDED 0 tags written since
+the change carry no suggestion; ONCE re-tagging leaves the stored suggestion
+alone, driven against `recordTag()` itself. `node scripts/observe-override.mjs`
+PASS, 9/9 steps against the production build. `pnpm test` **171/171 across 20
+suites** (was 166/19). `pnpm build` 21 routes, `/analytics` 233 kB unchanged.
+`check:traps` PASS; `verify:bank` 511/511; `check:tiers` PASS; `check:review`
+PASS; `tsc` clean; `pnpm lint` 0 errors and no new warnings.

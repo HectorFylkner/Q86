@@ -40,6 +40,7 @@ import {
 import { ELO_START, nextRating } from "../lib/elo.ts";
 import { PATTERN_CATEGORY_KEYS } from "../lib/generators/index.ts";
 import { mulberry32, pick, randInt, shuffle } from "../lib/generators/rng.ts";
+import { attributeError } from "../lib/error-inference.ts";
 import { TIME_BENCH } from "../lib/pacing.ts";
 import { COLD_SOLVE_LIMIT_SECONDS } from "../lib/redo.ts";
 import { nextReview, type ReviewGrade, type ReviewState } from "../lib/srs.ts";
@@ -203,6 +204,10 @@ type QRow = {
   fundamentalSkill: FundamentalSkill;
   difficulty: number;
   correctIndex: number;
+  /** Needed so the seeded suggestion sees the same distractor evidence the
+   *  live panel would — without it the fixture would exercise only the
+   *  timing and confidence half of the inference. */
+  trapMap: Record<string, string> | null;
 };
 
 async function main() {
@@ -215,6 +220,7 @@ async function main() {
       fundamentalSkill: questions.fundamentalSkill,
       difficulty: questions.difficulty,
       correctIndex: questions.correctIndex,
+      trapMap: questions.trapMap,
     })
     .from(questions)
     .all()) as QRow[];
@@ -535,6 +541,39 @@ async function main() {
         confidence: it.conf,
         errorType: it.errorType,
         createdAt: it.when,
+        // The suggestion is *inferred from the attempt's observable features*
+        // — time, confidence, chosen distractor — exactly as the live panel
+        // would infer it. It is deliberately not derived from `it.errorType`,
+        // which this script generates from its own error-mix model. If it
+        // were, the agreement rate would be circular and would prove nothing,
+        // which is the trap finding 5 warns about. As written, the fixture
+        // measures the inference against the fixture's generative model: a
+        // real smoke test of the pipeline, and still not evidence about a
+        // real reader.
+        ...(it.errorType
+          ? (() => {
+              const best = attributeError({
+                correct: it.correct,
+                timeSeconds: it.seconds,
+                difficulty: it.q.difficulty as 1 | 2 | 3 | 4 | 5,
+                confidence: it.conf,
+                selectedIndex: it.selected,
+                correctIndex: it.q.correctIndex,
+                chosenTrap: it.q.trapMap?.[String(it.selected)] ?? null,
+                subtopicAccuracy: null,
+                subtopicAttempts: 0,
+              }).best;
+              return best
+                ? {
+                    suggestedErrorType: best.errorType,
+                    suggestedConfidence: best.confidence,
+                    taggedAt: it.when,
+                  }
+                : // nothing pointed anywhere; a zero says we looked, which is
+                  // what the audit distinguishes from nobody having looked.
+                  { suggestedConfidence: 0, taggedAt: it.when };
+            })()
+          : {}),
       });
     }
     // Review & Edit: a couple of changed answers per timed section, with

@@ -92,6 +92,16 @@ export const attempts = sqliteTable(
     confidence: text("confidence").$type<Confidence>().notNull(),
     errorType: text("error_type").$type<ErrorType>(),
     errorSubtag: text("error_subtag").$type<Subtopic>(),
+    // What the platform suggested at the moment the tag was made, and how
+    // much of the signal pointed there. Written once, on the first tag, and
+    // never rewritten — an override is only a labelled training example if
+    // the suggestion it overrode is still on the row. Before this existed,
+    // `tagAttempt` persisted the final tag alone, so an override was
+    // indistinguishable from a first-time tag and the labelled examples
+    // could not be reconstructed from history already collected.
+    suggestedErrorType: text("suggested_error_type").$type<ErrorType>(),
+    suggestedConfidence: real("suggested_confidence"),
+    taggedAt: integer("tagged_at", { mode: "timestamp_ms" }),
     // JSON array of up to 3 scratch-work images stored as data URLs
     // (kept in the DB so serverless hosts work; legacy rows may hold
     // relative file paths from the era of on-disk storage).

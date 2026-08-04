@@ -22,7 +22,8 @@
     "verify:bank": "node --experimental-strip-types scripts/verify-bank.ts",
     "check:tiers": "node --experimental-strip-types scripts/check-tiers.ts",
     "check:review": "node --experimental-strip-types scripts/check-review.ts",
-    "check:traps": "node --experimental-strip-types scripts/check-traps.ts"
+    "check:traps": "node --experimental-strip-types scripts/check-traps.ts",
+    "check:inference": "node --experimental-strip-types scripts/check-inference.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

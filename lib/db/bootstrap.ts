@@ -56,7 +56,9 @@ async function provision(): Promise<void> {
   }
 }
 
-/** Mirrors drizzle/0001_deep_talon.sql for databases that predate it. */
+/** Mirrors drizzle/0001_deep_talon.sql and 0002_neat_karma.sql for databases
+ *  that predate them. Additive only — nothing here drops or rewrites a
+ *  column, so an existing training record cannot be damaged by a cold start. */
 async function evolveSchema(): Promise<void> {
   await client.execute(`create table if not exists deck_reviews (
     question_id integer primary key not null,
@@ -83,4 +85,20 @@ async function evolveSchema(): Promise<void> {
   await client.execute(
     "create index if not exists question_flags_status_idx on question_flags (status)",
   );
+
+  // 0002: SQLite has no `add column if not exists`, so the columns are read
+  // first. Adding one to `attempts` never touches existing rows — they simply
+  // read null, which is exactly "this tag predates the suggestion being
+  // recorded" and is what the audit reports it as.
+  const columns = await client.execute("pragma table_info(attempts)");
+  const present = new Set(columns.rows.map((r) => String(r.name)));
+  for (const [name, type] of [
+    ["suggested_error_type", "text"],
+    ["suggested_confidence", "real"],
+    ["tagged_at", "integer"],
+  ] as const) {
+    if (!present.has(name)) {
+      await client.execute(`alter table attempts add column ${name} ${type}`);
+    }
+  }
 }
