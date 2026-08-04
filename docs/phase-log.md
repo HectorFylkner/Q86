@@ -2087,3 +2087,142 @@ PASS, 9/9 steps against the production build. `pnpm test` **171/171 across 20
 suites** (was 166/19). `pnpm build` 21 routes, `/analytics` 233 kB unchanged.
 `check:traps` PASS; `verify:bank` 511/511; `check:tiers` PASS; `check:review`
 PASS; `tsc` clean; `pnpm lint` 0 errors and no new warnings.
+
+## W14 — The review says what it changed, and Today says it is due
+
+### The gap, restated precisely
+
+W10 verified the mechanism end to end and the phase log records the proof:
+each chapter's spacing rung moves on its own slice — all correct advances,
+partial holds, none resets. None of that reached the reader. The result
+screen printed an accuracy figure and a subtopic table; the intervals moved
+silently. And the review was reachable only from `/learn`, which is the page
+a reader opens when they have *already* decided to read something new — so
+the one thing meant to happen before new work was behind the door to new
+work.
+
+A spaced-repetition system whose intervals are invisible is asking to be
+trusted on nothing. Worse, it is unlearnable: the reader never finds out that
+the schedule responds to them, so there is nothing to aim at.
+
+### D8 — the outcome is derived, not stored
+
+`reviewOutcome(sessionId)` reads the *before* state by replaying the same
+history the scheduler replays, stopped one session earlier
+(`chapterReviewStates({ asOf })`), and the *after* state by replaying all of
+it. Nothing new is persisted, so the sentence on the screen cannot drift from
+the schedule that is actually running — the same reason W10 derived the rungs
+instead of storing them, and still no migration.
+
+`reviewMovement()` moved into `lib/cumulative-config.ts` beside the ladder
+rule it describes, because the card's wording turns on it and a copy of the
+rule inside a component is a copy that will diverge.
+
+### What the reader now sees
+
+**On Today, above the day's drill** — "3 chapters due for review", the
+chapters named, and the button. Above the drill because the review's job is to
+detect decay in what is already proved, and four to ten questions is short
+enough to precede new work rather than replace it. Shown only when due; a
+permanent card reading "nothing due" is furniture.
+
+**On the result screen** — "What this changed": the headline, then one row per
+chapter with its slice, what happened, the rung transition, and when it comes
+back. Then the rule itself, in two sentences, on the card. The rule is stated
+*there* rather than in a help page because the moment you have just watched it
+applied is the moment it is learnable.
+
+The interval strings are read from `CHAPTER_REVIEW_STAGE_DAYS`, not typed —
+the same discipline W5d applied to the pacing checkpoints after they were
+found to be wrong by two minutes.
+
+### A copy defect found by looking, as usual
+
+The first run rendered `back to 2d` for a chapter that had missed everything
+while already on the bottom rung. It had not been *sent* back anywhere; the
+card was claiming a move that did not happen, and the headline said
+"2 chapters went back to the start". Both fixed: the chip reads
+**"still at the start"** when `stageAfter === stageBefore`, and the headline
+says chapters "are at the start" rather than "went back to" it. A test pins
+that exact case.
+
+### Verified by sitting it, in all three states
+
+`scripts/observe-review.mjs` drives the production build: read the Today card,
+start the review *from it*, answer every question, read the card off the page,
+compare against the database. `--correct` identifies each question by the
+prose of its stem — LaTeX stripped from both sides, since the page renders
+maths through KaTeX — so the "moved further out" branch is looked at rather
+than assumed.
+
+```
+  ✓ the review is offered on Today — 3 chapters due for review
+  ✓ Today's button starts the review — /drill?review=1
+  ✓ answered 6 question(s)
+  ✓ the 'What this changed' card rendered
+
+  card says:
+    What this changed · Every chapter moved further out. The next one is due
+    in 7 days. Divisibility, GCF & LCM 2/2 further out 2d → 7d back in 7d …
+
+  database says:
+    divisibility_gcf_lcm  2/2 · percent_change_chains 2/2 · rates_speed_work 2/2
+
+  ✓ every chapter's slice appears on the card
+  ✓ each chapter is given a next interval — back in 7d, back in 7d, back in 7d
+  ✓ the rule is stated on the card
+PASS
+```
+
+All three branches were read off the running build, not inferred:
+
+```
+  advanced : "Every chapter moved further out. The next one is due in 7 days."
+             "2/2  further out  2d → 7d  back in 7d"
+  held     : "Everything held its interval. A partial slice is as likely to be
+             noise as decay, so nothing was penalised."   "1/2  held  stays at 2d"
+  reset    : "1 chapter is at the start of the ladder — that is what missing
+             every question of a slice means."      "0/2  still at the start"
+```
+
+### The new gate
+
+`pnpm check:review` gained **OUTCOME**: over the most recent finished review,
+the movement and rung the card reports must equal what the ladder rule
+produces from the same slice, and the interval printed must be the one the
+chapter now sits on. It runs against *history*, so it is checked even when
+nothing is currently due — which is exactly the state right after a review,
+and the state in which a swallowed failure would be invisible. The early exit
+now honours failures instead of exiting 0.
+
+Measured on a completed all-correct review: **3 chapters reported, 0
+disagreements with the ladder.**
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Places the review is reachable from | 1 (`/learn`) | **2** (Today, above the day's drill) |
+| What the result screen says about the schedule | **nothing** | slice, movement, rung transition, next interval, and the rule |
+| Chapters whose next interval is stated after a review | **0 of 3** | **3 of 3** |
+| Copy branches read off the running build | — | **3 of 3** (advanced / held / reset) |
+| Invariants on what the card claims | **0** | 3, gated (rung, movement, interval) |
+| Schema migrations | — | **0** |
+
+*Not fixed, and stated:* with three chapters on one clock the fixture is
+either all-due or none-due, so `check:review` cannot exercise the served-set
+invariants and OUTCOME in a single run. Both were run and both passed —
+served-set on a fresh fixture, OUTCOME immediately after a completed review.
+Finding 6 (only 3 of 24 chapters reach the rotation) is untouched: it is a
+question about the entry gate, not about whether the reader is told, and it
+deserves its own decision rather than being folded in here.
+
+Acceptance: **`pnpm check:review` PASS** with OUTCOME 3 chapters, 0
+disagreements. `node scripts/observe-review.mjs --correct` PASS, 8/8 steps
+against the production build. `pnpm test` **176/176 across 21 suites** (was
+171/20) — 5 new tests pinning the movement classification at every rung,
+including the reset that lands where it started. `pnpm build` 21 routes;
+`check:traps` PASS; `check:inference` PASS; `check:tiers` PASS; `verify:bank`
+511/511; `check:a11y` 692/692 named (100%) with 5 live regions;
+`check:keyboard` 13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint`
+0 errors and no new warnings.

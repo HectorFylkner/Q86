@@ -9,9 +9,13 @@ import {
   REVIEW_PER_CHAPTER,
   dueChapters,
   nextChapterReviewStage,
+  reviewDelayDays,
+  reviewDueAt,
+  reviewMovement,
   reviewShape,
   type ChapterReviewStage,
   type ChapterReviewState,
+  type ReviewMovement,
 } from "./cumulative-config.ts";
 import { ALL_SUBTOPICS, type Subtopic } from "./taxonomy.ts";
 
@@ -24,9 +28,11 @@ export {
   dueChapters,
   nextChapterReviewStage,
   reviewDueAt,
+  reviewMovement,
   reviewShape,
   type ChapterReviewStage,
   type ChapterReviewState,
+  type ReviewMovement,
 } from "./cumulative-config.ts";
 
 /** Questions touched inside this window are not served again by a review —
@@ -102,9 +108,16 @@ function ceilingFromBands(
  * chapter-test activity. Each cumulative review it appears in then moves
  * it up, holds it, or resets it, and resets the clock.
  */
-export async function chapterReviewStates(): Promise<ChapterReviewState[]> {
+export async function chapterReviewStates(
+  { asOf }: { asOf?: number } = {},
+): Promise<ChapterReviewState[]> {
   const tests = await chapterTestStates();
-  const history = await reviewHistory();
+  const all = await reviewHistory();
+  // `asOf` replays only the reviews that had already happened at that
+  // moment, which is how the *before* half of "what this review changed" is
+  // obtained: the same replay, stopped one session earlier. Deriving it
+  // rather than storing it keeps the feature migration-free, as W10 chose.
+  const history = asOf == null ? all : all.filter((r) => r.at < asOf);
 
   const states: ChapterReviewState[] = [];
   for (const subtopic of ALL_SUBTOPICS) {
@@ -210,4 +223,88 @@ export async function selectCumulativeReview(
     questions: interleave(groups),
     chapters: plan.chapters.map((c) => c.subtopic),
   };
+}
+
+
+/**
+ * What a finished cumulative review changed, chapter by chapter.
+ *
+ * The mechanism has been verified end to end since W10 — each chapter's
+ * spacing rung moves on its own slice of the result — but the result screen
+ * showed accuracy and a subtopic table and said none of it. A spaced-
+ * repetition system whose intervals are invisible is asking to be trusted on
+ * nothing, and the reader has no way to learn that the schedule is
+ * responding to them. This is the read model behind saying so.
+ *
+ * Both halves come from the same replay: the state as it stood the instant
+ * before this session, and the state now. Nothing is stored, so the sentence
+ * on the screen cannot drift from the schedule that is actually running.
+ */
+export type ChapterReviewOutcome = {
+  subtopic: Subtopic;
+  correct: number;
+  total: number;
+  stageBefore: ChapterReviewStage;
+  stageAfter: ChapterReviewStage;
+  movement: ReviewMovement;
+  /** Days until this chapter comes back, from the rung it now sits on. */
+  intervalDays: number;
+  nextDueAt: number;
+};
+
+export async function reviewOutcome(
+  sessionId: number,
+): Promise<ChapterReviewOutcome[] | null> {
+  const row = await db
+    .select({
+      config: sessions.config,
+      summary: sessions.summary,
+      startedAt: sessions.startedAt,
+      endedAt: sessions.endedAt,
+    })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .get();
+  if (!row) return null;
+
+  const config = row.config as { cumulative_review?: boolean; chapters?: string[] };
+  if (!config.cumulative_review) return null;
+
+  const summary = (row.summary ?? {}) as {
+    bySubtopic?: Record<string, { correct: number; total: number }>;
+  };
+  const at = (row.endedAt ?? row.startedAt).getTime();
+
+  const before = new Map(
+    (await chapterReviewStates({ asOf: at })).map((s) => [s.subtopic, s]),
+  );
+  const after = new Map(
+    (await chapterReviewStates()).map((s) => [s.subtopic, s]),
+  );
+
+  const out: ChapterReviewOutcome[] = [];
+  for (const raw of config.chapters ?? []) {
+    const subtopic = raw as Subtopic;
+    const cell = summary.bySubtopic?.[subtopic];
+    const now = after.get(subtopic);
+    if (!cell?.total || !now) continue;
+    const was = before.get(subtopic);
+    const stageBefore = was?.stage ?? 0;
+    out.push({
+      subtopic,
+      correct: cell.correct,
+      total: cell.total,
+      stageBefore,
+      stageAfter: now.stage,
+      movement: reviewMovement(stageBefore, now.stage, cell.correct),
+      intervalDays: reviewDelayDays(now.stage),
+      nextDueAt: reviewDueAt(now),
+    });
+  }
+  // Worst first: the chapter that lost ground is the one to act on, and a
+  // list sorted by what happened reads as a verdict rather than a log.
+  const rank: Record<ReviewMovement, number> = { reset: 0, held: 1, advanced: 2 };
+  return out.sort(
+    (a, b) => rank[a.movement] - rank[b.movement] || a.correct - b.correct,
+  );
 }

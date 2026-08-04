@@ -12,6 +12,7 @@ import {
   reviewShape,
   type ChapterReviewStage,
   type ChapterReviewState,
+  reviewMovement,
 } from "../lib/cumulative-config.ts";
 import { STAGE_DELAY_DAYS } from "../lib/redo.ts";
 import type { Subtopic } from "../lib/taxonomy.ts";
@@ -153,5 +154,54 @@ describe("cumulative review — the schedule", () => {
     for (let i = 1; i < gaps.length; i++) {
       assert.ok(gaps[i] > gaps[i - 1], "intervals must grow");
     }
+  });
+});
+
+/**
+ * The wording on the result card turns on this classification, so it is
+ * pinned beside the ladder rule rather than left to the component. The case
+ * that matters is the last one: a chapter that misses everything while
+ * already on the bottom rung has not been *sent* anywhere, and a card that
+ * says it has is claiming a move that did not happen.
+ */
+describe("review movement, as the card reports it", () => {
+  test("all correct reads as advanced, at every rung below the top", () => {
+    for (const stage of [0, 1] as const) {
+      const after = nextChapterReviewStage(stage, 2, 2);
+      assert.equal(reviewMovement(stage, after, 2), "advanced");
+    }
+  });
+
+  test("a partial slice holds, and is never called a reset", () => {
+    for (const stage of [0, 1, 2] as const) {
+      const after = nextChapterReviewStage(stage, 1, 2);
+      assert.equal(after, stage);
+      assert.equal(reviewMovement(stage, after, 1), "held");
+    }
+  });
+
+  test("missing everything reads as a reset from any rung above the bottom", () => {
+    for (const stage of [1, 2] as const) {
+      const after = nextChapterReviewStage(stage, 0, 2);
+      assert.equal(after, 0);
+      assert.equal(reviewMovement(stage, after, 0), "reset");
+      assert.notEqual(after, stage, "a reset from above the bottom must move");
+    }
+  });
+
+  test("the top rung holds rather than advancing past the ladder", () => {
+    const top = (CHAPTER_REVIEW_STAGE_DAYS.length - 1) as 0 | 1 | 2;
+    const after = nextChapterReviewStage(top, 2, 2);
+    assert.equal(after, top);
+    assert.equal(reviewMovement(top, after, 2), "held");
+  });
+
+  test("a reset that lands on the rung it started from is flagged as unmoved", () => {
+    const after = nextChapterReviewStage(0, 0, 2);
+    assert.equal(after, 0);
+    assert.equal(reviewMovement(0, after, 0), "reset");
+    // The component reads `stageAfter !== stageBefore` to decide between
+    // "back to the start" and "still at the start"; this is that condition.
+    assert.equal(after !== 0, false);
   });
 });

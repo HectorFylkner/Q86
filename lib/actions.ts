@@ -22,7 +22,8 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
-import { selectCumulativeReview } from "./cumulative.ts";
+import { reviewOutcome, selectCumulativeReview } from "./cumulative.ts";
+import type { ChapterReviewOutcome } from "./cumulative.ts";
 import { REVIEW_MIN_CHAPTERS, REVIEW_PER_CHAPTER } from "./cumulative-config.ts";
 import { selectDiagnostic } from "./diagnostic.ts";
 import { TIER_MIN_SIZE, type ChapterTier } from "./chapter-test-config.ts";
@@ -323,6 +324,14 @@ export async function suggestErrorType(input: {
   attemptId: number;
 }): Promise<Attribution | null> {
   return attributionForAttempt(input.attemptId);
+}
+
+/** What a finished cumulative review moved, for the result screen. Null when
+ *  the session was not a review. */
+export async function cumulativeReviewOutcome(
+  sessionId: number,
+): Promise<ChapterReviewOutcome[] | null> {
+  return reviewOutcome(sessionId);
 }
 
 export async function finishSession(

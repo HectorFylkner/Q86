@@ -15,9 +15,10 @@ import {
   latestDiagnostic,
 } from "@/lib/diagnostic";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
+import { reviewPlan } from "@/lib/cumulative";
 import { findResumable, todaysQueueThenDrill } from "@/lib/resume";
 import { baselineWeakness, getSetting } from "@/lib/settings";
-import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
+import { SKILL_SHORT_LABELS, SKILL_LABELS, SUBTOPIC_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,7 @@ export default async function TodayPage() {
     : cadence - (inputs.dayIndex % cadence);
   const deck = await todaysDeck();
   const resumable = await findResumable();
+  const review = await reviewPlan();
   const planDrillIds = verifiedCount > 0 ? await selectPlanDrillIds(plan) : [];
   const today = await todaysQueueThenDrill(planDrillIds);
   const deckWaiting = deck.due + deck.fresh;
@@ -174,6 +176,48 @@ export default async function TodayPage() {
             >
               Resume {resumable.remainingCount} question
               {resumable.remainingCount === 1 ? "" : "s"} →
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Cumulative review sits above the day's drill because it is the
+          thing that should happen *before* new work, not instead of it — its
+          job is to detect decay in what has already been proved, and four to
+          ten questions is short enough to precede a chapter. It was reachable
+          only from /learn, which is the one page a reader opens when they
+          have already decided to read something new. Shown only when due; a
+          permanent card reading "nothing due" is furniture. */}
+      {review.available && (
+        <section className="rounded-card border border-amber/50 bg-amber/5 px-4 py-4 shadow-ambient">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-title font-semibold">
+                {review.chapters.length} chapter
+                {review.chapters.length === 1 ? "" : "s"} due for review
+              </h2>
+              <p className="mt-0.5 max-w-[62ch] text-caption text-graphite">
+                {review.questions} questions, interleaved, from chapters you
+                have already passed —{" "}
+                <span className="font-medium text-ink">
+                  {review.chapters
+                    .slice(0, 3)
+                    .map((c) => SUBTOPIC_LABELS[c.subtopic])
+                    .join(", ")}
+                  {review.chapters.length > 3
+                    ? ` and ${review.chapters.length - 3} more`
+                    : ""}
+                </span>
+                . Each one moves further out, holds, or comes back sooner
+                depending on how it goes.
+              </p>
+            </div>
+            <Link
+              href="/drill?review=1"
+              className="inline-flex min-h-[44px] shrink-0 items-center rounded-control bg-amber px-4 py-2 text-body font-medium text-paper transition-opacity hover:opacity-90"
+            >
+              Review {review.questions} question
+              {review.questions === 1 ? "" : "s"} →
             </Link>
           </div>
         </section>

@@ -12,7 +12,14 @@ import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { ErrorAttribution } from "@/components/drill/error-attribution";
 import { SolutionPanel } from "@/components/drill/solution-panel";
 import { ResultStroke } from "@/components/drill/result-stroke";
-import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
+import {
+  cumulativeReviewOutcome,
+  finishSession,
+  logAttempt,
+  tagAttempt,
+} from "@/lib/actions";
+import { ReviewOutcomeCard } from "@/components/drill/review-outcome";
+import type { ChapterReviewOutcome } from "@/lib/cumulative";
 import {
   CHAPTER_TIERS,
   TIER_SPEC,
@@ -56,6 +63,7 @@ export function QuestionRunner({
   focus = "focused",
   test,
   tier = "foundation",
+  review = false,
   onRestart,
 }: {
   sessionId: number;
@@ -67,6 +75,9 @@ export function QuestionRunner({
   test?: Subtopic | null;
   /** Which tier of that chapter test. */
   tier?: ChapterTier;
+  /** Set when this run is a cumulative review, so the result screen can say
+   *  what it moved. */
+  review?: boolean;
   onRestart?: () => void;
 }) {
   const router = useRouter();
@@ -80,6 +91,7 @@ export function QuestionRunner({
   const [results, setResults] = useState<Result[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [flagSignal, setFlagSignal] = useState(0);
+  const [outcome, setOutcome] = useState<ChapterReviewOutcome[] | null>(null);
   const startRef = useRef(Date.now());
 
   const question = questions[index];
@@ -191,10 +203,16 @@ export function QuestionRunner({
         bySkill,
         bySubtopic,
       };
-      finishSession(sessionId, summary).catch(() => {});
+      // The outcome is read *after* the summary lands, because the rungs are
+      // replayed from it — asking earlier would report the state this review
+      // has not yet changed.
+      finishSession(sessionId, summary)
+        .then(() => (review ? cumulativeReviewOutcome(sessionId) : null))
+        .then((res) => setOutcome(res))
+        .catch(() => {});
       setPhase("done");
     }
-  }, [phase, index, questions, results, sessionId]);
+  }, [phase, index, questions, results, sessionId, review]);
 
   const tagError = useCallback(
     (
@@ -293,6 +311,7 @@ export function QuestionRunner({
     const unlockedNext = passed ? CHAPTER_TIERS[tierIndex + 1] : undefined;
     return (
       <div className="space-y-4">
+        {outcome && <ReviewOutcomeCard outcome={outcome} />}
         {test != null && (
           <div
             className={cn(

@@ -219,6 +219,7 @@ export function DrillClient({
         focus={stage.focus}
         test={stage.test}
         tier={stage.tier}
+        review={autoStartReview}
         onRestart={() => setStage({ kind: "setup", error: null })}
       />
     );

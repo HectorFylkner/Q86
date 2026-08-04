@@ -136,3 +136,22 @@ export function reviewShape(due: ChapterReviewState[]): {
 export function daysOverdue(state: ChapterReviewState, now: number): number {
   return Math.max(0, Math.floor((now - reviewDueAt(state)) / 86_400_000));
 }
+
+/**
+ * How a chapter's slice reads on the result screen.
+ *
+ * Kept pure and beside the ladder rule it describes, because the card's
+ * wording turns on it: a chapter that misses everything while already on the
+ * bottom rung is at the start, not sent back to it, and saying otherwise
+ * claims a move that did not happen.
+ */
+export type ReviewMovement = "advanced" | "held" | "reset";
+
+export function reviewMovement(
+  stageBefore: ChapterReviewStage,
+  stageAfter: ChapterReviewStage,
+  correct: number,
+): ReviewMovement {
+  if (stageAfter > stageBefore) return "advanced";
+  return correct === 0 ? "reset" : "held";
+}
