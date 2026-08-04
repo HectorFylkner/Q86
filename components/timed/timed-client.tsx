@@ -9,6 +9,7 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import { ConfidencePicker } from "@/components/drill/confidence-picker";
 import { TimeInkBar } from "@/components/timed/time-ink-bar";
 import { ReviewGrid } from "@/components/timed/review-grid";
+import type { EditRecord } from "@/lib/edit-record";
 import { MarkingSummary } from "@/components/timed/marking-summary";
 import {
   saveTimedSession,
@@ -58,9 +59,12 @@ type Stage =
 export function TimedClient({
   verifiedTotal,
   autoStart,
+  editRecord = null,
 }: {
   verifiedTotal: number;
   autoStart?: TimedKind | null;
+  /** The reader's own Review & Edit ledger, read on the server. */
+  editRecord?: EditRecord | null;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "config", error: null });
   const autoStartedRef = useRef(false);
@@ -563,6 +567,7 @@ export function TimedClient({
           answers={answers}
           bookmarks={bookmarks}
           edits={editRecords}
+          record={editRecord}
           onToggleBookmark={toggleBookmark}
           onCommitEdit={(questionIndex, toIndex, reason, justification) => {
             const q = questions[questionIndex];

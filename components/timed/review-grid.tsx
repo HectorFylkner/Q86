@@ -7,6 +7,7 @@ import { ChoiceList } from "@/components/drill/choice-list";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import type { EditRecord } from "@/lib/edit-record";
 import {
   EDIT_REASONS,
   EDIT_REASON_LABELS,
@@ -27,6 +28,7 @@ export function ReviewGrid({
   answers,
   bookmarks,
   edits,
+  record = null,
   onToggleBookmark,
   onCommitEdit,
   onSubmit,
@@ -35,6 +37,8 @@ export function ReviewGrid({
   answers: (AnswerRecord | null)[];
   bookmarks: boolean[];
   edits: TimedEditInput[];
+  /** The reader's own edit ledger. Null before it has been read. */
+  record?: EditRecord | null;
   onToggleBookmark: (index: number) => void;
   onCommitEdit: (
     questionIndex: number,
@@ -212,8 +216,8 @@ export function ReviewGrid({
           </span>
         </div>
         <p className="mt-1 text-sm text-graphite">
-          Your record: quant edits have destroyed more points than they
-          earned. Open a question only if you can name a specific error.
+          <EditRecordLine record={record} /> Open a question only if you can
+          name a specific error.
         </p>
         <div className="mt-4 grid grid-cols-7 gap-2">
           {questions.map((q, i) => (
@@ -257,5 +261,58 @@ export function ReviewGrid({
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * What this reader's edits have actually done.
+ *
+ * This line used to be a fixed string — "Your record: quant edits have
+ * destroyed more points than they earned" — with nothing behind it. On a
+ * fresh database it described a history that did not exist; on a populated
+ * one it could be, and was, the opposite of what the ledger said. The
+ * caution it carried is right and is kept; the claim about the reader is now
+ * read from their own `edits` rows or not made at all.
+ */
+function EditRecordLine({ record }: { record: EditRecord | null }) {
+  if (!record || record.total === 0) {
+    return (
+      <>
+        You have not changed an answer under exam conditions yet, so there is
+        nothing to say about your record — which is itself the reason to be
+        careful here.
+      </>
+    );
+  }
+  if (record.net < 0) {
+    return (
+      <>
+        Your record: {record.total} edit{record.total === 1 ? "" : "s"},{" "}
+        {record.rescued} rescued and{" "}
+        <span className="font-medium text-redpen">
+          {record.destroyed} destroyed a right answer
+        </span>{" "}
+        — net {record.net}.
+        {record.worstReason
+          ? ` Most of the damage came from "${record.worstReason.label}".`
+          : ""}
+      </>
+    );
+  }
+  if (record.net === 0) {
+    return (
+      <>
+        Your record: {record.total} edit{record.total === 1 ? "" : "s"},{" "}
+        {record.rescued} rescued and {record.destroyed} destroyed a right
+        answer — net zero, so editing has neither helped nor hurt you yet.
+      </>
+    );
+  }
+  return (
+    <>
+      Your record: {record.total} edit{record.total === 1 ? "" : "s"},{" "}
+      <span className="font-medium text-good">{record.rescued} rescued</span>{" "}
+      and {record.destroyed} destroyed a right answer — net +{record.net}.
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { TimedClient } from "@/components/timed/timed-client";
 import { SectionTabs } from "@/components/section-tabs";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
+import { editRecord } from "@/lib/edit-record";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,6 +23,10 @@ export default async function TimedPage({
         .get()
     )?.n ?? 0;
 
+  // Read on the server so the review screen can state the reader's actual
+  // edit record instead of asserting one.
+  const record = await editRecord();
+
   return (
     <div className="space-y-4">
       <SectionTabs group="practice" />
@@ -29,6 +34,7 @@ export default async function TimedPage({
       <TimedClient
         verifiedTotal={verifiedTotal}
         autoStart={start === "full" || start === "mini" ? start : null}
+        editRecord={record}
       />
     </div>
   );

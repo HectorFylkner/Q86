@@ -32,10 +32,13 @@ import { CHAPTER_TIERS, type ChapterTier } from "@/lib/chapter-test-config";
 import { chapterTransfer } from "@/lib/chapter-transfer";
 import { parseLesson } from "@/lib/lesson-parse";
 import {
+  isMethodSlug,
   isTechniqueSlug,
+  methodDrillHref,
   listLessons,
   listTechniques,
   readLesson,
+  readMethod,
   readTechnique,
   techniqueDrillHref,
 } from "@/lib/lessons";
@@ -72,12 +75,15 @@ export default async function LessonPage({
   params: Promise<{ subtopic: string }>;
 }) {
   const { subtopic } = await params;
-  const technique = isTechniqueSlug(subtopic);
+  const method = isMethodSlug(subtopic);
+  const technique = isTechniqueSlug(subtopic) || method;
   if (!technique && !ALL_SUBTOPICS.includes(subtopic as Subtopic)) notFound();
 
-  const lesson = technique
-    ? readTechnique(subtopic)
-    : readLesson(subtopic as Subtopic);
+  const lesson = method
+    ? readMethod(subtopic)
+    : isTechniqueSlug(subtopic)
+      ? readTechnique(subtopic)
+      : readLesson(subtopic as Subtopic);
   if (!lesson) notFound();
 
   const parsed = parseLesson(lesson.body);
@@ -345,9 +351,11 @@ export default async function LessonPage({
             subtopic={subtopic}
             items={parsed.checklist}
             drill={
-              technique
-                ? techniqueDrillHref(subtopic)
-                : { href: `/drill?sub=${subtopic}&d=3`, label: "Drill this now →" }
+              method
+                ? methodDrillHref(subtopic)
+                : isTechniqueSlug(subtopic)
+                  ? techniqueDrillHref(subtopic)
+                  : { href: `/drill?sub=${subtopic}&d=3`, label: "Drill this now →" }
             }
             test={
               technique

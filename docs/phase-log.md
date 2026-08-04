@@ -2226,3 +2226,143 @@ including the reset that lands where it started. `pnpm build` 21 routes;
 511/511; `check:a11y` 692/692 named (100%) with 5 live regions;
 `check:keyboard` 13/13; `check:contrast` 60/60; `tsc` clean; `pnpm lint`
 0 errors and no new warnings.
+
+## W15 — The two cross-cutting chapters, and a false claim about the reader
+
+### A live defect found while researching the chapter
+
+Writing the Review & Edit chapter meant reading the mechanic the platform
+already implements, and the review screen carries this sentence:
+
+> *"Your record: quant edits have destroyed more points than they earned."*
+
+It is a fixed string. `ReviewGrid` receives only the current section's
+in-flight edits — no outcome is known yet — and nothing else. **The component
+had never read the record it was reporting.**
+
+On a fresh database it asserts a history that does not exist. On the seeded
+fixture it is not merely unsupported, it is backwards: the ledger holds 16
+edits, **11 rescued a wrong answer and 0 destroyed a right one**, net **+11**.
+The platform was telling this reader their edits were costing them points
+while their own `edits` rows said the opposite, and the one thing a reader can
+check about a claim like that is whether it is true of them.
+
+This is the same class as W11's two defects and was found the same way — by
+looking at what the page says rather than at what the function returns.
+
+**Fixed.** `lib/edit-record.ts` reads the ledger: rescued / destroyed /
+neutral, net, and per stated reason, casual sessions excluded like every other
+statistic. The advice the sentence carried — *open a question only if you can
+name a specific error* — is right and is kept; only the claim about the reader
+changed. Both branches were read off the running build:
+
+```
+  with a record : "Your record: 16 edits, 11 rescued and 0 destroyed a right
+                   answer — net +11. Open a question only if you can name a
+                   specific error."
+  day one       : "You have not changed an answer under exam conditions yet,
+                   so there is nothing to say about your record — which is
+                   itself the reason to be careful here."
+```
+
+The negative branch is written too — it names the reason with the worst net,
+because "your edits cost you points" is only actionable if it says *which
+reason* did the damage.
+
+### The two chapters
+
+Ranked second for three sessions. `content/method/`, same `/learn/[slug]`
+route, same `parseLesson()` seven-section contract, and **no new nav entry** —
+the slugs are disjoint from the subtopic keys, so Learn gained a third group
+rather than the product gaining a sixth destination.
+
+**`method-error-types` — The Six Misses: Naming What Went Wrong So You Repair
+The Right Thing.** The error vocabulary as a chapter. It is the same rubric
+`content/TRAP-VOCABULARY.md` fixes for the classifier and the hand labels, so
+the chapter, the trap gallery, the miss bridge and the inference now speak one
+language by construction rather than by care. The organising question is the
+rubric's: *what would have to change for this to stop happening?* Its "prove
+it" button goes to the redo queue — the place open misses are actually
+labelled.
+
+**`method-review-edit` — Review & Edit: Three Changes, And How To Spend
+Them.** The exam mechanic the platform models faithfully and taught nowhere.
+Three edits, the entry test (*"I answered X because I did Y, and Y is wrong
+because…"* — if the sentence will not finish, close the question), why the
+justification box exists, and why a good record is not a reason to fill the
+budget. Its third worked example is the reader's own ledger arithmetic. Its
+"prove it" button starts a timed section, which is the only place the skill
+exists.
+
+**Pacing triage and abandon rules are deliberately absent.** They are
+`technique-bail`, in full, with the four derived checkpoints. A second chapter
+restating them would be duplication rather than coverage — the same reasoning
+that made the technique layer four chapters instead of six. The brief's
+finding named all three; two of them were already written, and saying so is
+more useful than writing them twice.
+
+### Every number in both chapters recomputed independently
+
+The invariant is that no formula, worked example or numeric claim ships
+without being recomputed by a route other than the one that wrote it. All ten
+checked:
+
+```
+OK  Ex1 still-water speed 12, current 3   (brute-force search over halves,
+    not by solving the system: 12+3=15 downstream, 12−3=9 upstream)
+OK  Ex2 +25% then −20% nets exactly 0%    (integer cents, one percent added
+    at a time, never a composed multiplier)
+OK  Ex3 17/20 = 85%; 40/120 = 1/3, under half
+OK  core idea 2: (−1/2)² = 0.25 > −0.5
+OK  Review&Edit Ex1 3:30 = 210 s; 210/4 = 52.5 ("just over 52"); 40+60 = 100
+OK  Review&Edit Ex3 11 − 0 = +11 over 16 edits — read from the real ledger
+```
+
+One correction was made before shipping: the draft said "about $52$ seconds
+each" where $210/4 = 52.5$, so it now reads "just over $52$".
+
+### The new audit
+
+`pnpm check:chapters` measures the curriculum's shape across all 30 chapters
+and gates two properties:
+
+- **PARSES** — every chapter satisfies the seven-section contract, and every
+  worked example has a question, a body *and* an answer line. This failure is
+  otherwise silent: a deviating file still returns 200 and renders as a wall
+  of markdown.
+- **FLOOR** — no chapter falls below the shape the curriculum is written to
+  (≥5 core ideas, ≥3 worked examples, ≥5 cues, ≥5 traps, ≥4 speed moves, ≥5
+  checklist items).
+
+And it prints **DENSITY**, which is finding 7 measured rather than asserted:
+
+| | Value |
+| --- | ---: |
+| Chapters | **30** (24 concept · 4 technique · 2 method) |
+| Core ideas | **317** |
+| Worked examples | **90** |
+| Density | **one worked example per 3.5 core ideas** |
+| Worst chapter | `overlapping_sets`, 13 ideas to 3 examples |
+
+Deliberately **not** gated. The fix is authoring, and a density gate would
+only stop new chapters being written — the opposite of what finding 7 wants.
+
+### Measured before → after
+
+| | Before | After |
+| --- | ---: | ---: |
+| Cross-cutting chapters | **0** | **2** |
+| Chapters in Learn | 28 | **30** |
+| Top-level nav entries | 5 | **5** (a group inside Learn, not a destination) |
+| Claims about the reader's edit record that read the record | **0 of 1** | **1 of 1** |
+| Curriculum-shape invariants under a gate | **0** | **2** (PARSES, FLOOR) |
+| Chapters whose parse failure would be silent | **28** | **0** |
+
+Acceptance: **`pnpm check:chapters` PASS** — 30/30 parse, 30/30 clear the
+shape floor, density 317/90 reported. All routes 200 including both new
+chapters; both render the seven markdown sections and none of the three
+bank-derived ones (they have no subtopic). `pnpm test` 176/176 across 21
+suites; `pnpm build` 21 routes; `check:traps` PASS; `check:inference` PASS;
+`check:tiers` PASS; `check:review` PASS; `verify:bank` 511/511; `check:a11y`
+**694/694 named (100%)** with 5 live regions; `check:keyboard` 13/13;
+`check:contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors and no new warnings.

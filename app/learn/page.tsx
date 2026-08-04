@@ -6,7 +6,7 @@ import {
 } from "@/lib/chapter-tests";
 import { CHAPTER_TIERS, TIER_SPEC } from "@/lib/chapter-test-config";
 import { daysOverdue, reviewPlan } from "@/lib/cumulative";
-import { listLessons, listTechniques } from "@/lib/lessons";
+import { listLessons, listMethods, listTechniques } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +53,7 @@ function TierBadge({ state }: { state?: ChapterTestState }) {
 export default async function LearnPage() {
   const lessons = listLessons();
   const techniques = listTechniques();
+  const methods = listMethods();
   const tests = await chapterTestStates();
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   const review = await reviewPlan();
@@ -72,8 +73,8 @@ export default async function LearnPage() {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="font-display text-xl font-semibold">Learn</h1>
           <p className="text-xs text-graphite">
-            {techniques.length} technique chapters and {lessons.length} concept
-            chapters, one per drillable subtopic
+            {techniques.length} technique and {methods.length} method chapters,
+            plus {lessons.length} concept chapters — one per drillable subtopic
             {passedCount > 0 &&
               ` — ${passedCount} test${passedCount === 1 ? "" : "s"} passed`}
             .
@@ -83,6 +84,7 @@ export default async function LearnPage() {
           <LearnPrepared
             subtopics={[
               ...techniques.map((t) => t.slug),
+              ...methods.map((m) => m.slug),
               ...lessons.map((l) => l.subtopic),
             ]}
           />
@@ -188,6 +190,50 @@ export default async function LearnPage() {
                   <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
                     <span>~{technique.minutes} min</span>
                     <ReadBadge subtopic={technique.slug} />
+                  </span>
+                </span>
+                <span
+                  className="mt-0.5 text-graphite/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  aria-hidden
+                >
+                  →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Method after technique and before content. Neither a subtopic nor a
+          solution path: how a miss becomes the right repair, and how the
+          exam's own scored mechanic is spent. They are read once and then
+          used every day, which is why they sit above the 24 rather than
+          inside them. */}
+      {methods.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-baseline gap-2">
+            <h2 className="font-display text-sm font-semibold">Method</h2>
+            <span className="font-mono text-[11px] text-graphite">
+              how to run the exam, and how to repair a miss
+            </span>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {methods.map((chapter, i) => (
+              <Link
+                key={chapter.slug}
+                href={`/learn/${chapter.slug}`}
+                className="group flex items-start gap-3 rounded-card border border-grid border-l-2 border-l-amber/60 bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-amber/60 hover:bg-highlight/40"
+              >
+                <span className="mt-0.5 font-mono text-[11px] text-amber">
+                  M{i + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium transition-colors group-hover:text-ballpoint">
+                    {chapter.title}
+                  </span>
+                  <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
+                    <span>~{chapter.minutes} min</span>
+                    <ReadBadge subtopic={chapter.slug} />
                   </span>
                 </span>
                 <span

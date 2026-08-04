@@ -24,6 +24,7 @@ export type LessonMeta = {
 
 const LESSONS_DIR = path.join(process.cwd(), "content", "lessons");
 const TECHNIQUES_DIR = path.join(process.cwd(), "content", "techniques");
+const METHOD_DIR = path.join(process.cwd(), "content", "method");
 
 /**
  * Technique chapters — the cross-cutting half of the curriculum.
@@ -106,6 +107,69 @@ export function listTechniques(): TechniqueMeta[] {
   const out: TechniqueMeta[] = [];
   for (const slug of TECHNIQUE_SLUGS) {
     const chapter = readTechnique(slug);
+    if (!chapter) continue;
+    out.push({
+      slug,
+      title: chapter.title,
+      minutes: Math.max(3, Math.round(chapter.body.split(/\s+/).length / 200)),
+    });
+  }
+  return out;
+}
+
+/**
+ * Method chapters — the skills that decide points at the margin.
+ *
+ * Neither a subtopic nor a solution technique. The six-error vocabulary is
+ * how a miss becomes the right repair, and Review & Edit is a scored exam
+ * mechanic this platform models faithfully and taught nowhere. Both lived
+ * only in tooltips, and both were the number-two ranked gap for three
+ * sessions.
+ *
+ * Pacing triage and the abandon rules are deliberately *not* here: they are
+ * `technique-bail`, in full, and a second chapter restating them would be
+ * duplication rather than coverage — the same reasoning that made the
+ * technique layer four chapters instead of six.
+ *
+ * Same `/learn/[slug]` route, same `parseLesson()` contract, same seven
+ * sections. The slugs are disjoint from the subtopic keys, so nothing
+ * collides and no new nav entry appears.
+ */
+export const METHOD_SLUGS = ["method-error-types", "method-review-edit"] as const;
+export type MethodSlug = (typeof METHOD_SLUGS)[number];
+
+export function isMethodSlug(slug: string): slug is MethodSlug {
+  return (METHOD_SLUGS as readonly string[]).includes(slug);
+}
+
+export function readMethod(
+  slug: MethodSlug,
+): { title: string; body: string } | null {
+  const file = path.join(METHOD_DIR, `${slug}.md`);
+  if (!fs.existsSync(file)) return null;
+  const raw = fs.readFileSync(file, "utf8").trim();
+  const lines = raw.split("\n");
+  return {
+    title: lines[0]?.replace(/^#\s+/, "").trim() || slug,
+    body: lines.slice(1).join("\n").trim(),
+  };
+}
+
+/** Where a method chapter's "prove it" button goes. Neither teaches a
+ *  solution path, so both point at the surface where the skill is actually
+ *  exercised. */
+export function methodDrillHref(slug: MethodSlug): { href: string; label: string } {
+  return slug === "method-review-edit"
+    ? { href: "/timed?start=full", label: "Run a timed section →" }
+    : { href: "/queue", label: "Go label your open misses →" };
+}
+
+export type MethodMeta = { slug: MethodSlug; title: string; minutes: number };
+
+export function listMethods(): MethodMeta[] {
+  const out: MethodMeta[] = [];
+  for (const slug of METHOD_SLUGS) {
+    const chapter = readMethod(slug);
     if (!chapter) continue;
     out.push({
       slug,
