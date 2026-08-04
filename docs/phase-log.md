@@ -1793,3 +1793,144 @@ exist yet; the mechanism records it, but no real overrides have
 accumulated. Finding 7 (`/analytics` First Load JS, 233 kB) and finding 3
 (the 62 Data Sufficiency items) are both untouched this session and are
 described in the ranked list above.
+
+---
+
+# Session 4 — the diagnosis loop, measured
+
+**Goal.** Findings 1 and 2 first: the platform's strongest diagnostic
+evidence was missing for most wrong answers, and the one observation that
+would let the inference be fitted was being discarded as it was produced.
+Both are the diagnosis failing quietly, which is worse than failing loudly.
+
+## W12 — The trap classifier, measured rather than widened
+
+### What the handoff said, and what was actually true
+
+The handoff reported that `classifyTrap()` labels **865 of 2,044** trap
+sentences (42.3%) and that the other 58% contribute nothing. Both numbers
+reproduce exactly (`pnpm check:traps`, written before anything changed).
+
+But nobody had ever asked the other question, and it is the one that
+matters: **of the labels it did assign, how many were right?** So a
+hand-labelled gold set was built — 300 sentences drawn proportionally
+across subtopics by `scripts/sample-traps.ts`, split in half before any of
+them was read, and labelled against a written rubric
+(`content/TRAP-VOCABULARY.md`) rather than by feel.
+
+Measured on that sample, the classifier's precision was **64.1%**. More
+than a third of the labels it assigned were *wrong*. The finding was not
+"42% coverage with a conservative classifier"; it was 42% coverage at
+two-thirds precision — a signal that `lib/error-inference.ts` weighted at
+1.0 as its strongest evidence, above declared confidence and time on task.
+That reframes the work from a widening to a rewrite.
+
+### D5 — precision is gated, and coverage cannot be bought with wrong labels
+
+**Recorded before the change, as the trap-classifier behaviour is
+load-bearing for the diagnosis.** The brief named two ways to close the
+gap — widen the classifier, or constrain the authoring vocabulary — and
+warned that loosening until the number looks good is the failure mode.
+Both were taken, and a third thing was added so the failure mode is
+detectable rather than merely deprecated: **the audit gates precision on a
+blind split, so a rule that buys coverage with wrong labels fails the
+check.**
+
+`lib/trap-classify.ts` is now an ordered list of named rules reading the
+rubric's bands from most to least specific — the clock and underived
+choices, then execution slips, then answering a different question, then
+the sufficiency procedure on two-statement items, then false general
+beliefs, then wrong models. First match wins, and a sentence matching
+nothing still returns null.
+
+### The measurement protocol, and what round 1 cost
+
+Round 1 tuned the rules on a dev half of 150 and then ran once, blind,
+against a holdout half of 150:
+
+| | dev (tuned on) | holdout (blind) |
+| --- | ---: | ---: |
+| Precision | **86.8%** | **69.3%** |
+
+**A 17.5-point overfitting gap.** That is the number the whole exercise
+exists to expose: without the blind half, 86.8% would have been reported
+as the result and the classifier would have shipped believing itself 17
+points better than it was.
+
+So round 2 folded both halves into a 300-sentence training set, fixed the
+rules against all of it, and drew a **fresh 150** from the 1,743 sentences
+neither split had touched. Those were hand-labelled *before* the classifier
+was run over them, and no rule was edited afterwards.
+
+### Measured before → after
+
+| | Before | After | How |
+| --- | ---: | ---: | --- |
+| Trap sentences carrying a label | 865/2,044 = **42.3%** | 1,849/2,044 = **90.5%** | `pnpm check:traps` |
+| Precision, blind split | **64.1%** (round-1 dev, and the only number that existed) | **73.5%** | 150 hand-labelled, unseen |
+| Precision, `named`-tier labels | — | **87.5%** | same |
+| Precision, `inferred`-tier labels | — | **63.2%** | same |
+| Subtopic with the worst coverage | `prime_factorization` 23.8% | worst is now 80.0% | per-subtopic table |
+| Error types the classifier could ever emit | 4 of 6 | **6 of 6** | `time_pressure`, `guess` were unreachable |
+| Hand-labelled reference sentences | 0 | **450** | `content/trap-gold.json` |
+
+### The tier, and why the inference now discounts itself
+
+Per-rule precision on the gold set separates cleanly, and the split
+survives on unseen data — which is what makes it a design rather than a
+story:
+
+- **`named`** — the matched phrase names the mistake's category out loud
+  ("sign slip", "answers with … instead of", "granting (2)"). **87.5%** on
+  the blind split, 914 of the bank's labels.
+- **`inferred`** — the matched phrase only describes the operation
+  performed, and the category is deduced from it ("instead of", "treats",
+  a leading arithmetic verb). **63.2%**, 935 labels.
+
+`attributeError()` now weights the distractor signal by that tier — 1.0
+named, 0.6 inferred — instead of a flat 1.0. Both weights are the measured
+precision rounded **down**, and a test asserts they never exceed it, so
+this signal cannot claim more than the audit can show. Concretely: an
+inferred label no longer outranks a locked-in confidence on its own, which
+is exactly the case where the old code was most likely to be confidently
+wrong. The evidence sentence shown in the panel is worded differently for
+the two tiers, so the reader is told which kind of reading produced it.
+
+### Constraining the vocabulary, so the number can only improve
+
+`verifyAndAppend()` gained a third gate beside the independent `check()`
+and the computed distractor reachability: **every `trap_map` sentence must
+classify**, or the batch fails. Verified by probe — a batch whose four
+distractors are labelled "The number 12." and so on is rejected with four
+named failures and exit 1. `content/TRAP-VOCABULARY.md` is the rubric that
+gate points at, and it is the same document the hand labels were assigned
+against, so the authoring standard and the measurement standard are one
+text.
+
+### What is still wrong, stated plainly
+
+- **26.5% of the labels on the blind split are wrong**, concentrated in the
+  inferred tier. The confusion table says where: 26 sentences a human read
+  as `misread` were labelled `setup_error`, and 22 read as `content_gap`
+  went the same way. Distinguishing "computed a well-posed different
+  quantity" from "built the wrong model" needs to read the *stem*, which a
+  sentence-level classifier structurally cannot. The honest ceiling for
+  this approach is somewhere near where it now sits.
+- **195 sentences (9.5%) still get no label at all.** They are listed by
+  `pnpm check:traps --unclassified`; most are choice descriptions ("The
+  pair $(24,36)$ has gcd $12$…") that name no mistake, which is a bank
+  defect rather than a classifier one.
+- The gold set is one person's labelling against one rubric. It is
+  committed sentence by sentence so any disagreement is checkable, which is
+  the most that can be said for it.
+
+Acceptance: **`pnpm check:traps` PASS** — coverage 90.5% (floor 85%), blind
+precision 73.5% (floor 70%), named-tier precision 87.5% (floor 85%).
+`pnpm test` **166/166 across 19 suites** (was 159/18) — 7 new tests pinning
+that the classifier declines rather than guesses, that rule ids are unique
+and every fired rule resolves to a tier, that `classifyTrap` and
+`classifyTrapRule` agree about whether anything fired, that the weights
+never exceed measured precision, that a named rule outranks an inferred one
+on the same sentence, and that no test sentence appears in the training
+split. `verify:bank` 511/511; `check:tiers` PASS; `check:review` PASS;
+`tsc` clean; `pnpm lint` 0 errors and no new warnings.

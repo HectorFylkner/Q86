@@ -1,0 +1,3622 @@
+{
+ "note": "Hand-labelled trap sentences. Rubric: content/TRAP-VOCABULARY.md. Draws: scripts/sample-traps.ts. `split: test` rows were labelled before the classifier was run over them and the rules were not touched afterwards — that is the number `pnpm check:traps` gates on.",
+ "draws": {
+  "r1-dev": {
+   "seed": 8686,
+   "size": 300,
+   "note": "first draw, dev half — rules were written against these"
+  },
+  "r1-holdout": {
+   "seed": 8686,
+   "size": 300,
+   "note": "first draw, blind half — folded into training for round 2"
+  },
+  "r2-test": {
+   "seed": 4242,
+   "size": 150,
+   "note": "second draw, blind — the gate"
+  }
+ },
+ "samples": [
+  {
+   "text": "Accepts (2) after testing only pairs on the positive side of zero.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Accepts the $x < -3$ branch's root after a sign slip turns $3.5$ into $-4$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adds the two radii $0.06 + 0.05$ instead of intersecting the intervals.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Concludes there are no solutions because the two absolute values cannot both be zero at once.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Inside the window; $|22.4 - 20| = 2.4 \\le 2.5$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 2,
+   "label": null,
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Keeps only the left solution $-2.5 - 4.1 = -6.6$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the greatest possible price $44.45$ instead of the difference.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Subtracts in the wrong order, $5 - 8$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Treats the boundary $|w - 20| = 2.5$ as rejected, but $\\le$ allows equality.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 2,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Using a whole-tenth window instead of half.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes $2a + b = 36$ alone forces $a$ above $b$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes both ranges are needed when statement (2) already pins a single integer.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes one equation with two unknowns always needs the second statement; the cent equation has a single positive-integer solution.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Divides the perimeter by $4$ and never accounts for the $3$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Halves the total and ignores the gap entirely.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Mistakes the constant term 13 (from the first equation) for k, ignoring that k multiplies x, not the constant.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reaches $\\frac{n}{2} = 6$ and reports $6$ without doubling.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports Mika's score instead of Jonas's.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts the seatings being excluded — the $240$ in which Carla sits beside Ana.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Incorrectly computes $4! \\times 2 = 48$-style undercount by mis-sizing the block arrangement, then adjusts down to 60.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies the pool by the group size instead of counting selections.",
+   "subtopic": "combinatorics",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the all-doctor teams $\\binom{6}{4} = 15$ — the complement — instead of subtracting them.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Subtracts three-letter arrangements $5 \\cdot 4 \\cdot 3 = 60$ from $360$ instead of the four-letter complement.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Using the plain $5!$.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adds $1$ twice when counting from $23$ to $55$, using $18$ terms.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the mean $32$, which is the middle term rather than the largest.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes the average is unchanged when the lowest runner leaves.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes the smallest term in statement (2) can't determine the median without realizing the fixed count of 9 pins it down.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Drops the $+1$, counting the gaps between multiples rather than the multiples.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Shifts the mean by a full unit instead of half a spacing.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Subtracting the spacing once: $(k-4) + k$.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Wrongly thinks both pieces of information are needed together, not realizing each alone fixes the entire consecutive set.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Doubles the correct answer by taking $2^{3}$ rather than $2^{2}$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Doubting (2) because $48$ is not a perfect square.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Gives the least common multiple instead of the greatest common factor.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Picks a multiple of $15$ without checking that it is also a multiple of $6$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Trusting (1) because $6$ shares factors with $12$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Trusts (1) after testing only $n = 15$ and $n = 30$, missing $n = 3$ and $n = 6$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Ignores the minus sign and adds all three coefficients: $6 + 5 + 2 = 13$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies the exponents instead of adding them across the product, solving $2x(3x-3) = 4x+4$ and taking the positive root $x = 2$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Puts the decimal point two places wrong in the root, landing far below the radicand.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves $\\frac{5t}{18} - 2 = 3$ (using $8$ instead of $2^8$ as the target exponent).",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Squares term by term to $7 = 1$, then squares the leftover $7$ to get $49$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Squares term by term to $x + 7 - x = 1$, gets the false statement $7 = 1$, and answers with the right-hand side.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Believes (2) also transfers by symmetry, missing that $4 - 2 = 2$ pairs $x = 2$ with itself.",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes $2(3^{2})$ and forgets the $-5$.",
+   "subtopic": "functions_sequences",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts every term less than $100$ and ignores the lower bound.",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Includes $a_6 = 20$ by reading \"greater than\" as \"at least.\"",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies the longest clip, $265$ seconds, by all $12$ clips.",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the product of the roots, $c/a = \\tfrac{11}{2}$.",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves down to $4x = 24$ and reports $4x$ rather than $x$.",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Applies $y$'s wider range to $x$ as well, taking $x^2$ up to $49$: $49 + 35 = 84$.",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplying (1) by $b$ as if $b$ were known positive.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Treats the strict $< 40$ as $\\le 40$, admitting $x = y = 5$ since $5(5) + 3(5) = 40$.",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Using $x = 5, y = -2$ mid-range guess.",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "label": "guess",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adds the two discounts to $45\\%$ and subtracts that from the original.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes one year's interest and forgets the three-year term.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes the second period's interest, $2\\%$ of $12750 = 255$, and doubles it to $510$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Divides the reduction by the new price ($50/200$) instead of the original.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Forgets the profit target and prices for break-even: $1440/36 = 40$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Misplaces a decimal in $r^2$, using $0.00225$ for $0.15^2$: $67.50/0.00225 = 30{,}000$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Requires cost to be $70\\%$ of the new price, confusing profit on cost with margin on selling price.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves for the cost correctly, then answers with the final selling price $1.08 \\times 225 = 243$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adding $x + y$ with a sign slip on $x$.",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes the integer constraint pins down statement (1), missing that both $(15, 3)$ and $(7, 6)$ satisfy it.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Averaging the two totals and halving.",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computing $8 \\cdot 10$ from swapped assignments.",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves the system correctly but reports the scone price ($s = 2.50$) instead of the muffin price.",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Builds $3$ tables instead of the minimum $2$, leaving lumber for only $8$ chairs.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Insists the individual values of $x$ and $y$ are needed, missing that (1) bounds the product by itself.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reserving a month of budget as imagined slack.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the tank's final acid content, $0.40 \\times 40 = 16$ liters.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Averages the old average with the new score, $(78 + 90)/2$, which silently gives the fourth test the weight of three.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Removes $10\\%$ of the volume to match the $10$-point rise in concentration.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reverses the weights: $(2 \\cdot 10 + 3 \\cdot 15)/5 = 13$.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Sets the volumes directly proportional to the alligation distances $22:8$ instead of inversely proportional.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Uses the inverted concentration ratio $50:20 = 5:2$.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Weights each concentration by the *other* solution's volume.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Accepts II after testing a single value greater than $\\frac{1}{2}$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes a ratio greater than $1$ requires a positive numerator.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes two different-looking inequalities must intersect to a set with a single sign.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Combines out of caution, missing that $x > |y| \\ge -y$ already settles the question.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Confusing a negative product with a negative sum.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Credits $x > 0$ alone, forgetting a large negative $y$ can sink the sum.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Dividing both sides by $x$ without checking sign, \"proving\" $x > 1$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Is divisible by $n$ and often by $3$, but fails the factor of $2$ at $n = 1$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": null,
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies both sides by $b$ without checking that $b$ could be negative.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Takes reciprocals of both sides without reversing the inequality.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the overlap $65$ rather than the exactly-one count.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes the fraction of $P$ that is not in $Q$.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves for the support staff in the office, the variable itself.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solving the membership identity for the wrong unknown.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adding the $\\binom{4}{3} = 4$ all-even selections plus the three-odd count, although even sums lose.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts triples meeting at least one of the conditions instead of both.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts unordered pairs, missing that $(2,-1)$ and $(-1,2)$ are different ordered pairs.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Inventing a minimum audience size.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Only the opposite-signs statement is forced; II and III each have counterexamples.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": null,
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Pairs the negative sum with a single negative score, but then the product would be negative.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Sees two unknowns with no values and assumes no sign can be pinned down.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Solves $3u - 5d = 2$ with $u = 4$, $d = 2$, again using only six turns.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Upgrading \"even pairs\" to \"multiple of 4\" without basis.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with February's decline $k + 10 = 30$ rather than January's rise.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the $63\\%$ that stayed home rather than the $37\\%$ that shipped.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the share of *all respondents* who cycle without a car, $30\\%$, rather than the share of cyclists.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Doubles the loss, as though each move contributed $\\tfrac{p^2}{100}$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Guessing halfway between 40 and 60.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 4,
+   "label": "guess",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Subtracts the percents instead of dividing the factors: $25 - 5 = 20$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Uses only the $20\\%$ decline as the net change: $4160/0.2 = 20{,}800$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adds only one more $5$, reaching $5^2$, which is still not a multiple of three.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Believing three divisors pins one number by itself.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts all $24$ positive divisors of $8{,}415$ instead of its distinct primes.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Counts only the visible multiples of $6$ (namely $6$ and $12$) inside the product.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Rejects (1) because the primes $p$ and $q$ are unknown, though the count is $4$ regardless.",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the largest term (cans per box, n+4) instead of the number of crates.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes the probability that the first three batteries tested are all good.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Considers only the first two flips, $P(\\text{HH}) = \\tfrac14$.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Divides the $10$ remote analysts by all $80$ employees, ignoring the remote condition.",
+   "subtopic": "probability",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Removes the drawn marble from the total, using $7/11$. Nothing has been drawn yet, so the total is still $12$.",
+   "subtopic": "probability",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the fraction of all employees who work remotely: $40/80$.",
+   "subtopic": "probability",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computes the new product as $12 + 4$ instead of $(2+2)(6+2)$.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Rejecting $(3, 12)$ by mispairing the factors of $36$.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reporting the negative of one root.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Treats both statements as underdetermined and never tests the integer factor pairs of $13$.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reads \"four break down\" as \"four remain\", giving $60/4 = 15$ days and a finish on day $18$ — a delay of $10$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Splits the $8$ hours evenly, reads $45/4 = 11.25$ as the *downstream* speed, and backs out $11.25 - 3 = 8.25$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Uses B's rate for A, so A appears to need just 1.5 hours for its half.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Uses copier $A$'s rate alone: $1500 \\div 60 = 25$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Adds all three supplies, $5 + 1.5 + 1.2 = 7.7$, ignoring that the ratio forbids using them all.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the flour on hand, $5$ kilograms, treating the largest supply as the batch size.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assumes the two blends are used in equal amounts because the target ratio is $1:1$.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Finds $t=6$ but adds only $a + b = 3t + 5t$ with $t = 5$, or drops one part when totaling.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the grand total $a + b + c + d$ rather than $b + d$.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the larger number ($5$ parts) instead of the smaller.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Scales only for the job and ignores the larger crew: $10 \\times \\tfrac{500}{300} = \\tfrac{50}{3}$.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Takes $x:y$ straight from the coefficients as $2:3$ instead of inverting them.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Assuming both statements are needed because each involves a different power.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Averaging the digits $4$ and $3$ upward to $5$ under time pressure.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "time_pressure",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Computing $17^{33} \\equiv 8$ but then taking $8 + 8 = 16$ and reporting $16 - 11 = 5$ via a subtraction slip.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Divides by $10$ instead of $8$ and reports the units digit.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Mis-reduces $25$ to $6$ modulo $9$, giving $24 + 35 + 6 = 65 \\equiv 2$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Taking $2^6 = 64 \\equiv 12$ but then subtracting once more to $11$ by sign confusion with $-1$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Treats the program as $10$ minutes long, getting $20$ cycles and $20 \\cdot 2 = 40$ mist minutes.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Answers with the partial sum $S_{12} = 492$ rather than the twelfth term.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies December's $\\$67$ by $12$, as if every month matched the largest deposit.",
+   "subtopic": "series_patterns",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Multiplies the first term by the term number instead of adding the common difference.",
+   "subtopic": "series_patterns",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Applies the $-4$ to the standard deviation as well as the scaling: $3(2\\sqrt2) - 4$.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Covers only the $25$th position with a $1$ (using $13$ ones), forgetting the $26$th value must also be $1$; the median would be $1.5$.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Measures each top scorer's cost from the mean ($100 - 73 = 27$ points) rather than from the $60$ floor.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Reports the mean ($54/6 = 9$) rather than the median.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Takes the lower of the two middle values instead of averaging them.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 2,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-dev"
+  },
+  {
+   "text": "Flipping the inequality — that is the ON region.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Sign slip on the center.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adds the leftover $\\$7$ to the shortfall $\\$5$ and stops at the cash swing.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Applying the future ratio $2{:}1$ to today.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing the item count alone orders the split.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Grants statement (2) as well, though $(7,1)$ and $(1,7)$ answer differently.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Judges each statement sufficient after testing only one convenient pair.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Misreads '3 times the sum of x and 5' as distributing incorrectly to get $3x+30$ instead of $3x+15$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Mistakenly solves only using y-value guesses or misreads the coefficient pattern, landing on k = 1 by assuming the third equation mirrors the second equation's x-coefficient scaled incorrectly.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reading (2) as the equality $q - 4 = 24$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Rounds $8/3$ down to the nearest integer instead of up, forgetting the inequality requires $x \\ge 8/3$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Solves for the pair, gets one point $(14, 8)$, and mistrusts a unique answer from combining.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Solving $3n + 7 = n + 9$ — sign slip on the subtraction.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Stops at the raw difference between the two totals.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Using headcounts $7$ and $8$ after misreading.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adds the complement to the total, $360 + 120$, instead of subtracting it.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Divides by only one of the two repeated pairs: $\\dfrac{7!}{2!} = 2{,}520$.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Ignores the closure and answers with the unrestricted total $\\binom{10}{4} = 210$.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Uses $\\binom{12}{2} = 66$, placing dividers among $12$ gaps instead of the $11$ gaps between units.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Uses the combination $\\binom{8}{3} = 56$, ignoring that left-to-right order matters.",
+   "subtopic": "combinatorics",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Counts only the positive multiples $6$ through $78$, ignoring $0$ and the negative multiples.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Granting each alone because each supplies one clean number.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reporting the smallest ($23 - 3 = 20$).",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Testing one case where the sum looks divisible by 8 after an addition slip.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing the GCF alone pins $n$ against the fixed $45$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Finds a common multiple of the two cycles but not the least one.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Gives the product, a common multiple but not the least.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Includes a factor of $5$ (giving $24 \\cdot 5$), though $\\gcd(n, 40) = 8$ forbids it.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Omits $8$, capping the power of $2$ at $2^2$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reporting half of $126$ — a divisor of one number only.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the first gcd itself instead of building $n$ from both conditions.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Takes the second-smallest solution instead of the least — $12(30) = 360$ is also a multiple of $90$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Taking $3 \\cdot 7$ and dropping the shared $2$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Fails to decode $x^{3} < x$ into $0 < x < 1$ and concludes neither statement settles the comparison.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Fails to distribute, expanding $8^{x-1}$ as $2^{3x-1}$: $2x + 3x - 1 = 4x + 4$ gives $x = 5$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Gains two powers of ten, the mirror image of the first trap.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Granting (2) sufficiency by forgetting $(3,3)$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Multiplies $2$ by $3$ after dropping both the fraction and the negative sign.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the exponent difference $7 - 4 = 3$ instead of $3^{3}$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the second term alone.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracts one too few, giving $3^{4}$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 2,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Uses $t/6 - t/9$ for the combined exponent, halving the closing speed.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adds $5$ instead of subtracting it.",
+   "subtopic": "functions_sequences",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Dividing by $2^5$ — one doubling too many.",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Repeats the 10 gap once, shifting every later gap down by one step.",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Uses $12$ steps instead of $11$, making the last clip $285$ seconds long.",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing $b$'s sign alone could order the pair.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Confirms each statement with one convenient example instead of searching for a counterexample.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Divides both of $x$'s bounds by $y$'s smallest value, getting $\\dfrac{2}{1}$ and $\\dfrac{7}{1}$.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Dropping the sign of $-4$ and flipping the relation.",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reads the inequality as $\\le$, adding the roots $n = 3$ and $n = 8$ where the product is zero.",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Solves the equality correctly and then adds back the $3$ from the denominator.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Stops at the center value $3 + 2 = 5$, forgetting the radius push.",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adds the two $20\\%$ adjustments into a single $60\\%$ markup: $36 \\times 1.6 = 57.60$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the ending balance $\\$10{,}648$ instead of any interest figure.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Gives the original as a percent of the sale price, inverting the comparison.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the first shop's equivalent single discount, $1 - 0.8 \\times 0.85 = 32\\%$, rather than the second shop's.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the fraction of list the customer still pays, $396/600 = 66\\%$, instead of the discount.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the original selling price $S = 440$ instead of the cost.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the size of the increase rather than the original price.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracts $15$ dollars, treating the percent as an amount.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adds the two equations but forgets to divide the result by $2$.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Doubling $3$ because $-10$ looks like $-6$ scaled by $\\tfrac{5}{3}$ misread as $2$.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Multiplies the three given sums, $13 \\times 21 \\times 16 = 4{,}368$.",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Splits the sum evenly, using only the first equation.",
+   "subtopic": "linear_systems",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracting the equations and mis-assigning the $0.50$ gap.",
+   "subtopic": "linear_systems",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Trusting the ticket count while ignoring that prices alone can pin the split.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing a maximum needs calculus or more data.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing the constant term is the minimum (true only when $b = 0$).",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Believing the vertex location $-b/2$ alone yields the minimum value.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computes $6 + 2(4)$ by mistakenly using 5 additional hours only through hour 5 instead of hour 6.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Divides $400$ by $18$ and rounds down, ignoring the fee entirely.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Using $1, 2, 3$ but $24, 25$ above the median.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the tank's starting acid content, $0.25 \\times 40 = 10$ liters.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Divides the engineers' surplus by the engineers' own gap instead of the technicians': $360/12 = 30$.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Forms the ratio of the two concentrations, $20:50 = 2:5$, instead of the ratio of the volumes.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Solves $25(V+8) = 800$ correctly but reports the final volume $V+8 = 32$.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Treats the two replacements as removing acid linearly and underestimates the per-step draw.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Assumes a ratio greater than $1$ requires a positive denominator.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Counts only the odd $n$, missing the multiples of $8$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Doubting II because \"squares of fractions shrink\" — they shrink but stay positive.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Drops the negative part $-2 < x < 0$ of the solution set.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reads $a \\ne b$ as $a > b$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reads the positive product as forcing $x > 0$, ignoring that $z^3$ can be negative.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the number owning at least one, $170$.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Averaging the two group sizes minus part of the total.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computing the neither cell: $200 - 130$.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Divides $15$ by the union $60$ rather than by the $45$ in $P$.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Halving the daily count after seeing two list types.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the union $47 + 36 - 12$, which still includes the both-stand diners.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Adding magnitudes and dropping the shared negative sign.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Assumes two of every three consecutive starting points work: $\\frac{2}{3} \\cdot 96 = 64$.",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Assuming a quadratic can never be systematically odd.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Forgetting that $y = 0$ zeroes the product under (1).",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reading both as compatible with either parity.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Applies both changes forward instead of reversing them: $264 \\times 1.25 \\times 0.88 = \\$290.40$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Drops the extra ten points, solving $(1+t)(1-t) = 0.84$ for $t^2 = 0.16$ and $k = 40$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Rounds the base up to $10{,}000$, so $37\\%$ reads straight off as $3{,}700$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracts percents: $25 - 5 = 20$, ignoring that the fall acts on the enlarged base.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Awards every multiple of $5$ two fives, doubling the correct count minus nothing.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Counts ordered row-column pairs with both sides at least $2$, so each non-square layout is counted twice.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Granting each alone after finding $121$ mentally in both.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Multiplies in one of every prime ($2 \\cdot 3 \\cdot 5$), adding an unneeded $2$ that breaks the even power of $2$.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Stopping at $2^2$ and ignoring the $3^2$ factor.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Stopping at $3^2$ and ignoring the $2^2$ factor.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with $P(\\text{second red} \\mid \\text{first red}) = \\tfrac{3}{9} = \\tfrac13$, conditioning on the wrong event.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computes both buses late: $0.3 \\cdot 0.4$.",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computing the probability of same color (both black OR both white).",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Counts only the $15$ multiples of $4$, ignoring multiples of $6$.",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reporting the single-draw probability.",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracts the overlap twice: $\\tfrac{9 + 9 - 8}{36} = \\tfrac{10}{36} = \\tfrac{5}{18}$.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Grabs the coefficient $16$ from the target expression.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Rejecting the wide pair $(1, 36)$ as implausible.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reporting the length instead of the width.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Solving fully and reporting $x = 6$.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Treating double roots or sign constraints as ambiguity.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the $7.5$ days still needed after the breakdown rather than the delay.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the total elapsed time $4 + 4.4 = 8.4$ hours rather than the additional hours.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computes the head start at the express's speed instead of the freight's ($2.5 \\times 75 = 187.5$ km), giving $187.5/30 = 6.25$ hours after $10{:}30$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Drops the factor of $2$ from the total distance.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Finds Lena's distance, $5 \\cdot 2 = 10$ — the distance from town $Q$, not town $P$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Inverts the whole expression, producing a value far below any speed in the problem.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Treats the given interval as half an hour and simply doubles.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computes $y:z = 8:3$ instead of $x:z$.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Cross-multiplies carelessly, leaving the $20$ outside the parenthesis: $40k = 15k + 20$ gives $k = 0.8$ and $5k = 4$.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Inverts the proportion, scaling by $6/8$ as though more printers meant fewer pages.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the size of one part, $k = 12$, instead of the smaller number.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Subtracts $2 \\cdot 7$ from $77$, manipulating the ratio numbers directly instead of scaling parts.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Assumes a single fact about a product can never determine a digit, so both statements seem necessary.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Averaging the two units digits $7$ and $3$ to get $5$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Confuses the exponent with the modulus and concludes $100$ divides the power evenly.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the leftover rolls ($530 - 528 = 2$) instead of the shortfall to the next full bag.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reports the number of bags needed to hold every roll, $45$, instead of the missing rolls.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Using $260 / 7 \\approx 37.1$ and mapping the decimal $.1$ to the fifth weekday.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "content_gap",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Assumes the partial cycle contributes both of its blue beads, rounding up to $8$ full cycles.",
+   "subtopic": "series_patterns",
+   "difficulty": 2,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Drops the constant from $a_n = 6n + 2$, using $6 \\times 12 = 72$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Forgetting to halve: $60 \\cdot 61$.",
+   "subtopic": "series_patterns",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Miscounting the pairs as $50$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reads the common difference as $2$ and counts $2, 4, \\ldots, 98$.",
+   "subtopic": "series_patterns",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Reporting the last term.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Slips one index back, computing $a_{11} = 6(11) + 2 = 68$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Stops one step early at $a_5 = 82$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Treats the recursion as pure tripling, $a_n = 2 \\cdot 3^{n-1} = 486$, ignoring the $-2$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the difference between the two averages.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 3,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Answers with the numerator $70 - 46 = 24$ without dividing by $3$.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Computing the mean.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Ignores the $60$-point minimum entirely and computes $\\lfloor 1460/100 \\rfloor$.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Judging by the number of distinct values.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 4,
+   "label": "setup_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Rounds the top-three total up to 160 before subtracting from 280.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Taking the second value.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 2,
+   "label": "misread",
+   "split": "train",
+   "draw": "r1-holdout"
+  },
+  {
+   "text": "Evaluates at the anchor $x = -1.5$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Inverts each fraction, summing $\\tfrac72 + \\tfrac{11}{3} + \\tfrac{13}{4}$ instead.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Measures the union $[2.37,\\ 2.56]$ instead of the intersection.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Pins $y$ at its center $2$ instead of its extreme $3.5$.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Treating the display as a ceiling, not a rounding.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Turns the minus between the terms into a plus, as though the bars changed it.",
+   "subtopic": "abs_value_number_line_decimals",
+   "difficulty": 2,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds 24 instead of subtracting when clearing the substitution in the second inequality.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the son's age in seven years, $15$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes $a + 2b = 30$ alone forces $a$ above $b$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Believing revenue alone orders the counts.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubling Nadia's current age check: using $s = 16$ from a slip.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Granting each alone by assuming the other fact silently.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reads the per-crate weight gap as $6$ rather than $7$ kilograms.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports $y$ from the maximizing pair instead of $x - y$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Solves $2n + 5 < 39$ as $n < 16$, wrongly excluding $n = 16$.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Solving $3(n - 7) = n + 9$ — misplaced parentheses.",
+   "subtopic": "algebraic_translation",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Dividing by $3!$ as if three digits repeated.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Ignores both constraints: $\\binom{11}{5} = 462$.",
+   "subtopic": "combinatorics",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Miscounts the trip as $8$ moves and computes $\\binom{8}{3} = 56$.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Subtracting $5!$ once and $4!$ once by a mis-glue.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Treats all seven moves as distinguishable and computes $7! = 5040$.",
+   "subtopic": "combinatorics",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the median cannot be found without knowing how many integers the set contains.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Misses that a range of $14$ forces exactly $15$ consecutive integers wherever the run sits.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Multiplies the shift by $25$, pairing up only half of the terms.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Removes the highest bib instead of the lowest, computing $610/20$.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stopping at the middle value $23$.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stops one term short of the largest, at $36$.",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes $a$ cannot equal the lcm, but $(72, 12)$ works.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts only the multiples of $15$ that divide $60$, namely $15$, $30$, $60$.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts the $n$ with $\\gcd(n, 60) = 60$ — the multiples of $60$ — instead.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts the divisors of $540$ (or of $360$) itself rather than of the gcd.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Divides the lcm by 4 instead of using the product identity; $\\gcd(45,36) = 9$, not 6.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stops at the lcm — total tooth engagements, not revolutions.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "The pair $(24, 36)$ has gcd $12$ and lcm $72$, so $24$ is attainable.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": null,
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Uses $\\gcd \\cdot 10$; but $\\gcd(60, 36) = 12$, violating the first condition.",
+   "subtopic": "divisibility_gcf_lcm",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes $y^3=y$ forces $y=1$ only, ignoring $y=-1$ and the resulting sign dependence on $x$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Believing the sum $6$ forces the $\\{2,4\\}$ split.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Credits (1) as well, overlooking that $x = \\tfrac32$ satisfies $x^{2} < 4$ yet gives $\\sqrt{x} < x$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Dividing $4^9$'s exponent by... treating the four terms as $4^{x}$ and matching $x$ to half of $18$ minus 2.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Halves the number instead of taking its square root.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Keeps only the root $2^{x} = 2$, reporting $x = 1$ alone.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stopping at the numerator's $3^{18}$ and halving instead of subtracting $8$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Sums the roots of the quadratic in $u$ ($2 + 4 = 6$) without converting back to $x$.",
+   "subtopic": "exponents_roots_properties",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds $5$ to $29$ and stops.",
+   "subtopic": "functions_sequences",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds the final gap of 22 twice when accumulating the total.",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Dividing by $2^3$ — one too few.",
+   "subtopic": "functions_sequences",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Drops the constant, answering $10^2 = 100$.",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stops the telescope at round $5$, giving $1 - \\frac{1}{6}$.",
+   "subtopic": "functions_sequences",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Dividing by $-3$ without flipping.",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubling $y$'s endpoint before negating: $5 - (-9)$ style slip.",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubting III by forgetting strict AM–GM for unequal values.",
+   "subtopic": "inequalities",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Pairs $a$'s maximum with $b$'s minimum, $(3)(-2)$, without testing the other cross pair.",
+   "subtopic": "inequalities",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reverses an inequality under cubing, which in fact preserves it.",
+   "subtopic": "inequalities",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds $20\\%$ to the selling price instead of stripping it out.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds the discounts into a single $30\\%$: $250 \\times 0.7$. This is the error the item is built to catch.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Applies the $8\\%$ margin to the marked price rather than cost, effectively dividing $40$ by $6.4\\%$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Compounds a third year the question never asked for.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Divides the $\\$90$ by the loss percent alone: $90/0.12 = 750$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubles the gap $P r^2$ once per year, computing $8000 \\times 0.0025 \\times 2$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the total discount ($\\$70$) rather than the price paid.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Solves for the cost correctly, then answers with the marked price $1.6 \\times 225 = 360$.",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Multiplying the wrong pair: $12 \\cdot 7$ from the first equation.",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reflexively combining because one equation with two unknowns \"can't\" suffice.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reporting $y$ alone.",
+   "subtopic": "linear_systems",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Subtracts the 18-hour gap from both category totals before solving.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Swaps the solved values, computing $2x + 3y$ with $x = 4$ and $y = 2$.",
+   "subtopic": "linear_systems",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Capping the others at the average $+\\,$half the cap.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Ignores the required tables and converts all $60$ board-feet into chairs.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Ignoring $y$ entirely.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Prices only the required $2$ adult and $3$ child tickets, ignoring the other $4$ tickets.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 2,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Using $0$ among the positive integers.",
+   "subtopic": "min_max_optimization",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the $15$ from the stem, reading a percentage as a volume.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Averages $25$ and $50$ with no weighting, which would be right only for equal volumes.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Finds the final volume $32$ but subtracts the $8$ added liters twice, once for each scenario.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the liters of salt as though the number were a percent.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Spreads the correction over the $10$ review-session students: $68 + 30/10 = 71$.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Takes the simple average of the two prices, $(10+15)/2$, ignoring the different quantities.",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the nonzero factor $a$ must be negative, making the sum negative.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 2,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Cancels $a$ in (1) and equates nonzero with positive in (2).",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Confusing $x^2 > x$ with $x^2 > 1$; $x = -\\tfrac12$ separates them.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts only the multiples of $8$, missing that every odd $n$ also works.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts the complement using the off-by-one figure, $100 - 33 = 67$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubting I by confusing odd and even powers.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 2,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubting III by reading $|x| > x$ as $|x| > |x|$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 2,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Factors as $(n-1)(n+1)$, two integers two apart, which need not include a multiple of $3$.",
+   "subtopic": "must_be_true_testing",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the number studying at least one language, $96$.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Computing $90 - 35$ with a mis-derived overlap.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Omits adding the triple overlap back, getting $90$ in the union and $10$ outside.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the total number of employees in the office.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Subtracting the all-three count twice.",
+   "subtopic": "overlapping_sets",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes $8$ divides the whole expression because $n^2 + 4n$ looks like a multiple of $4$.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes $t$ is negative because it is tied to $s$, whose sign is actually free.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Combining out of caution when each statement already settles it.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Extends the negative total to every pair, but an under-par score plus the over-par score can be positive.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Misreads $abc > 0$ as requiring all three entries positive, leaving only $1$s and $2$s.",
+   "subtopic": "parity_signs",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Tacks $t$ onto the negative $rs$ and expects the product to stay negative.",
+   "subtopic": "parity_signs",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Treats squaring as erasing signs and then orders the squares from $x < y$ backwards.",
+   "subtopic": "parity_signs",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Accepts $p=20$ because $(0.96)(1.4) = 1.344$ feels close to 1.5 on a rough estimate.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adding a half-again adjustment to the loss percent.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds the percents to a net $+10\\%$: $4160/0.1 = 41{,}600$.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with 2024 revenue as a percent of 2023 revenue, $84$, instead of the decline.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the two-year net gain $5\\%$ rather than the second year's gain.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Applies the 20-point gap to the original base and inflates it.",
+   "subtopic": "percent_change_chains",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counting numbers with an odd number of PRIME divisors instead.",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts every divisor of $196$ as its own arrangement.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Fixes only the lone $5$, leaving the exponent of $3$ odd.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Includes the banned $1 \\times 196$ single-row layout despite the two-row minimum.",
+   "subtopic": "prime_factorization",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Never merges the prime exponents from the two statements into $2^2 \\cdot 3^3$.",
+   "subtopic": "prime_factorization",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Testing only $n = 6$ against (2) — it fails the premise, not the question.",
+   "subtopic": "prime_factorization",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with \"at least *one* white\", $1 - \\binom33/\\binom83 = \\tfrac{55}{56}$.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the probability of an even sum is simply 1/2 by treating odd and even sums as equally likely without checking the actual parity counts.",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Averaging the with/without-replacement answers.",
+   "subtopic": "probability",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Blocks the pair without its two internal orders and uses a straight-line count: $5!/6!$.",
+   "subtopic": "probability",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Counts only the red marbles, $4/12$.",
+   "subtopic": "probability",
+   "difficulty": 2,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubles $3$ instead of squaring it.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Forgetting the sign flip: reading the sum as the raw coefficient $-11$.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 2,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the product of the two crossing times from the reduced quadratic.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 3,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the quadratic's constant term with its sign.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Squaring but forgetting to subtract the cross term.",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the faster pump alone determines the combined time, ignoring pump A's contribution entirely.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 2,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubles $Q$'s 3 working hours twice, or assumes $Q$ is half as fast as $P$ plus its head start: $12$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Finishes with pipe A alone after the drain closes: $\\dfrac{44/72}{6/72} = \\dfrac{22}{3}$ hours.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Leaves the $30$ minutes in minutes, solving $d/30 = 30$ for $d = 900$.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Weights the average toward the faster outbound speed instead of the slower, longer-lasting leg.",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the transfer itself, $\\$900$, rather than the resulting share.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Computes $\\frac{7}{11}$ of $77$, solving for the wrong share of a misread total.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Computes the difference $(b+d) - (a+c)$ — the $5$ extra ratio parts — instead of $b+d$ itself.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Divides the total by the red term ($72/3$) rather than by the sum of the terms.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 2,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Inverts the fraction, producing a count larger than the membership.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Pairs A's milk with B's water only, $30:18$, ignoring the other half of each container.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Scales $863$ up to the whole mixture, $\\tfrac{15}{11}$ of the flour, instead of down to the sugar.",
+   "subtopic": "ratios_proportions",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the units digit alternates between two values, so half of all exponents qualify.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assumes the units digit of every power of $7$ is $7$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Cycle slip on $3^{97}$: position read as $3$ (digit $7$), then $4 - 7$ forced a fake borrow giving $7$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Off-by-one in the cycle of $3$: reading position $3$ as $9$ instead of $7$, then $9\\cdot 3 = 27 \\to 7$... miscombined to $9$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 3,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reduces the surviving sum $9$ by $7$ instead of $8$, using the wrong modulus.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Replaces $n^2$ by $n$'s residue $5$ instead of squaring: $20 + 35 + 6 = 61 \\equiv 7$.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Reports the last surviving term $3! = 6$ as the remainder.",
+   "subtopic": "remainders_units_digits",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Assuming full cancellation.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Doubling $a_6$: treating the recursion as doubling.",
+   "subtopic": "series_patterns",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Evaluates that same unsquared sum and reports it with the wrong sign.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Forgets that minute $20$ is itself a cooling minute, removing only three pauses: $670 - 96 = 574$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Forgets the squares and evaluates $1 - 2 + 3 - \\cdots - 100 = -50$.",
+   "subtopic": "series_patterns",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Stopping at $a_6 = 31$.",
+   "subtopic": "series_patterns",
+   "difficulty": 4,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Adds the two averages instead of differencing the two sums.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 3,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Answers with the new *variance* $9 \\times 8 = 72$ instead of the standard deviation.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "misread",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Comparing only the extreme values' gap without the middle pair.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 4,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Rounds $260/40 = 6.5$ up to $7$, which would force the remaining students below the $60$ minimum.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "calculation_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Subtracts only the median from the total: $84 - 10 = 74$.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "setup_error",
+   "draw": "r2-test",
+   "split": "test"
+  },
+  {
+   "text": "Swapping the two statistics' behavior.",
+   "subtopic": "statistics_mean_median_sd",
+   "difficulty": 5,
+   "label": "content_gap",
+   "draw": "r2-test",
+   "split": "test"
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 import { RUSH_RATIO, SINK_RATIO, TIME_BENCH } from "./pacing.ts";
-import { classifyTrap } from "./trap-classify.ts";
+import { classifyTrap, classifyTrapRule, ruleTier, trapLabelWeight } from "./trap-classify.ts";
 import {
   ERROR_TYPES,
   ERROR_TYPE_LABELS,
@@ -85,13 +85,25 @@ export function attributeError(input: AttributionInput): Attribution {
   // --- 1. the distractor itself -------------------------------------------
   // The strongest signal there is: the bank proves this choice is what the
   // named mistake produces, so picking it is evidence the mistake was made.
+  //
+  // How much weight that carries depends on how the trap sentence was read.
+  // `pnpm check:traps` measures the two tiers separately against a blind
+  // hand-labelled sample: a rule that matched a phrase *naming* the mistake
+  // is right 87.5% of the time, one that only read the arithmetic being
+  // described is right 63.2%. The weights below are those numbers rounded
+  // down, so this signal never claims more than the audit can show — and an
+  // inferred label no longer outranks a locked-in confidence by itself.
   if (input.chosenTrap) {
     const fromTrap = classifyTrap(input.chosenTrap);
-    if (fromTrap) {
+    const weight = trapLabelWeight(input.chosenTrap);
+    if (fromTrap && weight > 0) {
+      const hedged = ruleTier(classifyTrapRule(input.chosenTrap)) === "inferred";
       add(
         fromTrap,
-        1,
-        `The answer chosen is the one this question builds from a specific mistake: "${trimTo(input.chosenTrap, 110)}"`,
+        weight,
+        hedged
+          ? `The answer chosen is one this question builds from a specific mistake, read from the method it describes: "${trimTo(input.chosenTrap, 110)}"`
+          : `The answer chosen is the one this question builds from a specific mistake: "${trimTo(input.chosenTrap, 110)}"`,
       );
     }
   }

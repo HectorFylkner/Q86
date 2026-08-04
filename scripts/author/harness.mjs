@@ -28,6 +28,15 @@
  * fails the batch. Numbers are compared against the parsed choice value;
  * strings against the raw choice text (for algebraic-expression choices).
  *
+ * TRAP CLASSIFIABILITY (the third gate).
+ * A trap sentence that `classifyTrap()` cannot bucket is a distractor the
+ * diagnosis cannot use: `lib/error-inference.ts` treats the chosen wrong
+ * answer as its strongest evidence, and an unlabelled trap contributes
+ * nothing to it. So every trap_map sentence must classify, in the same way
+ * every distractor must be reachable. The vocabulary and the rubric are in
+ * content/TRAP-VOCABULARY.md; `pnpm check:traps` measures both coverage and
+ * precision over the shipped bank.
+ *
  * Usage: write a batch file next to this one (see example-batch.mjs),
  * then run it with `node --experimental-strip-types scripts/author/your-batch.mjs`
  * (the flag is needed below Node 22.18 — this file imports the app's .ts
@@ -42,6 +51,7 @@ import {
   numbersAgree,
 } from "../../lib/ai/verify.ts";
 import { DS_CHOICES } from "../../lib/taxonomy.ts";
+import { classifyTrap } from "../../lib/trap-classify.ts";
 
 const BANK = path.join(import.meta.dirname, "..", "seed-bank.json");
 
@@ -61,7 +71,12 @@ export function verifyAndAppend(
     if (new Set(q.choices.map((c) => c.trim())).size !== 5) fail(i, "choices not distinct");
     if (q.correct_index < 0 || q.correct_index > 4) fail(i, "bad correct_index");
     const wrong = [0,1,2,3,4].filter((x) => x !== q.correct_index);
-    for (const w of wrong) if (!q.trap_map[String(w)]) fail(i, `trap_map missing ${w}`);
+    for (const w of wrong) {
+      const trap = q.trap_map[String(w)];
+      if (!trap) { fail(i, `trap_map missing ${w}`); continue; }
+      if (!classifyTrap(trap))
+        fail(i, `trap ${w} names no classifiable mistake — see content/TRAP-VOCABULARY.md: "${trap}"`);
+    }
     for (const h of ["**Formal path**","**Trigger cue**","**Takeaway**"])
       if (!q.solution_md.includes(h)) fail(i, `solution missing ${h}`);
     const takeaway = (q.solution_md.split("**Takeaway**")[1] ?? "").trim();
