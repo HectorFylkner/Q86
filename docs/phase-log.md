@@ -725,6 +725,19 @@ artifacts, and both sides are reproducible from the same fixture
    trains the wrong repair. Left because it needs override data that
    does not exist yet — this session created the mechanism, not the
    history.
+
+   > **Correction, session 3 (2026-08).** "The panel already records
+   > them" is **false**, and two sessions have now deferred this item on
+   > the wrong blocker. `suggestErrorType()` computes the ranked
+   > suggestion on demand and returns it to the runner;
+   > `tagAttempt()` (`lib/actions.ts`) persists only the final
+   > `errorType`/`errorSubtag`. Nothing stores *what was suggested*, so
+   > an override is indistinguishable from a first-time tag and the
+   > labelled examples cannot be reconstructed after the fact — not even
+   > from history already collected. The blocker is not "wait for
+   > overrides to accumulate"; it is that the suggestion is not written
+   > down, and every day it stays that way is training data lost.
+   > Verified by reading both functions, 2026-08-02.
 2. **New chapters for the pedagogy the taxonomy has and Learn does not:**
    the six-error vocabulary as a chapter in its own right, and the exam
    mechanics (Review & Edit, pacing triage, abandon rules). All 24
@@ -1750,10 +1763,32 @@ state, and the honest check is the one that found them — sitting the flow.
 `scripts/check-review.ts` and `scripts/check-tiers.ts` guard the
 mechanisms; the wording is guarded by having looked at it in both states.)*
 
+## Measured state at the end of session 3
+
+Everything below was measured on this build, not carried forward.
+
+| | Value | How |
+| --- | --- | --- |
+| Bank | 511 items · D2 58 · D3 139 · D4 163 · D5 151 | `scripts/seed-bank.json` |
+| Subtopic depth | min 16 (2 chapters) · max 35 | 24 subtopics |
+| Non-structural technique share | 115/511 = **22.5%** (was 17.6% of 438) | `primaryStrategy()` over the bank |
+| Thinnest technique | estimate **14** (2.7%) | same |
+| Exam↔top band difficulty overlap | **16/24** chapters share a range | `assignBands()` per chapter |
+| Top bands that are pure D5 | **18/24** | same |
+| Mean difficulty gap exam→top | **0.88** of a level; 13/24 below 1.0 | same |
+| Heaviest route | `/patterns` **337 kB** First Load JS | `pnpm build` |
+| Next heaviest | `/postmortem` 252 · `/drill` 241 · `/queue` 241 · `/timed` 236 · `/analytics` **233** | same |
+| Data Sufficiency | 62/511 = 12.1%, labelled `DS · Data Insights` in the runner | `question-runner.tsx:431` |
+| Chapters eligible for cumulative review | **3/24** on the seeded fixture (needs both required tiers passed) | `chapterReviewStates()` |
+| Chapters | 24 concept + 4 technique | `content/lessons`, `content/techniques` |
+| Persisted error-suggestion overrides | **0, and not persistable** — see the correction above | `tagAttempt()` |
+
 ## Next action
 
-Finding 5 — fit the error-inference weights to the user's own
-post-mortem corrections. Still blocked on override data that does not
+Finding 5 is now unblocked in a different sense than the ranked list
+claimed: the first move is to **persist the suggestion alongside the
+tag** so overrides become recoverable, not to wait for data that is
+being discarded as it is produced. Still blocked on override data that does not
 exist yet; the mechanism records it, but no real overrides have
 accumulated. Finding 7 (`/analytics` First Load JS, 233 kB) and finding 3
 (the 62 Data Sufficiency items) are both untouched this session and are
