@@ -2366,3 +2366,60 @@ suites; `pnpm build` 21 routes; `check:traps` PASS; `check:inference` PASS;
 `check:tiers` PASS; `check:review` PASS; `verify:bank` 511/511; `check:a11y`
 **694/694 named (100%)** with 5 live regions; `check:keyboard` 13/13;
 `check:contrast` 60/60; `tsc` clean; `pnpm lint` 0 errors and no new warnings.
+
+## Measured state at the end of session 4
+
+Everything below was measured on this build, not carried forward.
+
+| | Value | How |
+| --- | --- | --- |
+| Trap sentences carrying an error-type label | **1,849 / 2,044 = 90.5%** (was 42.3%) | `pnpm check:traps` |
+| Label precision, blind hand-labelled split | **73.5%** overall · **87.5%** named-tier · **63.2%** inferred-tier | 150 unseen sentences |
+| Hand-labelled reference sentences | **450** across three draws | `content/trap-gold.json` |
+| Bank labels by tier | named **914** · inferred **935** | `classifyTrapRule()` per trap |
+| Weight the inference puts on a trap label | **1.0** named, **0.6** inferred (was a flat 1.0) | `trapLabelWeight()` |
+| Overrides recoverable from history | **every tag**, from the first one (was 0, and not persistable) | `attempts.suggested_error_type` |
+| Tags written since the change carrying no suggestion | **0** (gated) | `pnpm check:inference` |
+| Chapters told what a review changed | **all of them**, with the rung and the next interval | `pnpm check:review` OUTCOME |
+| Ways to reach the cumulative review | **2** (Today, `/learn`) | Today card |
+| Chapters | **30** — 24 concept · 4 technique · **2 method** | `pnpm check:chapters` |
+| Core ideas vs worked examples | **317 : 90** — one example per **3.5** ideas | same |
+| Chapters whose parse failure would be silent | **0** (was 28) | PARSES gate |
+| Claims about the reader's edit record that read it | **1 of 1** (was 0 of 1) | `lib/edit-record.ts` |
+| Bank | 511 items · D2 58 · D3 139 · D4 163 · D5 151 | unchanged this session |
+| Tests | **176 across 21 suites** (was 159/18) | `pnpm test` |
+| Checks that gate | test · verify:bank · check:tiers · check:review · **check:traps** · **check:inference** · **check:chapters** · check:a11y · check:keyboard · check:contrast | `package.json` |
+
+### What this session did not touch, and why
+
+- **Finding 4 and 5 — the difficulty scale.** Exam↔top band still overlaps in
+  16 of 24 chapters, and the authored difficulty label is still unvalidated
+  against observed accuracy. Untouched deliberately: the seeded fixture
+  *generates* accuracy from difficulty, so nothing measured on it can settle
+  the question, and settling it properly needs either real history or a
+  re-scaling decision that is its own workstream.
+- **Finding 6 — 3 of 24 chapters reach the review rotation.** W14 made the
+  review legible; whether a cleared foundation tier should earn a place at a
+  shorter interval is a question about the *entry gate*, and folding it into a
+  workstream about what the reader is told would have hidden the decision.
+- **Finding 7 — worked-example density.** Now measured and printed
+  (317 : 90, one per 3.5) rather than estimated, and the audit that prints it
+  is committed. Closing it is authoring at chapter scale.
+- **Finding 8 — estimation is 14 items of 511.** Untouched.
+
+### Next action
+
+**Finding 7, with the instrument now in place.** `pnpm check:chapters` ranks
+every chapter by ideas-per-example and names the worst — `overlapping_sets` at
+13 ideas to 3 examples. Adding examples to the ten densest chapters is the
+highest-yield content work available, it is measurable before and after, and
+the audit already exists to prove it moved.
+
+The one thing to *not* do is gate density. A floor there stops new chapters
+being written, which is the opposite of the finding.
+
+Second: **fit the inference weights.** The blocker really is override data
+now — the mechanism records it, `pnpm check:inference` reports the count, and
+`components/analytics/inference-card.tsx` withholds a rate below 25 examples.
+When that card starts printing a percentage, the confusion matrix beside it
+names which weight to move.
