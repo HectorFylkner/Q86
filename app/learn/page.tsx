@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
 import { chapterTestStates } from "@/lib/chapter-tests";
-import { listLessons } from "@/lib/lessons";
+import { listLessons, listStrategyNotes } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const METHOD = [
-  { step: "Read", detail: "the core ideas and cues" },
-  { step: "Attempt", detail: "each example before revealing" },
+  { step: "Read", detail: "each idea, answering its inline check" },
+  { step: "Attempt", detail: "every example on paper, against its pace target" },
   { step: "Tick", detail: "the pre-drill checklist honestly" },
-  { step: "Drill", detail: "the same subtopic while it's warm" },
+  { step: "Drill", detail: "the subtopic while it's warm — then take the test" },
 ];
 
 export default async function LearnPage() {
   const lessons = listLessons();
+  const notes = listStrategyNotes();
   const tests = await chapterTestStates();
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
@@ -53,6 +54,38 @@ export default async function LearnPage() {
           </div>
         ))}
       </div>
+
+      {notes.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-baseline gap-2">
+            <h2 className="font-display text-sm font-semibold">
+              The playbook
+            </h2>
+            <span className="text-xs text-graphite">
+              cross-chapter doctrine — read early, reread often
+            </span>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {notes.map((note, i) => (
+              <Link
+                key={note.slug}
+                href={`/learn/strategy/${note.slug}`}
+                className="group rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient transition-colors hover:border-ballpoint/50 hover:bg-highlight/40"
+              >
+                <span className="font-mono text-[10px] text-ballpoint">
+                  P{i + 1}
+                </span>
+                <span className="mt-0.5 block text-sm font-medium transition-colors group-hover:text-ballpoint">
+                  {note.title}
+                </span>
+                <span className="mt-0.5 block font-mono text-[11px] text-graphite">
+                  ~{note.minutes} min
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {lessons.length === 0 && (
         <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">

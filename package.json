@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "db:push": "node -e \"require('fs').mkdirSync('data',{recursive:true})\" && drizzle-kit push",
     "seed": "node --experimental-strip-types scripts/seed.ts",
+    "verify:lessons": "node --experimental-strip-types scripts/verify-lessons.ts",
     "backup": "node --experimental-strip-types scripts/backup.ts"
   },
   "dependencies": {

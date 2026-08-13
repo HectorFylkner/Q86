@@ -5,6 +5,10 @@ Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
 - AI question engine with independent verification — no generated question
   is ever served unless a second, blind solver agreed with its key
+- Course-grade Learn material: 24 concept chapters with attempt-first
+  concept checks, tiered worked examples (warm-up → Q86 level) carrying
+  pace targets, wrong-turn analysis, and a cross-chapter strategy
+  playbook — all verified by `pnpm verify:lessons`
 - Drill mode and full-section simulation with the official Review & Edit
   mechanic (max 3 edits, justification gate, edit ledger)
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
@@ -56,6 +60,7 @@ cp .env.example .env.local
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
 | `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm verify:lessons` | Verify every Learn chapter and playbook note against the authoring contract (template, tiered examples, concept checks, KaTeX) — fails loudly on any drift |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 

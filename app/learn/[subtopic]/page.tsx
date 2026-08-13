@@ -18,11 +18,17 @@ import {
 } from "@/components/lesson/sections";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
-import { listLessons, readLesson } from "@/lib/lessons";
+import {
+  LESSON_PREREQS,
+  lessonDependents,
+  listLessons,
+  readLesson,
+} from "@/lib/lessons";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  SUBTOPIC_LABELS,
   type Subtopic,
 } from "@/lib/taxonomy";
 
@@ -56,6 +62,8 @@ export default async function LessonPage({
   const meta = at >= 0 ? chapters[at] : null;
   const prev = at > 0 ? chapters[at - 1] : null;
   const next = at >= 0 && at < chapters.length - 1 ? chapters[at + 1] : null;
+  const prereqs = LESSON_PREREQS[subtopic as Subtopic] ?? [];
+  const dependents = lessonDependents(subtopic as Subtopic);
 
   const header = (
     <div>
@@ -74,9 +82,52 @@ export default async function LessonPage({
             Chapter {at + 1} of {chapters.length}
           </span>
           <span>~{meta.minutes} min</span>
-          <span>3 worked examples</span>
+          {parsed && (
+            <span>
+              {parsed.examples.length} worked examples
+              {parsed.examples.some((e) => e.tier)
+                ? ", warm-up → Q86"
+                : ""}
+            </span>
+          )}
           {testState?.passed && (
             <span className="text-ballpoint">✓ test passed</span>
+          )}
+        </p>
+      )}
+      {(prereqs.length > 0 || dependents.length > 0) && (
+        <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite">
+          {prereqs.length > 0 && (
+            <>
+              <span className="font-mono text-[10px] uppercase tracking-wider">
+                Builds on
+              </span>
+              {prereqs.map((p) => (
+                <Link
+                  key={p}
+                  href={`/learn/${p}`}
+                  className="rounded-full border border-grid px-2 py-0.5 transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+                >
+                  {SUBTOPIC_LABELS[p]}
+                </Link>
+              ))}
+            </>
+          )}
+          {dependents.length > 0 && (
+            <>
+              <span className="ml-1 font-mono text-[10px] uppercase tracking-wider">
+                Feeds into
+              </span>
+              {dependents.map((p) => (
+                <Link
+                  key={p}
+                  href={`/learn/${p}`}
+                  className="rounded-full border border-grid px-2 py-0.5 transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
+                >
+                  {SUBTOPIC_LABELS[p]}
+                </Link>
+              ))}
+            </>
           )}
         </p>
       )}
@@ -161,8 +212,11 @@ export default async function LessonPage({
                 key={ex.n}
                 n={ex.n}
                 level={Math.min(i, 2) as 0 | 1 | 2}
+                tier={ex.tier}
+                targetSeconds={ex.targetSeconds}
                 question={ex.question}
                 work={ex.work}
+                wrongTurns={ex.wrongTurns}
                 answer={ex.answer}
               />
             ))}

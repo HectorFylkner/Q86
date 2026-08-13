@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Md } from "@/components/math";
-import type { Cue, Titled } from "@/lib/lesson-parse";
+import { CheckChip } from "@/components/lesson/check-chip";
+import type { Cue, Idea, Titled } from "@/lib/lesson-parse";
 
 /** Numbered section frame: kicker index + display heading + tagline. */
 export function SectionShell({
@@ -41,14 +42,9 @@ export function WhyLede({ source }: { source: string }) {
   );
 }
 
-/** "The core ideas" — one numbered card per rule. */
-export function CoreIdeas({
-  intro,
-  ideas,
-}: {
-  intro: string;
-  ideas: string[];
-}) {
+/** "The core ideas" — one numbered card per rule, each optionally closed
+ *  by an attempt-first concept check. */
+export function CoreIdeas({ intro, ideas }: { intro: string; ideas: Idea[] }) {
   return (
     <div className="space-y-2">
       {intro && <Md source={intro} className="text-sm text-graphite" />}
@@ -60,7 +56,16 @@ export function CoreIdeas({
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ballpoint/10 font-mono text-[11px] font-medium text-ballpoint">
             {i + 1}
           </span>
-          <Md source={idea} className="min-w-0 max-w-[70ch] flex-1 text-[14.5px]" />
+          <div className="min-w-0 max-w-[70ch] flex-1">
+            <Md source={idea.body} className="text-[14.5px]" />
+            {idea.check && (
+              <CheckChip
+                q={idea.check.q}
+                a={idea.check.a}
+                id={`idea-${i + 1}-check`}
+              />
+            )}
+          </div>
         </div>
       ))}
     </div>
