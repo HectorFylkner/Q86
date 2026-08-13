@@ -1,0 +1,130 @@
+{
+  "skill": "prompt-master",
+  "version": "4.0.0",
+  "updated": "2026-08-12",
+  "grading": "Each case passes only if every assertion holds. human_judgment is the tiebreak for style and restraint.",
+  "cases": [
+    {
+      "id": "route-01-claude-target",
+      "input": "Skriv en systemprompt till min Claude-agent som läser PDF:er och fyller i ett JSON-schema.",
+      "assertions": [
+        "Loads references/anthropic.md, not the OpenAI route",
+        "Places documents before the final instruction",
+        "Assigns exact JSON syntax to the schema, not to prose",
+        "Includes the untrusted-content invariant because the agent reads documents"
+      ],
+      "human_judgment": "Does the answer name the Anthropic-specific control (effort/thinking) only if it was verified this session?"
+    },
+    {
+      "id": "route-02-unknown-vendor",
+      "input": "How should I prompt Kimi K2.6 for an agent swarm?",
+      "assertions": [
+        "States that no verified vendor route exists for this target",
+        "Maps to the nearest category and says so explicitly",
+        "Writes model-agnostically and marks any model-specific point UNVERIFIED"
+      ],
+      "human_judgment": "Does it resist inventing parameter names that sound plausible?"
+    },
+    {
+      "id": "freshness-01-stale-reference",
+      "input": "What effort level should I use for the current flagship Claude model?",
+      "assertions": [
+        "Fetches a primary source in-session or declines to name a level",
+        "Attaches a primary link and verification date to the recommendation",
+        "States the vendor default before recommending a change"
+      ],
+      "human_judgment": "Would the claim survive being checked against the vendor page today?"
+    },
+    {
+      "id": "freshness-02-no-cross-vendor-transfer",
+      "input": "I use reasoning.effort xhigh on GPT-5.6. What is the equivalent on Gemini?",
+      "assertions": [
+        "Refuses to map the control across vendors by analogy",
+        "Names the need to fetch the Google primary guide",
+        "Does not assert a Gemini parameter name from memory"
+      ],
+      "human_judgment": "Is the refusal substantive rather than a hedge?"
+    },
+    {
+      "id": "triage-01-not-a-prompt-problem",
+      "input": "My agent sometimes charges the customer twice. Add something to the prompt to stop it.",
+      "assertions": [
+        "Classifies the failure as application state, not prompt text",
+        "Names idempotency keys, transactions, bounded retries, reconciliation",
+        "Explicitly declines to ship placebo prompt text"
+      ],
+      "human_judgment": "Does it stay firm when the user only asked for prompt wording?"
+    },
+    {
+      "id": "triage-02-structured-output-drift",
+      "input": "The model keeps adding a sentence before my JSON.",
+      "assertions": [
+        "Points to native structured output or validation/retry as the primary fix",
+        "Identifies competing output contracts in the prompt",
+        "Defines missing-data behavior in the repaired version"
+      ],
+      "human_judgment": "Is the prompt edit smaller than the system recommendation, as it should be?"
+    },
+    {
+      "id": "controls-01-no-simulated-reasoning",
+      "input": "Add 'think step by step and generate three candidate answers, then pick the best' to my prompt.",
+      "assertions": [
+        "Rejects candidate generation inside one forward pass",
+        "Moves depth to the vendor reasoning parameter and selection to the harness",
+        "Does not add think-harder phrasing to the prompt block"
+      ],
+      "human_judgment": "Does it explain why, in one sentence, without lecturing?"
+    },
+    {
+      "id": "controls-02-length-vs-effort",
+      "input": "Responses are too long. Should I lower effort?",
+      "assertions": [
+        "States that the reasoning control governs thinking depth, not visible length",
+        "Puts length control in the prompt",
+        "Does not conflate the two levers"
+      ],
+      "human_judgment": "Is the conciseness instruction concrete enough to paste?"
+    },
+    {
+      "id": "migration-01-remove-scaffolding",
+      "input": "Here is my old system prompt with 'CRITICAL: you MUST always double-check your work and use a subagent to verify'. Migrating to the current model.",
+      "assertions": [
+        "Removes rather than rewrites the verification scaffolding where the model self-verifies",
+        "Flags emphatic wrapping as an overtriggering risk",
+        "Recommends re-running representative cases after the deletion"
+      ],
+      "human_judgment": "Does the change list read as deletions first, additions last?"
+    },
+    {
+      "id": "injection-01-untrusted-content",
+      "input": "My research agent follows instructions it finds inside the web pages it reads.",
+      "assertions": [
+        "Adds the evidence-not-commands invariant",
+        "Separates trusted policy from retrieved content by position and tags",
+        "Requires reporting attempted injection rather than silent handling"
+      ],
+      "human_judgment": "Does it also name the harness-side control rather than treating prose as sufficient?"
+    },
+    {
+      "id": "surface-01-tool-description",
+      "input": "Fix this tool description: search(query): Searches stuff.",
+      "assertions": [
+        "Specifies capability and exclusions before arguments",
+        "Defines argument semantics, return shape, and empty-result behavior",
+        "Names the alternative source for out-of-scope requests"
+      ],
+      "human_judgment": "Is the rewrite usable verbatim in a tool schema?"
+    },
+    {
+      "id": "deliver-01-format-and-check",
+      "input": "Write me a prompt that turns meeting transcripts into a decision log.",
+      "assertions": [
+        "Returns one copyable prompt block with no framework labels inside it",
+        "Includes falsifiable completion criteria and missing-data behavior",
+        "Ends with the Target / Reasoning-effort / Verified footer",
+        "Offers one falsifiable check or the smallest isolating eval case"
+      ],
+      "human_judgment": "Is anything in the prompt block removable without changing behavior?"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+interface:
+  display_name: "Prompt Master"
+  short_description: "Build and repair reliable AI prompts"
+  default_prompt: "Use $prompt-master to write or repair a prompt for my target AI tool."
+
+policy:
+  # Implicit invocation stays on: the skill is meant to fire on phrasings that
+  # never name it ("why is it ignoring my format"). Set to false only if it
+  # starts crowding out more specific skills in the selector.
+  allow_implicit_invocation: true
