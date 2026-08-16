@@ -9,7 +9,7 @@
  * Trap language tracks each chapter's own gallery.
  * Run: node scripts/author/batch-counting-fill.mjs   (APPEND=1 to write)
  */
-import { choiceIndexForValue, verifyAndAppend } from "./harness.mjs";
+import { verifyAndAppend } from "./harness.mjs";
 
 const C = {
   format: "problem_solving",

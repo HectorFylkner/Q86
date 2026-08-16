@@ -290,38 +290,10 @@ const items = [
     },
   },
 
-  // 9 — D5: required speed on the back leg, where averaging speeds fails
-  {
-    ...S,
-    difficulty: 5,
-    stem_md:
-      "A driver covers the first $150$ kilometers of a $300$-kilometer trip at $75$ kilometers per hour. At what constant speed, in kilometers per hour, must she cover the remaining distance in order to average $60$ kilometers per hour for the entire trip?",
-    choices: ["$30$", "$45$", "$50$", "$60$", "$75$"],
-    correct_index: 2,
-    solution_md:
-      "**Formal path**\n\nAveraging $60$ over $300$ kilometers fixes the total time at $\\frac{300}{60} = 5$ hours. The first leg consumed $\\frac{150}{75} = 2$ hours, leaving $3$ hours for the remaining $150$ kilometers. The required speed is $\\frac{150}{3} = 50$ kilometers per hour.\n\n**Trigger cue**\n\n\"Average $A$ for the whole trip\": convert the target average into a total time budget, subtract the time already spent, and divide the distance left by what remains.\n\n**Takeaway**\n\nA target average is a time budget, not a speed to average.",
-    fastest_path_md:
-      "Budget $5$ h; $2$ h spent; $150$ km in $3$ h is $50$ km/h.",
-    trap_map: {
-      "0": "Divides the remaining distance by the whole $5$-hour budget, as if no time had been spent.",
-      "1": "Averages the speeds instead of the times, computing $2(60) - 75$.",
-      "3": "Restates the target average as the required speed.",
-      "4": "Repeats the first leg's speed.",
-    },
-    numeric_check: "150/3",
-    check() {
-      const totalTime = 300 / 60;
-      const firstLegTime = 150 / 75;
-      let answer = null;
-      for (let tenths = 1; tenths <= 2000; tenths++) {
-        const speed = tenths / 10;
-        const trip = firstLegTime + 150 / speed;
-        if (Math.abs(trip - totalTime) < 1e-9) answer = speed;
-      }
-      if (answer == null) throw new Error("no speed");
-      return { kind: "value", value: answer };
-    },
-  },
+  // The D5 that sat here ("required back-leg speed to hit a target
+  // average") was withdrawn after a cold reread: two divisions and a
+  // subtraction is a D4 at most. Its replacement lives in
+  // batch-d5-replacements.mjs.
 
   // 10 — D5: fraction done versus fraction left, with a joiner
   {

@@ -532,33 +532,10 @@ const items = [
       return { kind: "value", value: best };
     },
   },
-  {
-    ...V,
-    subtopic: "consecutive_evenly_spaced",
-    context: "pure",
-    difficulty: 5,
-    stem_md:
-      "Set $S$ consists of $n$ consecutive even integers whose sum is $0$. If the greatest member of $S$ is $18$, what is the value of $n$?",
-    choices: ["$9$", "$10$", "$17$", "$19$", "$20$"],
-    correct_index: 3,
-    solution_md:
-      "**Formal path**\n\nA set of consecutive terms summing to $0$ must be symmetric about $0$, so it runs from $-18$ to $18$ in steps of $2$. The count is $\\frac{18 - (-18)}{2} + 1 = 19$. The count is odd because the symmetric set includes $0$ itself.\n\n**Trigger cue**\n\nEvenly spaced terms summing to zero: the set is symmetric about zero, so the endpoints are negatives of each other.\n\n**Takeaway**\n\nA zero sum forces symmetry about zero, centre included.",
-    fastest_path_md: "$-18$ to $18$ by $2$: $\\frac{36}{2} + 1 = 19$.",
-    trap_map: {
-      "0": "Counts only the positive members.",
-      "1": "Counts the positive members and zero.",
-      "2": "Counts gaps rather than terms, $\\frac{36}{2} - 1$.",
-      "4": "Adds one term too many, as if the count had to be even.",
-    },
-    numeric_check: "19",
-    check() {
-      const set = [];
-      for (let n = -18; n <= 18; n += 2) set.push(n);
-      if (set.reduce((a, b) => a + b, 0) !== 0) throw new Error("not zero-sum");
-      if (Math.max(...set) !== 18) throw new Error("wrong greatest");
-      return { kind: "value", value: set.length };
-    },
-  },
+  // A second D5 here ("consecutive even integers summing to zero") was
+  // authored and then withdrawn: a cold reread found it was a 20-second
+  // symmetry spot, honest at D3 and dishonest at D5. Its replacement lives
+  // in batch-d5-replacements.mjs.
 
   // ===================== divisibility_gcf_lcm =====================
   {
@@ -741,7 +718,7 @@ const items = [
     numeric_check: null,
     check(q) {
       const claims = [
-        (a, b) => a > 0,
+        (a) => a > 0,
         (a, b) => a + b > 0,
         (a, b) => a - b > 0,
         (a, b) => a / b > 0,
@@ -790,7 +767,7 @@ const items = [
         (m, n) => m + n,
         (m, n) => m * n,
         (m, n) => m + n * n,
-        (m, n) => 3 * m + 1,
+        (m) => 3 * m + 1,
         (m, n) => m * m + n,
       ];
       const survivors = [];
@@ -907,7 +884,7 @@ const items = [
     numeric_check: null,
     check(q) {
       const forms = [
-        (p, r) => p,
+        (p) => p,
         (p, r) => r,
         (p, r) => p * r,
         (p, r) => p - r,

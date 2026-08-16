@@ -821,36 +821,11 @@ const items = [
       return { kind: "value", value: answer };
     },
   },
-  {
-    ...A,
-    subtopic: "quadratics_factoring",
-    context: "pure",
-    difficulty: 5,
-    stem_md:
-      "If $x + \\dfrac{1}{x} = 5$, what is the value of $x^{3} + \\dfrac{1}{x^{3}}$?",
-    choices: ["$110$", "$115$", "$120$", "$125$", "$130$"],
-    correct_index: 0,
-    solution_md:
-      "**Formal path**\n\nCube the given: $\\left(x + \\frac{1}{x}\\right)^{3} = x^{3} + 3x + \\frac{3}{x} + \\frac{1}{x^{3}} = x^{3} + \\frac{1}{x^{3}} + 3\\left(x + \\frac{1}{x}\\right)$. So $125 = x^{3} + \\frac{1}{x^{3}} + 15$, giving $110$.\n\n**Trigger cue**\n\n\"$x + \\frac{1}{x} = n$, find a higher power\": raise the given to that power and subtract the cross terms, which are always multiples of the given itself.\n\n**Takeaway**\n\nCube the given; the cross terms are $3$ times it.",
-    fastest_path_md: "$5^{3} - 3(5) = 125 - 15 = 110$.",
-    trap_map: {
-      "1": "Subtracts $10$, using the squared identity's $-2$ scaled wrongly.",
-      "2": "Subtracts $5$ instead of $3 \\times 5$.",
-      "3": "Reports $5^{3}$ without removing the cross terms.",
-      "4": "Adds $5$ to the cube instead of subtracting the cross terms.",
-    },
-    numeric_check: "125 - 15",
-    check() {
-      // Solve x + 1/x = 5 numerically, then evaluate the target directly.
-      const root = (5 + Math.sqrt(25 - 4)) / 2;
-      if (Math.abs(root + 1 / root - 5) > 1e-9) throw new Error("bad root");
-      const value = root ** 3 + 1 / root ** 3;
-      const other = (5 - Math.sqrt(25 - 4)) / 2;
-      const value2 = other ** 3 + 1 / other ** 3;
-      if (Math.abs(value - value2) > 1e-6) throw new Error("roots disagree");
-      return { kind: "value", value: Math.round(value * 1e6) / 1e6 };
-    },
-  },
+  // The D5 that sat here ("$x + 1/x = 5$, find $x^3 + 1/x^3$") was
+  // withdrawn after a cold reread: with the identity known it is a
+  // 15-second question, and the chapter teaches the squared form already.
+  // Its replacement lives in batch-d5-replacements.mjs.
+
   {
     ...A,
     subtopic: "quadratics_factoring",

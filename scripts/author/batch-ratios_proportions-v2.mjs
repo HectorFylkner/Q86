@@ -7,7 +7,7 @@
  * Run: node scripts/author/batch-ratios_proportions-v2.mjs
  *      (APPEND=1 to write the bank)
  */
-import { choiceIndexForValue, verifyAndAppend } from "./harness.mjs";
+import { verifyAndAppend } from "./harness.mjs";
 
 const S = {
   format: "problem_solving",
