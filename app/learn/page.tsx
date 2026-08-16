@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
-import { chapterTestStates } from "@/lib/chapter-tests";
+import { SectionTabs } from "@/components/section-tabs";
+import { chapterTestStates, installedCoverage } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
 
@@ -17,11 +18,17 @@ const METHOD = [
 export default async function LearnPage() {
   const lessons = listLessons();
   const tests = await chapterTestStates();
+  const coverage = await installedCoverage();
+  // The CLI gate guards the committed bank; this guards what is actually
+  // installed, which is what a chapter test will draw from. They diverge
+  // when the bank has moved ahead of the last `pnpm seed`.
+  const thin = lessons.filter((l) => !coverage[l.subtopic]?.fillsFloor);
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
 
   return (
     <div className="space-y-5">
+      <SectionTabs group="learn" />
       <div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="font-display text-xl font-semibold">Learn</h1>
@@ -53,6 +60,22 @@ export default async function LearnPage() {
           </div>
         ))}
       </div>
+
+      {thin.length > 0 && (
+        <p className="rounded-card border border-amber/50 bg-amber/5 px-4 py-3 text-xs leading-snug text-graphite shadow-ambient">
+          <span className="font-medium text-amber">
+            {thin.length} chapter{thin.length === 1 ? "" : "s"} can&apos;t serve
+            a full test twice over
+          </span>{" "}
+          from the questions currently installed
+          {thin.length <= 4 && (
+            <> — {thin.map((l) => l.title.split(":")[0]).join(", ")}</>
+          )}
+          . Run <code className="font-mono">pnpm seed</code> to load the
+          committed bank, then <code className="font-mono">pnpm verify:coverage</code>{" "}
+          to see exactly which tiers are short.
+        </p>
+      )}
 
       {lessons.length === 0 && (
         <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">

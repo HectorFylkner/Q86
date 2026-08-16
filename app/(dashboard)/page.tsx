@@ -9,7 +9,12 @@ import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
 import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
 import { getSetting } from "@/lib/settings";
-import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
+import {
+  ERROR_TYPES,
+  ERROR_TYPE_LABELS,
+  SKILL_SHORT_LABELS,
+  SKILL_LABELS,
+} from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -254,7 +259,9 @@ export default async function TodayPage() {
         </h2>
         <p className="mt-0.5 text-xs text-graphite">
           Rolling last-30-attempt accuracy blended 50/50 with the imported
-          baseline; 5% floor keeps every skill in rotation.
+          baseline, then tilted by the error-type mix of your tagged misses —
+          a skill missing rules outranks one merely running out of clock.
+          5% floor keeps every skill in rotation.
         </p>
         <div className="mt-3 space-y-2">
           {plan.drill.bySkill.map(({ skill }) => {
@@ -277,6 +284,9 @@ export default async function TodayPage() {
                     ? `${record.correct}/${record.total} recent`
                     : "no data"}
                 </span>
+                <span className="w-32 text-right font-mono text-xs text-graphite">
+                  {dominantError(plan.errorMix[skill]) ?? "untagged"}
+                </span>
               </div>
             );
           })}
@@ -284,6 +294,25 @@ export default async function TodayPage() {
       </section>
     </div>
   );
+}
+
+/** The most common tagged failure mode for a skill, for the weight row.
+ *  Null when nothing in the window carries a tag — which is itself worth
+ *  showing, since an untagged miss teaches the plan nothing. */
+function dominantError(
+  mix: Record<string, number> | undefined,
+): string | null {
+  if (!mix) return null;
+  let best: string | null = null;
+  let bestN = 0;
+  for (const e of ERROR_TYPES) {
+    const n = mix[e] ?? 0;
+    if (n > bestN) {
+      bestN = n;
+      best = ERROR_TYPE_LABELS[e];
+    }
+  }
+  return best ? `${best} ×${bestN}` : null;
 }
 
 function PlanCard({

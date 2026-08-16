@@ -3,9 +3,17 @@
 Local-first, single-user training platform for GMAT Focus Edition
 Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
-- A committed bank of 298 problem-solving questions, every one admitted
+- A committed bank of 464 problem-solving questions, every one admitted
   only after code recomputed its answer from the stem's raw data by brute
   force — never on an LLM's say-so
+- 24 concept chapters with a strategy playbook, and a spaced deck fed from
+  both sides: the takeaway of every question you miss, and the cues, traps
+  and concept checks of every chapter you cement
+- Chapter tests that draw a real easy-to-exam-hard blend and prefer
+  questions you haven't seen on a previous take
+- Miss-to-prescription: tag a miss with its error type and the cure is one
+  click away — the chapter, its cue list, its speed moves, or the playbook
+  note that owns that failure mode
 - Drill mode and full-section simulation with the official Review & Edit
   mechanic (max 3 edits, justification gate, edit ledger)
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
@@ -37,7 +45,7 @@ pnpm dev
 Open http://localhost:3000. The full training loop — read a chapter,
 cement it in the deck, drill, chapter tests, timed sets, redo queue,
 pattern trainer, analytics, daily plan — works with no API key: the
-298-question bank ships in `scripts/seed-bank.json`, every question
+464-question bank ships in `scripts/seed-bank.json`, every question
 verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
@@ -72,6 +80,21 @@ SQLite database at `./data/q86.db`, gitignored, no accounts, no cloud.
 Want it as a website instead of localhost? See [DEPLOY.md](DEPLOY.md) —
 free Vercel + Turso hosting (push-to-deploy, password gate) is the
 recommended path; a Dockerfile + Fly.io config ship as the alternative.
+
+## Content layout
+
+| Path | What it holds |
+| --- | --- |
+| `content/lessons/*.md` | 24 concept chapters, one per subtopic, on a fixed seven-section template |
+| `content/strategy/*.md` | The strategy playbook — the four notes the prescription loop routes to |
+| `scripts/seed-bank.json` | The question bank (committed, verified, problem-solving only) |
+
+Chapters are the single source of truth for chapter-derived spaced-repetition
+cards: `lib/lesson-cards.ts` parses each chapter's trigger cues, named traps,
+and pre-drill concept checks at read time, and only a content-derived card id
+plus its scheduling state is ever stored. Edit a chapter and its cards follow;
+rewrite a card and it retires the old schedule and starts fresh, which is the
+honest behaviour for a cue that now says something different.
 
 ## Extending the question bank
 

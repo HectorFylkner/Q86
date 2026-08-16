@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  *  `routes` lists every path that should light the entry up. */
 const LINKS = [
   { href: "/", label: "Today", routes: ["/"] },
-  { href: "/learn", label: "Learn", routes: ["/learn"] },
+  { href: "/learn", label: "Learn", routes: ["/learn", "/strategy"] },
   { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
   { href: "/timed", label: "Timed", routes: ["/timed"] },
   { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },

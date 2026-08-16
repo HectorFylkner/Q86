@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
-import { gradeDeckCard } from "@/lib/actions";
+import { gradeDeckCard, gradeLessonCard } from "@/lib/actions";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,21 @@ function days(n: number): string {
   return n === 1 ? "1d" : `${n}d`;
 }
 
+/** Chapter cards get the ballpoint accent; misses keep the red-pen one, so
+ *  the two sources stay visually distinct without a second style system. */
+function accentFor(card: DeckCard): { chip: string; back: string } {
+  if (card.kind === "miss") {
+    return {
+      chip: "border-redpen/40 text-redpen",
+      back: "border-redpen/40 bg-redpen/5",
+    };
+  }
+  return {
+    chip: "border-ballpoint/40 text-ballpoint",
+    back: "border-ballpoint/50 bg-highlight",
+  };
+}
+
 export function DeckClient({ cards }: { cards: DeckCard[] }) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -29,9 +44,13 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
   const grade = useCallback(
     (g: ReviewGrade) => {
       if (!card) return;
-      const questionId = card.questionId;
+      const { kind, id, questionId } = card;
       startTransition(() => {
-        void gradeDeckCard(questionId, g);
+        if (kind === "miss" && questionId != null) {
+          void gradeDeckCard(questionId, g);
+        } else {
+          void gradeLessonCard(id, g);
+        }
       });
       setIndex((i) => i + 1);
       setFlipped(false);
@@ -62,15 +81,24 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
     return (
       <section className="rounded-card border border-grid bg-surface p-6 text-center shadow-ambient">
         <p className="text-sm text-graphite">
-          Nothing due — the deck builds itself from questions you miss, and
-          cards you&apos;ve graded return when their interval comes up.
+          Nothing due. The deck fills from two places: questions you miss
+          arrive on their own, and a chapter&apos;s cues, traps, and concept
+          checks arrive when you push its pack from the chapter page.
         </p>
-        <Link
-          href="/drill"
-          className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
-        >
-          Go drill →
-        </Link>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <Link
+            href="/drill"
+            className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
+          >
+            Go drill →
+          </Link>
+          <Link
+            href="/learn"
+            className="rounded-control border border-grid px-4 py-2 text-sm font-medium hover:border-ballpoint/50"
+          >
+            Read a chapter →
+          </Link>
+        </div>
       </section>
     );
   }
@@ -79,8 +107,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
     return (
       <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
         <p className="font-display text-base font-semibold">
-          Deck done — {cards.length} takeaway{cards.length === 1 ? "" : "s"}{" "}
-          graded.
+          Deck done — {cards.length} card{cards.length === 1 ? "" : "s"} graded.
         </p>
         <p className="mt-1 text-sm text-graphite">
           Two minutes that compound. The cards you knew are scheduled out;
@@ -89,6 +116,8 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
       </section>
     );
   }
+
+  const accent = accentFor(card);
 
   return (
     <div className="mx-auto max-w-2xl space-y-3">
@@ -100,18 +129,29 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
         onClick={advance}
         className={cn(
           "block w-full rounded-card border p-6 text-left shadow-ambient transition-colors",
-          flipped ? "border-ballpoint/50 bg-highlight" : "border-grid bg-surface",
+          flipped ? accent.back : "border-grid bg-surface",
         )}
       >
-        <p className="font-mono text-[10px] uppercase tracking-wide text-graphite">
-          {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
-          missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
-        </p>
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-wide text-graphite">
+          <span
+            className={cn("rounded-control border px-1.5 py-0.5", accent.chip)}
+          >
+            {card.kindLabel}
+          </span>
+          <span>{card.subtopicLabel}</span>
+          <span>
+            ·{" "}
+            {card.kind === "miss" ? "missed " : "added "}
+            {formatDistanceToNow(new Date(card.addedAt), { addSuffix: true })}
+          </span>
+        </span>
         <div className="mt-2 text-[15px]">
           <Md source={flipped ? card.back : card.front} />
         </div>
         {!flipped && (
-          <p className="mt-3 text-xs text-graphite">Enter to flip</p>
+          <p className="mt-3 text-xs text-graphite">
+            {card.prompt} · Enter to flip
+          </p>
         )}
       </button>
       {flipped ? (
@@ -146,12 +186,21 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
             </button>
           </div>
           <p className="text-center">
-            <Link
-              href={`/drill?qids=${card.questionId}`}
-              className="text-xs font-medium text-ballpoint hover:underline"
-            >
-              Re-solve the question this came from →
-            </Link>
+            {card.kind === "miss" && card.questionId != null ? (
+              <Link
+                href={`/drill?qids=${card.questionId}`}
+                className="text-xs font-medium text-ballpoint hover:underline"
+              >
+                Re-solve the question this came from →
+              </Link>
+            ) : (
+              <Link
+                href={`/learn/${card.subtopic}#${card.chapterAnchor ?? "cues"}`}
+                className="text-xs font-medium text-ballpoint hover:underline"
+              >
+                Open this in the chapter →
+              </Link>
+            )}
           </p>
         </>
       ) : null}

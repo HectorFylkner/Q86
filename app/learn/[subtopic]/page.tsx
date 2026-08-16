@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Md } from "@/components/math";
+import { CementPack } from "@/components/lesson/cement-pack";
 import { DrillChecklist } from "@/components/lesson/drill-checklist";
 import { ExampleCard } from "@/components/lesson/example-card";
 import {
@@ -17,12 +18,15 @@ import {
   WhyLede,
 } from "@/components/lesson/sections";
 import { chapterTestStates } from "@/lib/chapter-tests";
+import { chapterPackState } from "@/lib/deck";
+import { chapterPack } from "@/lib/lesson-cards";
 import { parseLesson } from "@/lib/lesson-parse";
-import { listLessons, readLesson } from "@/lib/lessons";
+import { listLessons, readLesson, prereqsFor } from "@/lib/lessons";
 import {
   ALL_SUBTOPICS,
   SKILL_BY_SUBTOPIC,
   SKILL_LABELS,
+  SUBTOPIC_LABELS,
   type Subtopic,
 } from "@/lib/taxonomy";
 
@@ -51,6 +55,9 @@ export default async function LessonPage({
 
   const parsed = parseLesson(lesson.body);
   const testState = (await chapterTestStates())[subtopic as Subtopic];
+  const pack = chapterPack(subtopic as Subtopic);
+  const packState = await chapterPackState(subtopic as Subtopic);
+  const prereqs = prereqsFor(subtopic as Subtopic);
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;
@@ -78,6 +85,23 @@ export default async function LessonPage({
           {testState?.passed && (
             <span className="text-ballpoint">✓ test passed</span>
           )}
+        </p>
+      )}
+      {prereqs.length > 0 && (
+        <p className="mt-1.5 text-xs text-graphite">
+          Builds on{" "}
+          {prereqs.map((p, i) => (
+            <span key={p}>
+              {i > 0 && " and "}
+              <Link
+                href={`/learn/${p}`}
+                className="font-medium text-ballpoint hover:underline"
+              >
+                {SUBTOPIC_LABELS[p]}
+              </Link>
+            </span>
+          ))}
+          .
         </p>
       )}
     </div>
@@ -208,6 +232,18 @@ export default async function LessonPage({
             }}
           />
         </SectionShell>
+
+        <CementPack
+          subtopic={subtopic as Subtopic}
+          packSize={pack.length}
+          breakdown={{
+            cues: pack.filter((c) => c.kind === "cue").length,
+            traps: pack.filter((c) => c.kind === "trap").length,
+            checks: pack.filter((c) => c.kind === "check").length,
+          }}
+          inDeck={packState.inDeck}
+          dueNow={packState.dueNow}
+        />
 
         {footer}
       </div>

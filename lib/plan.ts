@@ -1,5 +1,7 @@
 import {
+  ERROR_TYPES,
   FUNDAMENTAL_SKILLS,
+  type ErrorType,
   type FundamentalSkill,
 } from "./taxonomy.ts";
 import type { PatternCategoryKey } from "./generators/index.ts";
@@ -10,6 +12,54 @@ import type { PatternCategoryKey } from "./generators/index.ts";
  */
 
 export type SkillRecord = { correct: number; total: number };
+
+/** Tagged misses per skill group, by error type. Untagged misses are not
+ *  counted — an untagged miss carries no diagnostic information. */
+export type ErrorMix = Record<ErrorType, number>;
+
+export const EMPTY_ERROR_MIX: ErrorMix = Object.fromEntries(
+  ERROR_TYPES.map((e) => [e, 0]),
+) as ErrorMix;
+
+/**
+ * How much each error type should tilt a skill's weight, beyond what raw
+ * accuracy already says.
+ *
+ * Accuracy alone treats every miss as the same evidence, and it is not.
+ * A content gap is a hole that more reps of the *same* skill will not fill
+ * on their own but that does mark the skill as unlearned — it earns the
+ * most extra weight. Setup errors are close behind: they repeat. Time
+ * pressure and guesses are only weakly about this skill (the cure is
+ * pacing and diagnosis, prescribed elsewhere), so they barely move it,
+ * and weighting them hard would drill a skill to fix a clock problem.
+ */
+export const ERROR_TYPE_WEIGHTS: Record<ErrorType, number> = {
+  content_gap: 1.0,
+  setup_error: 0.8,
+  calculation_error: 0.5,
+  misread: 0.3,
+  time_pressure: 0.15,
+  guess: 0.4,
+};
+
+/** Cap on how far the error mix can move a skill's raw weakness score, so
+ *  a handful of tagged misses can never dominate a full accuracy record. */
+const ERROR_TILT_CAP = 0.25;
+
+/**
+ * The extra weakness a skill's tagged misses justify, in [0, ERROR_TILT_CAP].
+ * Scales with the *share* of attempts that were diagnostically serious
+ * misses, not with the raw count, so a skill you have barely touched does
+ * not get shouted down by one bad session.
+ */
+export function errorTilt(mix: ErrorMix, attempts: number): number {
+  if (attempts <= 0) return 0;
+  const weighted = ERROR_TYPES.reduce(
+    (sum, e) => sum + mix[e] * ERROR_TYPE_WEIGHTS[e],
+    0,
+  );
+  return Math.min(ERROR_TILT_CAP, weighted / attempts);
+}
 
 /** Training phase from days-to-test (Manhattan-style arc). */
 export type TrainingPhase = "foundations" | "accuracy" | "speed" | "peak";
@@ -58,6 +108,9 @@ export type PlanInputs = {
   daysToTest: number | null;
   /** Rolling last-30-attempts accuracy per skill (platform data). */
   skillAccuracy: Record<FundamentalSkill, SkillRecord>;
+  /** Error-type mix of the tagged misses in that same window, per skill.
+   *  Lets the plan see *why* a skill is weak, not just that it is. */
+  errorMix: Record<FundamentalSkill, ErrorMix>;
   /** Baseline weakness per skill from the imported report, 0..1
    *  (1 = weakest); null when nothing imported. */
   baselineWeakness: Record<FundamentalSkill, number> | null;
@@ -83,6 +136,9 @@ export type DailyPlan = {
     bySkill: Array<{ skill: FundamentalSkill; count: number }>;
   };
   weights: Record<FundamentalSkill, number>;
+  /** Passed through so the dashboard can name the dominant failure mode
+   *  per skill rather than only showing a percentage. */
+  errorMix: Record<FundamentalSkill, ErrorMix>;
   dueRedoCount: number;
   timedSetToday: boolean;
 };
@@ -93,7 +149,7 @@ const WEIGHT_FLOOR = 0.05;
 export function computeWeights(
   inputs: Pick<
     PlanInputs,
-    "skillAccuracy" | "baselineWeakness" | "weightOverrides"
+    "skillAccuracy" | "baselineWeakness" | "weightOverrides" | "errorMix"
   >,
 ): Record<FundamentalSkill, number> {
   const raw: Record<FundamentalSkill, number> = {} as Record<
@@ -109,8 +165,16 @@ export function computeWeights(
     }
     const record = inputs.skillAccuracy[skill];
     // No platform data yet → neutral 0.5 weakness.
-    const platformWeakness =
+    const accuracyWeakness =
       record.total > 0 ? 1 - record.correct / record.total : 0.5;
+    // Error-type mix tilts on top of accuracy: two skills at 60% are not
+    // equally urgent if one is missing rules and the other is running out
+    // of clock. Capped, so accuracy stays the dominant signal.
+    const tilt = errorTilt(
+      inputs.errorMix?.[skill] ?? EMPTY_ERROR_MIX,
+      record.total,
+    );
+    const platformWeakness = Math.min(1, accuracyWeakness + tilt);
     const baseline = inputs.baselineWeakness?.[skill];
     // Blend 50/50 with the imported baseline when it exists.
     raw[skill] =
@@ -212,6 +276,7 @@ export function computeDailyPlan(inputs: PlanInputs): DailyPlan {
       bySkill: bySkill.map(({ skill, count }) => ({ skill, count })),
     },
     weights,
+    errorMix: inputs.errorMix,
     dueRedoCount: inputs.dueRedoCount,
     timedSetToday:
       effectiveCadence > 0 && inputs.dayIndex % effectiveCadence === 0,

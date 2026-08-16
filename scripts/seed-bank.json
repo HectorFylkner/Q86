@@ -9863,33 +9863,6 @@
    "fundamental_skill": "rates_ratio_percent",
    "subtopic": "rates_speed_work",
    "difficulty": 5,
-   "stem_md": "A driver covers the first $150$ kilometers of a $300$-kilometer trip at $75$ kilometers per hour. At what constant speed, in kilometers per hour, must she cover the remaining distance in order to average $60$ kilometers per hour for the entire trip?",
-   "choices": [
-    "$30$",
-    "$45$",
-    "$50$",
-    "$60$",
-    "$75$"
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\nAveraging $60$ over $300$ kilometers fixes the total time at $\\frac{300}{60} = 5$ hours. The first leg consumed $\\frac{150}{75} = 2$ hours, leaving $3$ hours for the remaining $150$ kilometers. The required speed is $\\frac{150}{3} = 50$ kilometers per hour.\n\n**Trigger cue**\n\n\"Average $A$ for the whole trip\": convert the target average into a total time budget, subtract the time already spent, and divide the distance left by what remains.\n\n**Takeaway**\n\nA target average is a time budget, not a speed to average.",
-   "fastest_path_md": "Budget $5$ h; $2$ h spent; $150$ km in $3$ h is $50$ km/h.",
-   "trap_map": {
-    "0": "Divides the remaining distance by the whole $5$-hour budget, as if no time had been spent.",
-    "1": "Averages the speeds instead of the times, computing $2(60) - 75$.",
-    "3": "Restates the target average as the required speed.",
-    "4": "Repeats the first leg's speed."
-   },
-   "numeric_check": "150/3",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "problem_solving",
-   "content_domain": "arithmetic",
-   "context": "real",
-   "fundamental_skill": "rates_ratio_percent",
-   "subtopic": "rates_speed_work",
-   "difficulty": 5,
    "stem_md": "A tank is filled by inlet pipe A alone in $12$ hours and by inlet pipe B alone in $18$ hours, while a drain pipe C empties the full tank in $36$ hours. All three are opened together on an empty tank. After $6$ hours the drain is closed. How many more hours are needed to fill the tank?",
    "choices": [
     "$1.2$",
@@ -10664,33 +10637,6 @@
     "4": "Adds the sum and the difference without halving."
    },
    "numeric_check": "7/2",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "problem_solving",
-   "content_domain": "algebra",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "quadratics_factoring",
-   "context": "pure",
-   "difficulty": 5,
-   "stem_md": "If $x + \\dfrac{1}{x} = 5$, what is the value of $x^{3} + \\dfrac{1}{x^{3}}$?",
-   "choices": [
-    "$110$",
-    "$115$",
-    "$120$",
-    "$125$",
-    "$130$"
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\nCube the given: $\\left(x + \\frac{1}{x}\\right)^{3} = x^{3} + 3x + \\frac{3}{x} + \\frac{1}{x^{3}} = x^{3} + \\frac{1}{x^{3}} + 3\\left(x + \\frac{1}{x}\\right)$. So $125 = x^{3} + \\frac{1}{x^{3}} + 15$, giving $110$.\n\n**Trigger cue**\n\n\"$x + \\frac{1}{x} = n$, find a higher power\": raise the given to that power and subtract the cross terms, which are always multiples of the given itself.\n\n**Takeaway**\n\nCube the given; the cross terms are $3$ times it.",
-   "fastest_path_md": "$5^{3} - 3(5) = 125 - 15 = 110$.",
-   "trap_map": {
-    "1": "Subtracts $10$, using the squared identity's $-2$ scaled wrongly.",
-    "2": "Subtracts $5$ instead of $3 \\times 5$.",
-    "3": "Reports $5^{3}$ without removing the cross terms.",
-    "4": "Adds $5$ to the cube instead of subtracting the cross terms."
-   },
-   "numeric_check": "125 - 15",
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -11966,33 +11912,6 @@
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "context": "pure",
-   "difficulty": 5,
-   "stem_md": "Set $S$ consists of $n$ consecutive even integers whose sum is $0$. If the greatest member of $S$ is $18$, what is the value of $n$?",
-   "choices": [
-    "$9$",
-    "$10$",
-    "$17$",
-    "$19$",
-    "$20$"
-   ],
-   "correct_index": 3,
-   "solution_md": "**Formal path**\n\nA set of consecutive terms summing to $0$ must be symmetric about $0$, so it runs from $-18$ to $18$ in steps of $2$. The count is $\\frac{18 - (-18)}{2} + 1 = 19$. The count is odd because the symmetric set includes $0$ itself.\n\n**Trigger cue**\n\nEvenly spaced terms summing to zero: the set is symmetric about zero, so the endpoints are negatives of each other.\n\n**Takeaway**\n\nA zero sum forces symmetry about zero, centre included.",
-   "fastest_path_md": "$-18$ to $18$ by $2$: $\\frac{36}{2} + 1 = 19$.",
-   "trap_map": {
-    "0": "Counts only the positive members.",
-    "1": "Counts the positive members and zero.",
-    "2": "Counts gaps rather than terms, $\\frac{36}{2} - 1$.",
-    "4": "Adds one term too many, as if the count had to be even."
-   },
-   "numeric_check": "19",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "problem_solving",
-   "content_domain": "arithmetic",
-   "fundamental_skill": "value_order_factors",
    "subtopic": "divisibility_gcf_lcm",
    "context": "pure",
    "difficulty": 3,
@@ -12527,6 +12446,87 @@
     "4": "Carries the remainder $7$ across unchanged, though $7 > 4$."
    },
    "numeric_check": "3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "Pipe A alone fills a tank in $10$ hours and pipe B alone fills it in $15$ hours. Pipe A is opened alone at 6:00 a.m. Pipe B is opened at 9:00 a.m., and pipe A is closed at 11:00 a.m., leaving B to finish. At what time is the tank full?",
+   "choices": [
+    "1:12 p.m.",
+    "4:00 p.m.",
+    "4:30 p.m.",
+    "5:00 p.m.",
+    "8:30 p.m."
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThree phases, each with its own rate. From 6:00 to 9:00, A alone does $3 \\cdot \\frac{1}{10} = \\frac{3}{10}$. From 9:00 to 11:00, both run at $\\frac{1}{10} + \\frac{1}{15} = \\frac{1}{6}$, adding $\\frac{2}{6} = \\frac{1}{3}$. Banked so far: $\\frac{3}{10} + \\frac{1}{3} = \\frac{19}{30}$. B alone must cover the remaining $\\frac{11}{30}$ at $\\frac{1}{15}$ per hour, taking $\\frac{11}{30} \\cdot 15 = 5.5$ hours. From 11:00 that is 4:30 p.m.\n\n**Trigger cue**\n\nWorkers joining and leaving at stated times: split the clock into phases, bank the fraction each phase completes, and recompute the rate at every change.\n\n**Takeaway**\n\nRecompute the rate at every join and every exit.",
+   "fastest_path_md": "$\\frac{3}{10} + \\frac{1}{3} = \\frac{19}{30}$ banked by 11:00; $\\frac{11}{30} \\div \\frac{1}{15} = 5.5$ h.",
+   "trap_map": {
+    "0": "Leaves pipe A open to the end, finishing the remainder at the combined rate.",
+    "1": "Forgets that B ever joins, running A alone for its full $10$ hours.",
+    "3": "Rounds the final $5.5$ hours up to $6$.",
+    "4": "Uses the fraction already filled, $\\frac{19}{30}$, as the fraction remaining."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "context": "pure",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "quadratics_factoring",
+   "difficulty": 5,
+   "stem_md": "If $x^{2} - 5x + 3 = 0$, what is the value of $x^{4} - 10x^{3} + 25x^{2} - 12$?",
+   "choices": [
+    "$-21$",
+    "$-12$",
+    "$-3$",
+    "$6$",
+    "$9$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nDo not solve for $x$. The first three terms are a perfect square: $x^{4} - 10x^{3} + 25x^{2} = \\left(x^{2} - 5x\\right)^{2}$. The given equation says $x^{2} - 5x = -3$, so that square is $(-3)^{2} = 9$, and the whole expression is $9 - 12 = -3$. Both roots give the same value, as they must.\n\n**Trigger cue**\n\nA quartic whose coefficients look like a squared quadratic: isolate $x^{2} + bx$ from the given equation and hunt for its square in the target.\n\n**Takeaway**\n\nFind the given expression inside the target; never solve for $x$.",
+   "fastest_path_md": "$\\left(x^{2}-5x\\right)^{2} - 12 = (-3)^{2} - 12 = -3$.",
+   "trap_map": {
+    "0": "Carries the sign through the squaring, using $(-3)^{2} = -9$.",
+    "1": "Takes the square to be $0$, as if $x^{2} - 5x$ vanished.",
+    "3": "Subtracts $3$ instead of $12$.",
+    "4": "Stops at the square and forgets the trailing $-12$."
+   },
+   "numeric_check": "9 - 12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "pure",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "consecutive_evenly_spaced",
+   "difficulty": 5,
+   "stem_md": "How many integers from $100$ through $999$, inclusive, are multiples of $6$ but not multiples of $8$?",
+   "choices": [
+    "$37$",
+    "$112$",
+    "$113$",
+    "$132$",
+    "$150$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nCount the multiples of $6$: they run $102$ to $996$, so $\\frac{996-102}{6} + 1 = 150$. Now remove those that are also multiples of $8$ — that means multiples of $\\mathrm{lcm}(6,8) = 24$, not of $48$. They run $120$ to $984$, so $\\frac{984-120}{24} + 1 = 37$. The answer is $150 - 37 = 113$.\n\n**Trigger cue**\n\n\"Multiples of $a$ but not of $b$\": count the multiples of $a$, then subtract the multiples of $\\mathrm{lcm}(a,b)$ — pin the first and last qualifying value at each step.\n\n**Takeaway**\n\nThe overlap of two divisibility conditions is their lcm.",
+   "fastest_path_md": "$150$ multiples of $6$, minus $37$ multiples of $24$, is $113$.",
+   "trap_map": {
+    "0": "Reports the multiples of $24$ that were removed rather than what survives.",
+    "1": "Drops a term from one of the inclusive counts.",
+    "3": "Uses $48$, the product, as the overlap instead of $\\mathrm{lcm}(6,8) = 24$.",
+    "4": "Counts the multiples of $6$ and ignores the second condition."
+   },
+   "numeric_check": "150 - 37",
    "provenance": "authored + brute-force programmatic verification"
   }
  ]

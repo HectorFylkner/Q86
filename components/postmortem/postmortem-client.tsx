@@ -6,7 +6,9 @@ import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ChoiceList } from "@/components/drill/choice-list";
 import { ScratchCapture } from "@/components/postmortem/capture";
+import { PrescriptionCard } from "@/components/postmortem/prescription-card";
 import { tagAttempt } from "@/lib/actions";
+import { prescribe } from "@/lib/prescriptions";
 import type { CoachResponse } from "@/lib/ai/schemas";
 import type { Attempt, Question } from "@/lib/db/schema";
 import {
@@ -275,12 +277,13 @@ export function PostmortemClient({
         </motion.section>
       )}
 
-      {(coach || attempt.aiFeedbackMd) && (
-        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+      <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
             Classification
             <span className="ml-2 text-xs font-normal text-graphite">
-              AI-suggested — confirm or override before it enters the log
+              {coach || attempt.aiFeedbackMd
+                ? "AI-suggested — confirm or override before it enters the log"
+                : "Tag the miss and the cure appears below — no API key needed"}
             </span>
           </h2>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -354,7 +357,17 @@ export function PostmortemClient({
               </span>
             )}
           </div>
-        </section>
+      </section>
+
+      {errorType && (
+        <PrescriptionCard
+          prescription={prescribe({
+            errorType,
+            subtopic: errorSubtag ?? question.subtopic,
+            difficulty: question.difficulty,
+            timeSeconds: attempt.timeSeconds,
+          })}
+        />
       )}
 
       {(coach || attempt.aiFeedbackMd) && (

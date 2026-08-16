@@ -209,6 +209,38 @@ export const deckReviews = sqliteTable(
   (t) => [index("deck_reviews_due_idx").on(t.dueAt)],
 );
 
+/**
+ * Scheduling for chapter-derived cards (trigger cues, named traps,
+ * concept checks — see lib/lesson-cards.ts). Same SM-2-lite engine as
+ * deckReviews, but keyed by a content-derived card id rather than a
+ * question id, because the content lives in the chapter markdown and is
+ * never copied into the database. A row existing means the card is in the
+ * deck; pushing a chapter's pack inserts one row per card.
+ */
+export const lessonCardReviews = sqliteTable(
+  "lesson_card_reviews",
+  {
+    cardId: text("card_id").primaryKey(),
+    subtopic: text("subtopic").$type<Subtopic>().notNull(),
+    kind: text("kind").notNull(),
+    ease: real("ease").notNull().default(2.5),
+    intervalDays: integer("interval_days").notNull().default(0),
+    reps: integer("reps").notNull().default(0),
+    lapses: integer("lapses").notNull().default(0),
+    dueAt: integer("due_at", { mode: "timestamp_ms" }).notNull(),
+    addedAt: integer("added_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("lesson_card_due_idx").on(t.dueAt),
+    index("lesson_card_subtopic_idx").on(t.subtopic),
+  ],
+);
+
 // Content QC: questions the user flags mid-review. Resolving may retire
 // the question (verified = false) — rows are never deleted.
 export const questionFlags = sqliteTable(
@@ -240,4 +272,5 @@ export type PatternAttempt = typeof patternAttempts.$inferSelect;
 export type EloRating = typeof eloRatings.$inferSelect;
 export type BaselineReport = typeof baselineReports.$inferSelect;
 export type DeckReview = typeof deckReviews.$inferSelect;
+export type LessonCardReview = typeof lessonCardReviews.$inferSelect;
 export type QuestionFlag = typeof questionFlags.$inferSelect;

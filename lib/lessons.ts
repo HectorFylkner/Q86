@@ -8,6 +8,10 @@ import {
   type Subtopic,
 } from "./taxonomy.ts";
 
+// The prerequisite map lives in its own module: lib/prescriptions.ts needs
+// it in a client component, and this file reaches for the filesystem.
+export { LESSON_PREREQS, prereqsFor } from "./lesson-prereqs.ts";
+
 /** Original concept chapters, one per subtopic, written and math-reviewed
  *  through the platform's agent gates. Markdown in the app's dialect. */
 export type LessonMeta = {

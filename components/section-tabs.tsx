@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
  *  group renders <SectionTabs group="…" /> under its title so the group
  *  reads as one place with views, not separate destinations. */
 export const SECTION_GROUPS = {
+  learn: [
+    { href: "/learn", label: "Chapters" },
+    { href: "/strategy", label: "Strategy playbook" },
+  ],
   review: [
     { href: "/deck", label: "Takeaway deck" },
     { href: "/queue", label: "Redo queue" },

@@ -14,12 +14,19 @@ import {
 } from "./generators/index.ts";
 import {
   computeDailyPlan,
+  EMPTY_ERROR_MIX,
   type DailyPlan,
+  type ErrorMix,
   type PlanInputs,
   type SkillRecord,
 } from "./plan.ts";
 import { baselineWeakness, getSetting, weightOverrides } from "./settings.ts";
-import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
+import {
+  ERROR_TYPES,
+  FUNDAMENTAL_SKILLS,
+  type ErrorType,
+  type FundamentalSkill,
+} from "./taxonomy.ts";
 
 export async function daysToTest(): Promise<number | null> {
   const raw = await getSetting("test_date");
@@ -55,6 +62,40 @@ async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
   return out;
 }
 
+/**
+ * Error-type mix over the same last-30-attempts window as skillAccuracy,
+ * so the two signals describe the same slice of history. Only tagged
+ * misses count; an untagged miss says nothing about *why* it happened.
+ */
+async function skillErrorMix(): Promise<Record<FundamentalSkill, ErrorMix>> {
+  const out = {} as Record<FundamentalSkill, ErrorMix>;
+  for (const skill of FUNDAMENTAL_SKILLS) {
+    const rows = await db
+      .select({ correct: attempts.correct, errorType: attempts.errorType })
+      .from(attempts)
+      .innerJoin(questions, eq(attempts.questionId, questions.id))
+      .where(
+        and(
+          eq(questions.fundamentalSkill, skill),
+          eq(attempts.focus, "focused"),
+        ),
+      )
+      .orderBy(desc(attempts.id))
+      .limit(30)
+      .all();
+    const mix: ErrorMix = { ...EMPTY_ERROR_MIX };
+    for (const row of rows) {
+      if (row.correct) continue;
+      const tag = row.errorType;
+      if (tag && ERROR_TYPES.includes(tag as ErrorType)) {
+        mix[tag as ErrorType] += 1;
+      }
+    }
+    out[skill] = mix;
+  }
+  return out;
+}
+
 export async function dueRedoCount(): Promise<number> {
   const rows = await db
     .select({ id: redoQueue.id })
@@ -84,6 +125,7 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   return {
     daysToTest: await daysToTest(),
     skillAccuracy: await skillAccuracy(),
+    errorMix: await skillErrorMix(),
     baselineWeakness: await baselineWeakness(),
     weightOverrides: await weightOverrides(),
     dueRedoCount: await dueRedoCount(),

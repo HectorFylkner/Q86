@@ -9,6 +9,7 @@ import {
   deckReviews,
   edits,
   eloRatings,
+  lessonCardReviews,
   patternAttempts,
   questionFlags,
   questions,
@@ -17,6 +18,7 @@ import {
 } from "./db/schema.ts";
 import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
+import { chapterPack, parseCardId } from "./lesson-cards.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
 import {
@@ -621,6 +623,87 @@ export async function gradeDeckCard(
   } else {
     await db.insert(deckReviews).values({ questionId, ...next, dueAt }).run();
   }
+}
+
+/**
+ * Push a chapter's card pack into the deck: its trigger cues, named traps,
+ * and concept checks, all due immediately. Idempotent — a card already in
+ * the deck keeps the schedule it has earned, so re-reading a chapter and
+ * pressing the button again never resets your intervals. Only the card id
+ * is stored; the text is re-parsed from the chapter markdown on every
+ * read, so the chapter stays the single source of truth.
+ */
+export async function pushChapterPack(
+  subtopic: Subtopic,
+): Promise<{ added: number; alreadyPresent: number }> {
+  const pack = chapterPack(subtopic);
+  if (pack.length === 0) return { added: 0, alreadyPresent: 0 };
+  const existing = new Set(
+    (
+      await db
+        .select({ cardId: lessonCardReviews.cardId })
+        .from(lessonCardReviews)
+        .where(eq(lessonCardReviews.subtopic, subtopic))
+        .all()
+    ).map((r) => r.cardId),
+  );
+  const now = new Date();
+  let added = 0;
+  for (const card of pack) {
+    if (existing.has(card.id)) continue;
+    await db
+      .insert(lessonCardReviews)
+      .values({
+        cardId: card.id,
+        subtopic: card.subtopic,
+        kind: card.kind,
+        dueAt: now,
+        addedAt: now,
+      })
+      .onConflictDoNothing()
+      .run();
+    added++;
+  }
+  revalidatePath("/deck");
+  revalidatePath(`/learn/${subtopic}`);
+  return { added, alreadyPresent: pack.length - added };
+}
+
+/** Grade a chapter card. Same SM-2-lite ladder as a miss card. */
+export async function gradeLessonCard(
+  cardId: string,
+  grade: ReviewGrade,
+): Promise<void> {
+  const parsed = parseCardId(cardId);
+  if (!parsed) return;
+  const existing =
+    (await db
+      .select()
+      .from(lessonCardReviews)
+      .where(eq(lessonCardReviews.cardId, cardId))
+      .get()) ?? null;
+  const next = nextReview(existing, grade);
+  const dueAt = new Date(Date.now() + next.intervalDays * 86_400_000);
+  if (existing) {
+    await db
+      .update(lessonCardReviews)
+      .set({ ...next, dueAt, updatedAt: new Date() })
+      .where(eq(lessonCardReviews.cardId, cardId))
+      .run();
+    return;
+  }
+  // Grading a card that was never pushed (a deep link, say) enrolls it.
+  await db
+    .insert(lessonCardReviews)
+    .values({
+      cardId,
+      subtopic: parsed.subtopic as Subtopic,
+      kind: parsed.kind,
+      ...next,
+      dueAt,
+    })
+    .onConflictDoNothing()
+    .run();
 }
 
 export async function flagQuestion(input: {

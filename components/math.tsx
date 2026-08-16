@@ -91,6 +91,17 @@ type Block =
   | { kind: "ol"; items: string[] }
   | { kind: "p"; lines: string[] };
 
+/** Slug for a heading, so notes and chapters can be deep-linked to a
+ *  section. Matches lib/strategy.ts noteAnchor(). */
+export function headingAnchor(text: string): string {
+  return text
+    .replace(/\$[^$]*\$/g, " ")
+    .replace(/[*_`\\]/g, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function parseBlocks(source: string): Block[] {
   const blocks: Block[] = [];
   // Split out $$...$$ display math first.
@@ -168,14 +179,19 @@ export function Md({
             return (
               <h2
                 key={key}
-                className="!mt-6 font-display text-base font-semibold first:!mt-0"
+                id={headingAnchor(block.text)}
+                className="!mt-6 scroll-mt-24 font-display text-base font-semibold first:!mt-0"
               >
                 {renderInline(block.text, key)}
               </h2>
             );
           case "h3":
             return (
-              <h3 key={key} className="!mt-4 font-display text-sm font-semibold">
+              <h3
+                key={key}
+                id={headingAnchor(block.text)}
+                className="!mt-4 scroll-mt-24 font-display text-sm font-semibold"
+              >
                 {renderInline(block.text, key)}
               </h3>
             );
