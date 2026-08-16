@@ -9045,6 +9045,870 @@
    },
    "numeric_check": "4*6",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "The sum of five positive integers is $60$, and each of them is at least $4$. What is the greatest possible value of one of these integers?",
+   "choices": [
+    "$12$",
+    "$40$",
+    "$44$",
+    "$48$",
+    "$56$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nTo push one value as high as possible, push every other value as low as it is allowed to go. The other four each sit at the floor of $4$, using $16$, so the target takes $60 - 16 = 44$.\n\n**Trigger cue**\n\n\"Greatest possible value of one member\" with a fixed total: extremize everyone else in the opposite direction.\n\n**Takeaway**\n\nTo maximize one, minimize all the others at their floor.",
+   "fastest_path_md": "$60 - 4 \\times 4 = 60 - 16 = 44$.",
+   "trap_map": {
+    "0": "Reports the average, $\\frac{60}{5}$.",
+    "1": "Reserves the floor for all five values, subtracting $20$.",
+    "3": "Reserves the floor for only three of the other integers.",
+    "4": "Uses $1$ as the floor for the others, ignoring the stated minimum of $4$."
+   },
+   "numeric_check": "60 - 16",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "A print shop charges a flat setup fee of $\\$45$ plus $\\$0.13$ for each page printed. What is the greatest number of whole pages that can be printed for a total cost of at most $\\$100$?",
+   "choices": [
+    "$55$",
+    "$423$",
+    "$424$",
+    "$769$",
+    "$770$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nAfter the setup fee, $100 - 45 = 55$ dollars remain for pages, buying $\\frac{55}{0.13} = 423.07\\ldots$ pages. Pages are whole, and $424$ pages would cost $45 + 55.12 = 100.12 > 100$, so the answer is $423$.\n\n**Trigger cue**\n\n\"Greatest number within a budget\": solve the inequality, then floor — a budget can never be rounded up into.\n\n**Takeaway**\n\nA cap floors; a required minimum ceilings.",
+   "fastest_path_md": "$\\frac{55}{0.13} \\approx 423.1$; take the floor, $423$.",
+   "trap_map": {
+    "0": "Reports the dollars left for pages rather than the page count.",
+    "2": "Rounds the quotient up, breaking the budget by $12$ cents.",
+    "3": "Ignores the setup fee, dividing the full $\\$100$ by $\\$0.13$.",
+    "4": "Ignores the setup fee and rounds up as well."
+   },
+   "numeric_check": "423",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "Five distinct positive integers have a median of $9$. What is the greatest possible value of the smallest of the five integers?",
+   "choices": [
+    "$1$",
+    "$5$",
+    "$6$",
+    "$7$",
+    "$8$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe median is the third value, so exactly two integers lie below $9$. Being distinct integers below $9$, the largest they can be is $8$ and $7$. The smallest of the five is therefore at most $7$, achieved by $7, 8, 9, 10, 11$.\n\n**Trigger cue**\n\n\"Distinct integers\" plus a median: pack the values on the target's side consecutively against the tightest bound.\n\n**Takeaway**\n\nDistinct integers pack one apart, never on top of each other.",
+   "fastest_path_md": "Two values sit below $9$; packed tight they are $8$ and $7$, so the smallest is $7$.",
+   "trap_map": {
+    "0": "Assumes the smallest must be $1$, as if only the median were constrained.",
+    "1": "Leaves a gap below the median instead of packing tightly.",
+    "2": "Packs from $6$, using one more value below the median than the median allows.",
+    "4": "Uses $8$ for both values below the median, ignoring distinctness."
+   },
+   "numeric_check": "7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $x$ and $y$ are positive numbers such that $x + y = 30$, what is the greatest possible value of $xy$?",
+   "choices": [
+    "$15$",
+    "$221$",
+    "$225$",
+    "$450$",
+    "$900$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWith the sum fixed, the product is largest when the two numbers are equal: $x = y = 15$ gives $xy = 225$. Formally, $xy = x(30-x) = -(x-15)^{2} + 225$, a downward parabola peaking at $x = 15$.\n\n**Trigger cue**\n\n\"$x + y$ is fixed, maximize $xy$\": the cap is $\\left(\\frac{S}{2}\\right)^{2}$, hit at the midpoint.\n\n**Takeaway**\n\nA fixed sum makes the product peak when the parts are equal.",
+   "fastest_path_md": "$\\left(\\frac{30}{2}\\right)^{2} = 225$.",
+   "trap_map": {
+    "0": "Reports the value of $x$ at the maximum rather than the product.",
+    "1": "Assumes the numbers must be distinct integers, settling for $13 \\times 17$.",
+    "3": "Multiplies the sum by the midpoint, $30 \\times 15$.",
+    "4": "Squares the sum instead of the half-sum."
+   },
+   "numeric_check": "15*15",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $3 \\le a \\le 8$ and $-5 \\le b \\le 2$, what is the least possible value of $ab$?",
+   "choices": [
+    "$-40$",
+    "$-16$",
+    "$-15$",
+    "$6$",
+    "$16$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nThe extreme of a product over two intervals occurs at a corner. The four corners are $3(-5) = -15$, $3(2) = 6$, $8(-5) = -40$, and $8(2) = 16$. The least is $-40$.\n\n**Trigger cue**\n\nRanges for two variables and an extreme of $ab$: evaluate all four corners — the biggest $|a|$ paired with the most negative $b$ usually wins.\n\n**Takeaway**\n\nFor a product's extreme, test every corner, not the obvious one.",
+   "fastest_path_md": "Most negative needs the largest $a$ against the most negative $b$: $8(-5) = -40$.",
+   "trap_map": {
+    "1": "Misreads $b$'s lower bound as $-2$.",
+    "2": "Pairs the smallest $a$ with the most negative $b$, $3(-5)$.",
+    "3": "Reports the least *positive* corner, $3(2)$.",
+    "4": "Reports the greatest corner rather than the least."
+   },
+   "numeric_check": "8*(-5)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "Four people share $\\$960$ so that each person receives a positive amount and no person receives more than three times what any other person receives. What is the greatest amount, in dollars, that any one of them can receive?",
+   "choices": [
+    "$240$",
+    "$320$",
+    "$360$",
+    "$480$",
+    "$720$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nIf the largest share is $M$, the cap forces every other share to be at least $\\frac{M}{3}$. The three others therefore total at least $M$, so $960 \\ge M + M = 2M$ and $M \\le 480$. That bound is reachable: $480$ with three shares of $160$ each, and $480 = 3 \\times 160$ satisfies the cap exactly.\n\n**Trigger cue**\n\n\"No one may have more than $k$ times any other\": the real floor on the others is $\\frac{M}{k}$, not the smallest number you can imagine.\n\n**Takeaway**\n\nA ratio cap sets a floor on the others that scales with the maximum.",
+   "fastest_path_md": "Others are each $\\ge \\frac{M}{3}$, so $960 \\ge 2M$ and $M = 480$.",
+   "trap_map": {
+    "0": "Splits the money evenly, ignoring that a maximum is being sought.",
+    "1": "Uses a cap of $2$ rather than $3$, giving $960 \\ge \\frac{5M}{2}$.",
+    "2": "Sets the other three to a fixed small share without checking the cap holds against $M$.",
+    "4": "Drives the other three toward zero, ignoring the floor the cap imposes."
+   },
+   "numeric_check": "480",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "Five distinct positive integers have an average (arithmetic mean) of $20$, and the largest of them is $40$. What is the greatest possible value of the smallest of them?",
+   "choices": [
+    "$12$",
+    "$13$",
+    "$14$",
+    "$15$",
+    "$20$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe five sum to $100$, so the four other than $40$ sum to $60$. To raise the smallest as high as possible, keep those four as close together as distinctness allows: $s, s+1, s+2$ and one more, needing $4s + 6 \\le 60$, so $s \\le 13.5$ and $s = 13$. It works: $13, 14, 15, 18, 40$ sums to $100$.\n\n**Trigger cue**\n\n\"Greatest possible value of the smallest\" with distinct integers: bunch the others as tightly as distinctness permits, then floor.\n\n**Takeaway**\n\nTo lift the minimum, crowd the rest together — one apart, no closer.",
+   "fastest_path_md": "Four values summing to $60$, distinct: $4s + 6 \\le 60 \\Rightarrow s = 13$.",
+   "trap_map": {
+    "0": "Stops one short of the achievable packing.",
+    "2": "Rounds $13.5$ up, which overshoots the available sum.",
+    "3": "Divides $60$ by $4$ and ignores distinctness entirely.",
+    "4": "Reports the average rather than the smallest value."
+   },
+   "numeric_check": "13",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "A caterer has $\\$500$ to spend on serving trays. A small tray costs $\\$18$ and a large tray costs $\\$31$. If she must buy at least $6$ large trays, what is the greatest total number of trays she can buy?",
+   "choices": [
+    "$21$",
+    "$22$",
+    "$23$",
+    "$24$",
+    "$27$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLarge trays cost more per tray, so buy exactly the required $6$: that is $186$, leaving $314$. Small trays then number $\\left\\lfloor \\frac{314}{18} \\right\\rfloor = 17$, for $6 + 17 = 23$ trays. Any seventh large tray leaves $283$, buying only $15$ small, for $22$ — worse.\n\n**Trigger cue**\n\nA count to maximize with a required minimum of the expensive item: buy exactly the minimum of the expensive one, then floor the remainder.\n\n**Takeaway**\n\nMeet the requirement exactly, then spend the rest on the cheapest unit.",
+   "fastest_path_md": "$500 - 6(31) = 314$; $\\left\\lfloor \\frac{314}{18} \\right\\rfloor = 17$; total $23$.",
+   "trap_map": {
+    "0": "Buys eight large trays, over-satisfying the requirement.",
+    "1": "Buys seven large trays rather than the required six.",
+    "3": "Rounds the small-tray count up, exceeding the budget.",
+    "4": "Ignores the large-tray requirement and buys only small trays."
+   },
+   "numeric_check": "6 + 17",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "If $-4 \\le x \\le 6$ and $2 \\le y \\le 9$, what is the greatest possible value of $x^{2} - y$?",
+   "choices": [
+    "$4$",
+    "$14$",
+    "$27$",
+    "$34$",
+    "$38$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nThe two terms are independent: maximize $x^{2}$ and minimize $y$. Over $[-4, 6]$ the square is largest at $x = 6$, giving $36$ — larger than the $16$ at $x = -4$. The smallest $y$ is $2$. So the maximum is $36 - 2 = 34$.\n\n**Trigger cue**\n\nAn extreme of a difference over two ranges: take opposite extremes, but square first — a squared variable's extreme need not sit at the negative end.\n\n**Takeaway**\n\nSquare before choosing the corner; then take opposite extremes.",
+   "fastest_path_md": "$x^{2}$ peaks at $36$, $y$ bottoms at $2$: $34$.",
+   "trap_map": {
+    "0": "Forgets to square, computing $6 - 2$.",
+    "1": "Takes $x = -4$ without comparing its square to $6^{2}$.",
+    "2": "Uses the largest $y$ instead of the smallest.",
+    "4": "Adds the smallest $y$ instead of subtracting it."
+   },
+   "numeric_check": "36 - 2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "Three distinct positive integers have a sum of $30$ and a median of $8$. What is the greatest possible value of the largest of the three?",
+   "choices": [
+    "$10$",
+    "$20$",
+    "$21$",
+    "$22$",
+    "$29$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWith three values the median is the middle one, so the set is $\\{s, 8, L\\}$ with $s < 8 < L$. Maximizing $L$ means minimizing $s$, and the smallest positive integer below $8$ is $1$. Then $L = 30 - 8 - 1 = 21$, and $1 < 8 < 21$ is legal.\n\n**Trigger cue**\n\nA sum plus a median, maximize the top: drop the bottom to its legal floor and check the ordering survives.\n\n**Takeaway**\n\nAfter extremizing, verify order, distinctness, and positivity.",
+   "fastest_path_md": "$30 - 8 - 1 = 21$.",
+   "trap_map": {
+    "0": "Reports the average of the three values.",
+    "1": "Uses $s = 2$, leaving the floor unreached.",
+    "3": "Uses $s = 0$, which is not a positive integer.",
+    "4": "Forgets the median term, computing $30 - 1$."
+   },
+   "numeric_check": "30 - 8 - 1",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "equal_unequal_alg",
+   "subtopic": "min_max_optimization",
+   "context": "pure",
+   "difficulty": 5,
+   "stem_md": "Seven distinct positive integers have a sum of $100$ and a median of $12$. What is the greatest possible value of the largest of the seven integers?",
+   "choices": [
+    "$55$",
+    "$57$",
+    "$58$",
+    "$61$",
+    "$82$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nSorted, the fourth value is $12$. Three values sit strictly below it and three strictly above. Minimize everything except the target: the three below are $1, 2, 3$ (sum $6$), and of the three above, the two that are not the target must be at least $13$ and $14$ (sum $27$). So the largest is $100 - 6 - 12 - 27 = 55$, realized by $1, 2, 3, 12, 13, 14, 55$.\n\n**Trigger cue**\n\nA median with distinct integers on both sides: reserve the minimum legal sum on *both* sides before spending the remainder on the target.\n\n**Takeaway**\n\nEvery value on both sides of the median must be reserved first.",
+   "fastest_path_md": "Reserve $1+2+3 = 6$ below, $12$ at the median, $13+14 = 27$ above: $100 - 45 = 55$.",
+   "trap_map": {
+    "1": "Lets a value above the median equal $12$, reserving $12 + 13$ instead of $13 + 14$.",
+    "2": "Reuses $1$ for all three values below the median, ignoring distinctness.",
+    "3": "Forgets to reserve anything below the median.",
+    "4": "Reserves only the median, ignoring the two other above-median values."
+   },
+   "numeric_check": "100 - 6 - 12 - 27",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "stem_md": "A class of $12$ students averaged $75$ on a test, and a second class of $18$ students averaged $85$ on the same test. What was the average score of all $30$ students?",
+   "choices": [
+    "$79$",
+    "$80$",
+    "$81$",
+    "$82$",
+    "$83$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWork in totals: $12 \\times 75 = 900$ and $18 \\times 85 = 1530$, so the combined total is $2430$ over $30$ students, giving $\\frac{2430}{30} = 81$.\n\n**Trigger cue**\n\n\"Average of the two groups combined\": sum both totals and divide by the combined count — never average the two averages.\n\n**Takeaway**\n\nCombine totals, not averages; weights are the counts.",
+   "fastest_path_md": "The larger class pulls the mean toward $85$: $75 + \\frac{18}{30}(10) = 81$.",
+   "trap_map": {
+    "0": "Weights the groups backwards, pulling the mean toward the smaller class.",
+    "1": "Averages the two averages, $\\frac{75+85}{2}$.",
+    "3": "Overshoots the lever, using a weight of $\\frac{7}{10}$.",
+    "4": "Pulls the mean nearly all the way to the larger group's average."
+   },
+   "numeric_check": "(12*75 + 18*85)/30",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "stem_md": "How many liters of a $10\\%$ salt solution must be mixed with $4$ liters of a $30\\%$ salt solution to produce a solution that is $15\\%$ salt?",
+   "choices": [
+    "$8$",
+    "$10$",
+    "$12$",
+    "$16$",
+    "$20$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nLet $x$ be the liters of the $10\\%$ solution. Salt in equals salt out: $0.10x + 0.30(4) = 0.15(x + 4)$, so $0.10x + 1.2 = 0.15x + 0.6$, giving $0.05x = 0.6$ and $x = 12$.\n\n**Trigger cue**\n\n\"Mix $x$ liters of $a\\%$ with $y$ liters of $b\\%$ to reach $c\\%$\": write the salt ledger, or use the lever — distances $5$ and $15$ mean a $3 : 1$ volume ratio.\n\n**Takeaway**\n\nTrack the pure substance; the totals take care of themselves.",
+   "fastest_path_md": "Distances from $15$: the $10\\%$ side is $5$ away, the $30\\%$ side is $15$ away, so volumes run $15 : 5 = 3 : 1$. Three times $4$ is $12$.",
+   "trap_map": {
+    "0": "Inverts the lever, giving the larger volume to the farther ingredient.",
+    "1": "Averages the two concentrations rather than weighting them.",
+    "3": "Reports the total volume of the finished mixture.",
+    "4": "Uses a $5 : 1$ ratio, reading the distances off the wrong endpoints."
+   },
+   "numeric_check": "12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 2,
+   "stem_md": "A grocer blends $15$ kilograms of tea costing $\\$8$ per kilogram with $10$ kilograms of tea costing $\\$13$ per kilogram. What is the cost, in dollars per kilogram, of the blend?",
+   "choices": [
+    "$9$",
+    "$10$",
+    "$10.50$",
+    "$11$",
+    "$21$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nTotal cost is $15(8) + 10(13) = 120 + 130 = 250$ for $25$ kilograms, so the blend costs $\\frac{250}{25} = 10$ per kilogram.\n\n**Trigger cue**\n\n\"Cost per kilogram of the blend\": weighted average of the unit prices, with the quantities as weights.\n\n**Takeaway**\n\nBlend price is total cost over total weight.",
+   "fastest_path_md": "$\\frac{120 + 130}{25} = \\frac{250}{25} = 10$.",
+   "trap_map": {
+    "0": "Weights the prices backwards, pulling toward the cheaper tea too hard.",
+    "2": "Averages the two prices, ignoring the unequal weights.",
+    "3": "Pulls the blend toward the more expensive tea.",
+    "4": "Adds the two unit prices rather than averaging them."
+   },
+   "numeric_check": "(15*8 + 10*13)/25",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "A tank holds $60$ liters of a solution that is $8\\%$ acid. How many liters of water must evaporate so that the remaining solution is $12\\%$ acid?",
+   "choices": [
+    "$15$",
+    "$20$",
+    "$24$",
+    "$36$",
+    "$40$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nOnly water leaves, so the acid stays at $0.08(60) = 4.8$ liters. For that to be $12\\%$ of the new volume $V$, $V = \\frac{4.8}{0.12} = 40$. The water evaporated is $60 - 40 = 20$ liters.\n\n**Trigger cue**\n\n\"Water evaporates\": freeze the solute, divide it by the target concentration to get the new total, then subtract.\n\n**Takeaway**\n\nEvaporation removes water only — the pure amount never moves.",
+   "fastest_path_md": "Acid $4.8$ L fixed; new volume $= \\frac{4.8}{0.12} = 40$; evaporate $20$.",
+   "trap_map": {
+    "0": "Uses the percentage-point gap of $4$ as a fraction of $60$ divided by $16$.",
+    "2": "Reduces the acid along with the water, as if evaporation removed solution.",
+    "3": "Reports the volume that would remain if the concentration merely rose by $12$ points.",
+    "4": "Reports the remaining volume rather than the amount evaporated."
+   },
+   "numeric_check": "60 - 4.8/0.12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "A radiator contains $18$ liters of a mixture that is $25\\%$ antifreeze. How many liters of pure antifreeze must be added so that the mixture becomes $40\\%$ antifreeze?",
+   "choices": [
+    "$2.7$",
+    "$4.5$",
+    "$5$",
+    "$6$",
+    "$10.8$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nTreat pure antifreeze as a $100\\%$ solution. With $x$ liters added, $0.25(18) + x = 0.40(18 + x)$, so $4.5 + x = 7.2 + 0.4x$, giving $0.6x = 2.7$ and $x = 4.5$.\n\n**Trigger cue**\n\n\"Replaced with / add pure antifreeze\": the added liquid enters the weighted average at $100\\%$.\n\n**Takeaway**\n\nPure means $100\\%$ — put it in the ledger at full strength.",
+   "fastest_path_md": "Lever from $25$ and $100$ to $40$: distances $15$ and $60$, so volumes $60 : 15 = 4 : 1$; $\\frac{18}{4} = 4.5$.",
+   "trap_map": {
+    "0": "Reports the percentage-point gap applied to the original volume, $0.15(18)$.",
+    "2": "Rounds the answer to a whole number of liters.",
+    "3": "Uses a $3 : 1$ lever ratio, misreading the distance to $100\\%$.",
+    "4": "Reports the non-antifreeze share of the target mixture, $0.6 \\times 18$."
+   },
+   "numeric_check": "4.5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "A juice blend is $30\\%$ mango. A distributor reformulates it so that the mango content rises by $12$ percentage points. The reformulated blend's mango content is what percent of the original blend's mango content?",
+   "choices": [
+    "$12\\%$",
+    "$40\\%$",
+    "$112\\%$",
+    "$140\\%$",
+    "$142\\%$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nPercentage points add: the new content is $30 + 12 = 42$ percent. As a fraction of the original $30$, that is $\\frac{42}{30} = 1.4 = 140\\%$.\n\n**Trigger cue**\n\n\"Rises by $n$ percentage points\": add $n$ to the concentration; only a \"rises by $n$ percent\" would multiply it.\n\n**Takeaway**\n\nPoints add to the rate; percents multiply it.",
+   "fastest_path_md": "$30 + 12 = 42$; $\\frac{42}{30} = 140\\%$.",
+   "trap_map": {
+    "0": "Reports the size of the shift rather than the comparison asked for.",
+    "1": "Reports the new mango percentage of the blend, not of the old content.",
+    "2": "Reads \"$12$ percentage points\" as a $12\\%$ increase, giving $\\times 1.12$.",
+    "4": "Adds $12$ to $130$, mixing the point shift into the ratio."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "Solution X is $20\\%$ alcohol and solution Y is $50\\%$ alcohol. In what ratio, by volume, must X and Y be mixed to produce a solution that is $30\\%$ alcohol?",
+   "choices": [
+    "$1 : 2$",
+    "$2 : 1$",
+    "$2 : 3$",
+    "$3 : 2$",
+    "$5 : 2$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nLedger: $0.20x + 0.50y = 0.30(x+y)$, so $0.20y = 0.10x$ and $\\frac{x}{y} = 2$. The ratio is $2 : 1$. The lever says the same thing: the target sits $10$ from X and $20$ from Y, so X carries twice the weight.\n\n**Trigger cue**\n\nTwo concentrations and a target: distances from the target give the volumes, crossed over.\n\n**Takeaway**\n\nThe mean sits near the heavy component — short distance, big weight.",
+   "fastest_path_md": "Distances $10$ and $20$; volumes are the reversed distances, $20 : 10 = 2 : 1$.",
+   "trap_map": {
+    "0": "Inverts the lever, assigning the larger volume to the farther solution.",
+    "2": "Uses the raw distances as the volume ratio without crossing them.",
+    "3": "Uses the concentrations' own ratio rather than their distances from the target.",
+    "4": "Compares $50$ to $20$ instead of comparing both to the target."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 3,
+   "stem_md": "A $40$-liter tank is filled with a solution that is $25\\%$ acid. If $8$ liters of the solution are drained and replaced with $8$ liters of water, what percent of the resulting $40$ liters is acid?",
+   "choices": [
+    "$15\\%$",
+    "$17\\%$",
+    "$20\\%$",
+    "$21\\%$",
+    "$25\\%$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe drained $8$ liters carries acid in the current proportion, so $0.25(8) = 2$ liters of acid leave. Acid falls from $10$ to $8$ liters, and the volume returns to $40$, giving $\\frac{8}{40} = 20\\%$.\n\n**Trigger cue**\n\n\"Drawn off and replaced\": the removed mixture carries solute and water in the current ratio — the retention factor is $\\frac{V-k}{V}$.\n\n**Takeaway**\n\nDraining removes solute too, in the current proportion.",
+   "fastest_path_md": "Retention is $\\frac{32}{40} = 0.8$, so $25\\% \\times 0.8 = 20\\%$.",
+   "trap_map": {
+    "0": "Subtracts $8$ percentage points, treating liters as points.",
+    "1": "Uses $\\frac{8}{47}$-style arithmetic, adding the replacement to the volume.",
+    "3": "Applies the retention factor to the volume rather than to the concentration.",
+    "4": "Assumes only water was drained, leaving the concentration unchanged."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "stem_md": "A $50$-liter container is full of pure syrup. Ten liters are drawn off and replaced with water; the container is stirred, and the process is repeated twice more. How many liters of syrup remain in the container?",
+   "choices": [
+    "$20$",
+    "$25.6$",
+    "$29$",
+    "$32$",
+    "$35$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nEach cycle keeps $\\frac{50-10}{50} = \\frac{4}{5}$ of whatever syrup is present. Three cycles leave $50\\left(\\frac{4}{5}\\right)^{3} = 50 \\times \\frac{64}{125} = 25.6$ liters.\n\n**Trigger cue**\n\n\"Drawn off and replaced\" more than once: multiply by the retention factor $\\left(\\frac{V-k}{V}\\right)$ once per cycle.\n\n**Takeaway**\n\nRepeated replacement is geometric decay, not repeated subtraction.",
+   "fastest_path_md": "$50 \\cdot \\left(\\frac{4}{5}\\right)^{3} = 50 \\cdot \\frac{64}{125} = 25.6$.",
+   "trap_map": {
+    "0": "Subtracts $10$ liters of syrup per cycle, $50 - 30$.",
+    "2": "Applies the retention factor twice instead of three times, then rounds.",
+    "3": "Applies the retention factor only twice, $50\\left(\\frac{4}{5}\\right)^{2}$.",
+    "4": "Subtracts $10$ liters once and then applies one retention factor."
+   },
+   "numeric_check": "50*(4/5)^3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "stem_md": "A chemist mixes $6$ liters of a $c\\%$ acid solution with $4$ liters of a $45\\%$ acid solution and obtains a solution that is $33\\%$ acid. What is the value of $c$?",
+   "choices": [
+    "$15$",
+    "$21$",
+    "$25$",
+    "$29$",
+    "$33$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nAcid in equals acid out: $\\frac{c}{100}(6) + 0.45(4) = 0.33(10)$. The right side is $3.3$ liters and the known solution contributes $1.8$, so the unknown solution must contribute $1.5$ liters across $6$ liters of volume: $\\frac{c}{100} = \\frac{1.5}{6} = 0.25$, giving $c = 25$.\n\n**Trigger cue**\n\nOne unknown concentration with both volumes known: one ledger equation, one unknown.\n\n**Takeaway**\n\nWrite the pure-substance ledger; the unknown falls out.",
+   "fastest_path_md": "Acid needed $3.3$; the $45\\%$ solution brings $1.8$; the remaining $1.5$ over $6$ liters is $25\\%$.",
+   "trap_map": {
+    "0": "Weights by the swapped volumes, running the lever backwards.",
+    "1": "Averages the two concentrations, ignoring that the volumes differ.",
+    "3": "Shifts the target down by an unweighted share of the $12$-point gap.",
+    "4": "Restates the target concentration of the finished solution."
+   },
+   "numeric_check": "25",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "mixtures_weighted_avg",
+   "difficulty": 4,
+   "stem_md": "Blend P mixes juice and water in the ratio $1 : 3$, and blend Q mixes juice and water in the ratio $2 : 3$. If $8$ liters of P are combined with $10$ liters of Q, what fraction of the resulting mixture is juice?",
+   "choices": [
+    "$\\dfrac{1}{4}$",
+    "$\\dfrac{3}{10}$",
+    "$\\dfrac{1}{3}$",
+    "$\\dfrac{2}{5}$",
+    "$\\dfrac{13}{20}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nConvert each ratio to a fraction of its whole: P is $\\frac{1}{4}$ juice and Q is $\\frac{2}{5}$ juice. Juice totals $8\\left(\\frac{1}{4}\\right) + 10\\left(\\frac{2}{5}\\right) = 2 + 4 = 6$ liters out of $18$, which is $\\frac{6}{18} = \\frac{1}{3}$.\n\n**Trigger cue**\n\nTwo blends combined: convert each ratio to a fraction of the whole *before* combining, then track one ingredient's total.\n\n**Takeaway**\n\nRatios must become fractions of the whole before they can be mixed.",
+   "fastest_path_md": "Juice $= 2 + 4 = 6$ of $18$ liters, so $\\frac{1}{3}$.",
+   "trap_map": {
+    "0": "Reports blend P's juice fraction alone.",
+    "1": "Averages the two juice fractions without weighting by volume.",
+    "3": "Reports blend Q's juice fraction alone.",
+    "4": "Adds the two juice fractions instead of weighting them."
+   },
+   "numeric_check": "6/18",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 2,
+   "stem_md": "Pump A can fill a tank in $6$ hours and pump B can fill the same tank in $12$ hours. Working together at their constant rates, how many hours do the two pumps take to fill the tank?",
+   "choices": [
+    "$2$",
+    "$4$",
+    "$6$",
+    "$9$",
+    "$18$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nRates add: $\\frac{1}{6} + \\frac{1}{12} = \\frac{3}{12} = \\frac{1}{4}$ of the tank per hour, so the job takes $4$ hours. Sanity check: together must beat the faster pump's $6$ hours, and $4 < 6$.\n\n**Trigger cue**\n\n\"Working together at their constant rates\": add the rates; for exactly two workers jump to $\\frac{ab}{a+b}$.\n\n**Takeaway**\n\nAdd rates, then invert — never add the times.",
+   "fastest_path_md": "$\\frac{6 \\times 12}{6 + 12} = \\frac{72}{18} = 4$.",
+   "trap_map": {
+    "0": "Divides the faster time by three, guessing rather than adding rates.",
+    "2": "Reports the faster pump's solo time unchanged.",
+    "3": "Averages the two solo times.",
+    "4": "Adds the two times, giving a result slower than either pump alone."
+   },
+   "numeric_check": "6*12/(6+12)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 2,
+   "stem_md": "A cyclist rides $30$ kilometers at $15$ kilometers per hour and then rides another $30$ kilometers at $10$ kilometers per hour. What was her average speed, in kilometers per hour, for the entire $60$ kilometers?",
+   "choices": [
+    "$11$",
+    "$12$",
+    "$12.5$",
+    "$13$",
+    "$25$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nTimes: $\\frac{30}{15} = 2$ hours and $\\frac{30}{10} = 3$ hours, for $5$ hours total. Average speed is $\\frac{60}{5} = 12$ kilometers per hour — below the arithmetic mean, because more time is spent at the slower speed.\n\n**Trigger cue**\n\n\"Average speed\" over equal distances: total distance over total time, or jump to $\\frac{2ab}{a+b}$.\n\n**Takeaway**\n\nAverage speed weights by time, so the slow leg dominates.",
+   "fastest_path_md": "$\\frac{2(15)(10)}{15+10} = \\frac{300}{25} = 12$.",
+   "trap_map": {
+    "0": "Undershoots by weighting the slow leg even more heavily than the times warrant.",
+    "2": "Averages the two speeds, $\\frac{15+10}{2}$.",
+    "3": "Weights toward the faster speed instead of the slower.",
+    "4": "Adds the two speeds."
+   },
+   "numeric_check": "60/5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 2,
+   "stem_md": "A machine produces $420$ bolts in $35$ minutes. At this constant rate, how many bolts does the machine produce in $2$ hours?",
+   "choices": [
+    "$840$",
+    "$1{,}200$",
+    "$1{,}440$",
+    "$1{,}470$",
+    "$1{,}680$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe unit rate is $\\frac{420}{35} = 12$ bolts per minute. Two hours is $120$ minutes, so the output is $12 \\times 120 = 1{,}440$ bolts.\n\n**Trigger cue**\n\n\"Produces $N$ units in $M$ minutes\": compute the per-minute rate first, then treat it like any other rate.\n\n**Takeaway**\n\nGet to a unit rate before scaling anything.",
+   "fastest_path_md": "$12$ bolts per minute $\\times\\, 120$ minutes $= 1{,}440$.",
+   "trap_map": {
+    "0": "Doubles the given output, treating $2$ hours as twice $35$ minutes.",
+    "1": "Uses a rate of $10$ bolts per minute.",
+    "3": "Treats $2$ hours as $3.5$ times the given window.",
+    "4": "Uses $140$ minutes for two hours."
+   },
+   "numeric_check": "420/35*120",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 3,
+   "stem_md": "Working together at their constant rates, Ana and Ben paint a room in $4$ hours. Working alone, Ana paints the room in $10$ hours. How many hours does Ben take to paint the room working alone?",
+   "choices": [
+    "$5\\dfrac{1}{3}$",
+    "$6$",
+    "$6\\dfrac{2}{3}$",
+    "$7$",
+    "$14$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nSubtract rates: $R_B = \\frac{1}{4} - \\frac{1}{10} = \\frac{5-2}{20} = \\frac{3}{20}$ of the room per hour. Ben alone takes $\\frac{20}{3} = 6\\frac{2}{3}$ hours.\n\n**Trigger cue**\n\n\"Together they take …; one of them alone takes …\": subtract the known rate from the combined rate.\n\n**Takeaway**\n\nRates subtract as cleanly as they add.",
+   "fastest_path_md": "$\\frac{1}{4} - \\frac{1}{10} = \\frac{3}{20}$, so $\\frac{20}{3}$ hours.",
+   "trap_map": {
+    "0": "Inverts a slip in the common denominator, using $\\frac{1}{4}-\\frac{1}{12}$.",
+    "1": "Subtracts the times, $10 - 4$, instead of the rates.",
+    "3": "Rounds the exact $\\frac{20}{3}$ to a whole number of hours.",
+    "4": "Adds the times, $10 + 4$."
+   },
+   "numeric_check": "20/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "stem_md": "Machine X, working alone, completes a job in $9$ hours; machine Y, working alone, completes the same job in $6$ hours. Machine X starts the job alone at 8:00 a.m., and machine Y joins it at 11:00 a.m. At what time is the job completed?",
+   "choices": [
+    "12:00 noon",
+    "12:24 p.m.",
+    "1:00 p.m.",
+    "1:24 p.m.",
+    "2:00 p.m."
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nIn its first $3$ hours alone, X does $\\frac{3}{9} = \\frac{1}{3}$ of the job, leaving $\\frac{2}{3}$. From 11:00 both run, at a combined rate of $\\frac{1}{9} + \\frac{1}{6} = \\frac{5}{18}$ per hour. The remaining time is $\\frac{2/3}{5/18} = \\frac{2}{3} \\cdot \\frac{18}{5} = 2.4$ hours, i.e. $2$ hours $24$ minutes after 11:00, so 1:24 p.m.\n\n**Trigger cue**\n\n\"Starts alone at …, joined at …\": tally the head start as a fraction of the job, then run the combined rate against what is left.\n\n**Takeaway**\n\nThe early starter keeps working — count its hours to the finish.",
+   "fastest_path_md": "X banks $\\frac{1}{3}$ by 11:00; $\\frac{2}{3} \\div \\frac{5}{18} = 2.4$ h; 11:00 $+$ 2:24 $=$ 1:24 p.m.",
+   "trap_map": {
+    "0": "Uses the fraction already done, $\\frac{1}{3}$, as the remaining work.",
+    "1": "Stops machine X when Y joins, running only Y against the remainder.",
+    "2": "Rounds $2.4$ hours to $2$ hours.",
+    "4": "Ignores the head start and runs the combined rate over the whole job from 11:00."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "stem_md": "A freight train leaves a station travelling at $45$ kilometers per hour. Ninety minutes later, an express train leaves the same station on the same track travelling at $75$ kilometers per hour. How many kilometers from the station does the express train overtake the freight train?",
+   "choices": [
+    "$67.5$",
+    "$112.5$",
+    "$135$",
+    "$168.75$",
+    "$202.5$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nIn $1.5$ hours the freight train covers $45 \\times 1.5 = 67.5$ kilometers of head start. The express closes that gap at $75 - 45 = 30$ kilometers per hour, taking $\\frac{67.5}{30} = 2.25$ hours. In that time the express travels $75 \\times 2.25 = 168.75$ kilometers.\n\n**Trigger cue**\n\n\"Leaves later, catches up\": head-start distance divided by the *difference* of speeds — then reread which distance or clock the question wants.\n\n**Takeaway**\n\nCatch-up time is head start over speed difference.",
+   "fastest_path_md": "Head start $67.5$ km $\\div$ gap $30$ km/h $= 2.25$ h; $75 \\times 2.25 = 168.75$ km.",
+   "trap_map": {
+    "0": "Reports the head-start distance rather than the meeting point.",
+    "1": "Reports the distance the express covers in the $1.5$-hour head-start window.",
+    "2": "Uses the sum of the speeds instead of the difference when closing the gap.",
+    "4": "Adds the head start to the meeting distance, double-counting the freight train's start."
+   },
+   "numeric_check": "75*(45*1.5/(75-45))",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 4,
+   "stem_md": "Two runners start from the same point on a circular track $400$ meters around and run in opposite directions, one at $4$ meters per second and the other at $6$ meters per second. How many seconds after they start do they meet for the third time?",
+   "choices": [
+    "$40$",
+    "$80$",
+    "$120$",
+    "$200$",
+    "$240$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nRunning in opposite directions, the gap between them closes at the sum of the speeds, $10$ meters per second. They meet each time their combined distance covers another full lap, so meetings occur every $\\frac{400}{10} = 40$ seconds. The third meeting is at $3 \\times 40 = 120$ seconds.\n\n**Trigger cue**\n\n\"Toward each other\" or opposite directions on a loop: one mover at the *sum* of the speeds, one lap per meeting.\n\n**Takeaway**\n\nOpposite directions add speeds; each meeting costs one full lap.",
+   "fastest_path_md": "$\\frac{400}{4+6} = 40$ s per meeting; the third is at $120$ s.",
+   "trap_map": {
+    "0": "Reports the time of the first meeting.",
+    "1": "Reports the time of the second meeting.",
+    "3": "Uses the difference of the speeds instead of the sum.",
+    "4": "Charges one lap of the slower runner, $\\frac{400}{4}$, per meeting."
+   },
+   "numeric_check": "3*400/(4+6)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "Three crews can pave a road in $10$, $15$, and $30$ days respectively, each working at its own constant rate. All three begin together, but the fastest crew leaves after $2$ days and the other two finish the road. How many days in total does the paving take?",
+   "choices": [
+    "$5$",
+    "$6$",
+    "$8$",
+    "$10$",
+    "$12$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nCombined, all three pave $\\frac{1}{10} + \\frac{1}{15} + \\frac{1}{30} = \\frac{3+2+1}{30} = \\frac{1}{5}$ of the road per day, so the first two days complete $\\frac{2}{5}$. The remaining $\\frac{3}{5}$ falls to the other two crews at $\\frac{1}{15} + \\frac{1}{30} = \\frac{1}{10}$ per day, taking $\\frac{3/5}{1/10} = 6$ days. Total: $2 + 6 = 8$ days.\n\n**Trigger cue**\n\nA worker leaving partway: bank the multi-worker fraction first, then run the reduced rate against the remainder.\n\n**Takeaway**\n\nBank what is done, then divide the remainder by the new rate.",
+   "fastest_path_md": "All three: $\\frac{1}{5}$/day for $2$ days $= \\frac{2}{5}$. Remaining $\\frac{3}{5} \\div \\frac{1}{10} = 6$ days. Total $8$.",
+   "trap_map": {
+    "0": "Reports the time all three together would need for the whole road.",
+    "1": "Counts only the days after the fastest crew leaves, dropping the first two.",
+    "3": "Reports the time the two slower crews would need for the whole road alone.",
+    "4": "Adds the two shared days to that whole-road figure, double-counting the head start."
+   },
+   "numeric_check": "2 + 6",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "A driver covers the first $150$ kilometers of a $300$-kilometer trip at $75$ kilometers per hour. At what constant speed, in kilometers per hour, must she cover the remaining distance in order to average $60$ kilometers per hour for the entire trip?",
+   "choices": [
+    "$30$",
+    "$45$",
+    "$50$",
+    "$60$",
+    "$75$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nAveraging $60$ over $300$ kilometers fixes the total time at $\\frac{300}{60} = 5$ hours. The first leg consumed $\\frac{150}{75} = 2$ hours, leaving $3$ hours for the remaining $150$ kilometers. The required speed is $\\frac{150}{3} = 50$ kilometers per hour.\n\n**Trigger cue**\n\n\"Average $A$ for the whole trip\": convert the target average into a total time budget, subtract the time already spent, and divide the distance left by what remains.\n\n**Takeaway**\n\nA target average is a time budget, not a speed to average.",
+   "fastest_path_md": "Budget $5$ h; $2$ h spent; $150$ km in $3$ h is $50$ km/h.",
+   "trap_map": {
+    "0": "Divides the remaining distance by the whole $5$-hour budget, as if no time had been spent.",
+    "1": "Averages the speeds instead of the times, computing $2(60) - 75$.",
+    "3": "Restates the target average as the required speed.",
+    "4": "Repeats the first leg's speed."
+   },
+   "numeric_check": "150/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "rates_speed_work",
+   "difficulty": 5,
+   "stem_md": "A tank is filled by inlet pipe A alone in $12$ hours and by inlet pipe B alone in $18$ hours, while a drain pipe C empties the full tank in $36$ hours. All three are opened together on an empty tank. After $6$ hours the drain is closed. How many more hours are needed to fill the tank?",
+   "choices": [
+    "$1.2$",
+    "$2$",
+    "$2.4$",
+    "$3$",
+    "$4.8$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWith all three open the net rate is $\\frac{1}{12} + \\frac{1}{18} - \\frac{1}{36} = \\frac{3 + 2 - 1}{36} = \\frac{4}{36} = \\frac{1}{9}$ per hour, so six hours fill $\\frac{6}{9} = \\frac{2}{3}$. With the drain closed the rate becomes $\\frac{1}{12} + \\frac{1}{18} = \\frac{5}{36}$ per hour, and the remaining $\\frac{1}{3}$ takes $\\frac{1/3}{5/36} = \\frac{36}{15} = 2.4$ hours.\n\n**Trigger cue**\n\nAn outflow among the inflows: subtract the drain's rate, and recompute the rate the moment any pipe changes state.\n\n**Takeaway**\n\nA drain is a negative rate; the remainder is one minus what is done.",
+   "fastest_path_md": "Net $\\frac{1}{9}$/h for $6$ h $= \\frac{2}{3}$; remaining $\\frac{1}{3} \\div \\frac{5}{36} = 2.4$ h.",
+   "trap_map": {
+    "0": "Ignores the drain during the first six hours.",
+    "1": "Rounds the exact $2.4$ hours down to a whole number.",
+    "3": "Leaves the drain open for the final stretch as well.",
+    "4": "Uses the fraction already filled, $\\frac{2}{3}$, as the fraction remaining."
+   },
+   "numeric_check": "(1/3)/(1/12 + 1/18)",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
