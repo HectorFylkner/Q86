@@ -1,5 +1,5 @@
 {
- "description": "Q86 seed bank. Every item passed verification before entry: either the two-model pipeline (independent blind solver + mathjs cross-check) or authored-with-programmatic-verification (answer recomputed from the stem's data by code; exactly one choice matches).",
+ "description": "Q86 seed bank. Problem-solving only, matching the GMAT Focus Quantitative section (Data Sufficiency lives in Data Insights and was retired from this bank). Every item passed verification before entry: authored-with-programmatic-verification (the answer recomputed from the stem's raw data by brute force, exactly one choice matching) or the legacy two-model pipeline, re-verified structurally by scripts/verify-bank.ts.",
  "questions": [
   {
    "format": "problem_solving",
@@ -80,33 +80,6 @@
     "4": "Charges $2 for all 6 hours plus the $6 base separately without recognizing the first hour is already included in the flat fee, giving $6 + 2(7)$ style overcounting."
    },
    "numeric_check": "6 + 2*5",
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 3,
-   "stem_md": "Set $S$ consists of $9$ consecutive even integers. What is the sum of all the integers in $S$?\n\n(1) The median of $S$ is $22$.\n\n(2) The smallest integer in $S$ is $14$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "solution_md": "**Formal path**\nWith 9 consecutive even integers spaced 2 apart, label them $a, a+2, a+4, \\dots, a+16$. The median is the 5th term, $a+8$, and the sum of an evenly spaced set equals (count) × (median) = $9(a+8)$.\n\nStatement (1): median $= 22$, so sum $= 9 \\times 22 = 198$. Sufficient.\n\nStatement (2): smallest $= a = 14$, so median $= a + 8 = 22$, giving sum $= 9 \\times 22 = 198$. Sufficient.\n\nBoth statements independently pin down the median (and hence the sum), so each alone works — the answer is that each statement alone is sufficient.\n\n**Trigger cue**\nWhen you see \"sum of a consecutive/evenly spaced set,\" reach for sum = count × median (or average), so any single fact that fixes the median or the average fixes the sum.\n\n**Takeaway**\n\nEvenly spaced: sum equals count times median.",
-   "fastest_path_md": "For a set of consecutive evenly spaced integers, the sum equals (number of terms) × (median). Here the count is fixed at 9, so the sum is determined the instant you know the median. Statement (1) gives the median directly: sum $= 9 \\times 22 = 198$. Statement (2) gives the smallest term, which for 9 consecutive even integers (spaced by 2) fixes the median as smallest $+ 8 = 22$, giving the same sum $198$. Each statement alone is sufficient.",
-   "trap_map": {
-    "0": "Assumes the smallest term in statement (2) can't determine the median without realizing the fixed count of 9 pins it down.",
-    "1": "Assumes the median alone (statement 1) isn't enough, forgetting the count of terms is already fixed at 9.",
-    "2": "Thinks you need both the smallest term and the median simultaneously, missing that either one alone determines the other via the fixed spacing and count.",
-    "4": "Incorrectly concludes the sum can't be pinned down at all, ignoring that sum = count × median applies directly."
-   },
-   "numeric_check": null,
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
@@ -191,33 +164,6 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 2,
-   "stem_md": "Set $S$ consists of $7$ consecutive integers. What is the sum of all the integers in $S$?\n\n(1) The smallest integer in $S$ is $12$.\n\n(2) The median of $S$ is $15$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "solution_md": "**Formal path**\nIf the smallest integer is $12$, the 7 consecutive integers are $12,13,14,15,16,17,18$, and their sum is $12+13+\\cdots+18 = 105$ (or use sum $= 7 \\times$ median $= 7\\times15$). So statement (1) alone determines the sum exactly — sufficient.\n\nIf the median is $15$, then since the set has 7 consecutive integers, the median is also the middle (4th) term, and the terms are $12,13,14,15,16,17,18$ — the same set. Sum $=7\\times15=105$ — sufficient.\n\nEach statement alone pins down the entire set (or at least its sum), so each is independently sufficient.\n\n**Trigger cue**\nWhen you see a fixed-size set of consecutive (evenly spaced) integers, reach for sum $=$ (number of terms) $\\times$ median/mean.\n\n**Takeaway**\nFor consecutive integers, knowing one term or the median fixes the whole sum.",
-   "fastest_path_md": "For a set of consecutive integers, the sum equals (number of terms) times the median. With 7 terms, sum $= 7 \\times \\text{median}$. Statement (1) gives the smallest term, which pins down every term (and thus the median) since the set is consecutive — sufficient. Statement (2) gives the median directly, so sum $= 7 \\times 15 = 105$ — sufficient. Each alone works, so the answer is choice 4.",
-   "trap_map": {
-    "0": "Assumes the median formula only works from the smallest term, missing that the median itself directly gives the sum too.",
-    "1": "Assumes only the median can determine the sum, overlooking that knowing the smallest term also fixes every term in a consecutive set.",
-    "2": "Wrongly thinks both pieces of information are needed together, not realizing each alone fixes the entire consecutive set.",
-    "4": "Incorrectly concludes the set's sum can't be pinned down at all, ignoring that consecutive integers are fully determined by one term or the median."
-   },
-   "numeric_check": null,
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -267,33 +213,6 @@
     "1": "Confuses $n^2$'s parity with being fixed, forgetting $n^2$ matches $n$'s own (unknown) parity.",
     "2": "Fails to notice $n+3$ flips parity relative to $n$, so its evenness depends on $n$ being odd.",
     "3": "Misses that $3n$ shares $n$'s parity, so $3n-1$'s parity depends on $n$ rather than being fixed."
-   },
-   "numeric_check": null,
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "What is the value of $x^3$?\n\n(1) $x^4 = 16x^2$\n\n(2) $\\sqrt{x^2} = 4$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\nFrom (1): $x^4 - 16x^2 = 0 \\Rightarrow x^2(x^2-16)=0 \\Rightarrow x=0, 4, -4$. Three possible values for $x^3$ (0, 64, -64), so (1) alone is not sufficient.\n\nFrom (2): $\\sqrt{x^2}=4$ means $|x|=4$, so $x=4$ or $x=-4$. Then $x^3 = 64$ or $x^3=-64$ — two possible values, so (2) alone is not sufficient.\n\nTogether: (1) restricts $x$ to $\\{0,4,-4\\}$ and (2) restricts $x$ to $\\{4,-4\\}$. The intersection is still $\\{4,-4\\}$, so $x^3$ could be $64$ or $-64$. Even combined, the value of $x^3$ is not uniquely determined — not sufficient.\n\n**Trigger cue**\nWhen you see $x^2$, $x^4$, or $\\sqrt{x^2}$ in a statement, reach for the reminder that even powers and square roots destroy sign information, so solve for $|x|$, not $x$.\n\n**Takeaway**\n\nEven powers and square roots hide sign; test both roots before declaring sufficiency.",
-   "fastest_path_md": "Test numbers rather than solve algebraically. Statement (1) says $x^4 = 16x^2$, so $x^2(x^2-16)=0$, giving $x=0,4,-4$ — already three candidate values, so it can't pin down $x^3$. Statement (2) says $x^3 = x\\cdot|x|\\cdot k$ for some... actually just test $x=2$ and $x=-2$ in each statement to see the value of $x^3$ flip sign or stay ambiguous. Combining still leaves $x=4$ and $x=-4$ both satisfying both statements, giving $x^3=64$ or $x^3=-64$ — not sufficient.",
-   "trap_map": {
-    "0": "Assumes statement (1) forces $x=4$ only, ignoring that $x=0$ and $x=-4$ also satisfy $x^4=16x^2$.",
-    "1": "Assumes $\\sqrt{x^2}=4$ forces $x=4$ only, forgetting that $x=-4$ also satisfies it since square roots are nonnegative but $x$ itself can be negative.",
-    "2": "Believes combining the two statements narrows $x$ to a single value, missing that both $x=4$ and $x=-4$ remain valid after intersecting the solution sets.",
-    "3": "Incorrectly concludes each statement alone pins down a unique $x^3$, overlooking the sign ambiguity introduced by even powers/roots in both statements."
    },
    "numeric_check": null,
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
@@ -515,33 +434,6 @@
    "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "If $x$ and $y$ are nonzero real numbers, is $x^{y} > 0$?\n\n(1) $x^{2} = x^{4}$\n\n(2) $y^{3} = y$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\nFrom (1): $x^2=x^4 \\Rightarrow x^2(x^2-1)=0$. Since $x\\neq0$, $x^2=1$, giving $x=1$ or $x=-1$.\nFrom (2): $y^3=y \\Rightarrow y(y^2-1)=0$. Since $y\\neq0$, $y=1$ or $y=-1$.\nCombining, the pairs $(x,y)$ allowed are $(1,1),(1,-1),(-1,1),(-1,-1)$.\n- $(1,1)$: $x^y=1>0$.\n- $(1,-1)$: $x^y=1^{-1}=1>0$.\n- $(-1,1)$: $x^y=-1<0$.\n- $(-1,-1)$: $x^y=(-1)^{-1}=-1<0$.\nDifferent pairs give different truth values for \"$x^y>0$\", so even together the statements do not pin down a unique answer — **not sufficient**.\n\n**Trigger cue**\nWhen an exponent/root equation reduces to $\\pm1$ solutions, immediately test all sign combinations before assuming a value question is settled.\n\n**Takeaway**\nSolving to $x=\\pm1,\\ y=\\pm1$ isn't the finish line — check every sign pairing.",
-   "fastest_path_md": "Statement (1): $x^2=x^4 \\Rightarrow x^2(x^2-1)=0 \\Rightarrow x=\\pm1$ (since $x\\neq0$). So $x=1$ or $x=-1$. If $x=1$, $x^y=1>0$ always; if $x=-1$, $x^y$ depends on parity of $y$ (could be $-1$ if $y$ odd integer, or undefined/negative for non-integer $y$). Not sufficient. Statement (2): $y^3=y \\Rightarrow y(y^2-1)=0 \\Rightarrow y=\\pm1$ (since $y\\neq0$). So $y=1$ or $y=-1$; $x^y$ can be positive or negative depending on sign of $x$ — not sufficient alone. Combine: $x=\\pm1$, $y=\\pm1$. Test $x=-1,y=1$: $x^y=-1<0$. Test $x=1,y=-1$: $x^y=1>0$. Both allowed combos give different sign answers, so together still not sufficient.",
-   "trap_map": {
-    "0": "Assumes $x^2=x^4$ forces $x=1$ only, ignoring the $x=-1$ root that changes the sign of $x^y$.",
-    "1": "Assumes $y^3=y$ forces $y=1$ only, ignoring $y=-1$ and the resulting sign dependence on $x$.",
-    "2": "Stops after finding $x=\\pm1,y=\\pm1$ without testing all four sign combinations, missing that both a positive and a negative result occur.",
-    "3": "Incorrectly believes each statement alone fixes $x$ or $y$ to a single value, when each actually allows two opposite-sign solutions."
-   },
-   "numeric_check": null,
-   "provenance": "sonnet-5 pipeline: independent solver + mathjs gate + brute-force audit (passed)"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -591,33 +483,6 @@
     "2": "Averaging the two units digits $7$ and $3$ to get $5$.",
     "3": "Reporting the units digit of $3^{47}$ alone and forgetting the second factor.",
     "4": "Off-by-one in the cycle of $3$: reading position $3$ as $9$ instead of $7$, then $9\\cdot 3 = 27 \\to 7$... miscombined to $9$."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "remainders_units_digits",
-   "difficulty": 3,
-   "stem_md": "What is the remainder when the positive integer $n$ is divided by $6$?\n\n(1) When $n$ is divided by $3$, the remainder is $2$.\n\n(2) $n$ is even.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "Statement (1) allows $n \\bmod 6 \\in \\{2, 5\\}$ (test $n = 2, 5$). Statement (2) allows $\\{0, 2, 4\\}$ (test $n = 6, 2, 4$). Each alone fails; together only remainder $2$ survives.",
-   "solution_md": "**Formal path**\n\nFrom (1), $n = 3k + 2$, so modulo $6$ the value is $2$ (when $k$ is even) or $5$ (when $k$ is odd) — not sufficient. From (2), an even $n$ can leave remainder $0$, $2$, or $4$ — not sufficient. Together: $n$ must be even and $\\equiv 2 \\pmod 3$; of $\\{0,2,4\\}$ only $2$ satisfies $2 \\bmod 3 = 2$. The remainder is exactly $2$ — sufficient.\n\n**Trigger cue**\n\nWhen a remainder mod $6$ is asked from mod-$2$ and mod-$3$ facts, reach for listing the residues each statement allows.\n\n**Takeaway**\n\nList the surviving residues; sufficiency means exactly one survives.",
-   "trap_map": {
-    "0": "Believing $n \\equiv 2 \\pmod 3$ forces $n \\equiv 2 \\pmod 6$, forgetting the $n \\equiv 5$ branch.",
-    "1": "Believing evenness alone pins the remainder because $6$ is even.",
-    "3": "Assuming each statement alone must work since both mention divisibility facts about $6$'s factors.",
-    "4": "Concluding the two statements conflict and settle nothing, instead of intersecting the residue lists."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -699,33 +564,6 @@
     "2": "Adding one extra day for \"day 1 counts as zero,\" landing on Tuesday.",
     "3": "Using $260 / 7 \\approx 37.1$ and mapping the decimal $.1$ to the fifth weekday.",
     "4": "Computing $260 \\bmod 7 = 6$ via $7 \\cdot 36 = 252$, $260 - 252 = 8$ mishandled, landing on Saturday."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "remainders_units_digits",
-   "difficulty": 4,
-   "stem_md": "Is the units digit of the positive integer $k$ equal to $7$?\n\n(1) The units digit of $k^2$ is $9$.\n\n(2) The units digit of $k^3$ is $3$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "fastest_path_md": "Only the units digit of $k$ matters, so test digits $0$–$9$. Squares ending in $9$: digits $3$ and $7$ — (1) leaves two cases. Cubes ending in $3$: only digit $7$ ($7^3 = 343$) — (2) pins it.",
-   "solution_md": "**Formal path**\n\nThe units digit of a power depends only on the units digit of $k$. For (1): $3^2 = 9$ and $7^2 = 49$ both end in $9$, so $k$ could end in $3$ (answer no) or $7$ (answer yes) — not sufficient. For (2): checking $d^3$ for $d = 0..9$ gives units digits $0,1,8,7,4,5,6,3,2,9$; only $d = 7$ yields $3$. So (2) forces the units digit to be $7$ — sufficient.\n\n**Trigger cue**\n\nWhen a statement constrains a power's units digit, reach for testing the ten digits.\n\n**Takeaway**\n\nCubes separate digits that squares confuse.",
-   "trap_map": {
-    "0": "Believing squares ending in $9$ come only from digit $7$, forgetting $3^2 = 9$.",
-    "2": "Assuming both statements are needed because each involves a different power.",
-    "3": "Treating (1) as sufficient by symmetry with (2) without listing the square's two cases.",
-    "4": "Concluding neither works because a units digit \"can't be recovered\" from powers."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -866,60 +704,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 3,
-   "stem_md": "Is the integer $n$ odd?\n\n(1) $n^2 + n$ is even.\n\n(2) $3n + 5$ is even.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "fastest_path_md": "(1) $n^2 + n = n(n+1)$ is a product of consecutive integers — always even, so it says nothing. (2) $3n + 5$ even forces $3n$ odd, so $n$ is odd.",
-   "solution_md": "**Formal path**\n\n(1) holds for every integer ($n$ and $n+1$ include one even factor), so it cannot separate odd from even — not sufficient. (2): even $= 3n + 5 = 3n + \\text{odd}$ requires $3n$ odd; since $3$ is odd, $n$ must be odd — sufficient, and the answer is yes.\n\n**Trigger cue**\n\nWhen a parity statement holds for all integers, reach for discarding it as information-free.\n\n**Takeaway**\n\nConsecutive-integer products are always even — zero information.",
-   "trap_map": {
-    "0": "Reading $n(n+1)$ even as \"n must be even.\"",
-    "2": "Keeping (1) as \"needed context\" although it is universally true.",
-    "3": "Granting (1) sufficiency by pattern-matching to (2).",
-    "4": "Doubting (2) because $3n+5$ mixes multiplication and addition."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 3,
-   "stem_md": "Is $x > y$?\n\n(1) $x^2 > y^2$\n\n(2) $x + y > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "Test numbers: $(x,y) = (-2, 1)$ vs $(2, 1)$ breaks (1) alone; $(1, 2)$ vs $(2, 1)$ breaks (2) alone. Together, $|x| > |y|$ and a positive sum force $x$ to be the positive dominant value, so $x > y$.",
-   "solution_md": "**Formal path**\n\n(1) says $|x| > |y|$ — sign unknown, not sufficient. (2) allows either order — not sufficient. Together: if $x \\le 0$, then $y > -x = |x| > |y| \\ge y$, a contradiction, so $x > 0$; then $x = |x| > |y| \\ge y$. Yes — sufficient.\n\n**Trigger cue**\n\nWhen $x^2 > y^2$ appears, reach for reading it as $|x| > |y|$ and only then argue signs.\n\n**Takeaway**\n\nSquares compare magnitudes; sums fix the sign.",
-   "trap_map": {
-    "0": "Reading $x^2 > y^2$ as $x > y$ directly, ignoring negatives.",
-    "1": "Treating a positive sum as if it ordered the pair.",
-    "3": "Granting each alone after testing only positive values.",
-    "4": "Missing the contradiction argument and declaring the combination inconclusive."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -942,33 +726,6 @@
     "2": "Testing only $x = \\tfrac12$ and generalizing.",
     "3": "Believing reciprocals of small numbers are large in value rather than magnitude.",
     "4": "Accepting all three after testing a single positive value."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 4,
-   "stem_md": "Is $|x| > x^2$?\n\n(1) $x^2 < 1$\n\n(2) $x \\ne 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "$|x| > x^2$ means $|x|(1 - |x|) > 0$, i.e. $0 < |x| < 1$. (1) gives $|x| < 1$ but allows $x = 0$ (answer no). (2) alone allows $x = 2$ (no) or $x = \\tfrac12$ (yes). Together they pin $0 < |x| < 1$: yes.",
-   "solution_md": "**Formal path**\n\nRewrite the question: $|x| > x^2 = |x|^2 \\iff |x|(1 - |x|) > 0 \\iff 0 < |x| < 1$. Statement (1): $|x| < 1$, but $x = 0$ gives $0 > 0$ false while $x = \\tfrac12$ gives true — not sufficient. Statement (2): $x = 2$ gives false, $x = \\tfrac12$ true — not sufficient. Together: $x \\ne 0$ and $|x| < 1$ is exactly the yes-set — sufficient.\n\n**Trigger cue**\n\nWhen $|x|$ meets $x^2$, reach for writing $x^2 = |x|^2$ and factoring.\n\n**Takeaway**\n\nBetween $0$ and $1$ in magnitude, the square loses.",
-   "trap_map": {
-    "0": "Forgetting $x = 0$ sits inside $x^2 < 1$ and breaks the yes.",
-    "1": "Treating nonzero as if it bounded the magnitude.",
-    "3": "Declaring each alone sufficient after testing only $x = \\tfrac12$.",
-    "4": "Missing that the two statements exactly assemble $0 < |x| < 1$."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -1082,33 +839,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "parity_signs",
-   "difficulty": 3,
-   "stem_md": "Is the integer $k$ even?\n\n(1) $k^2 - 1$ is odd.\n\n(2) $5k + 3$ is odd.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "fastest_path_md": "(1) $k^2 - 1$ odd means $k^2$ even, so $k$ is even — sufficient. (2) $5k + 3$ odd means $5k$ even, so $k$ is even — sufficient. Each alone answers yes.",
-   "solution_md": "**Formal path**\n\n(1): odd $= k^2 - 1 \\Rightarrow k^2$ is even $\\Rightarrow k$ is even (squares preserve parity) — sufficient. (2): odd $= 5k + 3 \\Rightarrow 5k$ is even; $5$ is odd, so $k$ is even — sufficient. Answer: each statement alone.\n\n**Trigger cue**\n\nWhen parity facts wrap $k$ in arithmetic, reach for peeling constants off first.\n\n**Takeaway**\n\nSquares and odd multipliers both preserve parity.",
-   "trap_map": {
-    "0": "Doubting (2) because the coefficient $5$ looks parity-relevant.",
-    "1": "Doubting (1) by forgetting squares preserve parity.",
-    "2": "Combining out of caution when each statement already settles it.",
-    "4": "Reading both as compatible with either parity."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1131,33 +861,6 @@
     "1": "Doubting I by imagining two negatives.",
     "2": "Testing one example for III and mistrusting it as coincidence.",
     "3": "Doubting I after confusing \"exactly one negative\" with \"at least one\"."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "parity_signs",
-   "difficulty": 5,
-   "stem_md": "Is $x^3 y^4 z^5 > 0$?\n\n(1) $xz > 0$\n\n(2) $y \\ne 0$ and $xy^2 > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "The sign of $x^3 y^4 z^5$ is the sign of $xz$ once $y \\ne 0$ ($y^4 > 0$, odd powers keep signs). (1) gives $xz > 0$ but allows $y = 0$ (product $= 0$, answer no). (2) gives $x > 0$ and $y \\ne 0$ but says nothing about $z$. Together: $xz > 0$ and $y \\ne 0$ — yes.",
-   "solution_md": "**Formal path**\n\n$x^3 y^4 z^5$ has the sign of $x z$ multiplied by the nonnegative $y^4$; it is positive exactly when $xz > 0$ and $y \\ne 0$. (1) alone: $y$ could be $0$, making the product $0$ — not sufficient. (2) alone: $y^2 > 0$ so $x > 0$, but $z$ is free — not sufficient. Together both conditions of the yes-set hold — sufficient.\n\n**Trigger cue**\n\nWhen a sign question has big exponents, reach for reducing each exponent to odd/even.\n\n**Takeaway**\n\nEven powers vanish from sign analysis; zeros still kill products.",
-   "trap_map": {
-    "0": "Forgetting that $y = 0$ zeroes the product under (1).",
-    "1": "Treating (2)'s $x > 0$ as if it decided $z$'s sign too.",
-    "3": "Granting (1) sufficiency by ignoring the $y^4$ factor entirely.",
-    "4": "Missing that the combination exactly matches the yes-condition."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -1298,33 +1001,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "divisibility_gcf_lcm",
-   "difficulty": 4,
-   "stem_md": "Is the positive integer $n$ divisible by $12$?\n\n(1) $n$ is divisible by $6$.\n\n(2) $n^2$ is divisible by $48$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "fastest_path_md": "(1): $n = 6$ says no, $n = 12$ says yes — not sufficient. (2): $48 = 2^4 \\cdot 3$. Exponents in $n^2$ are doubled exponents of $n$, so $2 e_2(n) \\ge 4$ and $2 e_3(n) \\ge 1$ force $e_2(n) \\ge 2$, $e_3(n) \\ge 1$: $n$ carries $2^2 \\cdot 3 = 12$. Sufficient — yes.",
-   "solution_md": "**Formal path**\n\n(1) alone fails on $n = 6$ vs $n = 12$. For (2): write prime exponents. $48 \\mid n^2$ demands $e_2(n^2) \\ge 4$ and $e_3(n^2) \\ge 1$. Since $e_p(n^2) = 2e_p(n)$, this gives $e_2(n) \\ge 2$ and $e_3(n) \\ge 1$ (exponents are integers, so $2e_3(n) \\ge 1$ rounds up to $e_3(n) \\ge 1$). Hence $12 = 2^2 \\cdot 3$ divides $n$ — statement (2) alone is sufficient.\n\n**Trigger cue**\n\nWhen a square's divisibility is given, reach for doubling/halving prime exponents with ceilings.\n\n**Takeaway**\n\nSquares double exponents; invert with a ceiling.",
-   "trap_map": {
-    "0": "Trusting (1) because $6$ shares factors with $12$.",
-    "2": "Combining out of caution when (2) already forces $2^2 \\cdot 3$.",
-    "3": "Granting (1) sufficiency by pattern-matching it to (2).",
-    "4": "Doubting (2) because $48$ is not a perfect square."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1349,33 +1025,6 @@
     "4": "Multiplying the periods and dividing by $6$ instead of the GCF $12$."
    },
    "numeric_check": "lcm(36, 48)",
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "divisibility_gcf_lcm",
-   "difficulty": 4,
-   "stem_md": "What is the value of the positive integer $n$?\n\n(1) $\\gcd(n, 45) = 9$\n\n(2) $\\text{lcm}(n, 45) = 90$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1) allows $n = 9, 18, 36, \\ldots$ — not sufficient. (2) allows $n = 18$ and $n = 90$ — not sufficient. Together, $\\gcd \\cdot \\text{lcm} = 45n$ gives $9 \\cdot 90 = 810 = 45n$, so $n = 18$.",
-   "solution_md": "**Formal path**\n\n(1): $n$ must carry $3^2$, no factor $5$, and no third $3$: $n \\in \\{9, 18, 36, 72, \\ldots\\}$ — many values. (2): $\\text{lcm}(n, 45) = 90 = 2 \\cdot 3^2 \\cdot 5$ allows $n = 2 \\cdot 3^2 = 18$ or $n = 90$ among others — not unique. Together, the identity $\\gcd(n, 45)\\cdot\\text{lcm}(n, 45) = 45n$ gives $n = \\tfrac{9 \\cdot 90}{45} = 18$, and $18$ satisfies both statements — sufficient.\n\n**Trigger cue**\n\nWhen a pair's GCF and LCM both appear, reach for $\\gcd \\cdot \\text{lcm} = $ product.\n\n**Takeaway**\n\nGCF times LCM equals the product of the pair.",
-   "trap_map": {
-    "0": "Believing the GCF alone pins $n$ against the fixed $45$.",
-    "1": "Believing the LCM alone pins $n$; $18$ and $90$ both work.",
-    "3": "Granting each alone after finding a single example for each.",
-    "4": "Missing the product identity and declaring the pair inconclusive."
-   },
-   "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
@@ -1541,33 +1190,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 4,
-   "stem_md": "$S$ is a set of consecutive integers. What is the sum of the integers in $S$?\n\n(1) $S$ contains exactly $9$ integers.\n\n(2) The median of $S$ is $14$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "Sum $=$ count $\\times$ median for consecutive integers. (1) gives the count only; (2) gives the median only; together: $9 \\cdot 14 = 126$.",
-   "solution_md": "**Formal path**\n\nFor consecutive integers, the sum is (number of terms) $\\times$ (median). (1) alone: median unknown — any 9-term run works. (2) alone: the run's length is unknown ($\\{14\\}$, $\\{13,14,15\\}$, …). Together the sum is pinned at $9 \\cdot 14 = 126$ — sufficient.\n\n**Trigger cue**\n\nWhen a consecutive set's sum is asked, reach for count × median and check which piece each statement supplies.\n\n**Takeaway**\n\nSum needs both the count and the center.",
-   "trap_map": {
-    "0": "Assuming a 9-integer run has a default starting point.",
-    "1": "Assuming the median fixes the set's size.",
-    "3": "Granting each alone because each supplies one clean number.",
-    "4": "Missing that the two numbers multiply to the sum."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -1649,33 +1271,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "real",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "prime_factorization",
-   "difficulty": 4,
-   "stem_md": "A print shop packs $n$ identical flyers into boxes for delivery. What is the value of $n$?\n\n(1) $n$ has exactly three positive divisors.\n\n(2) $n$ is between $110$ and $130$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "Exactly three divisors means $n = p^2$ for a prime $p$ ($1, p, p^2$). (1) alone: infinitely many. (2) alone: twenty candidates. Together: the only prime square in $(110, 130)$ is $121 = 11^2$.",
-   "solution_md": "**Formal path**\n\nA divisor count of $3$ forces $n = p^2$ with $p$ prime, since $3$ is odd and prime: exponent pattern $(2)$. Squares of primes near the window: $49, 121, 169$ — only $121$ lies between $110$ and $130$. Each statement alone leaves multiple values; together they pin $n = 121$.\n\n**Trigger cue**\n\nWhen a divisor count is tiny, reach for the exponent-pattern characterization.\n\n**Takeaway**\n\nThree divisors means a prime squared.",
-   "trap_map": {
-    "0": "Believing three divisors pins one number by itself.",
-    "1": "Treating the range alone as narrow enough.",
-    "3": "Granting each alone after finding $121$ mentally in both.",
-    "4": "Missing that prime squares are sparse enough for the window to isolate one."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -1730,33 +1325,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "real",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "prime_factorization",
-   "difficulty": 5,
-   "stem_md": "A charity splits a donation of $n$ dollars, where $n$ is a positive integer, evenly among its programs. Is $n$ divisible by $36$?\n\n(1) $n$ is divisible by $12$ and by $18$.\n\n(2) $n^2$ is divisible by $216$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "fastest_path_md": "(1): divisible by both $12$ and $18$ means divisible by $\\text{lcm}(12, 18) = 36$ — sufficient. (2): $216 = 2^3 \\cdot 3^3$, and exponents in $n^2$ are doubled, so $2e_2(n) \\ge 3$ and $2e_3(n) \\ge 3$ force $e_2(n) \\ge 2$ and $e_3(n) \\ge 2$: $n$ carries $2^2 \\cdot 3^2 = 36$ — also sufficient.",
-   "solution_md": "**Formal path**\n\n(1): joint divisibility is LCM divisibility, and $\\text{lcm}(12, 18) = 2^2 \\cdot 3^2 = 36$ — sufficient, answer yes. (2): $216 \\mid n^2$ means $n^2$ carries $2^3 3^3$; prime exponents of a square are even and doubled from $n$, so $e_2(n) \\ge \\lceil 3/2 \\rceil = 2$ and likewise $e_3(n) \\ge 2$. Hence $36 \\mid n$ — sufficient. Each statement alone answers the question.\n\n**Trigger cue**\n\nWhen divisibility facts stack, reach for LCMs; when squares appear, halve exponents with ceilings.\n\n**Takeaway**\n\nLCM for joint facts; ceilings for square roots of exponents.",
-   "trap_map": {
-    "0": "Doubting (2) because $216$ is not a perfect square.",
-    "1": "Doubting (1) by multiplying $12 \\cdot 18 = 216$ and confusing product with LCM.",
-    "2": "Combining out of caution when each alone already forces $2^2 3^2$.",
-    "4": "Testing only $n = 6$ against (2) — it fails the premise, not the question."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1784,60 +1352,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "If $x$ is a nonzero number, what is the value of $x$?\n\n(1) $x^2 = 2x$\n\n(2) $x^3 > x$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "fastest_path_md": "(1): $x^2 - 2x = x(x - 2) = 0$; nonzero $x$ forces $x = 2$ — sufficient. (2): both $x = 2$ and $x = -\\tfrac12$ satisfy $x^3 > x$ — not sufficient.",
-   "solution_md": "**Formal path**\n\n(1): factoring beats dividing: $x(x - 2) = 0$ gives $x = 0$ or $x = 2$; the stem excludes $0$, so $x = 2$ — sufficient. (2): $x^3 > x$ holds on $x > 1$ and on $-1 < x < 0$, which contains many values — not sufficient.\n\n**Trigger cue**\n\nWhen an equation has $x$ on both sides, reach for factoring — division by $x$ silently drops roots.\n\n**Takeaway**\n\nFactor, then apply the stem's exclusions.",
-   "trap_map": {
-    "1": "Believing $x^3 > x$ pins a single region, forgetting the two disjoint intervals.",
-    "2": "Combining unnecessarily after doubting the factored (1).",
-    "3": "Granting (2) sufficiency by testing only $x = \\tfrac12$.",
-    "4": "Dividing (1) by $x$ and worrying the excluded root ruins sufficiency."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "Is $x > 1$?\n\n(1) $\\sqrt{x} > 1$\n\n(2) $x^2 > x$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "fastest_path_md": "(1): $\\sqrt{x} > 1$ requires $x \\ge 0$ and squaring preserves order on nonnegatives: $x > 1$ — sufficient. (2): $x^2 > x$ also holds for every negative $x$ — not sufficient.",
-   "solution_md": "**Formal path**\n\n(1): the square root is defined for $x \\ge 0$ and is increasing, so $\\sqrt{x} > 1 = \\sqrt{1}$ forces $x > 1$ — sufficient, answer yes. (2): $x(x-1) > 0$ means $x > 1$ or $x < 0$; the negative branch answers no — not sufficient.\n\n**Trigger cue**\n\nWhen a square root appears in an inequality, reach for its hidden domain restriction first.\n\n**Takeaway**\n\nRoots restrict the domain; squares do not.",
-   "trap_map": {
-    "1": "Reading $x^2 > x$ as guaranteeing $x > 1$ by dividing by $x$.",
-    "2": "Combining although (1) already settles it.",
-    "3": "Granting (2) after testing only positive values.",
-    "4": "Doubting (1) by imagining negative $x$ inside the root."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -1860,33 +1374,6 @@
     "1": "Adding exponents term by term: $4x = 4 \\cdot 9 \\Rightarrow x = 9$? adjusted upward to $14$ by misfactoring.",
     "3": "Off-by-one: $x + 2 = 19$ from writing $4^9 = 2^{19}$? backing into $17$.",
     "4": "Matching $x$ directly to $4^9$'s converted exponent $18$, forgetting the $+2$."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 5,
-   "stem_md": "The integers $a$ and $b$ are both greater than $1$. What is the value of $a^b$?\n\n(1) $a^b = b^a$ and $a \\ne b$\n\n(2) $a + b = 6$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "fastest_path_md": "(1): the only integer pair with $a^b = b^a$, $a \\ne b$, both $> 1$, is $\\{2, 4\\}$ — in either order $a^b = 16$ — sufficient. (2): $(2,4)$ gives $16$ but $(3,3)$ gives $27$ — not sufficient.",
-   "solution_md": "**Formal path**\n\n(1): for integers above $1$, $a^b = b^a$ with $a \\ne b$ forces $\\{a, b\\} = \\{2, 4\\}$ (the function $\\tfrac{\\ln t}{t}$ takes each value at most twice, and the only integer collision is $2, 4$). Both orders give $a^b = 2^4 = 16$ or $4^2 = 16$ — the value is pinned: sufficient. (2): $a + b = 6$ allows $(2,4) \\to 16$, $(4,2) \\to 16$, and $(3,3) \\to 27$ — not sufficient.\n\n**Trigger cue**\n\nWhen $a^b = b^a$ appears with distinct integers, reach for the unique pair $2$ and $4$.\n\n**Takeaway**\n\nTwo and four: the only distinct integer power-swap pair.",
-   "trap_map": {
-    "1": "Believing the sum $6$ forces the $\\{2,4\\}$ split.",
-    "2": "Combining although (1) alone pins the value.",
-    "3": "Granting (2) sufficiency by forgetting $(3,3)$.",
-    "4": "Doubting (1) because $a$ and $b$ individually remain unknown — the QUESTION asks for $a^b$ only."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -1968,33 +1455,6 @@
     "2": "Keeping only the second case's root $2$.",
     "3": "Dropping the sign of the sum: $|-4| = 4$.",
     "4": "Adding the magnitudes of the roots: $6 + 2$."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "abs_value_number_line_decimals",
-   "difficulty": 4,
-   "stem_md": "On the number line, is the point $x$ closer to $10$ than to $2$?\n\n(1) $x > 6$\n\n(2) $|x - 8| < 2$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "fastest_path_md": "\"Closer to $10$ than to $2$\" means $x$ lies strictly right of their midpoint $6$. (1) says exactly $x > 6$ — sufficient. (2) gives $6 < x < 10$, entirely right of $6$ — sufficient. Each alone answers yes.",
-   "solution_md": "**Formal path**\n\nThe tie point between $2$ and $10$ is their midpoint $6$; \"closer to $10$\" is exactly $x > 6$. Statement (1) is that condition verbatim — sufficient. Statement (2) unpacks to $6 < x < 10$, a subset of $x > 6$ — sufficient. Answer: each statement alone.\n\n**Trigger cue**\n\nWhen \"closer to $a$ than to $b$\" appears, reach for the midpoint of $a$ and $b$.\n\n**Takeaway**\n\nCloser-to questions are midpoint questions.",
-   "trap_map": {
-    "0": "Solving (1) but never unpacking the interval hidden in (2).",
-    "1": "Trusting only the explicit absolute-value statement and doubting the bare inequality.",
-    "2": "Combining out of caution when each alone already lands right of the midpoint.",
-    "4": "Believing a distance comparison needs the exact position of $x$."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -2135,33 +1595,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "quadratics_factoring",
-   "difficulty": 4,
-   "stem_md": "What is the value of the positive number $x$?\n\n(1) $x^2 - 6x + 9 = 0$\n\n(2) $x^2 = 9$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "fastest_path_md": "(1) is a perfect square: $(x - 3)^2 = 0$ forces $x = 3$ — sufficient. (2) gives $x = \\pm 3$, and the stem's positivity keeps only $3$ — sufficient. Each alone works.",
-   "solution_md": "**Formal path**\n\n(1): $(x-3)^2 = 0$ has the single (double) root $x = 3$ — sufficient. (2): $x^2 = 9$ gives $x \\in \\{3, -3\\}$; the stem says $x > 0$, leaving $x = 3$ — sufficient. Answer: each statement alone.\n\n**Trigger cue**\n\nWhen a quadratic looks like $a^2 \\pm 2ab + b^2$, reach for the perfect-square form; and always re-read the stem's constraints before judging sufficiency.\n\n**Takeaway**\n\nStem constraints count toward sufficiency.",
-   "trap_map": {
-    "0": "Discarding (2) for its two algebraic roots, forgetting the stem's positivity.",
-    "1": "Missing that the perfect square has a unique root.",
-    "2": "Combining although each alone already pins $x = 3$.",
-    "4": "Treating double roots or sign constraints as ambiguity."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2184,33 +1617,6 @@
     "1": "Rejecting $(2, 18)$ after a sum slip.",
     "2": "Rejecting $(3, 12)$ by mispairing the factors of $36$.",
     "3": "Rejecting $(4, 9)$ after adding to $14$ by mistake."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "quadratics_factoring",
-   "difficulty": 5,
-   "stem_md": "The integers $a$ and $b$ satisfy $ab = 24$. What is the value of $a + b$?\n\n(1) $a^2 + b^2 = 73$\n\n(2) $a > b > 0$ and $a - b = 5$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "fastest_path_md": "(1): $(a+b)^2 = 73 + 48 = 121$, so $a + b = \\pm 11$ — two values, not sufficient. (2): $a - b = 5$ with $ab = 24$ and positives gives $(8, 3)$: $a + b = 11$ — sufficient.",
-   "solution_md": "**Formal path**\n\n(1): $(a+b)^2 = a^2 + 2ab + b^2 = 73 + 48 = 121$, so $a + b = 11$ or $-11$ (e.g. $(8,3)$ vs $(-8,-3)$) — not sufficient. (2): positivity and $a - b = 5$ force $(a, b) = (8, 3)$, so $a + b = 11$ — sufficient.\n\n**Trigger cue**\n\nWhen $ab$ and $a^2 + b^2$ appear together, reach for completing $(a \\pm b)^2$ — and watch the $\\pm$.\n\n**Takeaway**\n\nA squared sum has two square roots.",
-   "trap_map": {
-    "0": "Forgetting the negative pair $(-8, -3)$ under (1).",
-    "2": "Combining after the $\\pm$ scare, although (2) alone settles it.",
-    "3": "Granting (1) after silently assuming positives.",
-    "4": "Missing that (2)'s difference plus the product pins the pair."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -2324,33 +1730,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "inequalities",
-   "difficulty": 4,
-   "stem_md": "Is $a > b$?\n\n(1) $\\dfrac{a}{b} > 1$\n\n(2) $b > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1) with $b > 0$ means $a > b$; but with $b < 0$ it means $a < b$ (flip when multiplying by negative $b$) — alone, not sufficient. (2) alone says nothing about $a$. Together: multiply (1) by the positive $b$: $a > b$ — sufficient.",
-   "solution_md": "**Formal path**\n\n(1): $\\tfrac{a}{b} > 1$ with $(a, b) = (3, 2)$ gives yes; with $(-3, -2)$ gives $\\tfrac{-3}{-2} = 1.5 > 1$ but $-3 < -2$ — no. Not sufficient. (2) alone: no information on $a$. Together: $b > 0$ lets us multiply the inequality by $b$ without flipping: $a > b$ — sufficient.\n\n**Trigger cue**\n\nWhen an inequality involves a quotient, reach for the denominator's sign before clearing it.\n\n**Takeaway**\n\nClearing a denominator needs its sign first.",
-   "trap_map": {
-    "0": "Multiplying (1) by $b$ as if $b$ were known positive.",
-    "1": "Believing $b$'s sign alone could order the pair.",
-    "3": "Granting (1) sufficiency after testing only positive pairs.",
-    "4": "Missing that the pair combines cleanly."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -2427,33 +1806,6 @@
     "2": "Doubling $3$ because $-10$ looks like $-6$ scaled by $\\tfrac{5}{3}$ misread as $2$.",
     "3": "Matching the constants $9 \\to 15$ by adding $6$ to $k = 3$.",
     "4": "Using the constant $15$ itself."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "real",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "linear_systems",
-   "difficulty": 4,
-   "stem_md": "At a fundraiser, adult tickets cost \\$12 each and child tickets cost \\$5 each. How many adult tickets were sold?\n\n(1) Ticket revenue was \\$93 in total.\n\n(2) A total of $13$ tickets were sold.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "fastest_path_md": "(1): $12a + 5c = 93$ in whole tickets. Mod $5$: $2a \\equiv 3$, so $a \\equiv 4 \\pmod 5$; and $12a \\le 93$ caps $a \\le 7$. Only $a = 4$ works ($c = 9$) — sufficient. (2): $a + c = 13$ alone allows many splits — not sufficient.",
-   "solution_md": "**Formal path**\n\n(1): one equation, two unknowns — but tickets are nonnegative integers. Reducing $12a + 5c = 93$ modulo $5$: $2a \\equiv 3 \\pmod 5$, giving $a \\equiv 4 \\pmod 5$, so $a \\in \\{4, 9, \\ldots\\}$; the budget caps $a \\le 7$, leaving $a = 4$ uniquely ($c = 9$). Sufficient. (2): $(a, c)$ could be $(1,12)$, $(4,9)$, $(10,3)$, … — not sufficient.\n\n**Trigger cue**\n\nWhen one equation has two integer unknowns, reach for modular constraints before declaring it insufficient.\n\n**Takeaway**\n\nInteger constraints can make one equation sufficient.",
-   "trap_map": {
-    "1": "Trusting the ticket count while ignoring that prices alone can pin the split.",
-    "2": "Reflexively combining because one equation with two unknowns \"can't\" suffice.",
-    "3": "Granting (2) alone after finding a single convenient split.",
-    "4": "Declaring both hopeless by the equations-versus-unknowns rule."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -2567,33 +1919,6 @@
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "min_max_optimization",
-   "difficulty": 3,
-   "stem_md": "What is the maximum value that the expression $-(x - 4)^2 + k$ attains?\n\n(1) $k = 25$\n\n(2) The expression equals $9$ when $x = 0$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "fastest_path_md": "The vertex form peaks at $x = 4$ with value $k$. (1) hands over $k$ — sufficient. (2): $-(0-4)^2 + k = 9$ gives $k = 25$ — sufficient. Each alone.",
-   "solution_md": "**Formal path**\n\n$-(x-4)^2 \\le 0$ with equality at $x = 4$, so the maximum is exactly $k$. (1) states $k = 25$. (2) solves to $-16 + k = 9$, i.e. $k = 25$. Either statement pins the maximum at $25$.\n\n**Trigger cue**\n\nWhen a quadratic is in vertex form, reach for reading the extreme value straight off.\n\n**Takeaway**\n\nVertex form hands you the max for free.",
-   "trap_map": {
-    "0": "Discounting (2) as a single point that \"can't reveal the peak.\"",
-    "1": "Discounting (1) because the peak location $x = 4$ is not restated.",
-    "2": "Combining although either alone determines $k$.",
-    "4": "Believing a maximum needs calculus or more data."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -2618,33 +1943,6 @@
     "4": "Assuming the least must equal the average."
    },
    "numeric_check": "160 - 4*40",
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "min_max_optimization",
-   "difficulty": 3,
-   "stem_md": "The function $y = x^2 + bx + c$ has constants $b$ and $c$. What is the minimum value of $y$?\n\n(1) $b = -8$\n\n(2) $c = 19$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "Completing the square: minimum $= c - \\tfrac{b^2}{4}$. It needs BOTH constants: (1) alone leaves $c$ free, (2) alone leaves $b$ free; together the minimum is $19 - 16 = 3$.",
-   "solution_md": "**Formal path**\n\n$y = \\left(x + \\tfrac{b}{2}\\right)^2 + c - \\tfrac{b^2}{4}$, so the minimum equals $c - \\tfrac{b^2}{4}$. Each statement supplies one constant and leaves the other free — insufficient alone. Together: $19 - \\tfrac{64}{4} = 3$ — sufficient.\n\n**Trigger cue**\n\nWhen a quadratic's extreme is asked, reach for completing the square and see which constants the formula needs.\n\n**Takeaway**\n\nThe minimum reads $c - b^2/4$: both constants required.",
-   "trap_map": {
-    "0": "Believing the vertex location $-b/2$ alone yields the minimum value.",
-    "1": "Believing the constant term is the minimum (true only when $b = 0$).",
-    "3": "Granting each alone after conflating vertex location with vertex value.",
-    "4": "Missing that the two constants plug straight into one formula."
-   },
-   "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
   },
   {
@@ -2697,33 +1995,6 @@
     "1": "Computing $2a_3 - 7$ by reusing the wrong constant.",
     "3": "Adding one extra iteration's worth by sign slip.",
     "4": "Iterating once too many: $a_5 = 35$."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "functions_sequences",
-   "difficulty": 4,
-   "stem_md": "The sequence $b_1, b_2, b_3, \\ldots$ is arithmetic. What is the value of $b_{10}$?\n\n(1) $b_3 = 11$\n\n(2) $b_7 = 27$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "An arithmetic sequence has two unknowns (start and step). One term alone leaves the step free; two terms pin both: step $= \\tfrac{27 - 11}{4} = 4$, so $b_{10} = 27 + 3 \\cdot 4 = 39$.",
-   "solution_md": "**Formal path**\n\n$b_n = b_1 + (n-1)d$. (1) alone or (2) alone fixes one linear equation in two unknowns — insufficient. Together: $b_7 - b_3 = 4d = 16$, so $d = 4$ and $b_{10} = b_7 + 3d = 39$ — sufficient.\n\n**Trigger cue**\n\nWhen an arithmetic sequence hides two parameters, reach for counting equations against unknowns.\n\n**Takeaway**\n\nTwo parameters need two independent facts.",
-   "trap_map": {
-    "0": "Treating one anchor term as enough.",
-    "1": "Same slip on the other anchor.",
-    "3": "Granting each alone by assuming a default step of 1.",
-    "4": "Missing that the term gap divides evenly into the index gap."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -2886,114 +2157,6 @@
     "1": "Adding $12$ only to the son's side.",
     "3": "Adding $12$ only to Nadia's side.",
     "4": "Doubling Nadia's current age check: using $s = 16$ from a slip."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "difficulty": 4,
-   "stem_md": "A drawer contains only silver coins worth $5$ points each and gold coins worth $8$ points each. How many gold coins are in the drawer?\n\n(1) The coins are worth $79$ points in total.\n\n(2) The drawer contains $11$ coins in total.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1): $5s + 8g = 79$ has TWO integer solutions: $(s, g) = (11, 3)$ and $(3, 8)$ — not sufficient. (2): eleven coins split many ways — not sufficient. Together: only $(3, 8)$ has $s + g = 11$, so $g = 8$.",
-   "solution_md": "**Formal path**\n\n(1): modulo $5$, $3g \\equiv 4 \\pmod 5$ gives $g \\equiv 3 \\pmod 5$, so $g \\in \\{3, 8\\}$ within the point budget; both $(11, 3)$ and $(3, 8)$ work — insufficient. (2): the count alone fixes nothing — insufficient. Together: $(11, 3)$ has $14$ coins, $(3, 8)$ has $11$ ✓ — unique, $g = 8$. Sufficient combined.\n\n**Trigger cue**\n\nWhen a coin equation has several integer solutions, reach for intersecting with the count.\n\n**Takeaway**\n\nSieve the integer solutions, then intersect the statements.",
-   "trap_map": {
-    "0": "Stopping the mod-5 sieve at $g = 3$ and missing $g = 8$.",
-    "1": "Trusting the coin count alone.",
-    "3": "Granting each alone after finding one solution for each.",
-    "4": "Declaring one equation with two unknowns hopeless despite the integer sieve."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "difficulty": 4,
-   "stem_md": "Rana and Tomás each donated a whole number of dollars to a fund. How much did Rana donate?\n\n(1) Rana donated \\$15 more than Tomás.\n\n(2) Together they donated \\$95.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1) alone: any pair with a \\$15 gap. (2) alone: any split of \\$95. Together: $r = t + 15$ and $r + t = 95$ give $2t = 80$, $t = 40$, $r = 55$ — one value.",
-   "solution_md": "**Formal path**\n\nTwo unknowns need two independent equations. (1): $r = t + 15$ — a line of possibilities. (2): $r + t = 95$ — another line. Intersecting: $t + 15 + t = 95$, $t = 40$, $r = 55$ — sufficient together only.\n\n**Trigger cue**\n\nWhen a word problem hides a two-variable system, reach for counting independent equations.\n\n**Takeaway**\n\nTwo unknowns, two equations — no fewer.",
-   "trap_map": {
-    "0": "Treating the gap alone as if anchored to a known base.",
-    "1": "Treating the total alone as if split evenly.",
-    "3": "Granting each alone by assuming the other fact silently.",
-    "4": "Missing that the two lines intersect at one point."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "real",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "difficulty": 4,
-   "stem_md": "A vending machine sells snacks for \\$2 each and drinks for \\$3 each. Yesterday it sold snacks and drinks only. Did it sell more snacks than drinks yesterday?\n\n(1) Yesterday's revenue was \\$36.\n\n(2) It sold $15$ items in total yesterday.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1): $2s + 3d = 36$ allows $(s, d) = (15, 2)$ (yes) and $(3, 10)$ (no) — not sufficient. (2): $s + d = 15$ allows both orders — not sufficient. Together: $2s + 3(15 - s) = 36$ gives $s = 9$, $d = 6$: yes — sufficient.",
-   "solution_md": "**Formal path**\n\n(1) has many integer solutions with either ordering — insufficient. (2) fixes only the count — insufficient. Together: substitute $d = 15 - s$ into the revenue: $2s + 45 - 3s = 36$, so $s = 9$ and $d = 6$; $9 > 6$ answers yes — sufficient.\n\n**Trigger cue**\n\nWhen a yes/no question sits on a hidden system, reach for solving the system fully before judging.\n\n**Takeaway**\n\nAnswer the question after the system collapses.",
-   "trap_map": {
-    "0": "Believing revenue alone orders the counts.",
-    "1": "Believing the item count alone orders the split.",
-    "3": "Granting each alone after finding one convenient solution.",
-    "4": "Stopping at \"two unknowns\" without combining."
-   },
-   "numeric_check": null,
-   "provenance": "authored (fable-5) + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "difficulty": 4,
-   "stem_md": "The positive integer $q$ is the number of questions on a quiz. What is $q$?\n\n(1) If the quiz had $5$ more questions, it would have more than $31$ questions.\n\n(2) If the quiz had $4$ fewer questions, it would have fewer than $24$ questions.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "fastest_path_md": "(1): $q + 5 > 31$ means $q > 26$, i.e. $q \\ge 27$ — many values. (2): $q - 4 < 24$ means $q < 28$, i.e. $q \\le 27$ — many values. Together the integer bounds pinch: $q = 27$.",
-   "solution_md": "**Formal path**\n\nTranslate each: (1) $q + 5 > 31 \\Rightarrow q \\ge 27$ (integers); (2) $q - 4 < 24 \\Rightarrow q \\le 27$. Each alone leaves infinitely (or many) values — insufficient. Their intersection is the single integer $27$ — sufficient together.\n\n**Trigger cue**\n\nWhen verbal inequalities bracket an integer, reach for sharpening each strict bound to its integer endpoint.\n\n**Takeaway**\n\nStrict bounds on integers pinch to endpoints.",
-   "trap_map": {
-    "0": "Reading (1) as the equality $q + 5 = 31$.",
-    "1": "Reading (2) as the equality $q - 4 = 24$.",
-    "3": "Granting each alone by treating one bound as an exact value.",
-    "4": "Missing that the two integer bounds meet at exactly one value."
    },
    "numeric_check": null,
    "provenance": "authored (fable-5) + brute-force programmatic verification"
@@ -5240,33 +4403,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "remainders_units_digits",
-   "difficulty": 3,
-   "stem_md": "What is the units digit of the positive integer $n$?\n\n(1) The units digit of $7n$ is $1$.\n\n(2) The units digit of $4n$ is $2$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\nOnly the units digit $d$ of $n$ matters. From (1): scan $7d$ for $d = 0$ through $9$; the units digits are $0, 7, 4, 1, 8, 5, 2, 9, 6, 3$, and only $d = 3$ gives $1$. Statement (1) pins $d = 3$ — sufficient. From (2): the units digits of $4d$ are $0, 4, 8, 2, 6, 0, 4, 8, 2, 6$; both $d = 3$ and $d = 8$ give $2$, so statement (2) leaves two possibilities — not sufficient.\n\n**Trigger cue**\n\nA units digit described through a multiple: test all ten digits and count the preimages.\n\n**Takeaway**\n\nMultiplying by $7$ permutes units digits; multiplying by $4$ collapses them.",
-   "fastest_path_md": "For (1), $7 \\cdot 3 = 21$ is the only way to end in $1$ — sufficient. For (2), $4 \\cdot 3 = 12$ and $4 \\cdot 8 = 32$ both end in $2$ — not sufficient. Answer: statement (1) alone.",
-   "trap_map": {
-    "1": "Believes a units digit of $2$ for $4n$ pins $n$'s digit, missing that both $3$ and $8$ work.",
-    "2": "Assumes a single fact about a product can never determine a digit, so both statements seem necessary.",
-    "3": "Checks only $n$ ending in $3$ against statement (2) and never tests $n$ ending in $8$.",
-    "4": "Doubts that any digit can be recovered from a product's units digit at all."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "pure",
@@ -5345,33 +4481,6 @@
     "4": "Adds the phases to an $8$-minute cycle, getting $25$ cycles and $25 \\cdot 2 = 50$ mist minutes."
    },
    "numeric_check": "22*2",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "remainders_units_digits",
-   "difficulty": 4,
-   "stem_md": "If $n$ is a positive integer, what is the units digit of $n^4$?\n\n(1) $n$ is even.\n\n(2) $n$ is not a multiple of $5$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\nThe units digit of $n^4$ depends only on the units digit of $n$: digits $1, 3, 7, 9$ give $1$; digits $2, 4, 6, 8$ give $6$; digit $5$ gives $5$; digit $0$ gives $0$. From (1), $n$ can end in $0, 2, 4, 6, 8$, so $n^4$ ends in $0$ or $6$ — not sufficient. From (2), $n$ can end in any digit except $0$ and $5$, so $n^4$ ends in $1$ or $6$ — not sufficient. Together, $n$ ends in $2, 4, 6,$ or $8$, and every such digit gives $n^4$ ending in $6$ — sufficient.\n\n**Trigger cue**\n\nA question about the units digit of a fixed power under digit restrictions: tabulate the ten possible outcomes first.\n\n**Takeaway**\n\nFourth powers end only in $0$, $1$, $5$, or $6$.\n",
-   "fastest_path_md": "Tabulate fourth-power endings: $\\{0 \\to 0,\\ 5 \\to 5,\\ \\text{odd} \\to 1,\\ \\text{even} \\to 6\\}$. (1) leaves $\\{0, 6\\}$; (2) leaves $\\{1, 6\\}$; the overlap of the digit restrictions leaves only $6$.",
-   "trap_map": {
-    "0": "Assumes every even $n$ gives $n^4$ ending in $6$, forgetting $n$ ending in $0$.",
-    "1": "Assumes every non-multiple of $5$ gives $n^4$ ending in $6$, forgetting odd digits give $1$.",
-    "3": "Knows fourth powers end only in $0, 1, 5, 6$ and concludes each statement alone narrows to one digit.",
-    "4": "Misses that combining even with not-a-multiple-of-$5$ leaves only $2, 4, 6, 8$, all with fourth powers ending in $6$."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -5483,33 +4592,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "min_max_optimization",
-   "difficulty": 3,
-   "stem_md": "A list consists of five integers whose sum is $60$. Is the greatest integer in the list at least $15$?\n\n(1) The least integer in the list is $4$.\n\n(2) Every integer in the list is less than $15$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "solution_md": "**Formal path**\n\nStatement (2): every integer is less than $15$, so the greatest is at most $14$ — a definite No. Sufficient. Statement (1): the other four integers sum to $56$. The list $4, 14, 14, 14, 14$ answers No, while $4, 4, 4, 4, 44$ answers Yes. Not sufficient. Answer: statement (2) alone.\n\n**Trigger cue**\n\nA yes/no question about a list's greatest value under a sum constraint: test extreme allocations for each statement.\n\n**Takeaway**\n\nA guaranteed no settles a yes/no question.",
-   "fastest_path_md": "(2) caps every entry below $15$, so the answer is a definite No — sufficient. For (1), compare $4, 14, 14, 14, 14$ with $4, 4, 4, 4, 44$: both legal, different answers.",
-   "trap_map": {
-    "0": "Assumes the least value $4$ forces one of the remaining four (summing to $56$) up to $15$, overrating the pigeonhole bound of $14$.",
-    "2": "Combines the statements without noticing that (2) alone already forces a definite No.",
-    "3": "Credits (1) with sufficiency by rounding the average $56/4 = 14$ up to $15$.",
-    "4": "Treats the definite No from (2) as a failure to answer rather than as sufficiency."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5537,33 +4619,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "min_max_optimization",
-   "difficulty": 3,
-   "stem_md": "If $x$ and $y$ are numbers, is $xy \\le 49$?\n\n(1) $x + y = 14$\n\n(2) $x - y = 4$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\nStatement (1): with $x + y = 14$, we get $xy = x(14 - x) = 49 - (x - 7)^2 \\le 49$, so the answer is always Yes. Sufficient. Statement (2): $x = 9, y = 5$ gives $xy = 45$ (Yes), while $x = 12, y = 8$ gives $xy = 96$ (No). Not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA product bound when the sum is fixed: complete the square or recall the equal-split maximum.\n\n**Takeaway**\n\nA fixed sum caps the product at the equal split.",
-   "fastest_path_md": "A fixed sum of $14$ caps the product at $7 \\cdot 7 = 49$, so (1) forces Yes. For (2), test $(9, 5)$ and $(12, 8)$ — different answers.",
-   "trap_map": {
-    "1": "Tests only modest pairs for (2), such as $(9, 5)$, and never a large pair like $(12, 8)$.",
-    "2": "Insists the individual values of $x$ and $y$ are needed, missing that (1) bounds the product by itself.",
-    "3": "Assumes each linear relation pins down $xy$ well enough to compare with $49$.",
-    "4": "Believes a yes/no product question requires the exact value of $xy$, which neither statement gives."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "real",
@@ -5588,60 +4643,6 @@
     "4": "Drops the ratio rule and gives the other six employees the bare minimum of $4$ shifts each."
    },
    "numeric_check": "40 - 6*5",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 3,
-   "stem_md": "Set $S$ consists of consecutive integers. How many integers are in $S$?\n\n(1) The sum of the integers in $S$ is $120$.\n\n(2) The largest integer in $S$ is $14$ more than the smallest integer in $S$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "solution_md": "**Formal path**\nStatement (1): a sum of $120$ arises from runs of different lengths — $39+40+41$ uses $3$ integers, $22+23+24+25+26$ uses $5$, and $1+2+\\dots+15$ uses $15$. The count is not determined. Not sufficient.\n\nStatement (2): consecutive integers step by $1$, so largest $-$ smallest $= 14$ forces exactly $14 + 1 = 15$ integers, no matter where the run is located. Sufficient.\n\nStatement (2) alone is sufficient; statement (1) alone is not.\n\n**Trigger cue**\nFor consecutive integers, the range alone fixes the count: count $=$ range $+ 1$.\n\n**Takeaway**\nConsecutive integers: count equals range plus one.",
-   "fastest_path_md": "Statement (2) is instant: range $14$ means $14 + 1 = 15$ integers. To kill statement (1), produce two decompositions of $120$ with different lengths — $39+40+41$ and $1+2+\\dots+15$ — and you are done.",
-   "trap_map": {
-    "0": "Assumes $120$ decomposes into consecutive integers in only one way, overlooking runs like $39+40+41$.",
-    "2": "Thinks the range only bounds the spread and that the sum is still needed to fix the count.",
-    "3": "Credits statement (1) with fixing the count, though $3$, $5$, and $15$ integers all reach a sum of $120$.",
-    "4": "Misses that a range of $14$ forces exactly $15$ consecutive integers wherever the run sits."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 2,
-   "stem_md": "What is the largest of $5$ consecutive even integers?\n\n(1) The smallest of the five integers is $18$.\n\n(2) The sum of the five integers is $110$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "solution_md": "**Formal path**\nWrite the five integers as $a, a+2, a+4, a+6, a+8$; the largest is $a + 8$.\n\nStatement (1): $a = 18$, so the largest is $18 + 8 = 26$. Sufficient.\n\nStatement (2): $5a + 20 = 110$ gives $a = 18$, so the largest is again $26$. Sufficient.\n\nEach statement alone is sufficient.\n\n**Trigger cue**\nWhen the count and spacing of an evenly spaced set are fixed, any single anchor — an endpoint, the sum, or the mean — locks in every term.\n\n**Takeaway**\nFixed count and spacing: one anchor determines the whole set.",
-   "fastest_path_md": "With $5$ terms spaced by $2$, the set has one degree of freedom. Statement (1) anchors it directly. Statement (2) anchors it through the mean: $110/5 = 22$ is the middle term, so the largest is $22 + 4 = 26$. Each alone works.",
-   "trap_map": {
-    "0": "Misses that the sum in statement (2) yields the mean $22$, which is the middle term and fixes the set.",
-    "1": "Misses that the smallest term plus four steps of $2$ pins the largest at $26$.",
-    "2": "Thinks an anchor and the sum are both needed, though either one alone fixes the single unknown.",
-    "4": "Treats the set as undetermined even though the count is fixed at $5$ and the spacing at $2$."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -5777,33 +4778,6 @@
     "4": "Divides the original sum $651$ by $20$ without removing the withdrawn bib."
    },
    "numeric_check": "630/20",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "consecutive_evenly_spaced",
-   "difficulty": 4,
-   "stem_md": "$T$ is a set of consecutive even integers. What is the median of $T$?\n\n(1) The sum of the integers in $T$ is $0$.\n\n(2) $T$ contains fewer than $8$ integers.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\nFor any evenly spaced set, the median equals the mean.\n\nStatement (1): the mean is $\\text{sum}/\\text{count} = 0/\\text{count} = 0$, whatever the count, so the median is $0$. (For instance $\\{-2, 0, 2\\}$ and $\\{-6, -4, -2, 0, 2, 4, 6\\}$ both qualify, and both have median $0$.) Sufficient.\n\nStatement (2): $\\{2, 4\\}$ has median $3$ while $\\{6, 8\\}$ has median $7$; both contain fewer than $8$ integers. Not sufficient.\n\nStatement (1) alone is sufficient.\n\n**Trigger cue**\nA median question about an evenly spaced set: convert it to a mean question, because mean and median coincide — a zero sum then forces both to be $0$.\n\n**Takeaway**\nEvenly spaced: zero sum forces zero mean and median.",
-   "fastest_path_md": "Median $=$ mean for evenly spaced sets, and statement (1) makes the mean $0/\\text{count} = 0$ with no case analysis. Statement (2) dies to two quick examples, $\\{2,4\\}$ versus $\\{6,8\\}$.",
-   "trap_map": {
-    "1": "Believes the size bound in statement (2) locates the set while the zero-sum condition does not.",
-    "2": "Thinks the count is needed alongside the zero sum, missing that median $=$ mean $= 0$ for any qualifying size.",
-    "3": "Credits statement (2) alone, though $\\{2,4\\}$ and $\\{6,8\\}$ give different medians.",
-    "4": "Assumes the median cannot be found without knowing how many integers the set contains."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -6053,114 +5027,6 @@
    "content_domain": "algebra",
    "fundamental_skill": "equal_unequal_alg",
    "subtopic": "algebraic_translation",
-   "format": "data_sufficiency",
-   "context": "pure",
-   "difficulty": 4,
-   "stem_md": "If $x$ and $y$ are positive integers, what is the value of $x$?\n\n(1) $x + 3y = 26$\n\n(2) $x > 3y$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\n\n(1): $x = 26 - 3y$ gives $x \\in \\{23, 20, 17, \\dots, 2\\}$ for $y = 1, \\dots, 8$ — insufficient. (2): an inequality alone fixes nothing — insufficient. Together: $26 - 3y > 3y$ forces $y \\le 4$, leaving $x \\in \\{14, 17, 20, 23\\}$ — still four values. Insufficient even combined.\n\n**Trigger cue**\n\nAn equation plus an inequality over positive integers: list the surviving solutions explicitly before judging sufficiency.\n\n**Takeaway**\n\nAn inequality narrows a solution list; it rarely collapses it to one.",
-   "fastest_path_md": "(1) leaves $8$ pairs. Adding (2): $26 - 3y > 3y$ means $y \\le 4$, so $x$ can still be $14$, $17$, $20$, or $23$ — pick E.",
-   "trap_map": {
-    "0": "Believes positivity makes $x + 3y = 26$ have a unique solution.",
-    "1": "Treats the inequality $x > 3y$ as if it pinned $x$ by itself.",
-    "2": "Assumes adding the inequality must narrow the list to a single pair; four pairs survive.",
-    "3": "Judges each statement sufficient after testing only one convenient pair."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "content_domain": "algebra",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "format": "data_sufficiency",
-   "context": "pure",
-   "difficulty": 4,
-   "stem_md": "For numbers $a$ and $b$, is $a$ greater than $b$?\n\n(1) The sum of $a$ and twice $b$ is $30$.\n\n(2) The sum of $b$ and twice $a$ is $36$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\n(1): $a + 2b = 30$ allows $(a, b) = (30, 0)$, a yes, and $(0, 15)$, a no — insufficient. (2): $2a + b = 36$ allows $(18, 0)$, a yes, and $(0, 36)$, a no — insufficient. Together: subtracting (1) from (2) gives $(2a + b) - (a + 2b) = 36 - 30$, so $a - b = 6 > 0$ — a definite yes. Sufficient combined.\n\n**Trigger cue**\n\nTwo mirrored linear equations and a comparison question: subtract them to read off $a - b$ directly.\n\n**Takeaway**\n\nSubtracting mirrored equations produces the difference immediately.",
-   "fastest_path_md": "Each equation alone bends both ways. Subtract the two: $a - b = 6$, so together they answer yes without ever solving for $a$ or $b$.",
-   "trap_map": {
-    "0": "Assumes $a + 2b = 30$ alone forces $a$ above $b$.",
-    "1": "Assumes $2a + b = 36$ alone forces $a$ above $b$.",
-    "3": "Grants each statement alone after testing only positive sample values.",
-    "4": "Solves for the pair, gets one point $(14, 8)$, and mistrusts a unique answer from combining."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "content_domain": "algebra",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "format": "data_sufficiency",
-   "context": "real",
-   "difficulty": 4,
-   "stem_md": "At a school store, pencils cost $40$ cents each and erasers cost $70$ cents each. Kavi bought at least one pencil, at least one eraser, and nothing else. Did Kavi buy more pencils than erasers?\n\n(1) Kavi spent $\\$4.10$ in total.\n\n(2) Kavi bought $8$ items in total.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\n(1): in cents, $40p + 70e = 410$, i.e. $4p + 7e = 41$. Since $4p$ is even and $41$ is odd, $e$ must be odd, so $e \\in \\{1, 3, 5\\}$; only $e = 3$ leaves $41 - 21 = 20$ divisible by $4$, giving $p = 5$. The purchase is unique and $5 > 3$ — a definite yes. Sufficient. (2): $p + e = 8$ allows $(7, 1)$, a yes, and $(1, 7)$, a no — insufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA money total over integer item counts: run the parity-and-divisibility sieve before dismissing one equation in two unknowns.\n\n**Takeaway**\n\nInteger constraints can make a single equation sufficient.",
-   "fastest_path_md": "For (1), $4p + 7e = 41$ needs $e$ odd; test $e = 1, 3, 5$ — only $e = 3$, $p = 5$ works, so (1) answers yes by itself. (2) obviously splits both ways.",
-   "trap_map": {
-    "1": "Trusts the item count alone, though it says nothing about the split.",
-    "2": "Assumes one equation with two unknowns always needs the second statement; the cent equation has a single positive-integer solution.",
-    "3": "Grants statement (2) as well, though $(7,1)$ and $(1,7)$ answer differently.",
-    "4": "Dismisses statement (1) as one equation, two unknowns without testing integer solutions."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "content_domain": "algebra",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
-   "format": "data_sufficiency",
-   "context": "pure",
-   "difficulty": 4,
-   "stem_md": "What is the value of the integer $n$?\n\n(1) Three more than twice $n$ is greater than $15$ and less than $21$.\n\n(2) Four less than three times $n$ is greater than $19$ and less than $23$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "solution_md": "**Formal path**\n\n(1): $15 < 2n + 3 < 21$ gives $12 < 2n < 18$, so $6 < n < 9$ and $n \\in \\{7, 8\\}$ — insufficient. (2): $19 < 3n - 4 < 23$ gives $23 < 3n < 27$, so $\\frac{23}{3} < n < 9$; the only integer in that band is $n = 8$ — sufficient. Answer: statement (2) alone.\n\n**Trigger cue**\n\nA range statement about an integer: convert to explicit bounds and count the integers inside before judging.\n\n**Takeaway**\n\nA range is sufficient when exactly one integer fits inside.",
-   "fastest_path_md": "(1): $6 < n < 9$ holds two integers — out. (2): $23 < 3n < 27$ traps $n$ strictly between $7.67$ and $9$, so $n = 8$ — done, B.",
-   "trap_map": {
-    "0": "Overlooks that statement (1) leaves both $n = 7$ and $n = 8$.",
-    "2": "Assumes both ranges are needed when statement (2) already pins a single integer.",
-    "3": "Grants statement (1) as well, though it allows two values.",
-    "4": "Declares that ranges never determine a value; between $19$ and $23$, $3n - 4$ forces $n = 8$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "content_domain": "algebra",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "algebraic_translation",
    "format": "problem_solving",
    "context": "pure",
    "difficulty": 5,
@@ -6347,60 +5213,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 3,
-   "stem_md": "Is $x + y > 0$?\n\n(1) $x > |y|$\n\n(2) $x > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\n(1) gives $x > |y| \\ge -y$, so $x + y > 0$ for every allowed pair — sufficient. (2) allows $(x, y) = (1, 1)$ with a positive sum and $(1, -5)$ with a negative sum — not sufficient. Statement (1) alone answers the question.\n\n**Trigger cue**\n\nA variable dominating an absolute value: $x > |y|$ means $x$ outweighs $y$ whichever sign $y$ takes.\n\n**Takeaway**\n\n$x > |y|$ makes $x$ outweigh $y$ in any sum.",
-   "fastest_path_md": "(1): $x$ beats $|y|$, so the sum must be positive — sufficient. (2): compare $(1, 1)$ with $(1, -5)$ — insufficient. Answer: (1) alone.",
-   "trap_map": {
-    "1": "Credits $x > 0$ alone, forgetting a large negative $y$ can sink the sum.",
-    "2": "Combines out of caution, missing that $x > |y| \\ge -y$ already settles the question.",
-    "3": "Grants (2) sufficiency after testing only nonnegative values of $y$.",
-    "4": "Doubts (1) because $y$'s sign is unknown, though $|y|$ absorbs both signs."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 3,
-   "stem_md": "Is $a > 0$?\n\n(1) $a^2 = 4a$\n\n(2) $a \\ne 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\n(1) rearranges to $a^2 - 4a = 0$, so $a(a - 4) = 0$ and $a = 0$ or $a = 4$. The question “is $a > 0$?” gets a no at $a = 0$ and a yes at $a = 4$ — not sufficient. (2) allows $a = 1$ and $a = -1$ — not sufficient. Together, $a \\ne 0$ removes the root $a = 0$, leaving $a = 4 > 0$ — sufficient.\n\n**Trigger cue**\n\nAn equation with the variable on both sides: factor it; never divide by the variable.\n\n**Takeaway**\n\nDividing by a variable silently discards its zero root.",
-   "fastest_path_md": "(1): $a \\in \\{0, 4\\}$ — one no, one yes. (2): clearly not alone. Together only $a = 4$ survives — both statements needed.",
-   "trap_map": {
-    "0": "Divides $a^2 = 4a$ by $a$, silently discarding the root $a = 0$.",
-    "1": "Reads $a \\ne 0$ as $a > 0$.",
-    "3": "Cancels $a$ in (1) and equates nonzero with positive in (2).",
-    "4": "Keeps both roots of (1) even after (2) eliminates $a = 0$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6423,33 +5235,6 @@
     "1": "Reads the positive product as forcing $x > 0$, ignoring that $z^3$ can be negative.",
     "2": "Tests only positive $z$, which makes II look forced, while doubting the quotient in III.",
     "4": "Accepts II after testing only positive values of $z$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "must_be_true_testing",
-   "difficulty": 4,
-   "stem_md": "Is $z < 0$?\n\n(1) $z^3 < z$\n\n(2) $z^5 < z^3$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\n\n(1) $z^3 < z \\iff z(z - 1)(z + 1) < 0 \\iff z < -1$ or $0 < z < 1$. (2) $z^5 < z^3 \\iff z^3(z^2 - 1) < 0$, which yields the identical set $z < -1$ or $0 < z < 1$. Each statement, and therefore the combination, still contains $z = -2$ (answer yes) and $z = \\frac{1}{2}$ (answer no) — not sufficient even together.\n\n**Trigger cue**\n\nPower inequalities: move everything to one side and sign-chart; different exponents can hide identical statements.\n\n**Takeaway**\n\nTwo statements with the same solution set add nothing together.",
-   "fastest_path_md": "Sign-chart both: each says exactly $z < -1$ or $0 < z < 1$ — identical information. Test $z = -2$ and $z = \\frac{1}{2}$: still both answers, so together insufficient.",
-   "trap_map": {
-    "0": "Solves (1) as only $z < -1$, dropping the $0 < z < 1$ branch.",
-    "1": "Solves (2) as only $z < -1$, dropping the $0 < z < 1$ branch.",
-    "2": "Assumes two different-looking inequalities must intersect to a set with a single sign.",
-    "3": "Cancels powers of $z$ in each statement, reducing both to $z < -1$."
    },
    "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
@@ -6644,33 +5429,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "divisibility_gcf_lcm",
-   "difficulty": 4,
-   "stem_md": "If $n$ is a positive integer, is $n$ divisible by $15$?\n\n(1) The least common multiple of $n$ and $10$ is $30$.\n\n(2) The greatest common divisor of $n$ and $9$ is $3$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\n\n(1) $\\mathrm{lcm}(n, 10) = 30$ forces $n \\mid 30$ and $n$ to supply the factor $3$ that $10$ lacks: $n \\in \\{3, 6, 15, 30\\}$. Here $n = 3$ answers no while $n = 15$ answers yes — insufficient. (2) $\\gcd(n, 9) = 3$ says $n$ is a multiple of $3$ but not of $9$: $n = 3$ gives no, $n = 15$ gives yes — insufficient. Combined: every candidate in $\\{3, 6, 15, 30\\}$ is already a multiple of $3$ and none is a multiple of $9$, so statement (2) eliminates nothing; $n = 3$ (no) and $n = 15$ (yes) both survive. Together the statements are still insufficient.\n\n**Trigger cue**\n\nBefore combining, test whether one statement's candidate list already satisfies the other statement.\n\n**Takeaway**\n\nCombining adds nothing when one statement implies the other.",
-   "fastest_path_md": "(1) gives $n \\in \\{3, 6, 15, 30\\}$ — mixed yes/no. Each of these already has $\\gcd(n, 9) = 3$, so (2) removes no candidates. Still mixed: choose (E).",
-   "trap_map": {
-    "0": "Trusts (1) after testing only $n = 15$ and $n = 30$, missing $n = 3$ and $n = 6$.",
-    "1": "Reads $\\gcd(n, 9) = 3$ as forcing $n = 3$, which would give a definite no.",
-    "2": "When combining, discards $n = 3$ and $n = 6$ on the false idea that $\\gcd(n, 9) = 3$ requires $n > 9$.",
-    "3": "Treats each statement as pinning $n$ to a single value."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -6695,33 +5453,6 @@
     "4": "Stops at the lcm — total tooth engagements, not revolutions."
    },
    "numeric_check": "378/42",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "divisibility_gcf_lcm",
-   "difficulty": 4,
-   "stem_md": "If $m$ and $n$ are positive integers, what is the value of $\\gcd(m, n)$?\n\n(1) $m = n + 6$\n\n(2) Both $m$ and $n$ are multiples of $6$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\n(1) $\\gcd(m, n) = \\gcd(n + 6, n) = \\gcd(6, n)$, which can be $1$, $2$, $3$, or $6$ depending on $n$ — insufficient. (2) A common divisor of two multiples of $6$ is at least $6$, but $m = 6, n = 12$ gives $\\gcd = 6$ while $m = 12, n = 24$ gives $\\gcd = 12$ — insufficient. Combined: by (1) the gcd divides $m - n = 6$, and by (2) it is a multiple of $6$; the only positive integer that both divides $6$ and is a multiple of $6$ is $6$ itself — sufficient.\n\n**Trigger cue**\n\nA fixed difference between two integers caps their gcd: any common divisor must divide the difference.\n\n**Takeaway**\n\nThe gcd of two integers divides their difference.",
-   "fastest_path_md": "From (1) the gcd divides $6$; from (2) it is a multiple of $6$; together it must equal $6$. Alone, (1) allows $1, 2, 3, 6$ and (2) allows $6, 12, \\dots$",
-   "trap_map": {
-    "0": "Jumps from $m - n = 6$ straight to $\\gcd = 6$, though $\\gcd(6, n)$ can be $1$, $2$, or $3$.",
-    "1": "Assumes two multiples of $6$ must have gcd exactly $6$, missing $m = 12$, $n = 24$.",
-    "3": "Makes both errors above and grants each statement alone.",
-    "4": "Never intersects \"the gcd divides $6$\" with \"$6$ divides the gcd\"."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -6860,33 +5591,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "parity_signs",
-   "difficulty": 3,
-   "stem_md": "Is $uv > 0$?\n\n(1) $\\dfrac{u}{v} > 0$\n\n(2) $u + v > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\n(1): a positive quotient requires $u$ and $v$ to be nonzero with the same sign, and same-sign nonzero numbers have a positive product — sufficient, answer yes. (2): $(u, v) = (1, 2)$ gives $uv = 2 > 0$, while $(3, -1)$ gives $uv = -3 < 0$ — not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nWhen a quotient's sign is given, reach for \"quotient and product of the same pair share a sign.\"\n\n**Takeaway**\n\nA quotient and product of the same two numbers share their sign.",
-   "fastest_path_md": "$\\tfrac{u}{v}$ and $uv$ always have the same sign (both are \"same signs vs. opposite signs\" detectors), so (1) is a yes immediately. For (2), test $(1, 2)$ and $(3, -1)$: yes then no.",
-   "trap_map": {
-    "1": "Trusts the concrete-looking sum while missing that a positive quotient pins matching signs.",
-    "2": "Combines out of caution when (1) already forces $u$ and $v$ to share a sign.",
-    "3": "Grants (2) sufficiency after testing only pairs of positive numbers.",
-    "4": "Sees two unknowns with no values and assumes no sign can be pinned down."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -6911,33 +5615,6 @@
     "4": "Gives $3^n$ the parity of $n$, making both terms match so every sum looks even."
    },
    "numeric_check": "50/2",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "parity_signs",
-   "difficulty": 5,
-   "stem_md": "If $p$ and $q$ are nonzero integers, is $p^q < 0$?\n\n(1) $p^5 q^2 < 0$\n\n(2) $q$ is odd and $pq > 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\nFor nonzero integers, $p^q < 0$ exactly when $p < 0$ and $q$ is odd. (1): $q^2 > 0$, so the inequality reduces to $p^5 < 0$, i.e., $p < 0$; but $(p, q) = (-2, 3)$ gives $-8$ (yes) while $(-2, 2)$ gives $4$ (no) — not sufficient. (2): $(3, 1)$ gives $3$ (no) while $(-3, -1)$ gives $-\\tfrac{1}{3}$ (yes) — not sufficient. Together: $p < 0$ and $pq > 0$ force $q < 0$, and $q$ is odd, so $p^q < 0$ — always yes. Answer: both together.\n\n**Trigger cue**\n\nWhen a power's sign is asked, reach for splitting into base sign and exponent parity.\n\n**Takeaway**\n\nOnly a negative base with an odd exponent yields a negative power.",
-   "fastest_path_md": "The yes-set is \"$p < 0$ and $q$ odd.\" (1) delivers only $p < 0$ (the $q^2$ is dead weight); (2) delivers only \"$q$ odd\" plus a sign link. Neither half decides alone; the two halves combined do.",
-   "trap_map": {
-    "0": "Reads (1)'s $p < 0$ as settling the sign, forgetting the exponent's parity decides.",
-    "1": "Assumes (2)'s odd exponent forces a negative result without pinning the sign of $p$.",
-    "3": "Grants each statement the half of the argument that only the other one supplies.",
-    "4": "Misses that combined, $q$ is a negative odd and $p$ is negative — the power's sign is fixed."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -7184,33 +5861,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "real",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "prime_factorization",
-   "difficulty": 4,
-   "stem_md": "A community theater sold a total of $n$ tickets to its weekend festival, where $n$ is a positive integer. Is $n$ divisible by $18$?\n\n(1) $n$ is divisible by $12$.\n\n(2) $n$ is divisible by $27$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n$18 = 2 \\cdot 3^2$. (1) guarantees $2^2 \\cdot 3$ but only one $3$: $n = 12$ gives no, $n = 36$ gives yes — insufficient. (2) guarantees $3^3$ but no factor of $2$: $n = 27$ gives no, $n = 54$ gives yes — insufficient. Together $n$ is a multiple of $\\text{lcm}(12, 27) = 2^2 \\cdot 3^3 = 108$, and $18 \\mid 108$, so the answer is always yes — sufficient combined.\n\n**Trigger cue**\nDivisibility DS: convert each statement into guaranteed prime exponents, then merge with the LCM.\n\n**Takeaway**\nMerge divisibility facts by taking each prime's larger exponent.",
-   "fastest_path_md": "$18 = 2 \\cdot 3^2$. (1) supplies the $2$ but only one $3$; (2) supplies $3^3$ but no $2$. Alone each fails ($12$, $27$ are counterexamples); together $n$ is a multiple of $\\text{lcm}(12, 27) = 108$, hence of $18$.",
-   "trap_map": {
-    "0": "Assumes divisibility by $12$ already carries the $3^2$ that $18$ requires.",
-    "1": "Assumes divisibility by $27$ settles it, forgetting $18$ also needs a factor of $2$.",
-    "3": "Tests only friendly values like $36$ and $54$ and declares each statement sufficient.",
-    "4": "Never merges the prime exponents from the two statements into $2^2 \\cdot 3^3$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7265,33 +5915,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "arithmetic",
-   "context": "real",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "prime_factorization",
-   "difficulty": 5,
-   "stem_md": "A ceramicist fires a batch of $n$ mugs in her kiln, where $n$ is an integer greater than $1$. How many positive divisors does $n$ have?\n\n(1) $n$ is the product of two distinct prime numbers.\n\n(2) $n$ is even and $4 < n < 12$.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 3,
-   "solution_md": "**Formal path**\nThe target is the divisor count, not $n$ itself. (1): if $n = pq$ with $p, q$ distinct primes, its divisors are exactly $1, p, q, pq$ — four, whatever the primes are. Sufficient. (2): the even integers strictly between $4$ and $12$ are $6, 8, 10$, with divisor counts $4$ ($1,2,3,6$), $4$ ($1,2,4,8$), and $4$ ($1,2,5,10$). One common value — sufficient. Each statement alone determines the count.\n\n**Trigger cue**\nWhen a DS question asks for a derived quantity, test whether that quantity — not the variable — is pinned down.\n\n**Takeaway**\nSufficiency needs a unique answer, not a unique $n$.",
-   "fastest_path_md": "Answer the asked question, not \"what is $n$.\" (1): $pq$ always has $4$ divisors. (2): $n \\in \\{6, 8, 10\\}$ and $d(6) = d(8) = d(10) = 4$. Each alone suffices.",
-   "trap_map": {
-    "0": "Rejects (2) because $n$ could be $6$, $8$, or $10$ — but all three share one divisor count.",
-    "1": "Rejects (1) because the primes $p$ and $q$ are unknown, though the count is $4$ regardless.",
-    "2": "Combines out of caution when each statement alone already fixes the count at four.",
-    "4": "Declares both useless because neither statement determines $n$ itself."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "arithmetic",
    "context": "real",
@@ -7316,33 +5939,6 @@
     "4": "Counts all $24$ positive divisors of $8{,}415$ instead of its distinct primes."
    },
    "numeric_check": "4",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "If $b$ is a positive number, what is the value of $x$?\n\n(1) $b^{x} = b^{2x - 6}$\n\n(2) $b = 3$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\nStatement (1): if $b \\ne 1$, equal powers of the same base force equal exponents, so $x = 2x - 6$ and $x = 6$. But $b = 1$ also satisfies $b^{x} = b^{2x-6}$ for every $x$, since both sides equal $1$. So $x$ is not determined — insufficient.\n\nStatement (2): $b = 3$ carries no information about $x$ — insufficient.\n\nTogether: $b = 3 \\ne 1$, so exponents must match: $x = 2x - 6 \\Rightarrow x = 6$, a unique value. Sufficient.\n\n**Trigger cue**\nAn equation of the form $b^{\\text{stuff}} = b^{\\text{other stuff}}$: before equating exponents, ask whether the base could be $1$.\n\n**Takeaway**\nEquating exponents requires a base other than $1$.",
-   "fastest_path_md": "Statement (2) contains no $x$, so B and D die instantly. For (1), test $b = 1$: every $x$ works, so A dies. Together $3^{x} = 3^{2x-6}$ forces $x = 6$ — C.",
-   "trap_map": {
-    "0": "Equates the exponents in statement (1) immediately, forgetting that $b = 1$ satisfies the equation for every $x$.",
-    "1": "Treats knowing the base as knowing the whole equation, though statement (2) says nothing about $x$.",
-    "3": "Combines both errors: equates exponents in (1) and credits (2) with fixing $x$ on its own.",
-    "4": "Misses that once $b = 3 \\ne 1$ is known, the exponent equation $x = 2x - 6$ has the single solution $x = 6$."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -7373,33 +5969,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "If $n$ is an integer, is $(-5)^{n} > 0$?\n\n(1) $(-5)^{n+1} < 0$\n\n(2) $5^{n} < 1$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n$(-5)^{n}$ is positive exactly when $n$ is even, so the question asks: is $n$ even?\n\nStatement (1): $(-5)^{n+1} < 0$ means $n + 1$ is odd, so $n$ is even. The answer is a definite yes — sufficient.\n\nStatement (2): $5^{n} < 1$ means $n < 0$. Then $n = -1$ gives $(-5)^{-1} = -\\tfrac{1}{5} < 0$ (no), while $n = -2$ gives $(-5)^{-2} = \\tfrac{1}{25} > 0$ (yes) — insufficient.\n\n**Trigger cue**\nA negative base raised to an integer power: the sign depends only on the parity of the exponent, not its size or sign.\n\n**Takeaway**\nA negative base is positive exactly at even integer exponents.",
-   "fastest_path_md": "Parity is everything. (1) says $n+1$ is odd, so $n$ is even — definite yes. (2) only says $n < 0$: test $n = -1$ (no) and $n = -2$ (yes). Answer A.",
-   "trap_map": {
-    "1": "Reads $5^{n} < 1$ as forcing a negative power and assumes a negative exponent makes $(-5)^{n}$ negative.",
-    "2": "Believes the parity from (1) still needs the sign information from (2) before the question can be answered.",
-    "3": "Credits (2) with fixing the sign of $(-5)^{n}$, though negative even and odd exponents give opposite signs.",
-    "4": "Assumes the sign of $(-5)^{n}$ cannot be settled without knowing $n$ itself, missing the parity shortcut in (1)."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7427,60 +5996,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "If $x > 0$, is $\\sqrt{x} > x$?\n\n(1) $x^{2} < 4$\n\n(2) $x^{3} < x$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "solution_md": "**Formal path**\nFor $x > 0$, squaring both sides of $\\sqrt{x} > x$ gives $x > x^{2}$, i.e. $x(1 - x) > 0$, i.e. $0 < x < 1$. So the question is: is $x < 1$?\n\nStatement (1): $x^{2} < 4$ with $x > 0$ gives $0 < x < 2$. Then $x = \\tfrac{1}{2}$ answers yes while $x = \\tfrac{3}{2}$ answers no — insufficient.\n\nStatement (2): $x^{3} < x$ with $x > 0$ divides by the positive number $x$ to give $x^{2} < 1$, so $0 < x < 1$. The answer is a definite yes — sufficient.\n\n**Trigger cue**\nComparing $x$ with $\\sqrt{x}$ or with powers of $x$ for positive $x$: everything reduces to where $x$ sits relative to $1$.\n\n**Takeaway**\nFor positive $x$, $\\sqrt{x}$ exceeds $x$ only when $x < 1$.",
-   "fastest_path_md": "Translate the question first: for $x > 0$, $\\sqrt{x} > x$ exactly when $x < 1$. (2) $x^{3} < x$ divides to $x^{2} < 1$, so $x < 1$ — sufficient. (1) allows both $x = \\tfrac12$ and $x = \\tfrac32$ — insufficient. B.",
-   "trap_map": {
-    "0": "Reads $x^{2} < 4$ as $x < 2$ and assumes every such $x$ has $\\sqrt{x} > x$, ignoring values between $1$ and $2$.",
-    "2": "Thinks (2) still needs (1)'s upper bound, not seeing that $x^{3} < x$ with $x > 0$ already forces $x < 1$.",
-    "3": "Credits (1) as well, overlooking that $x = \\tfrac32$ satisfies $x^{2} < 4$ yet gives $\\sqrt{x} < x$.",
-    "4": "Fails to decode $x^{3} < x$ into $0 < x < 1$ and concludes neither statement settles the comparison."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 4,
-   "stem_md": "What is the value of $x$?\n\n(1) $7^{x^{2}} = 7^{4x - 3}$\n\n(2) $x^{x - 3} = 1$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 4,
-   "solution_md": "**Formal path**\nStatement (1): the base $7$ exceeds $1$, so the exponents are equal: $x^{2} = 4x - 3$, i.e. $(x - 1)(x - 3) = 0$, so $x = 1$ or $x = 3$ — two values, insufficient.\n\nStatement (2): a power equals $1$ in three ways — exponent $0$ with nonzero base ($x = 3$), base $1$ ($x = 1$), or base $-1$ with an even integer exponent ($x = -1$, since $(-1)^{-4} = 1$). So $x \\in \\{-1, 1, 3\\}$ — insufficient.\n\nTogether: the intersection is $\\{1, 3\\}$, still two candidate values — insufficient.\n\n**Trigger cue**\nAny equation of the form $(\\text{expression})^{(\\text{expression})} = 1$: enumerate all three cases before judging sufficiency.\n\n**Takeaway**\n$a^{b} = 1$ has three cases; intersecting them can stay ambiguous.",
-   "fastest_path_md": "Test $x = 1$ and $x = 3$: both satisfy statement (1) ($7^{1} = 7^{1}$ and $7^{9} = 7^{9}$) and both satisfy statement (2) ($1^{-2} = 1$ and $3^{0} = 1$). Two survivors of both statements — E, no further work needed.",
-   "trap_map": {
-    "0": "Solves $x^{2} = 4x - 3$ but keeps only the root $x = 3$, missing $x = 1$ from the factoring.",
-    "1": "Reads $x^{x-3} = 1$ as forcing the exponent to be $0$, so $x = 3$ uniquely — missing the base-$1$ and base-$(-1)$ cases.",
-    "2": "Drops $x = 1$ from one of the two solution sets, so the intersection appears to collapse to the single value $3$.",
-    "3": "Believes each statement independently pins $x = 3$, overlooking the second root in (1) and the extra cases in (2)."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -7505,33 +6020,6 @@
     "4": "Multiplies the $u$-roots ($2 \\cdot 4 = 8$) — the quadratic's constant term — instead of converting to $x$."
    },
    "numeric_check": "1 + 2",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "exponents_roots_properties",
-   "difficulty": 5,
-   "stem_md": "If $x$ and $y$ are integers greater than $1$ and $x^{y} = 4{,}096$, what is the value of $x$?\n\n(1) $x > y$\n\n(2) $y$ is the square of an integer.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 1,
-   "solution_md": "**Formal path**\n$4{,}096 = 2^{12}$, so $x$ must be a power of $2$, say $x = 2^{d}$, with $dy = 12$. The pairs $(x, y)$ with both integers greater than $1$ are $(2, 12)$, $(4, 6)$, $(8, 4)$, $(16, 3)$, and $(64, 2)$.\n\nStatement (1): $x > y$ keeps $(8, 4)$, $(16, 3)$, and $(64, 2)$, so $x$ could be $8$, $16$, or $64$ — insufficient.\n\nStatement (2): among the possible exponents $\\{12, 6, 4, 3, 2\\}$, only $y = 4$ is a perfect square, forcing $(x, y) = (8, 4)$ and $x = 8$ — sufficient.\n\n**Trigger cue**\nA fixed number equated to $x^{y}$ with integer unknowns: prime-factorize it and list every base–exponent split before touching the statements.\n\n**Takeaway**\nList every base–exponent split of the prime power first.",
-   "fastest_path_md": "$4{,}096 = 2^{12}$: the splits are $2^{12}, 4^{6}, 8^{4}, 16^{3}, 64^{2}$. Scan the exponents $\\{12, 6, 4, 3, 2\\}$ for perfect squares — only $4$ qualifies, so (2) alone nails $x = 8$. (1) still allows $8$, $16$, $64$. B.",
-   "trap_map": {
-    "0": "Assumes $x > y$ leaves a single split, overlooking that $(8,4)$, $(16,3)$, and $(64,2)$ all satisfy it.",
-    "2": "Misses that $4$ is the only perfect square among the possible exponents, so combines the statements unnecessarily.",
-    "3": "Believes $x > y$ forces the extreme split $64^{2}$ uniquely while also crediting (2).",
-    "4": "Never enumerates the finitely many power representations of $4{,}096$ and assumes the ambiguity survives both statements."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -7640,33 +6128,6 @@
     "4": "Evaluates at the anchor $x = -1.5$."
    },
    "numeric_check": "7-(-1.5)",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "value_order_factors",
-   "subtopic": "abs_value_number_line_decimals",
-   "difficulty": 4,
-   "stem_md": "On the number line, is the point $x$ farther from $0$ than the point $y$ is?\n\n(1) $x^2 > y^2$\n\n(2) $x > y$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\nThe question asks: is $|x| > |y|$? For any reals, $x^2 > y^2$ holds exactly when $|x| > |y|$, since squaring erases sign and preserves the order of magnitudes. Statement (1) is therefore a restatement of the question — sufficient, answer yes. Statement (2) orders positions, not magnitudes: $x = 5, y = 1$ gives yes, while $x = 1, y = -5$ gives no — insufficient.\n\n**Trigger cue**\n\nWhen a question compares distances from zero, translate every statement into magnitudes before judging it.\n\n**Takeaway**\n\nComparing squares compares magnitudes; comparing positions does not.",
-   "fastest_path_md": "$x^2 > y^2 \\iff |x| > |y|$, so (1) answers the question outright. (2) dies on the pair $x = 1$, $y = -5$.",
-   "trap_map": {
-    "1": "Trusts $x > y$ to order magnitudes — it fails when $y$ is a large negative like $-5$.",
-    "2": "Combines out of caution, believing (1) still needs sign information from (2).",
-    "3": "Accepts (2) after testing only pairs on the positive side of zero.",
-    "4": "Rejects (1) for not fixing the signs of $x$ and $y$, which magnitudes never need."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -8075,33 +6536,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "quadratics_factoring",
-   "difficulty": 4,
-   "stem_md": "What is the value of $x$?\n\n(1) $x^2 = 5x$\n\n(2) $x^2 + x - 30 = 0$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\n(1): Move everything to one side — $x^2 - 5x = x(x - 5) = 0$, so $x = 0$ or $x = 5$: two values, not sufficient. (2): $x^2 + x - 30 = (x + 6)(x - 5) = 0$, so $x = -6$ or $x = 5$: not sufficient. Together, the only value in both root sets is $x = 5$ — sufficient. Answer: both statements together.\n\n**Trigger cue**\n\nTwo quadratic statements about one unknown: list each root set fully, then intersect — and never divide by a variable that could be zero.\n\n**Takeaway**\n\nIntersect root sets; dividing by $x$ deletes the root zero.",
-   "fastest_path_md": "(1) $x(x - 5) = 0$: $\\{0, 5\\}$. (2) $(x + 6)(x - 5) = 0$: $\\{-6, 5\\}$. Each set has two values, but they share only $5$ — combined sufficient.",
-   "trap_map": {
-    "0": "Divides statement (1) by $x$, silently discarding the root $x = 0$ and making (1) look sufficient.",
-    "1": "Drops statement (2)'s negative root $-6$ as if it were extraneous, leaving $x = 5$ alone.",
-    "3": "Makes both slips at once: divides by $x$ in (1) and discards the negative root in (2).",
-    "4": "Sees two candidates from each statement but never intersects the two root sets."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8124,33 +6558,6 @@
     "1": "Shifts the root sum by only $2$ (one root moved) even though the product is handled correctly.",
     "2": "Computes the new product as $12 + 4$ instead of $(2+2)(6+2)$.",
     "4": "Sign error rebuilding from Vieta: this equation's roots are $-4$ and $-8$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "quadratics_factoring",
-   "difficulty": 5,
-   "stem_md": "If $x$ and $y$ are positive integers with $x > y$, what is the value of $xy$?\n\n(1) $x^2 - y^2 = 13$\n\n(2) $x + y = 13$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\n\n(1): $x^2 - y^2 = (x - y)(x + y) = 13$. Both factors are positive integers with $x + y > x - y$, and $13$ is prime, so the only split is $x - y = 1$, $x + y = 13$, forcing $(x, y) = (7, 6)$ and $xy = 42$ — sufficient. (2): $x + y = 13$ allows $(12, 1), (11, 2), \\ldots, (7, 6)$, whose products differ — not sufficient. Answer: statement (1) alone.\n\n**Trigger cue**\n\nA difference of squares equal to a prime, with integer variables: factor it and match the factor pairs — one equation can pin two unknowns.\n\n**Takeaway**\n\nInteger constraints can make one equation sufficient.",
-   "fastest_path_md": "$13$ is prime, so $(x - y)(x + y) = 13$ forces $x - y = 1$ and $x + y = 13$: statement (1) alone pins $(7, 6)$. A bare sum, statement (2), leaves many pairs.",
-   "trap_map": {
-    "1": "Dismisses (1) as one equation with two unknowns while assuming the sum in (2) pins the pair.",
-    "2": "Combines the statements after reflexively dismissing (1) as one equation in two unknowns.",
-    "3": "Assumes any statement that fixes $x + y$ also fixes $xy$, granting (2) alongside (1).",
-    "4": "Treats both statements as underdetermined and never tests the integer factor pairs of $13$."
    },
    "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
@@ -8264,33 +6671,6 @@
    "provenance": "authored + brute-force programmatic verification"
   },
   {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "inequalities",
-   "difficulty": 4,
-   "stem_md": "Is $3x + 5y > 19$?\n\n(1) $x + y > 5$\n\n(2) $x - y < 1$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\n\n(1) alone: $(x, y) = (0, 6)$ gives $3x + 5y = 30$ — yes; $(x, y) = \\left(6, -\\tfrac{1}{2}\\right)$ gives $x + y = 5\\tfrac{1}{2} > 5$ but $3x + 5y = 15\\tfrac{1}{2}$ — no. Not sufficient. (2) alone: $(0, 6)$ gives yes; $(0, 0)$ gives no. Not sufficient. Together: $3x + 5y = 4(x + y) - (x - y)$. Statement (1) gives $4(x + y) > 20$ and statement (2) gives $-(x - y) > -1$; adding, $3x + 5y > 19$ — sufficient.\n\n**Trigger cue**\n\nA question about a linear combination of variables: try to build the target expression from the statements with positive multipliers before hunting for values.\n\n**Takeaway**\n\nCombine inequalities by adding positive multiples; never subtract or solve them like equations.",
-   "fastest_path_md": "Spot $3x + 5y = 4(x + y) - (x - y)$: four times (1) plus the reversed (2) gives $3x + 5y > 4(5) - 1 = 19$ exactly. Quick counterexamples like $\\left(6, -\\tfrac{1}{2}\\right)$ and $(0, 0)$ kill each statement alone.",
-   "trap_map": {
-    "0": "Declares (1) sufficient after testing only balanced pairs, missing cases like $\\left(6, -\\tfrac{1}{2}\\right)$ where $x + y > 5$ but $3x + 5y = 15\\tfrac{1}{2}$.",
-    "1": "Declares (2) sufficient even though $x - y < 1$ puts no floor under $x$ and $y$, e.g. $(0, 0)$ versus $(0, 6)$.",
-    "3": "Confirms each statement with one convenient example instead of searching for a counterexample.",
-    "4": "Tries to solve for $x$ and $y$ individually, finds no unique point, and concludes the inequalities cannot bound $3x + 5y$."
-   },
-   "numeric_check": null,
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
    "format": "problem_solving",
    "content_domain": "algebra",
    "context": "pure",
@@ -8396,33 +6776,6 @@
     "4": "Adds the two equations but forgets to divide the result by $2$."
    },
    "numeric_check": "2*2+3*4",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "real",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "linear_systems",
-   "difficulty": 4,
-   "stem_md": "A shipping crate contains only $3$-kilogram boxes and $8$-kilogram boxes, with at least one box of each kind. How many $8$-kilogram boxes does the crate contain?\n\n(1) The boxes in the crate weigh $69$ kilograms in total.\n\n(2) The crate contains exactly $13$ boxes.",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 2,
-   "solution_md": "**Formal path**\nLet $s$ and $e$ count the $3$-kg and $8$-kg boxes, with $s \\ge 1$, $e \\ge 1$ integers. (1): $3s + 8e = 69$ admits $(s, e) = (15, 3)$ and $(7, 6)$, so $e$ is not pinned down — insufficient. (2): $s + e = 13$ allows $e$ from $1$ to $12$ — insufficient. Together: $3(13 - e) + 8e = 69$ gives $5e = 30$, so $e = 6$ uniquely — sufficient. Both statements together, neither alone.\n\n**Trigger cue**\nOne equation with two positive-integer unknowns: list its integer solutions before judging — the integer constraint sometimes rescues a lone equation and sometimes does not.\n\n**Takeaway**\nCheck integer solutions explicitly; the constraint does not always force uniqueness.",
-   "fastest_path_md": "(1): $3s + 8e = 69$ needs $e \\equiv 0 \\pmod 3$, so $(15, 3)$ and $(7, 6)$ both work — not sufficient. (2): a bare count — not sufficient. Together the linear system solves to $e = 6$.",
-   "trap_map": {
-    "0": "Assumes the integer constraint pins down statement (1), missing that both $(15, 3)$ and $(7, 6)$ satisfy it.",
-    "1": "Treats the box count alone as determining the split between the two weights.",
-    "3": "Grants each statement sufficiency after finding one convenient combination for each.",
-    "4": "Dismisses the combined statements because statement (1) alone had multiple solutions."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {
@@ -8558,33 +6911,6 @@
     "4": "Uses ratio $2$ throughout, losing the sign of $-2$."
    },
    "numeric_check": "-6",
-   "provenance": "authored + brute-force programmatic verification"
-  },
-  {
-   "format": "data_sufficiency",
-   "content_domain": "algebra",
-   "context": "pure",
-   "fundamental_skill": "equal_unequal_alg",
-   "subtopic": "functions_sequences",
-   "difficulty": 4,
-   "stem_md": "The function $f$ is defined for all real numbers and satisfies $f(x) = f(4 - x)$ for every real number $x$. What is the value of $f(3)$?\n\n(1) $f(1) = 9$\n\n(2) $f(2) = 9$",
-   "choices": [
-    "Statement (1) alone is sufficient, but statement (2) alone is not.",
-    "Statement (2) alone is sufficient, but statement (1) alone is not.",
-    "Both statements together are sufficient, but neither alone is.",
-    "Each statement alone is sufficient.",
-    "Statements (1) and (2) together are not sufficient."
-   ],
-   "correct_index": 0,
-   "solution_md": "**Formal path**\nThe identity $f(x) = f(4 - x)$ pairs each input with its mirror across $x = 2$. Setting $x = 3$ gives $f(3) = f(1)$, so statement (1) forces $f(3) = 9$: sufficient. Setting $x = 2$ gives $f(2) = f(2)$ — the point $x = 2$ is its own mirror, so statement (2) constrains nothing beyond $x = 2$. Both $f(x) = 9$ and $f(x) = (x-2)^2 + 9$ satisfy the identity with $f(2) = 9$, yet give $f(3) = 9$ and $f(3) = 10$: insufficient.\n\n**Trigger cue**\nA relation $f(x) = f(c - x)$: substitute the queried input to locate its mirror point.\n\n**Takeaway**\nSymmetry $f(x) = f(c-x)$ equates values at inputs summing to $c$.",
-   "fastest_path_md": "Plug $x = 3$ into the identity: $f(3) = f(1)$, so (1) answers the question at once. The mirror of $2$ is $2$ itself, so (2) says nothing about $f(3)$.",
-   "trap_map": {
-    "1": "Assumes the value at the axis of symmetry pins down nearby values, so takes (2) alone as sufficient.",
-    "2": "Treats $f$ as an unknown curve needing two data points, so demands both statements.",
-    "3": "Believes (2) also transfers by symmetry, missing that $4 - 2 = 2$ pairs $x = 2$ with itself.",
-    "4": "Misses the pairing of $x = 1$ with $x = 3$ entirely and concludes nothing suffices."
-   },
-   "numeric_check": null,
    "provenance": "authored + brute-force programmatic verification"
   },
   {

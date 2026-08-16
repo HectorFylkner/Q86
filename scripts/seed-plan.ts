@@ -70,17 +70,9 @@ export function buildPlan(): PlanItem[] {
     context: "pure" as Context,
   }));
 
-  // DS format: exactly 25% of VOF + Equal/Unequal items
-  const dsEligible = items
-    .map((item, i) => ({ item, i }))
-    .filter(({ item }) => {
-      const skill = SKILL_BY_SUBTOPIC[item.subtopic];
-      return skill === "value_order_factors" || skill === "equal_unequal_alg";
-    });
-  const dsPickCount = Math.round(dsEligible.length * 0.25);
-  for (const { i } of shuffle(dsEligible, rng).slice(0, dsPickCount)) {
-    items[i].format = "data_sufficiency";
-  }
+  // Format: problem solving throughout. The Focus Quant section contains
+  // no Data Sufficiency — that format moved to Data Insights — so the plan
+  // no longer reserves a DS share.
 
   // Context: VOF leans pure (60%) — the diagnosed gap; everything else 50/50
   for (const item of items) {

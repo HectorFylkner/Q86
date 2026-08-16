@@ -31,8 +31,8 @@ const requestSchema = z.object({
     .array(z.enum(ALL_SUBTOPICS as [Subtopic, ...Subtopic[]]))
     .min(1)
     .optional(),
-  difficultyMin: z.number().int().min(1).max(5).default(2),
-  difficultyMax: z.number().int().min(1).max(5).default(5),
+  difficultyMin: z.number().int().min(2).max(5).default(2),
+  difficultyMax: z.number().int().min(2).max(5).default(5),
   format: z.enum(FORMATS).optional(),
   context: z.enum(CONTEXTS).optional(),
   twinOf: z.number().int().optional(),
@@ -41,7 +41,6 @@ const requestSchema = z.object({
 /** Global difficulty mix ≈ 10% D2 / 30% D3 / 40% D4 / 20% D5, restricted
  *  to the requested range. */
 const DIFFICULTY_WEIGHTS: Record<number, number> = {
-  1: 5,
   2: 10,
   3: 30,
   4: 40,
@@ -49,7 +48,7 @@ const DIFFICULTY_WEIGHTS: Record<number, number> = {
 };
 
 function sampleDifficulty(min: number, max: number): number {
-  const allowed = [1, 2, 3, 4, 5].filter((d) => d >= min && d <= max);
+  const allowed = [2, 3, 4, 5].filter((d) => d >= min && d <= max);
   const total = allowed.reduce((s, d) => s + DIFFICULTY_WEIGHTS[d], 0);
   let r = Math.random() * total;
   for (const d of allowed) {
@@ -75,13 +74,8 @@ function buildSpecs(
       subtopic = ALL_SUBTOPICS[Math.floor(Math.random() * ALL_SUBTOPICS.length)];
     }
     const skill = SKILL_BY_SUBTOPIC[subtopic];
-    const dsEligible =
-      skill === "value_order_factors" || skill === "equal_unequal_alg";
-    const format: QuestionFormat =
-      req.format ??
-      (dsEligible && Math.random() < 0.25
-        ? "data_sufficiency"
-        : "problem_solving");
+    // Focus Quant is problem solving only; DS lives in Data Insights.
+    const format: QuestionFormat = req.format ?? "problem_solving";
     const context: Context =
       req.context ?? (Math.random() < 0.5 ? "pure" : "real");
     specs.push({

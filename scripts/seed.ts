@@ -1,22 +1,29 @@
 /**
- * Q86 seed script — installs the 180-question verified bank (§12 phase 2).
+ * Q86 seed script — installs the committed, verified question bank.
  *
- * Default mode loads scripts/seed-bank.json — questions that already
- * passed verification (the two-model pipeline or authored-with-
- * programmatic-verification) — offline, idempotently, no API key needed.
+ * Default mode loads scripts/seed-bank.json — problem-solving questions
+ * that already passed the authoring gate (answer recomputed from the
+ * stem's raw data by brute force) — offline, idempotently, no API key
+ * needed. Idempotent in both directions: stems still in the bank are
+ * refreshed in place, and seed rows whose stems have left the bank are
+ * retired (verified = false, never deleted), so attempt history keeps
+ * resolving. That retirement path is how the 62 Data Sufficiency items
+ * were removed: the Focus Quant section is problem solving only.
  *
  * --api generates fresh questions through the §8 pipeline instead
  * (requires ANTHROPIC_API_KEY): resumable, tops up shortfalls, aborts
- * after 15 consecutive verification failures with a pattern report.
+ * after 15 consecutive verification failures with a pattern report. Its
+ * gate is an LLM cross-solve, which a brute-force audit found unreliable —
+ * see the warning it prints, and prefer the committed bank.
  *
- * Distribution (both modes):
+ * Distribution of the --api plan:
  *   - Value/Order/Factors: 70 (≥7 per VOF subtopic)
  *   - Equalities/Inequalities/Algebra (excl. translation): 35
  *   - Counting/Sets/Series/Prob/Stats: 30
  *   - Rates/Ratio/Percent: 20
  *   - algebraic_translation (13) + mixed across all skills (12): 25
- *   - Difficulty ≈ 10% D2 / 30% D3 / 40% D4 / 20% D5
- *   - ~25% of VOF and Equal/Unequal items in DS format
+ *   - Difficulty ≈ 10% D2 / 30% D3 / 40% D4 / 20% D5 (D1 is retired)
+ *   - Problem solving throughout
  *
  * Usage: pnpm seed          (offline, from scripts/seed-bank.json)
  *        pnpm seed --api    (generate via the AI pipeline)
@@ -96,14 +103,10 @@ async function buildTopUp(
   for (const [subtopic, t] of target) {
     const missing = t - (actual.get(subtopic) ?? 0);
     for (let i = 0; i < missing; i++) {
-      const skill = SKILL_BY_SUBTOPIC[subtopic];
-      const dsEligible =
-        skill === "value_order_factors" || skill === "equal_unequal_alg";
       candidates.push({
         subtopic,
         difficulty: pick(rng, [3, 4, 4, 5]),
-        format:
-          dsEligible && rng() < 0.25 ? "data_sufficiency" : "problem_solving",
+        format: "problem_solving",
         context: rng() < 0.5 ? "pure" : "real",
       });
     }

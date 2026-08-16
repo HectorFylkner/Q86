@@ -3,8 +3,9 @@
 Local-first, single-user training platform for GMAT Focus Edition
 Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
 
-- AI question engine with independent verification — no generated question
-  is ever served unless a second, blind solver agreed with its key
+- A committed bank of 298 problem-solving questions, every one admitted
+  only after code recomputed its answer from the stem's raw data by brute
+  force — never on an LLM's say-so
 - Drill mode and full-section simulation with the official Review & Edit
   mechanic (max 3 edits, justification gate, edit ledger)
 - Whiteboard post-mortem: photograph your scratch work, get a coaching
@@ -24,7 +25,7 @@ type stripping; the scripts pass `--experimental-strip-types`, which is
 default from Node 22.18) and pnpm.
 
 `pnpm db:push` creates `./data/q86.db`; `pnpm seed` loads the committed
-180-question bank into it — offline, no API key:
+question bank into it — offline, no API key:
 
 ```sh
 pnpm install
@@ -33,10 +34,11 @@ pnpm seed
 pnpm dev
 ```
 
-Open http://localhost:3000. The full training loop — drill, timed sets,
-redo queue, pattern trainer, analytics, daily plan — works with no API
-key: the 180-question bank ships in `scripts/seed-bank.json`, every
-question verified by a programmatic brute-force check before admission.
+Open http://localhost:3000. The full training loop — read a chapter,
+cement it in the deck, drill, chapter tests, timed sets, redo queue,
+pattern trainer, analytics, daily plan — works with no API key: the
+298-question bank ships in `scripts/seed-bank.json`, every question
+verified by a programmatic brute-force check before admission.
 
 The AI features (question twins, `/api/generate`, the post-mortem coach,
 score-report import) need a key — copy the template and fill in
@@ -55,7 +57,11 @@ cp .env.example .env.local
 | `pnpm dev` | Start the app at localhost:3000 |
 | `pnpm build` / `pnpm lint` | Production build / ESLint |
 | `pnpm db:push` | Apply the Drizzle schema to `./data/q86.db` |
-| `pnpm seed` | Load the committed 180-question bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm seed` | Load the committed bank into the DB — offline, idempotent (`--plan` prints the target distribution) |
+| `pnpm verify` | All three content gates: bank, coverage, chapters |
+| `pnpm verify:bank` | Re-verify every bank question mechanically (structure, key, scope) |
+| `pnpm verify:coverage` | Fail if any subtopic can't serve its chapter test twice with no repeats |
+| `pnpm verify:lessons` | Fail if any chapter drifts off the parser contract that feeds the card packs |
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
@@ -73,11 +79,27 @@ New questions enter `scripts/seed-bank.json` only through the authoring
 gate in `scripts/author/harness.mjs`: each item carries a `check()` that
 recomputes the answer from the stem's raw data by brute force, and the
 item is rejected unless the check agrees with the keyed choice. Start
-from `scripts/author/example-batch.mjs`. After appending, run
-`node --experimental-strip-types scripts/verify-bank.ts` (structural
-re-verification of the whole bank) and `pnpm seed` (loads new items,
-retires removed ones). The flag is needed below Node 22.18 because these
-tools import the app's TypeScript modules directly.
+from `scripts/author/example-batch.mjs`. After appending, run `pnpm
+verify` and then `pnpm seed` (loads new items, retires removed ones).
+
+Scope, enforced by the gates rather than by convention:
+
+- **Problem solving only.** The Focus Quant section contains no Data
+  Sufficiency — that format sits in Data Insights — so the bank holds
+  none, and both `harness.mjs` and `verify-bank.ts` reject it.
+- **Difficulty D2–D5.** D1 is retired: nothing on a real section sits
+  below the D2 time benchmark, and sub-D2 automation is trained by the
+  pattern trainer instead. Legacy D1 rows still resolve — benchmarks read
+  through `benchSeconds()` in `lib/pacing.ts`, which clamps into range.
+- **Coverage floor per subtopic: D2 ≥ 4, D3 ≥ 6, D4 ≥ 4, D5 ≥ 2.** That
+  is the chapter-test blend twice over, so a retake never repeats a
+  question. `pnpm verify:coverage` fails loudly on any shortfall; before
+  it existed, the selector padded a starved blend silently and you found
+  out mid-test.
+
+Removing a question is the same pipeline in reverse: delete it from the
+bank file and run `pnpm seed`. Rows are retired (`verified = false`),
+never deleted, so attempt history keeps resolving.
 
 Avoid `pnpm seed --api` (LLM generation): its verification is an LLM
 cross-solve plus numeric spot-check, and a brute-force audit found that

@@ -9,11 +9,16 @@
  * as an audit, exposed 22 defective questions that the LLM-only pipeline
  * gate had passed. Do not add questions to the bank any other way.
  *
+ * Scope: problem solving only, difficulty D2–D5. The Focus Quant section
+ * contains no Data Sufficiency (that format lives in Data Insights) and D1
+ * was retired from the taxonomy; the gate rejects both outright.
+ *
  * check() returns either
  *   { kind: "value", value: number }  — compared against the keyed choice
  *     (and asserted to differ from every other parseable choice), or
- *   { kind: "index", index: number }  — for DS / expression-choice items,
- *     the check itself must derive the correct index programmatically.
+ *   { kind: "index", index: number }  — for expression- or statement-choice
+ *     items, where the check itself derives the correct index
+ *     programmatically.
  *
  * Usage: write a batch file next to this one (see example-batch.mjs),
  * then run it with `node --experimental-strip-types scripts/author/your-batch.mjs`
@@ -28,7 +33,6 @@ import {
   evaluateExpression,
   numbersAgree,
 } from "../../lib/ai/verify.ts";
-import { DS_CHOICES } from "../../lib/taxonomy.ts";
 
 const BANK = path.join(import.meta.dirname, "..", "seed-bank.json");
 
@@ -50,11 +54,13 @@ export function verifyAndAppend(items, { dryRun = false } = {}) {
       if (!q.solution_md.includes(h)) fail(i, `solution missing ${h}`);
     const takeaway = (q.solution_md.split("**Takeaway**")[1] ?? "").trim();
     if (takeaway.split(/\s+/).filter(Boolean).length >= 15) fail(i, `takeaway ${takeaway.split(/\s+/).length} words`);
-    if (q.format === "data_sufficiency") {
-      if (q.choices.join("|") !== DS_CHOICES.join("|")) fail(i, "DS choices not canonical");
-      if (q.numeric_check != null) fail(i, "DS must have null numeric_check");
-      if (!/\(1\)/.test(q.stem_md) || !/\(2\)/.test(q.stem_md)) fail(i, "DS stem missing statements");
-    }
+    // Scope gate: the Focus Quant section is problem solving only — Data
+    // Sufficiency lives in Data Insights. The bank was cleared of DS and
+    // the door stays shut.
+    if (q.format !== "problem_solving")
+      fail(i, `format must be problem_solving (Focus Quant scope), got ${q.format}`);
+    if (q.difficulty < 2 || q.difficulty > 5)
+      fail(i, `difficulty must be 2–5 (D1 is retired), got ${q.difficulty}`);
     // currency hygiene: any bare $ immediately followed by a digit outside math is suspicious
     if (/(?<!\\)\$\d/.test(q.stem_md.replace(/\$[^$]*\$/g, ""))) fail(i, "possible unescaped currency $ in stem");
 

@@ -14,7 +14,11 @@
     "lint": "eslint .",
     "db:push": "node -e \"require('fs').mkdirSync('data',{recursive:true})\" && drizzle-kit push",
     "seed": "node --experimental-strip-types scripts/seed.ts",
-    "backup": "node --experimental-strip-types scripts/backup.ts"
+    "backup": "node --experimental-strip-types scripts/backup.ts",
+    "verify:bank": "node --experimental-strip-types scripts/verify-bank.ts",
+    "verify:coverage": "node --experimental-strip-types scripts/verify-coverage.ts",
+    "verify:lessons": "node --experimental-strip-types scripts/verify-lessons.ts",
+    "verify": "pnpm verify:bank && pnpm verify:coverage && pnpm verify:lessons"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

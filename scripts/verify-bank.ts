@@ -2,11 +2,12 @@
  * Re-verifies every question in scripts/seed-bank.json mechanically:
  *   - structural rules (5 distinct choices, valid key, full trap coverage,
  *     solution contract headers, takeaway under 15 words)
- *   - DS items use the canonical five choices and no numeric_check
+ *   - scope rules: problem solving only (Focus Quant carries no Data
+ *     Sufficiency) and difficulty D2–D5 (D1 is retired)
  *   - numeric_check evaluates via mathjs and equals the keyed choice's
  *     value while differing from every other parseable choice
  *
- * Usage: node scripts/verify-bank.ts   (exits 1 on any failure)
+ * Usage: pnpm verify:bank   (exits 1 on any failure)
  */
 
 import fs from "node:fs";
@@ -16,7 +17,6 @@ import {
   latexChoiceToExpression,
   numbersAgree,
 } from "../lib/ai/verify.ts";
-import { DS_CHOICES } from "../lib/taxonomy.ts";
 
 type BankQuestion = {
   format: string;
@@ -53,8 +53,8 @@ bank.questions.forEach((q, index) => {
     fail(index, q, "choices must be distinct");
   if (q.correct_index < 0 || q.correct_index > 4)
     fail(index, q, `correct_index out of range: ${q.correct_index}`);
-  if (q.difficulty < 1 || q.difficulty > 5)
-    fail(index, q, `difficulty out of range: ${q.difficulty}`);
+  if (q.difficulty < 2 || q.difficulty > 5)
+    fail(index, q, `difficulty out of range (D1 retired): ${q.difficulty}`);
   if (q.stem_md.trim().length < 20) fail(index, q, "stem too short");
 
   const wrong = [0, 1, 2, 3, 4].filter((i) => i !== q.correct_index);
@@ -73,14 +73,12 @@ bank.questions.forEach((q, index) => {
   if (q.fastest_path_md.trim().length < 10)
     fail(index, q, "fastest_path_md too short");
 
-  if (q.format === "data_sufficiency") {
-    if (q.choices.join("|") !== DS_CHOICES.join("|"))
-      fail(index, q, "DS choices must be the canonical five");
-    if (q.numeric_check != null)
-      fail(index, q, "DS items must not carry a numeric_check");
-    if (!/\(1\)/.test(q.stem_md) || !/\(2\)/.test(q.stem_md))
-      fail(index, q, "DS stem must contain statements (1) and (2)");
-  }
+  if (q.format !== "problem_solving")
+    fail(
+      index,
+      q,
+      `format must be problem_solving — the Focus Quant section carries no ${q.format}`,
+    );
 
   if (q.numeric_check != null) {
     const expected = evaluateExpression(q.numeric_check);

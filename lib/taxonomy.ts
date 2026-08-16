@@ -110,8 +110,16 @@ export const FLAG_REASONS = [
 ] as const;
 export type FlagReason = (typeof FLAG_REASONS)[number];
 
-export type Difficulty = 1 | 2 | 3 | 4 | 5;
-export const DIFFICULTIES: Difficulty[] = [1, 2, 3, 4, 5];
+/**
+ * Difficulty runs D2–D5. D1 was retired: nothing on a Focus Quant section
+ * sits below the D2 benchmark, the mastery ladders and the chapter-test
+ * blend were already D2→D5, and sub-D2 automation is trained by the
+ * pattern trainer (lib/generators) rather than by full-length questions.
+ * Legacy rows carrying difficulty 1 still resolve — read benchmarks
+ * through `benchSeconds` in lib/pacing.ts, which clamps into range.
+ */
+export type Difficulty = 2 | 3 | 4 | 5;
+export const DIFFICULTIES: Difficulty[] = [2, 3, 4, 5];
 
 // ---------------------------------------------------------------------------
 // Labels (sentence case; skill labels match the official score report)
@@ -211,15 +219,18 @@ export const EDIT_REASON_LABELS: Record<EditReason, string> = {
 // Difficulty labels are approximate by design: 3 ≈ mid-level official,
 // 5 ≈ hardest official.
 export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  1: "D1 · easy (approx.)",
   2: "D2 · easier official (approx.)",
   3: "D3 · mid official (approx.)",
   4: "D4 · hard official (approx.)",
   5: "D5 · hardest official (approx.)",
 };
 
-// The five canonical data-sufficiency answer choices, in our own words,
-// rendered as fixed choices for every DS question.
+// The five canonical data-sufficiency answer choices, in our own words.
+// The Focus Quant section is problem-solving only (DS lives in Data
+// Insights), so the bank ships no DS items and no default flow serves
+// them. These stay so that legacy DS rows already in a user's database
+// still render, and so the authoring gate can keep rejecting non-canonical
+// DS choices if the format is ever revived.
 export const DS_CHOICES: string[] = [
   "Statement (1) alone is sufficient, but statement (2) alone is not.",
   "Statement (2) alone is sufficient, but statement (1) alone is not.",

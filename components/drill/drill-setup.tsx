@@ -285,9 +285,8 @@ export function DrillSetup({
             <div className="mt-1.5 flex gap-1.5">
               {(
                 [
-                  ["all", "Both"],
+                  ["all", "All"],
                   ["problem_solving", "PS"],
-                  ["data_sufficiency", "DS · Data Insights"],
                 ] as const
               ).map(([value, label]) => (
                 <button

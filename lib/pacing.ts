@@ -7,12 +7,19 @@ import type { Difficulty } from "./taxonomy.ts";
  * its benchmark, and "rushed" when answered wrong in under half of it.
  */
 export const TIME_BENCH: Record<Difficulty, number> = {
-  1: 85,
   2: 100,
   3: 125,
   4: 150,
   5: 170,
 };
+
+/** Benchmark for a raw difficulty read off a question row. D1 was retired
+ *  from the taxonomy, so anything below D2 (or above D5) clamps into range
+ *  rather than returning undefined and poisoning the arithmetic. */
+export function benchSeconds(difficulty: number): number {
+  const d = Math.min(5, Math.max(2, Math.round(difficulty))) as Difficulty;
+  return TIME_BENCH[d];
+}
 
 export const SINK_RATIO = 1.5;
 export const RUSH_RATIO = 0.5;
@@ -50,19 +57,20 @@ export function pacingRead(items: PacedItem[]): PacingRead {
       difficulty,
       n,
       avgSeconds: total / n,
-      benchSeconds: TIME_BENCH[difficulty],
+      benchSeconds: benchSeconds(difficulty),
     }));
 
   const sinks = items
-    .filter((it) => it.timeSeconds > TIME_BENCH[it.difficulty] * SINK_RATIO)
+    .filter((it) => it.timeSeconds > benchSeconds(it.difficulty) * SINK_RATIO)
     .sort(
       (a, b) =>
-        b.timeSeconds / TIME_BENCH[b.difficulty] -
-        a.timeSeconds / TIME_BENCH[a.difficulty],
+        b.timeSeconds / benchSeconds(b.difficulty) -
+        a.timeSeconds / benchSeconds(a.difficulty),
     );
 
   const rushedWrong = items.filter(
-    (it) => !it.correct && it.timeSeconds < TIME_BENCH[it.difficulty] * RUSH_RATIO,
+    (it) =>
+      !it.correct && it.timeSeconds < benchSeconds(it.difficulty) * RUSH_RATIO,
   );
 
   return { byDifficulty, sinks, rushedWrong };

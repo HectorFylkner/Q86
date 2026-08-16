@@ -9,7 +9,7 @@ import { ResultStroke } from "@/components/drill/result-stroke";
 import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
-import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
+import { benchSeconds, pacingRead, type PacedItem } from "@/lib/pacing";
 import {
   CONTEXT_LABELS,
   DOMAIN_LABELS,
@@ -367,7 +367,7 @@ function PacingCard({
               .slice(0, 4)
               .map(
                 (s) =>
-                  `Q${s.index + 1} (${formatSeconds(s.timeSeconds)} on D${s.difficulty}, bench ${formatSeconds(TIME_BENCH[s.difficulty])})`,
+                  `Q${s.index + 1} (${formatSeconds(s.timeSeconds)} on D${s.difficulty}, bench ${formatSeconds(benchSeconds(s.difficulty))})`,
               )
               .join(" · ")}
             {" — "}every sink past 1.5× benchmark is a bail you didn&apos;t
