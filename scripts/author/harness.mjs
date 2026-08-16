@@ -36,6 +36,31 @@ import {
 
 const BANK = path.join(import.meta.dirname, "..", "seed-bank.json");
 
+/**
+ * Locate a computed value among choices that latexChoiceToExpression
+ * cannot read as bare numbers — percents ("$25\%$"), ratios, or anything
+ * carrying a unit. The check still derives the answer from raw data; this
+ * only maps that answer onto a choice index.
+ *
+ * It throws unless exactly one choice matches, so the uniqueness guarantee
+ * that { kind: "value" } gets for free — no distractor may equal the
+ * answer — still holds on this path.
+ */
+export function choiceIndexForValue(choices, value) {
+  const hits = [];
+  choices.forEach((choice, i) => {
+    const expr = latexChoiceToExpression(choice.replaceAll("\\%", "").replaceAll("%", ""));
+    const parsed = expr == null ? null : evaluateExpression(expr);
+    if (parsed != null && numbersAgree(parsed, value)) hits.push(i);
+  });
+  if (hits.length !== 1) {
+    throw new Error(
+      `computed ${value} matches ${hits.length} choices (${hits.join(",")}) in ${JSON.stringify(choices)}`,
+    );
+  }
+  return { kind: "index", index: hits[0] };
+}
+
 export function verifyAndAppend(items, { dryRun = false } = {}) {
   const failures = [];
   const fail = (i, msg) => failures.push(`[${i}] ${items[i].subtopic ?? "?"}: ${msg}`);

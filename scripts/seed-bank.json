@@ -8046,6 +8046,1005 @@
    },
    "numeric_check": "12500*(1.02^2 - 1)",
    "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 2,
+   "stem_md": "If $\\dfrac{9^{5} \\cdot 27^{2}}{3^{11}} = 3^{k}$, what is the value of $k$?",
+   "choices": [
+    "$-5$",
+    "$1$",
+    "$4$",
+    "$5$",
+    "$16$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nRewrite every base as a power of $3$: $9^{5} = (3^{2})^{5} = 3^{10}$ and $27^{2} = (3^{3})^{2} = 3^{6}$. The numerator is $3^{10+6} = 3^{16}$, so the quotient is $3^{16-11} = 3^{5}$ and $k = 5$.\n\n**Trigger cue**\n\nA mix of related bases ($9$, $27$, $3$) in one expression: convert everything to the smallest prime base first, then add and subtract exponents.\n\n**Takeaway**\n\nOne base first, then exponent arithmetic — never the reverse.",
+   "fastest_path_md": "$9^{5}\\cdot 27^{2} = 3^{10}\\cdot 3^{6} = 3^{16}$; $16 - 11 = 5$.",
+   "trap_map": {
+    "0": "Divides backwards, computing $11 - 16$ instead of $16 - 11$.",
+    "1": "Adds inside each conversion — $9^{5}$ as $3^{2+5}$ and $27^{2}$ as $3^{3+2}$ — instead of multiplying the exponents.",
+    "2": "Converts $27^{2}$ as $3^{3+2} = 3^{5}$: a power of a power multiplies exponents, it does not add them.",
+    "4": "Combines the numerator correctly but forgets to subtract the denominator's exponent."
+   },
+   "numeric_check": "5",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 2,
+   "stem_md": "If $2^{15} + 2^{15} + 2^{15} + 2^{15} = 2^{k}$, what is the value of $k$?",
+   "choices": [
+    "$15$",
+    "$16$",
+    "$17$",
+    "$30$",
+    "$60$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nFour identical copies of $2^{15}$ sum to $4 \\cdot 2^{15}$. Since $4 = 2^{2}$, the sum is $2^{2} \\cdot 2^{15} = 2^{17}$, so $k = 17$.\n\n**Trigger cue**\n\nThe same power added to itself several times: count the copies and factor — $n$ copies of $a^{x}$ is $n \\cdot a^{x}$, and if $n$ is itself a power of $a$ the exponents add.\n\n**Takeaway**\n\nAdding copies multiplies by the count; only then do exponents add.",
+   "fastest_path_md": "Four copies means $\\times 4 = \\times 2^{2}$, so $2^{15} \\to 2^{17}$.",
+   "trap_map": {
+    "0": "Treats repeated addition of a power as leaving it unchanged.",
+    "1": "Counts only one doubling, as if there were two copies rather than four.",
+    "3": "Adds the exponents across the plus signs, $15 + 15$, instead of factoring out the common power.",
+    "4": "Multiplies the exponent by the number of copies, $15 \\times 4$."
+   },
+   "numeric_check": "17",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "real",
+   "difficulty": 2,
+   "stem_md": "A bacterial culture doubles in number every $3$ hours. If the culture contains $400$ cells at 9:00 a.m., how many cells does it contain at 9:00 p.m. the same day?",
+   "choices": [
+    "$1{,}600$",
+    "$3{,}200$",
+    "$4{,}800$",
+    "$6{,}400$",
+    "$1{,}638{,}400$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nFrom 9:00 a.m. to 9:00 p.m. is $12$ hours, which is $\\frac{12}{3} = 4$ doubling periods. The count is $400 \\cdot 2^{4} = 400 \\cdot 16 = 6{,}400$.\n\n**Trigger cue**\n\n\"Doubles every $h$ hours\": model as $P \\cdot 2^{t/h}$ and count periods before touching the amounts.\n\n**Takeaway**\n\nCount doubling periods first; growth is a power, not a product.",
+   "fastest_path_md": "$12 \\div 3 = 4$ doublings; $400 \\to 800 \\to 1{,}600 \\to 3{,}200 \\to 6{,}400$.",
+   "trap_map": {
+    "0": "Multiplies by the number of periods, $400 \\times 4$, instead of by $2^{4}$.",
+    "1": "Stops one doubling short, at three periods.",
+    "2": "Multiplies by the number of hours, $400 \\times 12$.",
+    "4": "Doubles once per hour, computing $400 \\cdot 2^{12}$."
+   },
+   "numeric_check": "6400",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "What is the value of $16^{3/4} \\cdot 27^{2/3}$?",
+   "choices": [
+    "$6$",
+    "$18$",
+    "$24$",
+    "$72$",
+    "$108$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nA fractional exponent is a root and a power: $16^{3/4} = \\left(16^{1/4}\\right)^{3} = 2^{3} = 8$, and $27^{2/3} = \\left(27^{1/3}\\right)^{2} = 3^{2} = 9$. The product is $8 \\cdot 9 = 72$.\n\n**Trigger cue**\n\nA fractional exponent $\\frac{p}{q}$: take the $q$th root first (small numbers), then raise to the $p$th power.\n\n**Takeaway**\n\nRoot first, power second — the numbers stay small.",
+   "fastest_path_md": "$16^{3/4} = 2^{3} = 8$; $27^{2/3} = 3^{2} = 9$; $8 \\cdot 9 = 72$.",
+   "trap_map": {
+    "0": "Takes only the roots, $2 \\cdot 3$, dropping both numerators.",
+    "1": "Drops the cube on the $16$ term, using $2 \\cdot 9$.",
+    "2": "Drops the square on the $27$ term, using $8 \\cdot 3$.",
+    "4": "Multiplies base by exponent on the first factor, reading $16^{3/4}$ as $16 \\cdot \\frac{3}{4} = 12$."
+   },
+   "numeric_check": "72",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $2^{x+3} = 8^{x-1}$, what is the value of $x$?",
+   "choices": [
+    "$\\dfrac{3}{2}$",
+    "$2$",
+    "$3$",
+    "$6$",
+    "$8$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nWrite the right side in base $2$: $8^{x-1} = \\left(2^{3}\\right)^{x-1} = 2^{3(x-1)} = 2^{3x-3}$. With equal bases (and base $2 \\ne 1$) the exponents must match: $x + 3 = 3x - 3$, so $2x = 6$ and $x = 3$.\n\n**Trigger cue**\n\nTwo different but related bases across an equals sign: rewrite both in the common prime base, then set the exponents equal.\n\n**Takeaway**\n\nMatch the bases before you ever match exponents.",
+   "fastest_path_md": "$8^{x-1} = 2^{3x-3}$; $x + 3 = 3x - 3 \\Rightarrow x = 3$.",
+   "trap_map": {
+    "0": "Drops the $-1$ inside the exponent, solving $x + 3 = 3x$.",
+    "1": "Distributes the $3$ to $x$ only, solving $x + 3 = 3x - 1$.",
+    "3": "Stops at $2x = 6$ and reports that value instead of $x$.",
+    "4": "Answers $2^{x}$, the quantity in the exponent tower, rather than $x$ itself."
+   },
+   "numeric_check": "3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $(x - 2)^{2} = 25$, what is the sum of all possible values of $x$?",
+   "choices": [
+    "$-3$",
+    "$4$",
+    "$7$",
+    "$10$",
+    "$14$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nTaking the square root gives $|x - 2| = 5$, so $x - 2 = 5$ or $x - 2 = -5$, i.e. $x = 7$ or $x = -3$. Their sum is $7 + (-3) = 4$.\n\n**Trigger cue**\n\nA squared expression set equal to a number: write $\\pm$ immediately and carry both branches to the end.\n\n**Takeaway**\n\nSquares hide two roots; the sum of them is twice the anchor.",
+   "fastest_path_md": "Roots sit symmetrically about $x = 2$, so they sum to $2 \\cdot 2 = 4$ without solving.",
+   "trap_map": {
+    "0": "Keeps only the negative branch, $x = -3$.",
+    "2": "Keeps only the positive branch, $x = 7$.",
+    "3": "Finds both roots but adds their absolute values, $7 + 3$.",
+    "4": "Doubles the positive root, treating $\\pm$ as \"twice the answer\"."
+   },
+   "numeric_check": "4",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "A sample of an isotope loses half of its mass every $8$ years. If the sample has a mass of $160$ grams today, what will its mass be, in grams, $40$ years from now?",
+   "choices": [
+    "$4$",
+    "$5$",
+    "$10$",
+    "$20$",
+    "$32$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n$40$ years is $\\frac{40}{8} = 5$ half-life periods, so the mass is $160 \\cdot 2^{-5} = \\frac{160}{32} = 5$ grams.\n\n**Trigger cue**\n\n\"Cut in half every $h$ years\": model as $P \\cdot 2^{-t/h}$ and count periods before dividing anything.\n\n**Takeaway**\n\nHalving $n$ times divides by $2^{n}$, never by $n$.",
+   "fastest_path_md": "$5$ halvings: $160 \\to 80 \\to 40 \\to 20 \\to 10 \\to 5$.",
+   "trap_map": {
+    "0": "Halves six times, an off-by-one on the period count.",
+    "2": "Halves only four times.",
+    "3": "Halves only three times, miscounting $40 \\div 8$.",
+    "4": "Divides $160$ by the $5$ periods instead of halving five times."
+   },
+   "numeric_check": "160/32",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $a$ and $b$ are integers such that $3^{a} \\cdot 3^{b} = 81$ and $a - b = 2$, what is the value of $3^{a} - 3^{b}$?",
+   "choices": [
+    "$2$",
+    "$9$",
+    "$24$",
+    "$26$",
+    "$78$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$3^{a} \\cdot 3^{b} = 3^{a+b} = 81 = 3^{4}$, so $a + b = 4$. With $a - b = 2$, adding gives $2a = 6$, so $a = 3$ and $b = 1$. Then $3^{a} - 3^{b} = 27 - 3 = 24$.\n\n**Trigger cue**\n\nA product of same-base powers equal to a constant: collapse to one exponent, and read the constant as a power of that base.\n\n**Takeaway**\n\nMultiplying powers adds exponents; solve for the exponents first.",
+   "fastest_path_md": "$a+b=4$, $a-b=2 \\Rightarrow a=3, b=1$; $27 - 3 = 24$.",
+   "trap_map": {
+    "0": "Reports $a - b$, the quantity already given, instead of the difference of the powers.",
+    "1": "Computes $3^{a-b} = 3^{2}$, treating a difference of powers as a power of the difference.",
+    "3": "Uses $b = 0$, ignoring that the exponents must sum to $4$.",
+    "4": "Reads $3^{a} = 81$, taking the whole product as the first power, and computes $81 - 3$."
+   },
+   "numeric_check": "27 - 3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "Which of the following is greatest?",
+   "choices": [
+    "$2^{30}$",
+    "$3^{20}$",
+    "$5^{13}$",
+    "$6^{12}$",
+    "$10^{9}$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nMatch exponents to compare bases. $2^{30} = \\left(2^{3}\\right)^{10} = 8^{10}$ and $3^{20} = \\left(3^{2}\\right)^{10} = 9^{10}$, so $3^{20} > 2^{30}$. Against $6^{12}$: $3^{20} = \\left(3^{5}\\right)^{4} = 243^{4}$ while $6^{12} = \\left(6^{3}\\right)^{4} = 216^{4}$, so $3^{20}$ wins again. And $5^{13} < 5^{13}\\cdot 2 < 3^{20}$ since $5^{13} \\approx 1.2 \\times 10^{9}$ against $3^{20} \\approx 3.5 \\times 10^{9}$, with $10^{9}$ smaller still.\n\n**Trigger cue**\n\nPowers with unrelated bases and unequal exponents: rewrite them over a common exponent, then compare bases directly.\n\n**Takeaway**\n\nEqualize the exponents; the bigger base then wins outright.",
+   "fastest_path_md": "Common exponent $10$: $2^{30} = 8^{10}$, $3^{20} = 9^{10}$. Common exponent $4$: $3^{20} = 243^{4}$, $6^{12} = 216^{4}$. $3^{20}$ tops both.",
+   "trap_map": {
+    "0": "Picks the largest exponent, treating $30$ as decisive regardless of base.",
+    "2": "Compares base $\\times$ exponent products ($5 \\cdot 13 = 65$) instead of the powers themselves.",
+    "3": "Picks the largest base-and-exponent combination by eye without equalizing exponents.",
+    "4": "Picks the largest base, assuming powers of $10$ dominate."
+   },
+   "numeric_check": "3^20",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "If $4^{x} - 9 \\cdot 2^{x} + 8 = 0$, what is the sum of all values of $x$ that satisfy the equation?",
+   "choices": [
+    "$0$",
+    "$3$",
+    "$8$",
+    "$9$",
+    "$11$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n$4^{x} = \\left(2^{x}\\right)^{2}$, so with $y = 2^{x}$ the equation is $y^{2} - 9y + 8 = 0$, i.e. $(y-1)(y-8) = 0$ and $y = 1$ or $y = 8$. Both are positive, so both survive: $2^{x} = 1$ gives $x = 0$ and $2^{x} = 8$ gives $x = 3$. The sum is $0 + 3 = 3$.\n\n**Trigger cue**\n\nBoth $a^{2x}$ and $a^{x}$ (here $4^{x}$ and $2^{x}$) in one equation: substitute $y = a^{x}$ and solve the quadratic.\n\n**Takeaway**\n\nSubstitute, solve, then convert every positive root back to $x$.",
+   "fastest_path_md": "$y = 2^{x}$: $y^{2} - 9y + 8 = 0 \\Rightarrow y = 1, 8 \\Rightarrow x = 0, 3$; sum $3$.",
+   "trap_map": {
+    "0": "Reports only the root $x = 0$, discarding $y = 8$ as though it were impossible.",
+    "2": "Reports $y = 8$ instead of converting back to $x = 3$.",
+    "3": "Sums the substituted values $1 + 8$ rather than the exponents.",
+    "4": "Mixes the two worlds, adding the exponent $3$ to the substituted value $8$."
+   },
+   "numeric_check": "0 + 3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "real",
+   "difficulty": 4,
+   "stem_md": "The area of a pond covered by algae doubles every $4$ days. The pond is completely covered on day $24$. On which day was the pond exactly one-eighth covered?",
+   "choices": [
+    "$3$",
+    "$8$",
+    "$12$",
+    "$16$",
+    "$21$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nOne-eighth is $2^{-3}$ of full, so the pond was one-eighth covered three doublings before it was full. Three doublings take $3 \\times 4 = 12$ days, so the day is $24 - 12 = 12$.\n\n**Trigger cue**\n\nA doubling process given at its endpoint and asked about a fraction of it: count backwards in doublings, not in days or fractions.\n\n**Takeaway**\n\nEach halving backwards costs one full doubling period.",
+   "fastest_path_md": "Full on $24$, half on $20$, quarter on $16$, eighth on $12$.",
+   "trap_map": {
+    "0": "Divides the final day by $8$, treating the fraction as a divisor of time.",
+    "1": "Takes one-third of $24$, confusing \"one-eighth covered\" with a share of the elapsed days.",
+    "3": "Steps back only two doublings, reaching one-quarter rather than one-eighth.",
+    "4": "Subtracts one day per halving, $24 - 3$."
+   },
+   "numeric_check": "24 - 12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "If $n$ is an integer, what is the value of $\\dfrac{2^{n+3} - 2^{n}}{2^{n-1}}$?",
+   "choices": [
+    "$7$",
+    "$14$",
+    "$15$",
+    "$16$",
+    "$28$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nFactor the common power out of the numerator: $2^{n+3} - 2^{n} = 2^{n}\\left(2^{3} - 1\\right) = 7 \\cdot 2^{n}$. Dividing by $2^{n-1}$ leaves $7 \\cdot 2^{n - (n-1)} = 7 \\cdot 2 = 14$, independent of $n$.\n\n**Trigger cue**\n\nA sum or difference of powers of one base over another power of that base: factor out the smallest power, then subtract exponents once.\n\n**Takeaway**\n\nFactor across a minus sign; you can never subtract exponents through it.",
+   "fastest_path_md": "Numerator $= 2^{n}(8-1) = 7\\cdot 2^{n}$; over $2^{n-1}$ that is $7 \\cdot 2 = 14$.",
+   "trap_map": {
+    "0": "Divides by $2^{n}$ rather than $2^{n-1}$, losing the final factor of $2$.",
+    "2": "Subtracts exponents term by term as $2^{4} - 2^{0} = 16 - 1$.",
+    "3": "Keeps only the leading term, $2^{(n+3)-(n-1)} = 2^{4}$.",
+    "4": "Applies the $-1$ in the denominator twice, doubling the result."
+   },
+   "numeric_check": "14",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "value_order_factors",
+   "subtopic": "exponents_roots_properties",
+   "context": "pure",
+   "difficulty": 4,
+   "stem_md": "If $x$ and $y$ are positive integers and $x^{y} = 1{,}296$, how many ordered pairs $(x, y)$ satisfy the equation?",
+   "choices": [
+    "$2$",
+    "$3$",
+    "$4$",
+    "$5$",
+    "$6$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n$1{,}296 = 2^{4} \\cdot 3^{4} = 6^{4}$. A pair works exactly when $y$ divides the common exponent $4$, since $x = 6^{4/y}$ must be an integer: $y = 1$ gives $x = 1{,}296$, $y = 2$ gives $x = 36$, $y = 4$ gives $x = 6$. $y = 3$ fails because $1{,}296$ is not a perfect cube. That is $3$ pairs.\n\n**Trigger cue**\n\n$x^{y} = N$ with integer constraints: prime-factorize $N$, write it as a single base to a power, and list the divisors of that exponent.\n\n**Takeaway**\n\nEvery representation of $N$ as $x^{y}$ comes from a divisor of its exponent.",
+   "fastest_path_md": "$1{,}296 = 6^{4}$; divisors of $4$ are $1, 2, 4$, so three pairs: $(1296,1), (36,2), (6,4)$.",
+   "trap_map": {
+    "0": "Counts only the compressed forms $36^{2}$ and $6^{4}$, forgetting the trivial $y = 1$.",
+    "2": "Adds $y = 3$, treating $1{,}296$ as a perfect cube as well as a perfect square.",
+    "3": "Counts every $y$ from $1$ to $5$ without testing whether $1{,}296^{1/y}$ is an integer.",
+    "4": "Counts one pair for each divisor of $1{,}296$ that is itself a perfect power."
+   },
+   "numeric_check": "3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "stem_md": "A retailer buys a lamp for $\\$96$ and sells it at a price that yields a profit equal to $25\\%$ of the cost. What is the selling price, in dollars?",
+   "choices": [
+    "$24$",
+    "$72$",
+    "$120$",
+    "$121$",
+    "$128$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nA profit of $25\\%$ *of cost* means $S = C(1 + 0.25) = 1.25C$. With $C = 96$, the selling price is $1.25 \\times 96 = 120$.\n\n**Trigger cue**\n\n\"Profit equal to $k\\%$ of the cost\": write $S = (1+k)C$ on sight — the base is the cost.\n\n**Takeaway**\n\nProfit on cost multiplies the cost by $1 + k$.",
+   "fastest_path_md": "$96 + \\frac{96}{4} = 96 + 24 = 120$.",
+   "trap_map": {
+    "0": "Reports the profit, $0.25 \\times 96$, instead of the selling price.",
+    "1": "Subtracts the $25\\%$ instead of adding it.",
+    "3": "Adds the percent as if it were dollars, $96 + 25$.",
+    "4": "Reads the profit as $25\\%$ of the selling price, solving $96 = 0.75S$."
+   },
+   "numeric_check": "96*1.25",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "stem_md": "A jacket listed at $\\$200$ is discounted by $20\\%$, and the resulting sale price is then discounted by a further $10\\%$. What is the final price, in dollars?",
+   "choices": [
+    "$140$",
+    "$144$",
+    "$150$",
+    "$160$",
+    "$180$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nEach discount acts on the current price, so the factors multiply: $200 \\times 0.80 \\times 0.90 = 200 \\times 0.72 = 144$.\n\n**Trigger cue**\n\n\"Discounted $x\\%$, then a further $y\\%$ off\": multiply the factors into one net multiplier before touching any dollar amount.\n\n**Takeaway**\n\nStacked percents multiply; they never add.",
+   "fastest_path_md": "$0.8 \\times 0.9 = 0.72$; $200 \\times 0.72 = 144$.",
+   "trap_map": {
+    "0": "Adds the discounts into a single $30\\%$ off.",
+    "2": "Averages the two discounts into one $25\\%$ off.",
+    "3": "Applies only the first discount.",
+    "4": "Applies only the second discount."
+   },
+   "numeric_check": "200*0.8*0.9",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "stem_md": "How much simple interest, in dollars, does a deposit of $\\$4{,}500$ earn in $8$ months at an annual rate of $6\\%$?",
+   "choices": [
+    "$22.50$",
+    "$180$",
+    "$216$",
+    "$270$",
+    "$2{,}160$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\n$I = Prt$ with $t$ in years: $t = \\frac{8}{12} = \\frac{2}{3}$. So $I = 4500 \\times 0.06 \\times \\frac{2}{3} = 270 \\times \\frac{2}{3} = 180$.\n\n**Trigger cue**\n\nA simple-interest term stated in months: convert to $t = \\frac{\\text{months}}{12}$ before anything else.\n\n**Takeaway**\n\nSimple-interest time is always measured in years.",
+   "fastest_path_md": "A full year would earn $\\$270$; eight months is two-thirds of that, $\\$180$.",
+   "trap_map": {
+    "0": "Divides by $12$ a second time, treating the answer as a monthly figure.",
+    "2": "Reads $8$ months as $0.8$ of a year.",
+    "3": "Ignores the term and charges a full year of interest.",
+    "4": "Plugs $t = 8$ years instead of $\\frac{8}{12}$."
+   },
+   "numeric_check": "4500*0.06*(8/12)",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "stem_md": "A vendor sold a bicycle for $\\$2{,}500$, which was $\\$500$ more than what she paid for it. Her profit was what percent of her cost?",
+   "choices": [
+    "$20\\%$",
+    "$25\\%$",
+    "$80\\%$",
+    "$125\\%$",
+    "$500\\%$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nCost is $2500 - 500 = 2000$ and profit is $500$. As a percent of cost, that is $\\frac{500}{2000} = 0.25 = 25\\%$.\n\n**Trigger cue**\n\n\"Profit was what percent of the cost\": the word after \"of\" names the denominator — divide by cost, not by the sale price.\n\n**Takeaway**\n\nThe quantity after \"of\" is always the denominator.",
+   "fastest_path_md": "$\\frac{500}{2000} = \\frac{1}{4} = 25\\%$.",
+   "trap_map": {
+    "0": "Divides the profit by the selling price, $\\frac{500}{2500}$.",
+    "2": "Reports the cost as a percent of the selling price.",
+    "3": "Reports the selling price as a percent of the cost.",
+    "4": "Divides the selling price by the profit."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 2,
+   "stem_md": "The price of a stock rose by $20\\%$ during January and then fell by $20\\%$ during February. Its price at the end of February was what percent of its price at the start of January?",
+   "choices": [
+    "$80\\%$",
+    "$96\\%$",
+    "$100\\%$",
+    "$120\\%$",
+    "$144\\%$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nThe net factor is $1.20 \\times 0.80 = 0.96$, so the ending price is $96\\%$ of the starting price. The fall is larger in dollars than the rise because it acts on the higher January price.\n\n**Trigger cue**\n\nA rise of $x\\%$ followed by a fall of $x\\%$: multiply $(1+x)(1-x) = 1 - x^{2}$ — always a net loss.\n\n**Takeaway**\n\nUp then down by the same percent always ends below par.",
+   "fastest_path_md": "$1.2 \\times 0.8 = 0.96$, so $96\\%$.",
+   "trap_map": {
+    "0": "Applies only February's fall.",
+    "2": "Assumes a $20\\%$ rise and a $20\\%$ fall cancel exactly.",
+    "3": "Applies only January's rise.",
+    "4": "Treats both months as rises, $1.2 \\times 1.2$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "A store's profit on a certain item is $20\\%$ of the item's selling price. The profit is what percent of the item's cost?",
+   "choices": [
+    "$16\\%$",
+    "$20\\%$",
+    "$25\\%$",
+    "$40\\%$",
+    "$80\\%$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nProfit $= 0.2S$, so cost is $C = S - 0.2S = 0.8S$. Then $\\frac{\\text{profit}}{C} = \\frac{0.2S}{0.8S} = 0.25 = 25\\%$.\n\n**Trigger cue**\n\n\"Profit of $k\\%$ of the selling price\": write $C = (1-k)S$ immediately, then re-base whatever the question asks for.\n\n**Takeaway**\n\nA margin of $m$ on price is a markup of $\\frac{m}{1-m}$ on cost.",
+   "fastest_path_md": "Set $S = 100$: profit $20$, cost $80$, so $\\frac{20}{80} = 25\\%$.",
+   "trap_map": {
+    "0": "Takes $20\\%$ of the $80\\%$ cost share instead of dividing by it.",
+    "1": "Reports the given margin unchanged, as though the base did not matter.",
+    "3": "Doubles the margin.",
+    "4": "Reports the cost as a percent of the selling price."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "A merchant would incur a loss equal to $12\\%$ of his cost if he sold a desk for $\\$462$. How many more dollars must he charge instead in order to earn a profit equal to $8\\%$ of his cost?",
+   "choices": [
+    "$42$",
+    "$92.40$",
+    "$105$",
+    "$126$",
+    "$567$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nA $12\\%$ loss means $0.88C = 462$, so $C = 525$. The target price is $1.08C = 567$, and the increase is $567 - 462 = 105$. Equivalently, the gap between the two scenarios is $(12\\% + 8\\%)$ of cost: $0.20 \\times 525 = 105$.\n\n**Trigger cue**\n\n\"Sold at a loss of $a\\%$; $\\$d$ more would give a profit of $b\\%$\": the dollar gap is $(a+b)\\%$ of the cost.\n\n**Takeaway**\n\nBetween two scenarios on one cost, percent gap times cost equals the dollar gap.",
+   "fastest_path_md": "$C = \\frac{462}{0.88} = 525$; the gap is $20\\%$ of cost, $0.2 \\times 525 = 105$.",
+   "trap_map": {
+    "0": "Computes only the $8\\%$ profit, forgetting he must first recover the $12\\%$ loss.",
+    "1": "Applies the $20\\%$ gap to the $\\$462$ sale price instead of to the cost.",
+    "3": "Uses $24\\%$ of cost, doubling the loss rather than adding the profit to it.",
+    "4": "Reports the new selling price rather than the increase."
+   },
+   "numeric_check": "525*1.08 - 462",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "Marcus deposits $\\$8{,}000$ into an account paying $5\\%$ annual interest, compounded semiannually. How much interest, in dollars, does the account earn in one year?",
+   "choices": [
+    "$200$",
+    "$400$",
+    "$405$",
+    "$820$",
+    "$8{,}405$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nSemiannual compounding at $5\\%$ annual means two periods of $2.5\\%$ each. The balance after a year is $8000(1.025)^{2} = 8000 \\times 1.050625 = 8405$, so the interest earned is $8405 - 8000 = 405$.\n\n**Trigger cue**\n\n\"Compounded semiannually\": halve the annual rate, double the period count, and only then compute.\n\n**Takeaway**\n\nPer-period rate is $\\frac{r}{n}$; interest is the balance minus the principal.",
+   "fastest_path_md": "Two periods of $2.5\\%$: $\\$200$ then $\\$205$, so $\\$405$ — the extra $\\$5$ is interest on interest.",
+   "trap_map": {
+    "0": "Counts only the first semiannual period.",
+    "1": "Uses simple interest at $5\\%$ for the year.",
+    "3": "Compounds at the full annual rate for two periods, $8000(1.05)^{2} - 8000$.",
+    "4": "Reports the ending balance rather than the interest earned."
+   },
+   "numeric_check": "8000*1.025^2 - 8000",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "A shop lists a coat at a price $60\\%$ above its cost. During a sale, the shop sells the coat at $25\\%$ off the list price. The sale price is what percent of the cost?",
+   "choices": [
+    "$75\\%$",
+    "$120\\%$",
+    "$135\\%$",
+    "$160\\%$",
+    "$200\\%$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nList is $1.60C$ and the sale takes $25\\%$ off that: $1.60 \\times 0.75 = 1.20$. The sale price is $120\\%$ of cost — still a $20\\%$ profit.\n\n**Trigger cue**\n\n\"Marks up $x\\%$, then discounts $y\\%$\": compress to the single factor $(1+x)(1-y)$ before introducing any dollar amount.\n\n**Takeaway**\n\nOne net multiplier answers the whole chain.",
+   "fastest_path_md": "$1.6 \\times 0.75 = 1.2$, so $120\\%$.",
+   "trap_map": {
+    "0": "Applies only the discount, forgetting the markup.",
+    "2": "Subtracts the discount percent from the markup percent, $160 - 25$.",
+    "3": "Applies only the markup, forgetting the sale.",
+    "4": "Multiplies $1.6$ by $1.25$, treating the discount as another markup."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "A loan of $\\$7{,}200$ was repaid after $9$ months, together with $\\$486$ in simple interest. What was the annual interest rate on the loan?",
+   "choices": [
+    "$0.75\\%$",
+    "$6.75\\%$",
+    "$9\\%$",
+    "$13.5\\%$",
+    "$27\\%$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n$I = Prt$ with $t = \\frac{9}{12} = 0.75$ years: $486 = 7200 \\cdot r \\cdot 0.75 = 5400r$, so $r = \\frac{486}{5400} = 0.09 = 9\\%$.\n\n**Trigger cue**\n\n\"Settled the loan after $m$ months\" with simple interest: divide by $P \\cdot \\frac{m}{12}$ to recover the annual rate.\n\n**Takeaway**\n\nRate is interest divided by principal times years.",
+   "fastest_path_md": "Nine months of interest is $\\$486$, so a year is $\\frac{4}{3}$ of that, $\\$648$; $\\frac{648}{7200} = 9\\%$.",
+   "trap_map": {
+    "0": "Plugs $t = 9$ years instead of $\\frac{9}{12}$.",
+    "1": "Ignores the term entirely, dividing interest by principal.",
+    "3": "Reads the term as $6$ months, using $t = 0.5$.",
+    "4": "Reads \"$9$ months\" as a quarter of a year, using $t = 0.25$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "Priya invests $\\$12{,}000$ for two years at an annual interest rate of $5\\%$. How many more dollars of interest does she earn with annual compounding than she would earn with simple interest?",
+   "choices": [
+    "$30$",
+    "$60$",
+    "$600$",
+    "$1{,}200$",
+    "$1{,}230$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nCompound gives $12000(1.05)^{2} - 12000 = 1230$; simple gives $12000 \\times 0.05 \\times 2 = 1200$. The gap is $30$ — exactly the second year's interest on the first year's interest, $Pr^{2} = 12000 \\times 0.0025$.\n\n**Trigger cue**\n\n\"How much more with compounding\" over two annual periods: reach straight for $Pr^{2}$.\n\n**Takeaway**\n\nOver two years, compounding beats simple by exactly $Pr^{2}$.",
+   "fastest_path_md": "First year's interest is $\\$600$; the gap is a year of interest on it, $600 \\times 0.05 = \\$30$.",
+   "trap_map": {
+    "1": "Charges the gap once per year, doubling $Pr^{2}$.",
+    "2": "Reports one year's interest.",
+    "3": "Reports the total simple interest.",
+    "4": "Reports the total compound interest rather than the difference."
+   },
+   "numeric_check": "12000*1.05^2 - 12000 - 12000*0.05*2",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 3,
+   "stem_md": "A wholesaler marks up an item by $25\\%$ and sells it to a retailer, who marks that price up by a further $40\\%$ and sells it to consumers. The consumer price is what percent greater than the wholesaler's cost?",
+   "choices": [
+    "$15\\%$",
+    "$65\\%$",
+    "$75\\%$",
+    "$125\\%$",
+    "$175\\%$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nThe net factor is $1.25 \\times 1.40 = 1.75$. A factor of $1.75$ is a $75\\%$ increase, since the percent change is the multiplier minus $1$.\n\n**Trigger cue**\n\nTwo markups in a chain, asked as \"percent greater\": multiply the factors, then subtract $1$.\n\n**Takeaway**\n\nNet percent change is the multiplier minus one.",
+   "fastest_path_md": "Set cost $100$: $100 \\to 125 \\to 175$, an increase of $75$.",
+   "trap_map": {
+    "0": "Subtracts the two markup percents.",
+    "1": "Adds the two markup percents.",
+    "3": "Reports the wholesaler's multiplier as a percent.",
+    "4": "Reports the net multiplier, $175\\%$, instead of the increase it represents."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "context": "real",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "interest_profit_discount",
+   "difficulty": 5,
+   "stem_md": "A retailer paid $\\$1{,}400$ for $200$ identical mugs. She sold $60\\%$ of the mugs at a price that gave a profit equal to $50\\%$ of the cost per mug, and sold every remaining mug at a price $30\\%$ below that first selling price. What was her total profit, in dollars, on the $200$ mugs?",
+   "choices": [
+    "$252$",
+    "$420$",
+    "$448$",
+    "$700$",
+    "$1{,}848$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nCost per mug is $\\frac{1400}{200} = 7$. The first price is $1.5 \\times 7 = 10.50$, and $60\\%$ of $200$ is $120$ mugs, giving $120 \\times 10.50 = 1260$. The second price is $30\\%$ below the *first price*: $0.70 \\times 10.50 = 7.35$, and $80$ mugs give $80 \\times 7.35 = 588$. Revenue is $1260 + 588 = 1848$, so profit is $1848 - 1400 = 448$.\n\n**Trigger cue**\n\nA discount stated as \"below that price\": the base is the earlier selling price, not the cost — check which anchor the sentence names.\n\n**Takeaway**\n\nEach percent attaches to the base its sentence names.",
+   "fastest_path_md": "Per mug: $\\$7$ cost, $\\$10.50$ then $\\$7.35$. Profit is $120(3.50) + 80(0.35) = 420 + 28 = 448$.",
+   "trap_map": {
+    "0": "Discounts $30\\%$ off the cost per mug rather than off the first selling price.",
+    "1": "Counts profit on the first batch only, treating the rest as sold at cost.",
+    "3": "Assumes every mug sold at the $50\\%$-profit price.",
+    "4": "Reports total revenue rather than profit."
+   },
+   "numeric_check": "120*10.5 + 80*7.35 - 1400",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "real",
+   "difficulty": 2,
+   "stem_md": "The ratio of red marbles to blue marbles in a jar is $4 : 7$. If the jar contains $132$ marbles in all and no other colors, how many of them are blue?",
+   "choices": [
+    "$12$",
+    "$48$",
+    "$77$",
+    "$84$",
+    "$88$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nWrite the counts as $4k$ and $7k$. The total is $11k = 132$, so $k = 12$ and the blue count is $7k = 84$.\n\n**Trigger cue**\n\n\"The ratio is $m : n$\" plus a total: divide the total by $m + n$ once, then multiply.\n\n**Takeaway**\n\nRatio numbers are parts, not counts — find the multiplier first.",
+   "fastest_path_md": "$132 \\div 11 = 12$; $12 \\times 7 = 84$.",
+   "trap_map": {
+    "0": "Reports the multiplier $k$ rather than the blue count.",
+    "1": "Reports the red count, $4k$.",
+    "2": "Divides by $12$ parts instead of $11$.",
+    "4": "Reads the ratio as $1 : 2$ and takes two-thirds of the total."
+   },
+   "numeric_check": "132/11*7",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 2,
+   "stem_md": "The variable $y$ is inversely proportional to $x$. When $x = 6$, $y = 15$. What is the value of $y$ when $x = 10$?",
+   "choices": [
+    "$5.4$",
+    "$9$",
+    "$11$",
+    "$25$",
+    "$90$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nInverse proportionality means $xy = k$ is constant: $k = 6 \\times 15 = 90$. At $x = 10$, $y = \\frac{90}{10} = 9$.\n\n**Trigger cue**\n\n\"Inversely proportional to $x$\": write $y = \\frac{k}{x}$ before touching any numbers — the product, not the quotient, is fixed.\n\n**Takeaway**\n\nInverse means the product stays constant.",
+   "fastest_path_md": "$x$ grows by $\\frac{10}{6}$, so $y$ shrinks by it: $15 \\cdot \\frac{6}{10} = 9$.",
+   "trap_map": {
+    "0": "Divides by the ratio $\\frac{10}{6}$ twice, as if $y$ varied inversely with $x^{2}$.",
+    "2": "Subtracts the increase in $x$ from $y$, $15 - 4$.",
+    "3": "Treats the relationship as direct, scaling $y$ up by $\\frac{10}{6}$.",
+    "4": "Reports the constant $k$ instead of the new $y$."
+   },
+   "numeric_check": "90/10",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 2,
+   "stem_md": "If $3x = 4y$ and $y \\neq 0$, what is the ratio of $x$ to $y$?",
+   "choices": [
+    "$1 : 12$",
+    "$3 : 4$",
+    "$4 : 3$",
+    "$7 : 12$",
+    "$12 : 1$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nDivide both sides by $3y$: $\\frac{x}{y} = \\frac{4}{3}$, so $x : y = 4 : 3$. Check with a concrete pair: $x = 4$, $y = 3$ gives $3(4) = 4(3) = 12$.\n\n**Trigger cue**\n\n\"$ax = by$\": the coefficients swap sides — $x : y = b : a$. Solve it explicitly or plug the LCM.\n\n**Takeaway**\n\nIn $ax = by$ the coefficients cross over.",
+   "fastest_path_md": "Set the common value to $12$: $x = 4$, $y = 3$, so $4 : 3$.",
+   "trap_map": {
+    "0": "Divides the coefficients into the LCM but reports the parts in the wrong order.",
+    "1": "Reads the coefficients straight off, $3 : 4$, without swapping them.",
+    "3": "Adds the coefficients into the second term.",
+    "4": "Multiplies the coefficients into a single part."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $x : y = 2 : 5$ and $y : z = 3 : 4$, what is $x : z$?",
+   "choices": [
+    "$1 : 2$",
+    "$3 : 10$",
+    "$5 : 6$",
+    "$8 : 15$",
+    "$10 : 3$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nMake the shared term match: scale $x : y = 2 : 5$ by $3$ to get $6 : 15$, and scale $y : z = 3 : 4$ by $5$ to get $15 : 20$. Then $x : y : z = 6 : 15 : 20$, so $x : z = 6 : 20 = 3 : 10$.\n\n**Trigger cue**\n\nTwo ratios sharing one variable: rescale both so the shared term is their LCM, then read the combined ratio off in one line.\n\n**Takeaway**\n\nThe shared term must be identical in both ratios first.",
+   "fastest_path_md": "$\\frac{x}{z} = \\frac{x}{y}\\cdot\\frac{y}{z} = \\frac{2}{5}\\cdot\\frac{3}{4} = \\frac{3}{10}$.",
+   "trap_map": {
+    "0": "Chains without aligning, reading the parts as $2 : 5 : 4$ and taking $2 : 4$.",
+    "2": "Aligns on the wrong term, effectively using $y : x$ in the first ratio.",
+    "3": "Crosses the terms, computing $2 \\cdot 4 : 5 \\cdot 3$.",
+    "4": "Finds the right ratio but reports it as $z : x$."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "In a certain class the ratio of boys to girls is $3 : 5$. If $12$ more boys join the class and no one leaves, the ratio of boys to girls becomes $9 : 10$. How many girls are in the class?",
+   "choices": [
+    "$8$",
+    "$24$",
+    "$36$",
+    "$40$",
+    "$64$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nWrite the counts as $3k$ boys and $5k$ girls. After the arrivals, $\\frac{3k+12}{5k} = \\frac{9}{10}$, so $10(3k+12) = 45k$, i.e. $30k + 120 = 45k$ and $k = 8$. The girls number $5k = 40$.\n\n**Trigger cue**\n\n\"If $n$ more are added, the ratio becomes …\": parts as $mk$ and $nk$, apply the change, cross-multiply the new ratio.\n\n**Takeaway**\n\nAn addition breaks the old ratio; write a fresh equation.",
+   "fastest_path_md": "$10(3k+12) = 45k \\Rightarrow k = 8$; girls $= 5(8) = 40$.",
+   "trap_map": {
+    "0": "Reports the multiplier $k$ rather than a head count.",
+    "1": "Reports the original number of boys, $3k$.",
+    "2": "Reports the number of boys after the twelve arrive.",
+    "4": "Reports the original class total, $8k$."
+   },
+   "numeric_check": "5*8",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $\\dfrac{a}{b} = \\dfrac{3}{7}$, $\\dfrac{c}{d} = \\dfrac{3}{7}$, and $a + c = 24$, what is the value of $b + d$?",
+   "choices": [
+    "$10$",
+    "$28$",
+    "$31$",
+    "$56$",
+    "$168$"
+   ],
+   "correct_index": 3,
+   "solution_md": "**Formal path**\n\nEqual ratios add across: if $\\frac{a}{b} = \\frac{c}{d} = \\frac{3}{7}$, then $\\frac{a+c}{b+d}$ equals that same $\\frac{3}{7}$. So $\\frac{24}{b+d} = \\frac{3}{7}$ and $b + d = \\frac{24 \\times 7}{3} = 56$.\n\n**Trigger cue**\n\nTwo equal ratios with a sum given across the numerators: the sum of numerators over the sum of denominators is the same ratio.\n\n**Takeaway**\n\nEqual ratios stay equal when you add across them.",
+   "fastest_path_md": "$\\frac{24}{?} = \\frac{3}{7} \\Rightarrow ? = 24 \\cdot \\frac{7}{3} = 56$.",
+   "trap_map": {
+    "0": "Adds the ratio's own terms, $3 + 7$.",
+    "1": "Halves the numerator sum before scaling, using $\\frac{24}{6}\\cdot 7$.",
+    "2": "Adds $24 + 7$.",
+    "4": "Multiplies by $7$ without dividing by $3$."
+   },
+   "numeric_check": "24*7/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "The intensity of a light source is inversely proportional to the square of the distance from the source. At a distance of $4$ metres the intensity is $45$ units. What is the intensity, in units, at a distance of $6$ metres?",
+   "choices": [
+    "$20$",
+    "$22.5$",
+    "$30$",
+    "$67.5$",
+    "$101.25$"
+   ],
+   "correct_index": 0,
+   "solution_md": "**Formal path**\n\nWrite $I = \\frac{k}{d^{2}}$. From $45 = \\frac{k}{16}$, $k = 720$. At $d = 6$, $I = \\frac{720}{36} = 20$.\n\n**Trigger cue**\n\n\"Inversely proportional to the square of\": the distance ratio gets squared and divides — $\\left(\\frac{4}{6}\\right)^{2}$ of the old intensity.\n\n**Takeaway**\n\nInverse-square: scale by the squared ratio, and divide.",
+   "fastest_path_md": "Distance $\\times \\frac{3}{2}$, so intensity $\\times \\left(\\frac{2}{3}\\right)^{2} = \\frac{4}{9}$: $45 \\cdot \\frac{4}{9} = 20$.",
+   "trap_map": {
+    "1": "Halves the intensity, treating the distance as though it had doubled.",
+    "2": "Uses a plain inverse rather than an inverse square, $45 \\cdot \\frac{4}{6}$.",
+    "3": "Treats intensity as directly proportional to distance.",
+    "4": "Scales up by the squared ratio instead of down."
+   },
+   "numeric_check": "720/36",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $x$, $y$, and $z$ are positive numbers with $2x = 3y = 8z$, what is $x : y : z$?",
+   "choices": [
+    "$2 : 3 : 8$",
+    "$3 : 2 : 8$",
+    "$4 : 6 : 16$",
+    "$8 : 12 : 3$",
+    "$12 : 8 : 3$"
+   ],
+   "correct_index": 4,
+   "solution_md": "**Formal path**\n\nSet the common value to the LCM of the coefficients, $24$: then $x = 12$, $y = 8$, and $z = 3$, so $x : y : z = 12 : 8 : 3$. Check: $2(12) = 3(8) = 8(3) = 24$.\n\n**Trigger cue**\n\n\"$ax = by = cz$\": set the common value to $\\mathrm{lcm}(a,b,c)$ and read each variable straight off.\n\n**Takeaway**\n\nEqual products invert the coefficients; plug the LCM.",
+   "fastest_path_md": "Common value $24$: $x = 12$, $y = 8$, $z = 3$.",
+   "trap_map": {
+    "0": "Reads the coefficients off as the ratio without inverting them.",
+    "1": "Swaps only the first two coefficients.",
+    "2": "Doubles the coefficients, which still fails to invert them.",
+    "3": "Inverts the ratio for $z$ only, leaving $x$ and $y$ in coefficient order."
+   },
+   "numeric_check": null,
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "real",
+   "difficulty": 3,
+   "stem_md": "A coffee blend contains beans of type A and type B in the ratio $5 : 3$ by weight. How many kilograms of type B must be added to $32$ kilograms of this blend so that the ratio of A to B becomes $5 : 7$?",
+   "choices": [
+    "$8$",
+    "$12$",
+    "$16$",
+    "$20$",
+    "$28$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\nIn $32$ kilograms the parts are $\\frac{5}{8}(32) = 20$ of A and $\\frac{3}{8}(32) = 12$ of B. Only B changes, so $\\frac{20}{12 + b} = \\frac{5}{7}$, giving $12 + b = 28$ and $b = 16$.\n\n**Trigger cue**\n\nOne ingredient added to a fixed blend: convert the ratio to actual amounts first, then hold the untouched quantity constant.\n\n**Takeaway**\n\nAdding to one part leaves the other part fixed — anchor on it.",
+   "fastest_path_md": "A stays $20$; the new ratio makes B $= \\frac{7}{5}(20) = 28$, so add $28 - 12 = 16$.",
+   "trap_map": {
+    "0": "Uses the difference in the ratio's second terms, $7 - 3$, as kilograms.",
+    "1": "Reports the original amount of B.",
+    "3": "Reports the amount of A, which does not change.",
+    "4": "Reports the new total amount of B rather than the amount added."
+   },
+   "numeric_check": "28 - 12",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "algebra",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "pure",
+   "difficulty": 3,
+   "stem_md": "If $x$ is $\\dfrac{3}{5}$ of $y$, and $y$ is $\\dfrac{10}{9}$ of $z$, then $x$ is what fraction of $z$?",
+   "choices": [
+    "$\\dfrac{27}{50}$",
+    "$\\dfrac{3}{5}$",
+    "$\\dfrac{2}{3}$",
+    "$\\dfrac{10}{9}$",
+    "$\\dfrac{3}{2}$"
+   ],
+   "correct_index": 2,
+   "solution_md": "**Formal path**\n\n\"$x$ is $\\frac{3}{5}$ of $y$\" means $x = \\frac{3}{5}y$, and $y = \\frac{10}{9}z$. Substituting, $x = \\frac{3}{5}\\cdot\\frac{10}{9}z = \\frac{30}{45}z = \\frac{2}{3}z$.\n\n**Trigger cue**\n\nTwo \"is a fraction of\" statements sharing a middle variable: multiply the fractions in the order the chain runs.\n\n**Takeaway**\n\nChained \"fraction of\" statements multiply, front to back.",
+   "fastest_path_md": "$\\frac{3}{5}\\cdot\\frac{10}{9} = \\frac{2}{3}$.",
+   "trap_map": {
+    "0": "Inverts the second fraction before multiplying.",
+    "1": "Reports only the first relation.",
+    "3": "Reports only the second relation.",
+    "4": "Inverts the product, answering what fraction $z$ is of $x$."
+   },
+   "numeric_check": "2/3",
+   "provenance": "authored + brute-force programmatic verification"
+  },
+  {
+   "format": "problem_solving",
+   "content_domain": "arithmetic",
+   "fundamental_skill": "rates_ratio_percent",
+   "subtopic": "ratios_proportions",
+   "context": "real",
+   "difficulty": 5,
+   "stem_md": "At a company, the ratio of managers to engineers is $2 : 9$ and the ratio of engineers to interns is $6 : 5$. After the company hires $30$ additional interns and no one else, the ratio of engineers to interns becomes $9 : 10$. How many managers does the company have?",
+   "choices": [
+    "$6$",
+    "$24$",
+    "$30$",
+    "$90$",
+    "$108$"
+   ],
+   "correct_index": 1,
+   "solution_md": "**Formal path**\n\nAlign on engineers. Scale $2 : 9$ by $2$ to get managers $:$ engineers $= 4 : 18$, and scale $6 : 5$ by $3$ to get engineers $:$ interns $= 18 : 15$. So the three counts are $4k$, $18k$, $15k$. After the hires, $\\frac{18k}{15k+30} = \\frac{9}{10}$, so $180k = 135k + 270$, giving $k = 6$. Managers number $4k = 24$.\n\n**Trigger cue**\n\nTwo ratios sharing a middle group, plus a change to one end: align the shared term to its LCM, write all three as multiples of one $k$, then let the change give the equation.\n\n**Takeaway**\n\nAlign first, then let the change fix the multiplier.",
+   "fastest_path_md": "$4 : 18 : 15$; $180k = 9(15k+30) \\Rightarrow k = 6$; managers $= 24$.",
+   "trap_map": {
+    "0": "Reports the multiplier $k$ rather than a head count.",
+    "2": "Reports the number of interns hired, which the stem already gave.",
+    "3": "Reports the original number of interns.",
+    "4": "Reports the number of engineers."
+   },
+   "numeric_check": "4*6",
+   "provenance": "authored + brute-force programmatic verification"
   }
  ]
 }
