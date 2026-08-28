@@ -1,12 +1,16 @@
 import { desc, eq, sql } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { patternAttempts, sessions } from "./db/schema.ts";
 
 /** Consecutive local days with pattern work, ending today. */
-export async function computeDayStreak(): Promise<number> {
-  const dayRows = await db.all<{ d: string }>(
+export async function computeDayStreak(sdb: ScopedDb): Promise<number> {
+  // Raw SQL for SQLite's date functions; the tenant predicate is bound in
+  // rather than interpolated, and is not optional.
+  const dayRows = await sdb.q.all<{ d: string }>(
     sql`select distinct date(created_at / 1000.0, 'unixepoch', 'localtime') as d
-        from pattern_attempts order by d desc`,
+        from pattern_attempts
+        where user_id = ${sdb.userId}
+        order by d desc`,
   );
   let streak = 0;
   const today = new Date();
@@ -26,12 +30,13 @@ export async function computeDayStreak(): Promise<number> {
 
 /** Current consecutive-correct run for one category. */
 export async function computeCategoryStreak(
+  sdb: ScopedDb,
   category: string,
 ): Promise<number> {
-  const recent = await db
+  const recent = await sdb.q
     .select({ correct: patternAttempts.correct })
     .from(patternAttempts)
-    .where(eq(patternAttempts.category, category))
+    .where(sdb.own(patternAttempts, eq(patternAttempts.category, category)))
     .orderBy(desc(patternAttempts.id))
     .limit(200)
     .all();
@@ -46,13 +51,13 @@ export async function computeCategoryStreak(
 /** Best round score for a category selection ("mixed" or a category key),
  *  from pattern session summaries. */
 export async function bestRoundScore(
+  sdb: ScopedDb,
   categorySelection: string,
 ): Promise<number> {
-  const pastSessions = await db
-    .select()
-    .from(sessions)
-    .where(eq(sessions.mode, "pattern"))
-    .all();
+  const pastSessions = await sdb.rows(
+    sessions,
+    eq(sessions.mode, "pattern"),
+  );
   return pastSessions.reduce((best, s) => {
     const summary = s.summary as { category?: string; score?: number } | null;
     if (!summary || summary.category !== categorySelection) return best;

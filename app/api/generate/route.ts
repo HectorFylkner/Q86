@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { NotAuthenticatedError, requireAdmin } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { questions } from "@/lib/db/schema";
 import {
@@ -114,6 +115,19 @@ async function runPool<T>(
 }
 
 export async function POST(request: Request) {
+  // Generated questions land in `questions`, which every account shares, so
+  // this endpoint extends the bank for everyone. ADR 0001 §2 keeps the bank
+  // global and unforked, which makes generation an operator action: a
+  // subscriber can flag a question, but cannot add one.
+  try {
+    await requireAdmin();
+  } catch (e) {
+    if (e instanceof NotAuthenticatedError) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+    throw e;
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
       { error: "ANTHROPIC_API_KEY is not set. Add it to .env.local." },

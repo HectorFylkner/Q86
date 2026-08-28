@@ -1,5 +1,5 @@
 import { and, eq, isNotNull } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { sessions, type Question } from "./db/schema.ts";
 import { selectQuestions } from "./engine.ts";
 import { ALL_SUBTOPICS, type Subtopic } from "./taxonomy.ts";
@@ -20,12 +20,14 @@ import {
 export { CHAPTER_TEST_BAR, CHAPTER_TEST_SIZE };
 
 export async function selectChapterTest(
+  sdb: ScopedDb,
   subtopic: Subtopic,
 ): Promise<Question[]> {
   const picked: Question[] = [];
   for (const [difficulty, n] of CHAPTER_TEST_BLEND) {
     picked.push(
       ...(await selectQuestions(
+        sdb,
         {
           subtopics: [subtopic],
           difficultyMin: difficulty,
@@ -39,6 +41,7 @@ export async function selectChapterTest(
   if (picked.length < CHAPTER_TEST_SIZE) {
     picked.push(
       ...(await selectQuestions(
+        sdb,
         { subtopics: [subtopic], excludeIds: picked.map((q) => q.id) },
         CHAPTER_TEST_SIZE - picked.length,
       )),
@@ -56,10 +59,10 @@ export type ChapterTestState = {
   lastAt: number;
 };
 
-export async function chapterTestStates(): Promise<
-  Partial<Record<Subtopic, ChapterTestState>>
-> {
-  const rows = await db
+export async function chapterTestStates(
+  sdb: ScopedDb,
+): Promise<Partial<Record<Subtopic, ChapterTestState>>> {
+  const rows = await sdb.q
     .select({
       config: sessions.config,
       summary: sessions.summary,
@@ -67,7 +70,12 @@ export async function chapterTestStates(): Promise<
       endedAt: sessions.endedAt,
     })
     .from(sessions)
-    .where(and(eq(sessions.mode, "drill"), isNotNull(sessions.endedAt)))
+    .where(
+      sdb.own(
+        sessions,
+        and(eq(sessions.mode, "drill"), isNotNull(sessions.endedAt)),
+      ),
+    )
     .all();
 
   const out: Partial<Record<Subtopic, ChapterTestState>> = {};

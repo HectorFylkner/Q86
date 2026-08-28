@@ -2,7 +2,7 @@ import Link from "next/link";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { questions } from "@/lib/db/schema";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
@@ -16,12 +16,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function TodayPage() {
-  const inputs = await gatherPlanInputs();
+  const { sdb } = await requireScoped();
+  const inputs = await gatherPlanInputs(sdb);
   const plan = computeDailyPlan(inputs);
-  const days = await daysToTest();
+  const days = await daysToTest(sdb);
   const verifiedCount =
     (
-      await db
+      await sdb.q
         .select({ n: count() })
         .from(questions)
         .where(eq(questions.verified, true))
@@ -31,7 +32,7 @@ export default async function TodayPage() {
   const daysUntilTimed = plan.timedSetToday
     ? 0
     : cadence - (inputs.dayIndex % cadence);
-  const deck = await todaysDeck();
+  const deck = await todaysDeck(sdb);
   const deckWaiting = deck.due + deck.fresh;
   const firstRun =
     Object.values(inputs.skillAccuracy).reduce((s, r) => s + r.total, 0) === 0;
@@ -57,7 +58,10 @@ export default async function TodayPage() {
             </p>
           )}
         </div>
-        <SettingsForm testDate={await getSetting("test_date")} cadence={cadence} />
+        <SettingsForm
+          testDate={await getSetting(sdb, "test_date")}
+          cadence={cadence}
+        />
       </div>
 
       {firstRun && (

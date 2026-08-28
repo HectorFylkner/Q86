@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { PostmortemClient } from "@/components/postmortem/postmortem-client";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { attempts, questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -12,17 +12,17 @@ export default async function PostmortemPage({
 }: {
   params: Promise<{ attemptId: string }>;
 }) {
+  const { user, sdb } = await requireScoped();
   const { attemptId } = await params;
   const id = Number(attemptId);
   if (!Number.isInteger(id)) notFound();
 
-  const attempt = await db
-    .select()
-    .from(attempts)
-    .where(eq(attempts.id, id))
-    .get();
+  // Scoped read: another account's attempt id is indistinguishable from an
+  // attempt that does not exist.
+  const attempt = await sdb.row(attempts, eq(attempts.id, id));
   if (!attempt) notFound();
-  const question = await db
+
+  const question = await sdb.q
     .select()
     .from(questions)
     .where(eq(questions.id, attempt.questionId))
@@ -34,7 +34,11 @@ export default async function PostmortemPage({
       <h1 className="font-display text-xl font-semibold">
         Whiteboard post-mortem
       </h1>
-      <PostmortemClient attempt={attempt} question={question} />
+      <PostmortemClient
+        attempt={attempt}
+        question={question}
+        canGenerate={user.role === "admin"}
+      />
     </div>
   );
 }

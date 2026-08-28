@@ -1,7 +1,12 @@
 # Q86
 
-Local-first, single-user training platform for GMAT Focus Edition
-Quantitative Reasoning. The name is the target: a Quant scaled score of 86.
+Multi-tenant training platform for GMAT Focus Edition Quantitative
+Reasoning. The name is the target: a Quant scaled score of 86.
+
+Every account owns its own history, and isolation is enforced at a single
+scoped database accessor (`lib/db/scoped.ts`) rather than by remembering a
+`where` clause — see [docs/adr/0001](docs/adr/0001-database-and-tenancy.md).
+The 360-question bank is shared, verified content and stays global.
 
 - AI question engine with independent verification — no generated question
   is ever served unless a second, blind solver agreed with its key
@@ -59,13 +64,20 @@ cp .env.example .env.local
 | `pnpm start` | Serve the production build (after `pnpm build`) |
 | `pnpm backup` | Snapshot the local database (history, ELO, scratch photos — all one file) into `./backups`, safe while the app runs |
 
-Everything — attempt history, ELO, scratch-work photos — lives in one
-SQLite database at `./data/q86.db`, gitignored, no accounts, no cloud.
-`pnpm backup` snapshots it.
+Everything — accounts, attempt history, ELO, scratch-work photos — lives
+in one SQLite database at `./data/q86.db`, gitignored. `pnpm backup`
+snapshots it.
+
+Local development runs the same multi-tenant schema as production. Seed a
+first account with `pnpm dev-account`, which prints its credentials. If you
+are upgrading a database from before accounts existed, its history migrates
+into a single legacy owner — claim it with
+`pnpm claim-owner --email=… --password=…`, and run
+`pnpm migrate:multitenant --dry-run` first to see exactly what will move.
 
 Want it as a website instead of localhost? See [DEPLOY.md](DEPLOY.md) —
-free Vercel + Turso hosting (push-to-deploy, password gate) is the
-recommended path; a Dockerfile + Fly.io config ship as the alternative.
+free Vercel + Turso hosting (push-to-deploy) is the recommended path; a
+Dockerfile + Fly.io config ship as the alternative.
 
 ## Extending the question bank
 

@@ -1,6 +1,6 @@
 import { count, eq } from "drizzle-orm";
 import { TimedClient } from "@/components/timed/timed-client";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -11,10 +11,11 @@ export default async function TimedPage({
 }: {
   searchParams: Promise<{ start?: string }>;
 }) {
+  const { sdb } = await requireScoped();
   const { start } = await searchParams;
   const verifiedTotal =
     (
-      await db
+      await sdb.q
         .select({ n: count() })
         .from(questions)
         .where(eq(questions.verified, true))

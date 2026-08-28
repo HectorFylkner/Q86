@@ -1,7 +1,5 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { eq } from "drizzle-orm";
-import { db } from "../db/index.ts";
-import { settings } from "../db/schema.ts";
+import { getAppSetting } from "../db/app-settings.ts";
 
 export const DEFAULT_MODEL = "claude-sonnet-4-6";
 
@@ -16,17 +14,15 @@ function resolveBaseURL(): string | undefined {
 
 const anthropic = createAnthropic({ baseURL: resolveBaseURL() });
 
-/** settings.model override → ANTHROPIC_MODEL env → default. */
+/** app_settings.model override → ANTHROPIC_MODEL env → default. The model
+ *  is instance configuration, not a user preference: a subscriber must not
+ *  be able to redirect the operator's spend to a different model. */
 export async function getModelId(): Promise<string> {
   try {
-    const row = await db
-      .select()
-      .from(settings)
-      .where(eq(settings.key, "model"))
-      .get();
-    if (row?.value) return row.value;
+    const value = await getAppSetting("model");
+    if (value) return value;
   } catch {
-    // settings table may not exist before db:push — fall through
+    // app_settings may not exist before the first migration — fall through
   }
   return process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
 }

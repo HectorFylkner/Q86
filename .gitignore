@@ -17,3 +17,9 @@ backups/
 # misc
 *.tsbuildinfo
 .DS_Store
+
+# Test artefacts
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache

@@ -1,5 +1,5 @@
 import { and, count, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { attempts, questions, type Question } from "./db/schema.ts";
 import type {
   ContentDomain,
@@ -39,8 +39,12 @@ function whereFromFilter(filter: QuestionFilter): SQL | undefined {
   return and(...conds);
 }
 
-export async function countQuestions(filter: QuestionFilter): Promise<number> {
-  const row = await db
+/** The bank is shared content, so counting it needs no tenant predicate. */
+export async function countQuestions(
+  sdb: ScopedDb,
+  filter: QuestionFilter,
+): Promise<number> {
+  const row = await sdb.q
     .select({ n: count() })
     .from(questions)
     .where(whereFromFilter(filter))
@@ -54,20 +58,23 @@ export async function countQuestions(filter: QuestionFilter): Promise<number> {
  * deprioritized (weight 0.15 vs 1).
  */
 export async function selectQuestions(
+  sdb: ScopedDb,
   filter: QuestionFilter,
   count: number,
 ): Promise<Question[]> {
   const excluded = new Set(filter.excludeIds ?? []);
   const candidates = (
-    await db.select().from(questions).where(whereFromFilter(filter)).all()
+    await sdb.q.select().from(questions).where(whereFromFilter(filter)).all()
   ).filter((q) => !excluded.has(q.id));
   if (candidates.length === 0) return [];
 
-  const correctRows = await db
+  // Deprioritisation is personal: only this account's correct answers.
+  const correctRows = await sdb.q
     .select({ questionId: attempts.questionId })
     .from(attempts)
     .where(
-      and(
+      sdb.own(
+        attempts,
         eq(attempts.correct, true),
         inArray(
           attempts.questionId,
@@ -110,6 +117,7 @@ export async function selectQuestions(
  * skill are backfilled from the whole pool.
  */
 export async function selectTimedSet(
+  sdb: ScopedDb,
   total: 21 | 7,
   singleSkill?: FundamentalSkill,
 ): Promise<Question[]> {
@@ -118,7 +126,7 @@ export async function selectTimedSet(
   // DS questions train through drills, never inside a section sim.
   const formats: QuestionFormat[] = ["problem_solving"];
   if (singleSkill) {
-    return selectQuestions({ skills: [singleSkill], formats }, total);
+    return selectQuestions(sdb, { skills: [singleSkill], formats }, total);
   }
   const blend: Array<[FundamentalSkill, number]> =
     total === 21
@@ -139,6 +147,7 @@ export async function selectTimedSet(
   for (const [skill, n] of blend) {
     picked.push(
       ...(await selectQuestions(
+        sdb,
         { skills: [skill], formats, excludeIds: picked.map((q) => q.id) },
         n,
       )),
@@ -147,6 +156,7 @@ export async function selectTimedSet(
   if (picked.length < total) {
     picked.push(
       ...(await selectQuestions(
+        sdb,
         { formats, excludeIds: picked.map((q) => q.id) },
         total - picked.length,
       )),

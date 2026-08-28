@@ -1,5 +1,5 @@
 import { and, desc, eq, lte } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import {
   attempts,
   eloRatings,
@@ -21,8 +21,8 @@ import {
 import { baselineWeakness, getSetting, weightOverrides } from "./settings.ts";
 import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
 
-export async function daysToTest(): Promise<number | null> {
-  const raw = await getSetting("test_date");
+export async function daysToTest(sdb: ScopedDb): Promise<number | null> {
+  const raw = await getSetting(sdb, "test_date");
   if (!raw) return null;
   const target = new Date(`${raw}T00:00:00`);
   if (Number.isNaN(target.getTime())) return null;
@@ -31,17 +31,22 @@ export async function daysToTest(): Promise<number | null> {
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
 
-async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
+async function skillAccuracy(
+  sdb: ScopedDb,
+): Promise<Record<FundamentalSkill, SkillRecord>> {
   const out = {} as Record<FundamentalSkill, SkillRecord>;
   for (const skill of FUNDAMENTAL_SKILLS) {
-    const rows = await db
+    const rows = await sdb.q
       .select({ correct: attempts.correct })
       .from(attempts)
       .innerJoin(questions, eq(attempts.questionId, questions.id))
       .where(
-        and(
-          eq(questions.fundamentalSkill, skill),
-          eq(attempts.focus, "focused"),
+        sdb.own(
+          attempts,
+          and(
+            eq(questions.fundamentalSkill, skill),
+            eq(attempts.focus, "focused"),
+          ),
         ),
       )
       .orderBy(desc(attempts.id))
@@ -55,38 +60,34 @@ async function skillAccuracy(): Promise<Record<FundamentalSkill, SkillRecord>> {
   return out;
 }
 
-export async function dueRedoCount(): Promise<number> {
-  const rows = await db
-    .select({ id: redoQueue.id })
-    .from(redoQueue)
-    .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, new Date())))
-    .all();
+export async function dueRedoCount(sdb: ScopedDb): Promise<number> {
+  const rows = await sdb.rows(
+    redoQueue,
+    and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, new Date())),
+  );
   return rows.length;
 }
 
-export async function gatherPlanInputs(): Promise<PlanInputs> {
+export async function gatherPlanInputs(sdb: ScopedDb): Promise<PlanInputs> {
   const eloRows = new Map(
-    (await db.select().from(eloRatings).all()).map((r) => [
-      r.category,
-      r.rating,
-    ]),
+    (await sdb.rows(eloRatings)).map((r) => [r.category, r.rating]),
   );
   const eloByCategory = Object.fromEntries(
     PATTERN_CATEGORY_KEYS.map((k) => [k, eloRows.get(k) ?? ELO_START]),
   ) as Record<PatternCategoryKey, number>;
 
-  const cadenceRaw = Number((await getSetting("timed_set_cadence")) ?? "3");
+  const cadenceRaw = Number((await getSetting(sdb, "timed_set_cadence")) ?? "3");
   // Local-calendar day index so the cadence flips at local midnight.
   const now = new Date();
   const localDayIndex = Math.floor(
     (now.getTime() - now.getTimezoneOffset() * 60_000) / 86_400_000,
   );
   return {
-    daysToTest: await daysToTest(),
-    skillAccuracy: await skillAccuracy(),
-    baselineWeakness: await baselineWeakness(),
-    weightOverrides: await weightOverrides(),
-    dueRedoCount: await dueRedoCount(),
+    daysToTest: await daysToTest(sdb),
+    skillAccuracy: await skillAccuracy(sdb),
+    baselineWeakness: await baselineWeakness(sdb),
+    weightOverrides: await weightOverrides(sdb),
+    dueRedoCount: await dueRedoCount(sdb),
     cadenceDays:
       Number.isInteger(cadenceRaw) && cadenceRaw > 0 ? cadenceRaw : 3,
     dayIndex: localDayIndex,
@@ -94,16 +95,20 @@ export async function gatherPlanInputs(): Promise<PlanInputs> {
   };
 }
 
-export async function todaysPlan(): Promise<DailyPlan> {
-  return computeDailyPlan(await gatherPlanInputs());
+export async function todaysPlan(sdb: ScopedDb): Promise<DailyPlan> {
+  return computeDailyPlan(await gatherPlanInputs(sdb));
 }
 
 /** Pick the concrete questions for today's weighted drill block. */
-export async function selectPlanDrillIds(plan: DailyPlan): Promise<number[]> {
+export async function selectPlanDrillIds(
+  sdb: ScopedDb,
+  plan: DailyPlan,
+): Promise<number[]> {
   const ids: number[] = [];
   for (const { skill, count } of plan.drill.bySkill) {
     if (count <= 0) continue;
     const picked = await selectQuestions(
+      sdb,
       { skills: [skill], excludeIds: ids },
       count,
     );

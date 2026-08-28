@@ -32,8 +32,9 @@ try {
 import { and, count, eq } from "drizzle-orm";
 import { db } from "../lib/db/index.ts";
 import { ensureDbReady } from "../lib/db/bootstrap.ts";
+import { getAppSetting, putAppSetting } from "../lib/db/app-settings.ts";
 import { loadBank, verifiedSeedCount } from "../lib/db/seed-bank.ts";
-import { questions, settings } from "../lib/db/schema.ts";
+import { questions } from "../lib/db/schema.ts";
 import { createVerifiedQuestion } from "../lib/ai/pipeline.ts";
 import { SKILL_BY_SUBTOPIC, type Subtopic } from "../lib/taxonomy.ts";
 import { mulberry32, pick, shuffle } from "../lib/generators/rng.ts";
@@ -43,20 +44,12 @@ const MAX_CONSECUTIVE_FAILURES = 15;
 const CONCURRENCY = 3;
 
 async function getProgress(): Promise<number> {
-  const row = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "seed_progress"))
-    .get();
-  return row ? Number(row.value) : 0;
+  const value = await getAppSetting("seed_progress");
+  return value ? Number(value) : 0;
 }
 
 async function setProgress(n: number): Promise<void> {
-  await db
-    .insert(settings)
-    .values({ key: "seed_progress", value: String(n) })
-    .onConflictDoUpdate({ target: settings.key, set: { value: String(n) } })
-    .run();
+  await putAppSetting("seed_progress", String(n));
 }
 
 function printPlanSummary(plan: PlanItem[]): void {

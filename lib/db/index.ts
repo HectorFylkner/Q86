@@ -14,7 +14,7 @@ import * as schema from "./schema.ts";
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "q86.db");
 
-type DB = LibSQLDatabase<typeof schema>;
+export type DB = LibSQLDatabase<typeof schema>;
 
 // Keep a single connection across Next.js hot reloads.
 const globalForDb = globalThis as unknown as {

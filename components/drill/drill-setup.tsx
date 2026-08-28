@@ -37,10 +37,14 @@ export function DrillSetup({
   rows,
   error,
   onStart,
+  canGenerate,
 }: {
   rows: CountRow[];
   error: string | null;
   onStart: (config: DrillConfigValue) => void;
+  /** Generation writes into the shared verified bank, so it belongs to the
+   *  operator rather than to a subscriber (ADR 0001 §2). */
+  canGenerate: boolean;
 }) {
   const router = useRouter();
   const [skill, setSkill] = useState<FundamentalSkill | "all">(
@@ -363,6 +367,7 @@ export function DrillSetup({
         </div>
       </section>
 
+      {canGenerate && (
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
           Generate more questions
@@ -406,6 +411,7 @@ export function DrillSetup({
           )}
         </div>
       </section>
+      )}
     </div>
   );
 }

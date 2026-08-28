@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { attempts, questions, type Question } from "./db/schema.ts";
 
 /**
@@ -29,8 +29,11 @@ export function recommend(p: number): DecideRecommendation {
   return "bail";
 }
 
-export async function buildDecideRound(size = 8): Promise<DecideItem[]> {
-  const pool = await db
+export async function buildDecideRound(
+  sdb: ScopedDb,
+  size = 8,
+): Promise<DecideItem[]> {
+  const pool = await sdb.q
     .select()
     .from(questions)
     .where(
@@ -38,13 +41,14 @@ export async function buildDecideRound(size = 8): Promise<DecideItem[]> {
     )
     .all();
 
-  const history = await db
+  // The prediction is calibrated on this account's record, nobody else's.
+  const history = await sdb.q
     .select({
       questionId: attempts.questionId,
       correct: attempts.correct,
     })
     .from(attempts)
-    .where(eq(attempts.focus, "focused"))
+    .where(sdb.own(attempts, eq(attempts.focus, "focused")))
     .all();
   const byQuestion = new Map(pool.map((q) => [q.id, q]));
   const cellStats = new Map<string, { correct: number; total: number }>();

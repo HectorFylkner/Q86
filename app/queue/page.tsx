@@ -1,7 +1,7 @@
 import { and, desc, eq, gt, lte } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { attempts, questions, redoQueue } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -12,10 +12,11 @@ export default async function QueuePage({
 }: {
   searchParams: Promise<{ start?: string }>;
 }) {
+  const { sdb } = await requireScoped();
   const { start } = await searchParams;
   const now = new Date();
 
-  const due = (await db
+  const due = (await sdb.q
     .select({
       id: redoQueue.id,
       questionId: redoQueue.questionId,
@@ -27,11 +28,16 @@ export default async function QueuePage({
     })
     .from(redoQueue)
     .innerJoin(questions, eq(redoQueue.questionId, questions.id))
-    .where(and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, now)))
+    .where(
+      sdb.own(
+        redoQueue,
+        and(eq(redoQueue.cleared, false), lte(redoQueue.dueAt, now)),
+      ),
+    )
     .orderBy(redoQueue.dueAt)
     .all()) as DueRow[];
 
-  const upcoming = (await db
+  const upcoming = (await sdb.q
     .select({
       id: redoQueue.id,
       questionId: redoQueue.questionId,
@@ -43,12 +49,17 @@ export default async function QueuePage({
     })
     .from(redoQueue)
     .innerJoin(questions, eq(redoQueue.questionId, questions.id))
-    .where(and(eq(redoQueue.cleared, false), gt(redoQueue.dueAt, now)))
+    .where(
+      sdb.own(
+        redoQueue,
+        and(eq(redoQueue.cleared, false), gt(redoQueue.dueAt, now)),
+      ),
+    )
     .orderBy(redoQueue.dueAt)
     .limit(30)
     .all()) as DueRow[];
 
-  const log = (await db
+  const log = (await sdb.q
     .select({
       id: attempts.id,
       createdAt: attempts.createdAt,
@@ -67,6 +78,7 @@ export default async function QueuePage({
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
+    .where(sdb.own(attempts))
     .orderBy(desc(attempts.id))
     .limit(500)
     .all()) as LogRow[];

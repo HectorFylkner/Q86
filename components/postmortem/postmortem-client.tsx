@@ -42,9 +42,13 @@ type TwinState =
 export function PostmortemClient({
   attempt,
   question,
+  canGenerate,
 }: {
   attempt: Attempt;
   question: Question;
+  /** Twin generation writes into the shared verified bank, so it is the
+   *  operator's tool, not a subscriber's (ADR 0001 §2). */
+  canGenerate: boolean;
 }) {
   const [images, setImages] = useState<string[]>([]);
   const [coachState, setCoachState] = useState<CoachState>({ kind: "idle" });
@@ -357,7 +361,7 @@ export function PostmortemClient({
         </section>
       )}
 
-      {(coach || attempt.aiFeedbackMd) && (
+      {canGenerate && (coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">Twin drills</h2>
           <p className="mt-1 text-sm text-graphite">

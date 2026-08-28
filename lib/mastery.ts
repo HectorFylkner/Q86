@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { attempts, questions } from "./db/schema.ts";
 import {
   ALL_SUBTOPICS,
@@ -40,8 +40,8 @@ export type Ladder = {
   mastered: boolean;
 };
 
-export async function computeLadders(): Promise<Ladder[]> {
-  const rows = await db
+export async function computeLadders(sdb: ScopedDb): Promise<Ladder[]> {
+  const rows = await sdb.q
     .select({
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
@@ -50,12 +50,13 @@ export async function computeLadders(): Promise<Ladder[]> {
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(eq(attempts.focus, "focused"))
+    .where(sdb.own(attempts, eq(attempts.focus, "focused")))
     .orderBy(desc(attempts.id))
     .limit(5000)
     .all();
 
-  const bank = await db
+  // Availability is a property of the shared bank, not of the account.
+  const bank = await sdb.q
     .select({ subtopic: questions.subtopic, difficulty: questions.difficulty })
     .from(questions)
     .where(eq(questions.verified, true))

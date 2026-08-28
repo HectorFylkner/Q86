@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { and, desc, eq, inArray } from "drizzle-orm";
+import { requireAdmin, requireScoped } from "./auth/session.ts";
 import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import {
   attempts,
   baselineReports,
@@ -15,7 +17,8 @@ import {
   sessions,
   type Question,
 } from "./db/schema.ts";
-import { USER_RETIRED_KEY, userRetiredIds } from "./db/seed-bank.ts";
+import { putAppSetting } from "./db/app-settings.ts";
+import { userRetiredIds } from "./db/seed-bank.ts";
 import { selectChapterTest } from "./chapter-tests.ts";
 import { nextReview, type ReviewGrade } from "./srs.ts";
 import { ELO_START, nextRating } from "./elo.ts";
@@ -57,7 +60,8 @@ export async function startDrill(config: {
   timing: DrillTiming;
   focus?: SessionFocus;
 }): Promise<StartDrillResult> {
-  const picked = await selectQuestions(config.filter, config.count);
+  const { sdb } = await requireScoped();
+  const picked = await selectQuestions(sdb, config.filter, config.count);
   if (picked.length === 0) {
     return {
       error:
@@ -66,14 +70,10 @@ export async function startDrill(config: {
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: config as unknown as Record<string, unknown>,
-    })
-    .returning()
-    .get();
+  const session = await sdb.insert(sessions, {
+    mode: "drill",
+    config: config as unknown as Record<string, unknown>,
+  });
   return { error: null, sessionId: session.id, questions: picked };
 }
 
@@ -81,7 +81,8 @@ export async function startDrill(config: {
 export async function startChapterTest(
   subtopic: Subtopic,
 ): Promise<StartDrillResult> {
-  const picked = await selectChapterTest(subtopic);
+  const { sdb } = await requireScoped();
+  const picked = await selectChapterTest(sdb, subtopic);
   if (picked.length < 4) {
     return {
       error: "Not enough verified questions in this chapter for a test.",
@@ -89,24 +90,21 @@ export async function startChapterTest(
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({
-      mode: "drill",
-      config: { chapter_test: subtopic, count: picked.length },
-    })
-    .returning()
-    .get();
+  const session = await sdb.insert(sessions, {
+    mode: "drill",
+    config: { chapter_test: subtopic, count: picked.length },
+  });
   return { error: null, sessionId: session.id, questions: picked };
 }
 
 export async function startRedoSession(
   questionIds: number[],
 ): Promise<StartDrillResult> {
+  const { sdb } = await requireScoped();
   if (questionIds.length === 0) {
     return { error: "Nothing due to redo.", sessionId: null, questions: [] };
   }
-  const rows = await db
+  const rows = await sdb.q
     .select()
     .from(questions)
     .where(
@@ -117,11 +115,10 @@ export async function startRedoSession(
   const ordered = questionIds
     .map((id) => byId.get(id))
     .filter((q): q is Question => Boolean(q));
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "redo", config: { questionIds } })
-    .returning()
-    .get();
+  const session = await sdb.insert(sessions, {
+    mode: "redo",
+    config: { questionIds },
+  });
   return { error: null, sessionId: session.id, questions: ordered };
 }
 
@@ -130,10 +127,11 @@ export async function startRedoSession(
 export async function startDrillWithQuestions(
   questionIds: number[],
 ): Promise<StartDrillResult> {
+  const { sdb } = await requireScoped();
   if (questionIds.length === 0) {
     return { error: "No questions to drill.", sessionId: null, questions: [] };
   }
-  const rows = await db
+  const rows = await sdb.q
     .select()
     .from(questions)
     .where(
@@ -151,11 +149,10 @@ export async function startDrillWithQuestions(
       questions: [],
     };
   }
-  const session = await db
-    .insert(sessions)
-    .values({ mode: "drill", config: { questionIds } })
-    .returning()
-    .get();
+  const session = await sdb.insert(sessions, {
+    mode: "drill",
+    config: { questionIds },
+  });
   return { error: null, sessionId: session.id, questions: ordered };
 }
 
@@ -168,7 +165,8 @@ export async function logAttempt(input: {
   confidence: Confidence;
   focus?: SessionFocus;
 }): Promise<{ attemptId: number; correct: boolean }> {
-  const q = await db
+  const { sdb } = await requireScoped();
+  const q = await sdb.q
     .select()
     .from(questions)
     .where(eq(questions.id, input.questionId))
@@ -176,28 +174,40 @@ export async function logAttempt(input: {
   if (!q) throw new Error(`Question ${input.questionId} not found`);
   const correct = input.selectedIndex === q.correctIndex;
 
-  const attempt = await db
-    .insert(attempts)
-    .values({
-      questionId: input.questionId,
-      sessionId: input.sessionId,
-      mode: input.mode,
-      focus: input.focus ?? "focused",
-      selectedIndex: input.selectedIndex,
-      correct,
-      timeSeconds: input.timeSeconds,
-      confidence: input.confidence,
-    })
-    .returning()
-    .get();
+  // A session id supplied by the client is only honoured if the caller
+  // owns that session; otherwise the attempt is recorded unattached.
+  const sessionId = await ownedSessionId(sdb, input.sessionId);
+
+  const attempt = await sdb.insert(attempts, {
+    questionId: input.questionId,
+    sessionId,
+    mode: input.mode,
+    focus: input.focus ?? "focused",
+    selectedIndex: input.selectedIndex,
+    correct,
+    timeSeconds: input.timeSeconds,
+    confidence: input.confidence,
+  });
 
   if (input.mode === "redo") {
-    await applyRedoResult(q.id, correct, input.timeSeconds);
+    await applyRedoResult(sdb, q.id, correct, input.timeSeconds);
   } else if (!correct) {
-    await enqueueMiss(q.id, attempt.id);
+    await enqueueMiss(sdb, q.id, attempt.id);
   }
 
   return { attemptId: attempt.id, correct };
+}
+
+/** Null unless the session exists and belongs to the caller. Client-sent
+ *  ids are untrusted input, so they are resolved through the tenant
+ *  predicate before anything is written against them. */
+async function ownedSessionId(
+  sdb: ScopedDb,
+  candidate: number | null,
+): Promise<number | null> {
+  if (candidate == null) return null;
+  const owned = await sdb.row(sessions, eq(sessions.id, candidate));
+  return owned ? owned.id : null;
 }
 
 export type QuestionHistoryRow = {
@@ -212,7 +222,8 @@ export type QuestionHistoryRow = {
 export async function getQuestionHistory(
   questionId: number,
 ): Promise<QuestionHistoryRow[]> {
-  return db
+  const { sdb } = await requireScoped();
+  return sdb.q
     .select({
       correct: attempts.correct,
       timeSeconds: attempts.timeSeconds,
@@ -221,7 +232,7 @@ export async function getQuestionHistory(
       createdAt: attempts.createdAt,
     })
     .from(attempts)
-    .where(eq(attempts.questionId, questionId))
+    .where(sdb.own(attempts, eq(attempts.questionId, questionId)))
     .orderBy(desc(attempts.id))
     .limit(12)
     .all();
@@ -235,18 +246,20 @@ export async function tagAttempt(
     userNotes?: string | null;
   },
 ): Promise<void> {
-  await db.update(attempts).set(patch).where(eq(attempts.id, attemptId)).run();
+  const { sdb } = await requireScoped();
+  await sdb.update(attempts, patch, eq(attempts.id, attemptId));
 }
 
 export async function finishSession(
   sessionId: number,
   summary: Record<string, unknown>,
 ): Promise<void> {
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, sessionId))
-    .run();
+  const { sdb } = await requireScoped();
+  await sdb.update(
+    sessions,
+    { endedAt: new Date(), summary },
+    eq(sessions.id, sessionId),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -265,8 +278,9 @@ export async function startTimedSet(config: {
   showTimer: boolean;
   focus?: SessionFocus;
 }): Promise<StartTimedResult> {
+  const { sdb } = await requireScoped();
   const total = config.kind === "full" ? 21 : 7;
-  const picked = await selectTimedSet(total, config.skill);
+  const picked = await selectTimedSet(sdb, total, config.skill);
   if (picked.length < total) {
     return {
       error: `Not enough verified questions for a ${total}-question set (${picked.length} available). Run pnpm seed or generate more from the drill screen.`,
@@ -276,11 +290,10 @@ export async function startTimedSet(config: {
     };
   }
   const mode = config.kind === "full" ? "section_sim" : "timed_set";
-  const session = await db
-    .insert(sessions)
-    .values({ mode, config: config as unknown as Record<string, unknown> })
-    .returning()
-    .get();
+  const session = await sdb.insert(sessions, {
+    mode,
+    config: config as unknown as Record<string, unknown>,
+  });
   return { error: null, sessionId: session.id, questions: picked, mode };
 }
 
@@ -317,6 +330,7 @@ export async function saveTimedSession(input: {
   notReachedCount: number;
   focus?: SessionFocus;
 }): Promise<SaveTimedResponse> {
+  const { sdb } = await requireScoped();
   if (input.edits.length > 3) {
     throw new Error("A section allows at most 3 edits.");
   }
@@ -328,7 +342,14 @@ export async function saveTimedSession(input: {
     }
   }
 
-  const questionRows = await db
+  // The session must be the caller's, or the whole save is refused —
+  // otherwise a forged id could append attempts to a stranger's section.
+  const sessionId = await ownedSessionId(sdb, input.sessionId);
+  if (sessionId == null) {
+    throw new Error(`Session ${input.sessionId} not found`);
+  }
+
+  const questionRows = await sdb.q
     .select()
     .from(questions)
     .where(
@@ -343,45 +364,38 @@ export async function saveTimedSession(input: {
   const attemptIdByQuestionId: Record<number, number> = {};
   const correctByQuestionId: Record<number, boolean> = {};
 
-  await db.transaction(async (tx) => {
+  await sdb.transaction(async (tx) => {
     for (const result of input.results) {
       const q = byId.get(result.questionId);
       if (!q) throw new Error(`Question ${result.questionId} not found`);
       const correct = result.selectedIndex === q.correctIndex;
       correctByQuestionId[q.id] = correct;
-      const attempt = await tx
-        .insert(attempts)
-        .values({
-          questionId: q.id,
-          sessionId: input.sessionId,
-          mode: input.mode,
-          focus: input.focus ?? "focused",
-          selectedIndex: result.selectedIndex,
-          correct,
-          timeSeconds: result.timeSeconds,
-          confidence: result.confidence,
-        })
-        .returning()
-        .get();
+      const attempt = await tx.insert(attempts, {
+        questionId: q.id,
+        sessionId,
+        mode: input.mode,
+        focus: input.focus ?? "focused",
+        selectedIndex: result.selectedIndex,
+        correct,
+        timeSeconds: result.timeSeconds,
+        confidence: result.confidence,
+      });
       attemptIdByQuestionId[q.id] = attempt.id;
     }
 
     for (const edit of input.edits) {
       const q = byId.get(edit.questionId);
       if (!q) continue;
-      await tx
-        .insert(edits)
-        .values({
-          sessionId: input.sessionId,
-          questionId: edit.questionId,
-          fromIndex: edit.fromIndex,
-          toIndex: edit.toIndex,
-          fromCorrect: edit.fromIndex === q.correctIndex,
-          toCorrect: edit.toIndex === q.correctIndex,
-          reason: edit.reason,
-          justification: edit.justification.trim(),
-        })
-        .run();
+      await tx.add(edits, {
+        sessionId,
+        questionId: edit.questionId,
+        fromIndex: edit.fromIndex,
+        toIndex: edit.toIndex,
+        fromCorrect: edit.fromIndex === q.correctIndex,
+        toCorrect: edit.toIndex === q.correctIndex,
+        reason: edit.reason,
+        justification: edit.justification.trim(),
+      });
     }
   });
 
@@ -389,6 +403,7 @@ export async function saveTimedSession(input: {
   for (const result of input.results) {
     if (!correctByQuestionId[result.questionId]) {
       await enqueueMiss(
+        sdb,
         result.questionId,
         attemptIdByQuestionId[result.questionId],
       );
@@ -405,7 +420,7 @@ export async function saveTimedSession(input: {
     );
   }, 0);
 
-  const allEdits = await db.select().from(edits).all();
+  const allEdits = await sdb.rows(edits);
   const lifetimeEditNet = allEdits.reduce(
     (net, e) => net + (e.toCorrect ? 1 : 0) - (e.fromCorrect ? 1 : 0),
     0,
@@ -425,11 +440,11 @@ export async function saveTimedSession(input: {
     notReached: input.notReachedCount,
     durationSeconds: input.durationSeconds,
   };
-  await db
-    .update(sessions)
-    .set({ endedAt: new Date(), summary })
-    .where(eq(sessions.id, input.sessionId))
-    .run();
+  await sdb.update(
+    sessions,
+    { endedAt: new Date(), summary },
+    eq(sessions.id, sessionId),
+  );
 
   return {
     attemptIdByQuestionId,
@@ -465,45 +480,39 @@ export async function savePatternRound(input: {
   category: string; // a category key or "mixed"
   items: PatternRoundItem[];
 }): Promise<PatternRoundResult> {
+  const { sdb } = await requireScoped();
   const score = input.items.filter((i) => i.correct).length;
 
   // Previous best round score for this selection, from session summaries.
-  const previousBest = await bestRoundScore(input.category);
+  const previousBest = await bestRoundScore(sdb, input.category);
 
   const touched = [...new Set(input.items.map((i) => i.category))];
   const oldRatings: Record<string, number> = {};
   for (const category of touched) {
-    const row = await db
-      .select()
-      .from(eloRatings)
-      .where(eq(eloRatings.category, category))
-      .get();
+    const row = await sdb.row(
+      eloRatings,
+      eq(eloRatings.category, category),
+    );
     oldRatings[category] = row?.rating ?? ELO_START;
   }
 
   const newRatings = { ...oldRatings };
-  await db.transaction(async (tx) => {
-    await tx
-      .insert(sessions)
-      .values({
-        mode: "pattern",
-        config: { category: input.category },
-        endedAt: new Date(),
-        summary: { category: input.category, score, total: input.items.length },
-      })
-      .run();
+  await sdb.transaction(async (tx) => {
+    await tx.add(sessions, {
+      mode: "pattern",
+      config: { category: input.category },
+      endedAt: new Date(),
+      summary: { category: input.category, score, total: input.items.length },
+    });
     for (const item of input.items) {
-      await tx
-        .insert(patternAttempts)
-        .values({
-          category: item.category,
-          promptText: item.promptText,
-          correctAnswer: item.correctAnswer,
-          userAnswer: item.userAnswer,
-          ms: item.ms,
-          correct: item.correct,
-        })
-        .run();
+      await tx.add(patternAttempts, {
+        category: item.category,
+        promptText: item.promptText,
+        correctAnswer: item.correctAnswer,
+        userAnswer: item.userAnswer,
+        ms: item.ms,
+        correct: item.correct,
+      });
       newRatings[item.category] = nextRating(
         newRatings[item.category],
         item.difficultyRating,
@@ -511,25 +520,28 @@ export async function savePatternRound(input: {
       );
     }
     for (const category of touched) {
-      await tx
+      // The rating is per account, so the conflict target is the composite
+      // key — a shared (category) target would collide across users.
+      await tx.q
         .insert(eloRatings)
         .values({
+          userId: tx.userId,
           category,
           rating: newRatings[category],
           updatedAt: new Date(),
         })
         .onConflictDoUpdate({
-          target: eloRatings.category,
+          target: [eloRatings.userId, eloRatings.category],
           set: { rating: newRatings[category], updatedAt: new Date() },
         })
         .run();
     }
   });
 
-  const dayStreak = await computeDayStreak();
+  const dayStreak = await computeDayStreak(sdb);
   const categoryStreaks: Record<string, number> = {};
   for (const category of touched) {
-    categoryStreaks[category] = await computeCategoryStreak(category);
+    categoryStreaks[category] = await computeCategoryStreak(sdb, category);
   }
 
   return {
@@ -554,20 +566,18 @@ export async function saveDecisionRound(input: {
   aligned: number;
   calls: Array<{ questionId: number; call: string; recommendation: string }>;
 }): Promise<void> {
-  await db
-    .insert(sessions)
-    .values({
-      mode: "pattern",
-      config: { kind: "decision" },
-      endedAt: new Date(),
-      summary: {
-        kind: "decision",
-        total: input.total,
-        aligned: input.aligned,
-        calls: input.calls,
-      },
-    })
-    .run();
+  const { sdb } = await requireScoped();
+  await sdb.add(sessions, {
+    mode: "pattern",
+    config: { kind: "decision" },
+    endedAt: new Date(),
+    summary: {
+      kind: "decision",
+      total: input.total,
+      aligned: input.aligned,
+      calls: input.calls,
+    },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -575,24 +585,22 @@ export async function saveDecisionRound(input: {
 // ---------------------------------------------------------------------------
 
 export async function saveSetting(
-  key: "test_date" | "timed_set_cadence" | "weight_overrides" | "model",
+  key: "test_date" | "timed_set_cadence" | "weight_overrides" | "locale",
   value: string,
 ): Promise<void> {
-  await putSetting(key, value);
+  const { sdb } = await requireScoped();
+  await putSetting(sdb, key, value);
 }
 
 export async function saveBaselineReport(input: {
   rawText: string;
   parsed: ParsedReport;
 }): Promise<{ id: number }> {
-  const row = await db
-    .insert(baselineReports)
-    .values({
-      rawText: input.rawText,
-      parsed: input.parsed as unknown as Record<string, unknown>,
-    })
-    .returning()
-    .get();
+  const { sdb } = await requireScoped();
+  const row = await sdb.insert(baselineReports, {
+    rawText: input.rawText,
+    parsed: input.parsed as unknown as Record<string, unknown>,
+  });
   return { id: row.id };
 }
 
@@ -604,22 +612,21 @@ export async function gradeDeckCard(
   questionId: number,
   grade: ReviewGrade,
 ): Promise<void> {
-  const existing =
-    (await db
-      .select()
-      .from(deckReviews)
-      .where(eq(deckReviews.questionId, questionId))
-      .get()) ?? null;
+  const { sdb } = await requireScoped();
+  const existing = await sdb.row(
+    deckReviews,
+    eq(deckReviews.questionId, questionId),
+  );
   const next = nextReview(existing, grade);
   const dueAt = new Date(Date.now() + next.intervalDays * 86_400_000);
   if (existing) {
-    await db
-      .update(deckReviews)
-      .set({ ...next, dueAt, updatedAt: new Date() })
-      .where(eq(deckReviews.questionId, questionId))
-      .run();
+    await sdb.update(
+      deckReviews,
+      { ...next, dueAt, updatedAt: new Date() },
+      eq(deckReviews.questionId, questionId),
+    );
   } else {
-    await db.insert(deckReviews).values({ questionId, ...next, dueAt }).run();
+    await sdb.add(deckReviews, { questionId, ...next, dueAt });
   }
 }
 
@@ -628,22 +635,28 @@ export async function flagQuestion(input: {
   reason: FlagReason;
   note?: string;
 }): Promise<void> {
-  await db
-    .insert(questionFlags)
-    .values({
-      questionId: input.questionId,
-      reason: input.reason,
-      note: input.note?.trim() || null,
-    })
-    .run();
+  const { sdb } = await requireScoped();
+  await sdb.add(questionFlags, {
+    questionId: input.questionId,
+    reason: input.reason,
+    note: input.note?.trim() || null,
+  });
 }
 
-/** Resolve a flag; optionally retire the question (verified=false — rows
- *  are never deleted, and the seed loader will not re-verify it). */
+/**
+ * Resolve a flag; optionally retire the question (verified=false — rows
+ * are never deleted, and the seed loader will not re-verify it).
+ *
+ * Retiring is a change to the shared bank, so its consequence reaches
+ * every account. That makes it adjudication rather than a preference, and
+ * ADR 0001 §3 puts it behind the admin role: a subscriber can report a
+ * question, but only the operator can withdraw one.
+ */
 export async function resolveFlag(
   flagId: number,
   retire: boolean,
 ): Promise<void> {
+  await requireAdmin();
   const flag = await db
     .select()
     .from(questionFlags)
@@ -663,7 +676,7 @@ export async function resolveFlag(
       .run();
     const retired = await userRetiredIds();
     retired.add(flag.questionId);
-    await putSetting(USER_RETIRED_KEY, JSON.stringify([...retired]));
+    await putAppSetting("user_retired_qids", JSON.stringify([...retired]));
   }
   revalidatePath("/analytics");
 }

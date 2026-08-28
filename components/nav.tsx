@@ -40,7 +40,7 @@ function isActive(routes: string[], pathname: string): boolean {
   );
 }
 
-export function Nav() {
+export function Nav({ userEmail }: { userEmail: string }) {
   const pathname = usePathname();
 
   return (
@@ -78,8 +78,34 @@ export function Nav() {
           })}
         </nav>
         <ThemeToggle />
+        <AccountMenu email={userEmail} />
       </div>
     </header>
+  );
+}
+
+/**
+ * Identity and the way out. Sign-out is a POST form, never a link: a GET
+ * logout endpoint can be triggered by any page that can embed an image.
+ */
+function AccountMenu({ email }: { email: string }) {
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <span
+        title={email}
+        className="hidden max-w-[14ch] truncate font-mono text-[11px] text-graphite lg:inline"
+      >
+        {email}
+      </span>
+      <form action="/api/auth/logout" method="POST">
+        <button
+          type="submit"
+          className="rounded-control border border-grid px-2.5 py-1 text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
+        >
+          Logga ut
+        </button>
+      </form>
+    </div>
   );
 }
 

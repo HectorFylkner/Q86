@@ -1,5 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { attempts, deckReviews, questions } from "./db/schema.ts";
 import { previewIntervals, type ReviewGrade } from "./srs.ts";
 import { SUBTOPIC_LABELS, type Subtopic } from "./taxonomy.ts";
@@ -33,13 +33,13 @@ function section(md: string, header: string): string | null {
   return (next < 0 ? rest : rest.slice(0, next)).trim();
 }
 
-export async function todaysDeck(): Promise<{
+export async function todaysDeck(sdb: ScopedDb): Promise<{
   cards: DeckCard[];
   due: number;
   fresh: number;
   scheduled: number;
 }> {
-  const misses = await db
+  const misses = await sdb.q
     .select({
       questionId: attempts.questionId,
       createdAt: attempts.createdAt,
@@ -48,13 +48,18 @@ export async function todaysDeck(): Promise<{
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(and(eq(attempts.correct, false), eq(attempts.focus, "focused")))
+    .where(
+      sdb.own(
+        attempts,
+        and(eq(attempts.correct, false), eq(attempts.focus, "focused")),
+      ),
+    )
     .orderBy(desc(attempts.id))
     .limit(300)
     .all();
 
   const reviews = new Map(
-    (await db.select().from(deckReviews).all()).map((r) => [r.questionId, r]),
+    (await sdb.rows(deckReviews)).map((r) => [r.questionId, r]),
   );
 
   // One card per question (most recent miss wins), newest first.

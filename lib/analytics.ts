@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import {
   attempts,
   edits,
@@ -116,8 +116,10 @@ const EXPECTED_BY_CONFIDENCE: Record<Confidence, number> = {
   lock: 95,
 };
 
-export async function gatherAnalytics(): Promise<AnalyticsData> {
-  const rows = await db
+export async function gatherAnalytics(
+  sdb: ScopedDb,
+): Promise<AnalyticsData> {
+  const rows = await sdb.q
     .select({
       id: attempts.id,
       correct: attempts.correct,
@@ -133,16 +135,16 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
     })
     .from(attempts)
     .innerJoin(questions, eq(attempts.questionId, questions.id))
-    .where(eq(attempts.focus, "focused"))
+    .where(sdb.own(attempts, eq(attempts.focus, "focused")))
     .orderBy(desc(attempts.id))
     .limit(5000)
     .all();
 
   // Casual attempts and their sessions stay out of every statistic below.
-  const casualRows = await db
+  const casualRows = await sdb.q
     .select({ sessionId: attempts.sessionId })
     .from(attempts)
-    .where(eq(attempts.focus, "casual"))
+    .where(sdb.own(attempts, eq(attempts.focus, "casual")))
     .all();
   const casualExcluded = casualRows.length;
   const casualSessionIds = new Set(
@@ -196,7 +198,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
 
   // --- edit ledger ----------------------------------------------------------
   const editRows = (
-    await db
+    await sdb.q
       .select({
         id: edits.id,
         createdAt: edits.createdAt,
@@ -210,6 +212,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
       })
       .from(edits)
       .innerJoin(questions, eq(edits.questionId, questions.id))
+      .where(sdb.own(edits))
       .orderBy(desc(edits.id))
       .all()
   ).filter((e) => !casualSessionIds.has(e.sessionId));
@@ -218,13 +221,14 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   const destroyed = editRows.filter((e) => e.fromCorrect && !e.toCorrect).length;
 
   // Lock-confidence answers that were correct and then changed.
-  const attemptConfidence = await db
+  const attemptConfidence = await sdb.q
     .select({
       sessionId: attempts.sessionId,
       questionId: attempts.questionId,
       confidence: attempts.confidence,
     })
     .from(attempts)
+    .where(sdb.own(attempts))
     .all();
   const confidenceByKey = new Map(
     attemptConfidence.map((a) => [`${a.sessionId}|${a.questionId}`, a.confidence]),
@@ -325,7 +329,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
   }
 
   // --- redo compliance ---------------------------------------------------------
-  const redoRows = await db.select().from(redoQueue).all();
+  const redoRows = await sdb.rows(redoQueue);
   const nowMs = Date.now();
   const redoCompliance = {
     open: redoRows.filter((r) => !r.cleared).length,
@@ -340,10 +344,7 @@ export async function gatherAnalytics(): Promise<AnalyticsData> {
 
   // --- pattern ELO ---------------------------------------------------------------
   const eloMap = new Map(
-    (await db.select().from(eloRatings).all()).map((r) => [
-      r.category,
-      r.rating,
-    ]),
+    (await sdb.rows(eloRatings)).map((r) => [r.category, r.rating]),
   );
   const eloBars = PATTERN_CATEGORY_KEYS.map((category) => ({
     category,

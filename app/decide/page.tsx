@@ -1,12 +1,14 @@
 import { DecideClient } from "@/components/decide/decide-client";
 import { SectionTabs } from "@/components/section-tabs";
+import { requireScoped } from "@/lib/auth/session";
 import { buildDecideRound } from "@/lib/decide";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function DecidePage() {
-  const items = await buildDecideRound(8);
+  const { sdb } = await requireScoped();
+  const items = await buildDecideRound(sdb, 8);
 
   return (
     <div className="space-y-4">

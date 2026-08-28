@@ -2,9 +2,11 @@ import { sql } from "drizzle-orm";
 import {
   index,
   integer,
+  primaryKey,
   real,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type {
   Confidence,
@@ -20,6 +22,90 @@ import type {
   SessionMode,
   Subtopic,
 } from "../taxonomy.ts";
+
+
+// ---------------------------------------------------------------------------
+// Identity (ADR 0002). Sessions and tokens are stored as SHA-256 digests:
+// the database never holds a credential that could be replayed.
+// ---------------------------------------------------------------------------
+
+export const users = sqliteTable(
+  "users",
+  {
+    id: text("id").primaryKey(),
+    // Always stored lowercased and trimmed; uniqueness is enforced by index.
+    email: text("email").notNull(),
+    emailVerifiedAt: integer("email_verified_at", { mode: "timestamp_ms" }),
+    // Null for accounts that only ever signed in with Google.
+    passwordHash: text("password_hash"),
+    name: text("name"),
+    locale: text("locale").$type<"sv" | "en">().notNull().default("sv"),
+    role: text("role").$type<"user" | "admin">().notNull().default("user"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [uniqueIndex("users_email_idx").on(t.email)],
+);
+
+/** One row per signed-in browser. `id` is sha256(raw token). */
+export const authSessions = sqliteTable(
+  "auth_sessions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("auth_sessions_user_idx").on(t.userId)],
+);
+
+/** Federated identities. One row per (provider, subject). */
+export const authAccounts = sqliteTable(
+  "auth_accounts",
+  {
+    provider: text("provider").$type<"google">().notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    primaryKey({ columns: [t.provider, t.providerAccountId] }),
+    index("auth_accounts_user_idx").on(t.userId),
+  ],
+);
+
+/** Single-use tokens: password reset, magic link, email verification.
+ *  `id` is sha256(raw token); `usedAt` makes replay a no-op. */
+export const authTokens = sqliteTable(
+  "auth_tokens",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: text("kind")
+      .$type<"password_reset" | "magic_link" | "email_verify">()
+      .notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    usedAt: integer("used_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("auth_tokens_user_idx").on(t.userId, t.kind)],
+);
 
 export const questions = sqliteTable(
   "questions",
@@ -61,23 +147,33 @@ export const questions = sqliteTable(
   ],
 );
 
-export const sessions = sqliteTable("sessions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  mode: text("mode").$type<SessionMode>().notNull(),
-  config: text("config", { mode: "json" })
-    .$type<Record<string, unknown>>()
-    .notNull(),
-  startedAt: integer("started_at", { mode: "timestamp_ms" })
-    .notNull()
-    .default(sql`(unixepoch() * 1000)`),
-  endedAt: integer("ended_at", { mode: "timestamp_ms" }),
-  summary: text("summary", { mode: "json" }).$type<Record<string, unknown>>(),
-});
+export const sessions = sqliteTable(
+  "sessions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    mode: text("mode").$type<SessionMode>().notNull(),
+    config: text("config", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull(),
+    startedAt: integer("started_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    endedAt: integer("ended_at", { mode: "timestamp_ms" }),
+    summary: text("summary", { mode: "json" }).$type<Record<string, unknown>>(),
+  },
+  (t) => [index("sessions_user_idx").on(t.userId, t.mode)],
+);
 
 export const attempts = sqliteTable(
   "attempts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     questionId: integer("question_id")
       .notNull()
       .references(() => questions.id),
@@ -103,37 +199,47 @@ export const attempts = sqliteTable(
       .default(sql`(unixepoch() * 1000)`),
   },
   (t) => [
-    index("attempts_question_idx").on(t.questionId),
+    index("attempts_user_created_idx").on(t.userId, t.createdAt),
+    index("attempts_user_question_idx").on(t.userId, t.questionId),
     index("attempts_session_idx").on(t.sessionId),
-    index("attempts_created_idx").on(t.createdAt),
   ],
 );
 
 // The edit ledger: every Review & Edit answer change, with outcome.
-export const edits = sqliteTable("edits", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  sessionId: integer("session_id")
-    .notNull()
-    .references(() => sessions.id),
-  questionId: integer("question_id")
-    .notNull()
-    .references(() => questions.id),
-  fromIndex: integer("from_index").notNull(),
-  toIndex: integer("to_index").notNull(),
-  fromCorrect: integer("from_correct", { mode: "boolean" }).notNull(),
-  toCorrect: integer("to_correct", { mode: "boolean" }).notNull(),
-  reason: text("reason").$type<EditReason>().notNull(),
-  justification: text("justification").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
-    .notNull()
-    .default(sql`(unixepoch() * 1000)`),
-});
+export const edits = sqliteTable(
+  "edits",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => sessions.id),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id),
+    fromIndex: integer("from_index").notNull(),
+    toIndex: integer("to_index").notNull(),
+    fromCorrect: integer("from_correct", { mode: "boolean" }).notNull(),
+    toCorrect: integer("to_correct", { mode: "boolean" }).notNull(),
+    reason: text("reason").$type<EditReason>().notNull(),
+    justification: text("justification").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("edits_user_idx").on(t.userId)],
+);
 
 // Spaced redo queue: stage 0|1|2 → due +2d / +7d / +21d.
 export const redoQueue = sqliteTable(
   "redo_queue",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     questionId: integer("question_id")
       .notNull()
       .references(() => questions.id),
@@ -144,13 +250,16 @@ export const redoQueue = sqliteTable(
     dueAt: integer("due_at", { mode: "timestamp_ms" }).notNull(),
     cleared: integer("cleared", { mode: "boolean" }).notNull().default(false),
   },
-  (t) => [index("redo_due_idx").on(t.cleared, t.dueAt)],
+  (t) => [index("redo_due_idx").on(t.userId, t.cleared, t.dueAt)],
 );
 
 export const patternAttempts = sqliteTable(
   "pattern_attempts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     category: text("category").notNull(),
     promptText: text("prompt_text").notNull(),
     correctAnswer: text("correct_answer").notNull(),
@@ -161,41 +270,78 @@ export const patternAttempts = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (t) => [index("pattern_category_idx").on(t.category, t.createdAt)],
+  (t) => [index("pattern_category_idx").on(t.userId, t.category, t.createdAt)],
 );
 
-export const eloRatings = sqliteTable("elo_ratings", {
-  category: text("category").primaryKey(),
-  rating: real("rating").notNull().default(1200),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-    .notNull()
-    .default(sql`(unixepoch() * 1000)`),
-});
+export const eloRatings = sqliteTable(
+  "elo_ratings",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    category: text("category").notNull(),
+    rating: real("rating").notNull().default(1200),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.category] })],
+);
 
-export const baselineReports = sqliteTable("baseline_reports", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  rawText: text("raw_text").notNull(),
-  parsed: text("parsed", { mode: "json" })
-    .$type<Record<string, unknown>>()
-    .notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
-    .notNull()
-    .default(sql`(unixepoch() * 1000)`),
-});
+export const baselineReports = sqliteTable(
+  "baseline_reports",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    rawText: text("raw_text").notNull(),
+    parsed: text("parsed", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("baseline_reports_user_idx").on(t.userId, t.createdAt)],
+);
 
 // Keys: test_date, timed_set_cadence, weight overrides, model.
-export const settings = sqliteTable("settings", {
+/**
+ * Instance-wide configuration, owned by the operator rather than by any
+ * account: the AI model override, the seed-loader progress marker, and the
+ * ids of questions retired by admin triage. These lived in `settings`
+ * while Q86 had one user; multi-tenancy separates them so a user cannot
+ * read or write instance state (ADR 0001).
+ */
+export const appSettings = sqliteTable("app_settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
 });
+
+/** Per-account preferences: test_date, timed_set_cadence, weight_overrides. */
+export const settings = sqliteTable(
+  "settings",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    value: text("value").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.key] })],
+);
 
 // Graded-recall scheduling for the takeaway deck: one row per question,
 // updated on every grade (SM-2-lite; see lib/srs.ts).
 export const deckReviews = sqliteTable(
   "deck_reviews",
   {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     questionId: integer("question_id")
-      .primaryKey()
+      .notNull()
       .references(() => questions.id),
     ease: real("ease").notNull().default(2.5),
     intervalDays: integer("interval_days").notNull().default(0),
@@ -206,7 +352,10 @@ export const deckReviews = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (t) => [index("deck_reviews_due_idx").on(t.dueAt)],
+  (t) => [
+    primaryKey({ columns: [t.userId, t.questionId] }),
+    index("deck_reviews_due_idx").on(t.userId, t.dueAt),
+  ],
 );
 
 // Content QC: questions the user flags mid-review. Resolving may retire
@@ -215,6 +364,9 @@ export const questionFlags = sqliteTable(
   "question_flags",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     questionId: integer("question_id")
       .notNull()
       .references(() => questions.id),
@@ -225,9 +377,15 @@ export const questionFlags = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (t) => [index("question_flags_status_idx").on(t.status)],
+  (t) => [index("question_flags_status_idx").on(t.status, t.createdAt)],
 );
 
+export type AppSetting = typeof appSettings.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type AuthSession = typeof authSessions.$inferSelect;
+export type AuthAccount = typeof authAccounts.$inferSelect;
+export type AuthToken = typeof authTokens.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
 export type Session = typeof sessions.$inferSelect;

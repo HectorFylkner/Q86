@@ -1,7 +1,7 @@
 import { count, eq } from "drizzle-orm";
 import { DrillClient } from "@/components/drill/drill-client";
 import type { CountRow } from "@/components/drill/drill-setup";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { questions } from "@/lib/db/schema";
 import { ALL_SUBTOPICS, type Subtopic } from "@/lib/taxonomy";
 
@@ -19,6 +19,7 @@ export default async function DrillPage({
     test?: string;
   }>;
 }) {
+  const { user, sdb } = await requireScoped();
   const { qids, plan, sub, d, test } = await searchParams;
   let autoStartIds =
     qids
@@ -29,10 +30,10 @@ export default async function DrillPage({
   // One-click launch of today's weighted drill block (F8).
   if (!autoStartIds?.length && plan === "1") {
     const { todaysPlan, selectPlanDrillIds } = await import("@/lib/plan-server");
-    autoStartIds = await selectPlanDrillIds(await todaysPlan());
+    autoStartIds = await selectPlanDrillIds(sdb, await todaysPlan(sdb));
   }
 
-  const rows = (await db
+  const rows = (await sdb.q
     .select({
       subtopic: questions.subtopic,
       difficulty: questions.difficulty,
@@ -67,6 +68,7 @@ export default async function DrillPage({
         autoStartIds={autoStartIds?.length ? autoStartIds : null}
         autoStartRung={autoStartRung}
         autoStartTest={autoStartTest}
+        canGenerate={user.role === "admin"}
       />
     </div>
   );

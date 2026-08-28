@@ -16,6 +16,7 @@ import {
   TrapGallery,
   WhyLede,
 } from "@/components/lesson/sections";
+import { requireScoped } from "@/lib/auth/session";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { parseLesson } from "@/lib/lesson-parse";
 import { listLessons, readLesson } from "@/lib/lessons";
@@ -50,7 +51,8 @@ export default async function LessonPage({
   if (!lesson) notFound();
 
   const parsed = parseLesson(lesson.body);
-  const testState = (await chapterTestStates())[subtopic as Subtopic];
+  const { sdb } = await requireScoped();
+  const testState = (await chapterTestStates(sdb))[subtopic as Subtopic];
   const chapters = listLessons();
   const at = chapters.findIndex((c) => c.subtopic === subtopic);
   const meta = at >= 0 ? chapters[at] : null;

@@ -15,6 +15,13 @@
       "when": 1783242991470,
       "tag": "0001_deep_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1787908035125,
+      "tag": "0002_multitenant",
+      "breakpoints": true
     }
   ]
 }

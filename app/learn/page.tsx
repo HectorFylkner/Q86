@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
+import { requireScoped } from "@/lib/auth/session";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
@@ -15,8 +16,9 @@ const METHOD = [
 ];
 
 export default async function LearnPage() {
+  const { sdb } = await requireScoped();
   const lessons = listLessons();
-  const tests = await chapterTestStates();
+  const tests = await chapterTestStates(sdb);
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
 

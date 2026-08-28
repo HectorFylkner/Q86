@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { and, count, eq } from "drizzle-orm";
+import { getAppSetting } from "./app-settings.ts";
 import { db } from "./index.ts";
-import { questions, settings } from "./schema.ts";
+import { questions } from "./schema.ts";
 
 /** Shape of one committed bank item (scripts/seed-bank.json). */
 export type BankQuestion = {
@@ -31,19 +32,16 @@ export function readBank(): { questions: BankQuestion[] } {
   return JSON.parse(fs.readFileSync(BANK_PATH, "utf8"));
 }
 
-/** Questions the user retired via a content flag. The loader must never
- *  re-verify these, or a retirement would undo itself on the next boot. */
+/** Questions retired by admin triage. The loader must never re-verify
+ *  these, or a retirement would undo itself on the next boot. Instance
+ *  state, not account state — see lib/db/app-settings.ts. */
 export const USER_RETIRED_KEY = "user_retired_qids";
 
 export async function userRetiredIds(): Promise<Set<number>> {
-  const row = await db
-    .select({ value: settings.value })
-    .from(settings)
-    .where(eq(settings.key, USER_RETIRED_KEY))
-    .get();
-  if (!row) return new Set();
+  const raw = await getAppSetting("user_retired_qids");
+  if (!raw) return new Set();
   try {
-    const ids = JSON.parse(row.value) as unknown;
+    const ids = JSON.parse(raw) as unknown;
     return new Set(Array.isArray(ids) ? ids.filter(Number.isInteger) : []);
   } catch {
     return new Set();

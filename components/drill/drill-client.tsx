@@ -29,11 +29,13 @@ export function DrillClient({
   autoStartIds,
   autoStartRung,
   autoStartTest,
+  canGenerate,
 }: {
   rows: CountRow[];
   autoStartIds?: number[] | null;
   autoStartRung?: { subtopic: string; difficulty: number } | null;
   autoStartTest?: Subtopic | null;
+  canGenerate: boolean;
 }) {
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
@@ -157,5 +159,12 @@ export function DrillClient({
     );
   }
 
-  return <DrillSetup rows={rows} error={stage.error} onStart={handleStart} />;
+  return (
+    <DrillSetup
+      rows={rows}
+      error={stage.error}
+      onStart={handleStart}
+      canGenerate={canGenerate}
+    />
+  );
 }

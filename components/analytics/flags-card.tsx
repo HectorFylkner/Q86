@@ -2,13 +2,27 @@ import { desc, eq } from "drizzle-orm";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
 import { resolveFlag } from "@/lib/actions";
+import { currentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { questionFlags, questions } from "@/lib/db/schema";
 import { FLAG_REASON_LABELS, SUBTOPIC_LABELS } from "@/lib/taxonomy";
 
-/** Open content flags with resolve / retire actions. Renders nothing when
- *  the review list is empty. */
+/**
+ * Open content flags, with resolve / retire actions.
+ *
+ * Triage is deliberately cross-tenant: a flag is a report about the shared
+ * bank, and retiring a question affects every account, so the operator has
+ * to see every account's reports. That makes this one of the few surfaces
+ * that legitimately reads past the tenant predicate — and therefore one
+ * that must refuse to render for anyone but an admin. M6 moves it into the
+ * admin section proper; the guard is here so it is never merely hidden.
+ *
+ * Renders nothing for non-admins, and nothing when the list is empty.
+ */
 export async function FlagsCard() {
+  const viewer = await currentUser();
+  if (viewer?.role !== "admin") return null;
+
   const open = await db
     .select({
       id: questionFlags.id,

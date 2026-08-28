@@ -12,14 +12,14 @@ unverified.
 
 ## Current milestone
 
-**M0 — Decision record.** Complete.
+**M1 — Multi-tenancy and accounts.** Complete.
 
 ## Milestone status
 
 | # | Milestone | State | Commit |
 |---|-----------|-------|--------|
 | M0 | Decision record | ✅ done | see git log |
-| M1 | Multi-tenancy and accounts | ⬜ not started | — |
+| M1 | Multi-tenancy and accounts | ✅ done | see git log |
 | M2 | Billing and entitlements | ⬜ not started | — |
 | M3 | Swedish localization | ⬜ not started | — |
 | M4 | Public site and acquisition funnel | ⬜ not started | — |
@@ -38,11 +38,50 @@ Commands run in this session and what they printed.
 | `pnpm install --prefer-offline` | exit 0 | M0 |
 | `npx tsc --noEmit` | exit 0, no output | M0 baseline |
 | `pnpm lint` | 26 problems, **0 errors**, 26 warnings (all pre-existing, all `no-unused-vars` in `scripts/author/*.mjs`) | M0 baseline |
+| `pnpm lint` | exit 0 — 26 problems, **0 errors**, same 26 pre-existing warnings | M1 |
+| `pnpm typecheck` | exit 0, no output | M1 |
+| `pnpm test` (vitest) | **51 passed**, 4 files, 0 failed | M1 |
+| `pnpm build` | `✓ Compiled successfully`, 26 routes | M1 |
+| `npx playwright test` | **9 passed**, 0 failed (chromium) | M1 |
+| `pnpm migrate:multitenant --dry-run` | reported 53 user-owned rows across 10 tables, wrote nothing | M1 |
+| `pnpm migrate:multitenant` | backup written; counts preserved; `settings` 5 → 2 + 3 in `app_settings`; **no FK violations** | M1 |
+| `pnpm claim-owner --email=… --password=…` | legacy owner claimed; 40 attempts still owned by `usr_legacy_owner`; hash is `scrypt$16384$8…` | M1 |
 
 ## Known broken
 
-Nothing known broken. No test framework exists yet — that is M1's first
-task, and until it lands "the test suite" is not a thing that can be run.
+Nothing known broken.
+
+## Test suite (established in M1)
+
+- **Vitest** (`pnpm test`) — 51 tests over 4 files, run against a real
+  libSQL database, one fresh SQLite file per test file. Only `next/headers`
+  and `next/cache` are stubbed; the data layer is never mocked.
+  - `migration-tenancy.test.ts` — the 0002 migration against a populated
+    single-user fixture with rows in all ten owned tables.
+  - `tenant-isolation.test.ts` — user B cannot read or mutate user A's rows
+    through any server action.
+  - `tenancy-structure.test.ts` — the choke point cannot erode: no raw
+    handle outside the allowlist, no un-scoped query, no unregistered owned
+    table, no trace of the old shared password.
+  - `auth.test.ts` — hashing, sessions, single-use tokens, reset flow.
+- **Playwright** (`npx playwright test`) — 9 tests against a production
+  build. Chromium is resolved from `PLAYWRIGHT_BROWSERS_PATH`; nothing is
+  downloaded.
+
+## Decisions taken during M1 that change the product
+
+- **Question generation is now admin-only.** `/api/generate` writes into the
+  shared bank, so a subscriber generating questions would extend every
+  account's bank with items that never passed the authoring harness. The
+  route returns 403 to non-admins and the two UI entry points (drill setup,
+  post-mortem twins) are hidden unless `role === "admin"`.
+- **Flag triage is admin-only.** Reporting a question stays open to
+  everyone; retiring one is adjudication over shared content.
+- **`/api/export` no longer includes the question bank.** A personal export
+  is the account's own rows plus the ids of questions it references.
+- **`settings` split.** `model`, `seed_progress` and `user_retired_qids`
+  moved to a new `app_settings` table; they configure the deployment, not a
+  person.
 
 ## Baseline facts established by reading the code
 
@@ -81,4 +120,12 @@ are the items only the owner can provide, collected as they arise:
   ångerrätt) before launch. They are written to be correct and specific,
   not to substitute for advice.
 - **Google OAuth credentials** — a client id and secret from a Google Cloud
-  project, with the redirect URI registered.
+  project (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`), with
+  `<origin>/api/auth/google/callback` registered as the redirect URI. Until
+  they are set, the "Fortsätt med Google" button does not render at all and
+  Q86 runs on email + password.
+- **`NEXT_PUBLIC_SITE_URL`** on the deployment, so password-reset links
+  point at the real origin rather than `http://localhost:3000`.
+- **Claiming the legacy owner** on the production database, if it holds
+  pre-account history: `pnpm claim-owner --email=… --password=…` with the
+  Turso credentials set. Signing up fresh instead would start from zero.

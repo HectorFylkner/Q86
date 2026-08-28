@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { client, db } from "./index.ts";
@@ -56,7 +57,11 @@ async function provision(): Promise<void> {
   }
 }
 
-/** Mirrors drizzle/0001_deep_talon.sql for databases that predate it. */
+/**
+ * Databases created by `pnpm db:push` have no migration ledger for
+ * `migrate()` to build on, so late schema additions land here as guarded,
+ * idempotent DDL that mirrors the migration files.
+ */
 async function evolveSchema(): Promise<void> {
   await client.execute(`create table if not exists deck_reviews (
     question_id integer primary key not null,
@@ -82,5 +87,43 @@ async function evolveSchema(): Promise<void> {
   )`);
   await client.execute(
     "create index if not exists question_flags_status_idx on question_flags (status)",
+  );
+
+  // Last, so the tenancy rebuild finds every table it has to convert —
+  // including the two this function may just have created.
+  await applyTenancyIfMissing();
+}
+
+/**
+ * The multi-tenancy conversion for ledger-less databases. Rather than
+ * restating 60 statements in TypeScript — a second source of truth that
+ * would drift — this replays drizzle/0002_multitenant.sql itself through
+ * `client.migrate()`, which is the libSQL entry point that runs a batch
+ * with foreign-key enforcement off. The file is written to be safe on a
+ * populated database: rows are moved to a legacy owner that it creates
+ * only when there is data to own.
+ */
+async function applyTenancyIfMissing(): Promise<void> {
+  const columns = await client.execute("pragma table_info(attempts)");
+  if (columns.rows.some((row) => row.name === "user_id")) return;
+
+  const file = path.join(process.cwd(), "drizzle", "0002_multitenant.sql");
+  if (!fs.existsSync(file)) {
+    throw new Error(
+      "Q86 bootstrap: this database predates multi-tenancy and " +
+        "drizzle/0002_multitenant.sql is missing, so it cannot be converted.",
+    );
+  }
+  const statements = fs
+    .readFileSync(file, "utf8")
+    .split("--> statement-breakpoint")
+    .map((statement) => statement.trim())
+    .filter((statement) => statement.length > 0);
+
+  await client.migrate(statements);
+  console.log(
+    `Q86 bootstrap: multi-tenancy applied (${statements.length} statements). ` +
+      "Existing data belongs to the legacy owner account — claim it with " +
+      "`pnpm claim-owner`.",
   );
 }

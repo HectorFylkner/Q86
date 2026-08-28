@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { NotAuthenticatedError, requireScoped } from "@/lib/auth/session";
 import { attempts, questions } from "@/lib/db/schema";
 import { getModel, withRetry } from "@/lib/ai/model";
 import { coachSystem, coachUser } from "@/lib/ai/prompts";
@@ -20,6 +20,16 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  let sdb;
+  try {
+    ({ sdb } = await requireScoped());
+  } catch (e) {
+    if (e instanceof NotAuthenticatedError) {
+      return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    }
+    throw e;
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
       { error: "ANTHROPIC_API_KEY is not set. Add it to .env.local." },
@@ -37,18 +47,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const attempt = await db
-    .select()
-    .from(attempts)
-    .where(eq(attempts.id, body.attemptId))
-    .get();
+  // Scoped: coaching someone else's attempt would disclose both their
+  // answer and their scratch work.
+  const attempt = await sdb.row(attempts, eq(attempts.id, body.attemptId));
   if (!attempt) {
     return NextResponse.json(
       { error: `Attempt ${body.attemptId} not found.` },
       { status: 404 },
     );
   }
-  const question = await db
+  const question = await sdb.q
     .select()
     .from(questions)
     .where(eq(questions.id, attempt.questionId))
@@ -120,14 +128,14 @@ export async function POST(request: Request) {
     `**Takeaway**\n\n${coach.takeaway_15_words}`,
   ].join("\n\n");
 
-  await db
-    .update(attempts)
-    .set({
+  await sdb.update(
+    attempts,
+    {
       scratchImagePath: JSON.stringify(body.images),
       aiFeedbackMd: feedbackMd,
-    })
-    .where(eq(attempts.id, attempt.id))
-    .run();
+    },
+    eq(attempts.id, attempt.id),
+  );
 
   return NextResponse.json({ coach });
 }

@@ -1,12 +1,14 @@
 import { DeckClient } from "@/components/deck/deck-client";
 import { SectionTabs } from "@/components/section-tabs";
+import { requireScoped } from "@/lib/auth/session";
 import { todaysDeck } from "@/lib/deck";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function DeckPage() {
-  const { cards, due, fresh, scheduled } = await todaysDeck();
+  const { sdb } = await requireScoped();
+  const { cards, due, fresh, scheduled } = await todaysDeck(sdb);
 
   return (
     <div className="space-y-4">

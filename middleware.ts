@@ -1,43 +1,56 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Single-user password gate for hosted deployments. Active only when
- * SITE_PASSWORD is set (local use stays friction-free without it). The
- * cookie stores a SHA-256 digest of the password, so logging out of a
- * hosted instance means clearing the cookie or rotating the secret.
+ * A cheap redirect, not an authorization boundary (ADR 0002).
+ *
+ * Middleware runs on the Edge runtime and cannot reach the libSQL client,
+ * so it can only see whether a session cookie is present — not whether it
+ * is valid. The real check is `requireUser()` / `requireScoped()` inside
+ * every server action, route handler and protected page; this exists so a
+ * signed-out visitor gets the login screen instead of an error boundary.
+ *
+ * This replaced the shared instance password that guarded every route
+ * before M1: there is no instance-wide password any more, because there is
+ * no instance-wide user.
  */
-const COOKIE = "q86_auth";
+const SESSION_COOKIE = "q86_session";
 
-async function sha256Hex(value: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(value),
+/** Reachable without a session. Everything else redirects to /login. */
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/api/auth/",
+];
+
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PREFIXES.some(
+    (prefix) =>
+      pathname === prefix.replace(/\/$/, "") || pathname.startsWith(prefix),
   );
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
 }
 
-export async function middleware(request: NextRequest) {
-  const password = process.env.SITE_PASSWORD;
-  if (!password) return NextResponse.next();
-
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (pathname === "/login" || pathname === "/api/login") {
-    return NextResponse.next();
-  }
+  if (isPublic(pathname)) return NextResponse.next();
+  if (request.cookies.get(SESSION_COOKIE)?.value) return NextResponse.next();
 
-  const presented = request.cookies.get(COOKIE)?.value;
-  if (presented && presented === (await sha256Hex(password))) {
-    return NextResponse.next();
+  // API routes get a 401 rather than an HTML redirect, so a fetch from the
+  // client sees a status it can act on.
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
   }
 
   const url = request.nextUrl.clone();
   url.pathname = "/login";
-  url.search = "";
+  url.search =
+    pathname === "/" ? "" : `?next=${encodeURIComponent(pathname)}`;
   return NextResponse.redirect(url);
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|manifest\\.webmanifest|icons/|apple-touch-icon\\.png).*)",
+  ],
 };

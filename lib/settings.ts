@@ -1,54 +1,64 @@
 import { desc, eq } from "drizzle-orm";
-import { db } from "./db/index.ts";
+import type { ScopedDb } from "./db/scoped.ts";
 import { baselineReports, settings, type BaselineReport } from "./db/schema.ts";
 import { FUNDAMENTAL_SKILLS, type FundamentalSkill } from "./taxonomy.ts";
 
-/** The only settings keys that exist (§6). */
+/**
+ * Per-account preferences. The three keys that configure the deployment
+ * rather than a person (`model`, `seed_progress`, `user_retired_qids`)
+ * moved to `lib/db/app-settings.ts` when Q86 became multi-tenant, so a
+ * user cannot read or write instance state.
+ */
 export const SETTING_KEYS = [
   "test_date",
   "timed_set_cadence",
   "weight_overrides",
-  "model",
-  "seed_progress",
-  "user_retired_qids",
+  "locale",
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
-export async function getSetting(key: SettingKey): Promise<string | null> {
-  const row = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, key))
-    .get();
+export async function getSetting(
+  sdb: ScopedDb,
+  key: SettingKey,
+): Promise<string | null> {
+  const row = await sdb.row(settings, eq(settings.key, key));
   return row?.value ?? null;
 }
 
-export async function putSetting(key: SettingKey, value: string): Promise<void> {
-  await db
+export async function putSetting(
+  sdb: ScopedDb,
+  key: SettingKey,
+  value: string,
+): Promise<void> {
+  await sdb.q
     .insert(settings)
-    .values({ key, value })
-    .onConflictDoUpdate({ target: settings.key, set: { value } })
+    .values({ userId: sdb.userId, key, value })
+    .onConflictDoUpdate({
+      target: [settings.userId, settings.key],
+      set: { value },
+    })
     .run();
 }
 
-export async function getLatestBaseline(): Promise<BaselineReport | null> {
-  return (
-    (await db
-      .select()
-      .from(baselineReports)
-      .orderBy(desc(baselineReports.createdAt))
-      .limit(1)
-      .get()) ?? null
-  );
+export async function getLatestBaseline(
+  sdb: ScopedDb,
+): Promise<BaselineReport | null> {
+  const rows = await sdb.q
+    .select()
+    .from(baselineReports)
+    .where(sdb.own(baselineReports))
+    .orderBy(desc(baselineReports.createdAt))
+    .limit(1)
+    .all();
+  return rows[0] ?? null;
 }
 
 /** Weakness 0..1 per skill from the latest imported report's fundamental
  *  skill percentiles; null when nothing imported. */
-export async function baselineWeakness(): Promise<Record<
-  FundamentalSkill,
-  number
-> | null> {
-  const report = await getLatestBaseline();
+export async function baselineWeakness(
+  sdb: ScopedDb,
+): Promise<Record<FundamentalSkill, number> | null> {
+  const report = await getLatestBaseline(sdb);
   if (!report) return null;
   const parsed = report.parsed as {
     fundamental_skills?: Array<{ skill: string; percentile: number }>;
@@ -64,10 +74,10 @@ export async function baselineWeakness(): Promise<Record<
   return out;
 }
 
-export async function weightOverrides(): Promise<Partial<
-  Record<FundamentalSkill, number>
-> | null> {
-  const raw = await getSetting("weight_overrides");
+export async function weightOverrides(
+  sdb: ScopedDb,
+): Promise<Partial<Record<FundamentalSkill, number>> | null> {
+  const raw = await getSetting(sdb, "weight_overrides");
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as Record<string, number>;

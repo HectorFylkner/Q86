@@ -2,7 +2,7 @@ import { desc } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
-import { db } from "@/lib/db";
+import { requireScoped } from "@/lib/auth/session";
 import { baselineReports } from "@/lib/db/schema";
 import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
 
@@ -10,9 +10,11 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function ImportPage() {
-  const reports = await db
+  const { sdb } = await requireScoped();
+  const reports = await sdb.q
     .select()
     .from(baselineReports)
+    .where(sdb.own(baselineReports))
     .orderBy(desc(baselineReports.createdAt))
     .all();
 
@@ -31,8 +33,9 @@ export default async function ImportPage() {
               Backup your data
             </h2>
             <p className="mt-0.5 text-xs text-graphite">
-              One JSON file with everything: attempts, sessions, deck
-              scheduling, flags, settings, and the installed question bank.
+              One JSON file with everything Q86 holds about your account:
+              attempts, sessions, deck scheduling, flags and settings. This
+              is also the GDPR data export.
             </p>
           </div>
           <a

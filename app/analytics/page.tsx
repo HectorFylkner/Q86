@@ -2,12 +2,14 @@ import { AnalyticsClient } from "@/components/analytics/analytics-client";
 import { SectionTabs } from "@/components/section-tabs";
 import { FlagsCard } from "@/components/analytics/flags-card";
 import { gatherAnalytics } from "@/lib/analytics";
+import { requireScoped } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function AnalyticsPage() {
-  const data = await gatherAnalytics();
+  const { sdb } = await requireScoped();
+  const data = await gatherAnalytics(sdb);
 
   return (
     <div className="space-y-4">

@@ -4,6 +4,7 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 import { BottomTabs, Nav } from "@/components/nav";
 import { Providers } from "@/components/providers";
+import { currentUser } from "@/lib/auth/session";
 
 const inter = localFont({
   src: "./fonts/inter-var.woff2",
@@ -37,9 +38,13 @@ export const metadata: Metadata = {
 // Applied before hydration so a saved theme never flashes the wrong ground.
 const themeInit = `try{var t=localStorage.getItem("q86-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // The app chrome belongs to a signed-in session. Credential screens (and,
+  // from M4, the public site) render on the bare paper ground instead.
+  const user = await currentUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -49,15 +54,21 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <Providers>
-          <Nav />
-          <BottomTabs />
+          {user && (
+            <>
+              <Nav userEmail={user.email} />
+              <BottomTabs />
+            </>
+          )}
           <main className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-6 sm:px-6 sm:pb-16">
             {children}
           </main>
           <footer className="mx-auto w-full max-w-[1120px] px-4 pb-24 sm:px-6 sm:pb-8">
             <p className="border-t border-grid pt-4 text-center text-[11px] text-graphite">
-              Calibration comes from official GMAC material only. This
-              platform trains; official mocks measure.
+              Q86 är en oberoende tjänst utan koppling till GMAC. GMAT™ och
+              GMAT Focus Edition™ är varumärken som tillhör GMAC. Kalibrering
+              sker mot officiellt GMAC-material; plattformen tränar, officiella
+              provsimuleringar mäter.
             </p>
           </footer>
         </Providers>

@@ -1,4 +1,8 @@
-import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
+import {
+  NotAuthenticatedError,
+  requireScoped,
+} from "@/lib/auth/session";
 import {
   attempts,
   baselineReports,
@@ -7,7 +11,6 @@ import {
   eloRatings,
   patternAttempts,
   questionFlags,
-  questions,
   redoQueue,
   sessions,
   settings,
@@ -17,11 +20,34 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Full-database backup as a downloadable JSON file. Everything the
- *  platform knows lives in these tables, so restoring is a re-import. */
+/**
+ * Everything Q86 holds about the signed-in account, as a downloadable JSON
+ * file. This is both the personal backup and the GDPR article 20 export
+ * that `/integritetspolicy` promises (M4).
+ *
+ * Two deliberate boundaries:
+ *   - Only the caller's rows. Before M1 this endpoint dumped the whole
+ *     database, which in a multi-tenant deployment would be every
+ *     subscriber's history.
+ *   - The question bank is not included. A user's personal data is their
+ *     attempts, not the 360 verified questions those attempts point at, and
+ *     shipping the bank to anyone with a free account would hand over the
+ *     product. Question ids are exported so the export is still joinable
+ *     against a restored instance.
+ */
 export async function GET() {
+  let scope;
+  try {
+    scope = await requireScoped();
+  } catch (e) {
+    if (e instanceof NotAuthenticatedError) {
+      return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    }
+    throw e;
+  }
+  const { user, sdb } = scope;
+
   const [
-    questionRows,
     sessionRows,
     attemptRows,
     editRows,
@@ -33,24 +59,29 @@ export async function GET() {
     deckReviewRows,
     flagRows,
   ] = await Promise.all([
-    db.select().from(questions).all(),
-    db.select().from(sessions).all(),
-    db.select().from(attempts).all(),
-    db.select().from(edits).all(),
-    db.select().from(redoQueue).all(),
-    db.select().from(patternAttempts).all(),
-    db.select().from(eloRatings).all(),
-    db.select().from(baselineReports).all(),
-    db.select().from(settings).all(),
-    db.select().from(deckReviews).all(),
-    db.select().from(questionFlags).all(),
+    sdb.rows(sessions),
+    sdb.rows(attempts),
+    sdb.rows(edits),
+    sdb.rows(redoQueue),
+    sdb.rows(patternAttempts),
+    sdb.rows(eloRatings),
+    sdb.rows(baselineReports),
+    sdb.rows(settings),
+    sdb.rows(deckReviews),
+    sdb.rows(questionFlags),
   ]);
 
   const payload = {
     exported_at: new Date().toISOString(),
-    format: "q86-backup-v1",
+    format: "q86-account-export-v2",
+    account: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      locale: user.locale,
+      created_at: user.createdAt.toISOString(),
+    },
     counts: {
-      questions: questionRows.length,
       sessions: sessionRows.length,
       attempts: attemptRows.length,
       edits: editRows.length,
@@ -63,7 +94,6 @@ export async function GET() {
       question_flags: flagRows.length,
     },
     tables: {
-      questions: questionRows,
       sessions: sessionRows,
       attempts: attemptRows,
       edits: editRows,
@@ -75,13 +105,17 @@ export async function GET() {
       deck_reviews: deckReviewRows,
       question_flags: flagRows,
     },
+    // Referenced bank items, by id only — see the note above.
+    referenced_question_ids: [
+      ...new Set(attemptRows.map((a) => a.questionId)),
+    ].sort((a, b) => a - b),
   };
 
   const date = new Date().toISOString().slice(0, 10);
   return new Response(JSON.stringify(payload), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="q86-backup-${date}.json"`,
+      "Content-Disposition": `attachment; filename="q86-export-${date}.json"`,
       "Cache-Control": "no-store",
     },
   });

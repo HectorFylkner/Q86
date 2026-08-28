@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
+import { requireScoped } from "@/lib/auth/session";
 import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
@@ -12,7 +13,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function MasteryPage() {
-  const ladders = await computeLadders();
+  const { sdb } = await requireScoped();
+  const ladders = await computeLadders(sdb);
   const masteredCount = ladders.filter((l) => l.mastered).length;
 
   return (

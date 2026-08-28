@@ -34,20 +34,32 @@ You will create:
    | --- | --- |
    | `TURSO_DATABASE_URL` | the `libsql://…` URL from step 1 |
    | `TURSO_AUTH_TOKEN` | the token from step 1 |
-   | `SITE_PASSWORD` | invent a long password — this locks your site |
+   | `NEXT_PUBLIC_SITE_URL` | `https://<your-project>.vercel.app` — used in password-reset links |
 
-   Optional, only for the AI features (coach, twins, report import):
-   `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (e.g. `claude-sonnet-5`).
+   Optional: `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to offer Google
+   sign-in (register `<your URL>/api/auth/google/callback` as the redirect
+   URI); `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` for the AI features
+   (coach, twins, report import).
+
+   There is no site-wide password any more. Q86 has real accounts: the
+   first person to visit `/signup` creates one.
 
 4. Press **Deploy** and wait a minute or two.
 
 ## Step 3 — use it
 
-Open `https://<your-project>.vercel.app`, enter your site password
-once, and train. The very first page load takes a few extra seconds
-while the app installs its question bank into your Turso database —
-that happens only once. Bookmark it on your phone; the login lasts 90
-days per device.
+Open `https://<your-project>.vercel.app` and create an account at
+`/signup`. The very first page load takes a few extra seconds while the
+app installs its question bank into your Turso database — that happens
+only once. Bookmark it on your phone; a session lasts 30 days per device
+and slides forward while you keep training.
+
+If your Turso database already held history from before accounts existed,
+that history migrates into a single legacy owner account on first boot.
+Claim it from a terminal with
+`pnpm claim-owner --email=you@example.com --password='…'` (with
+`TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` set) rather than signing up
+fresh — a new signup would start from zero.
 
 From now on, any update pushed to the repository's main branch deploys
 itself automatically.
@@ -67,5 +79,5 @@ itself automatically.
 
 The repo also ships a `Dockerfile`, self-provisioning entrypoint, and
 `fly.toml`. On Fly.io/Railway/a VPS the app runs in file mode against a
-volume mounted at `/app/data` — no Turso involved. Set `SITE_PASSWORD`
-and deploy.
+volume mounted at `/app/data` — no Turso involved. Set
+`NEXT_PUBLIC_SITE_URL` and deploy.
