@@ -4,20 +4,27 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Md } from "@/components/math";
 import { saveDecisionRound } from "@/lib/actions";
 import type { DecideItem, DecideRecommendation } from "@/lib/decide";
+import { useI18n } from "@/components/i18n-provider";
+import { formatPercent } from "@/lib/i18n/format";
+import { subtopicLabel } from "@/lib/i18n/labels";
+import type { Key, Translate } from "@/lib/i18n";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
-import { SUBTOPIC_LABELS } from "@/lib/taxonomy";
 
 const SECONDS = 45;
 
-const CALL_LABELS: Record<DecideRecommendation, string> = {
-  solve: "Solve",
-  guess: "Educated guess",
-  bail: "Bail",
+const CALL_KEYS: Record<DecideRecommendation, Key> = {
+  solve: "decide.callSolve",
+  guess: "decide.callGuess",
+  bail: "decide.callBail",
 };
+
+const callLabel = (t: Translate, call: DecideRecommendation): string =>
+  t(CALL_KEYS[call]);
 
 type Call = { questionId: number; call: DecideRecommendation };
 
 export function DecideClient({ items }: { items: DecideItem[] }) {
+  const { locale, t } = useI18n();
   const [phase, setPhase] = useState<"intro" | "running" | "verdict" | "done">(
     "intro",
   );
@@ -41,10 +48,10 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
   useEffect(() => {
     if (phase !== "running") return;
     setRemaining(SECONDS);
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       setRemaining((r) => {
         if (r <= 1) {
-          clearInterval(t);
+          clearInterval(timer);
           // Time expiring without a call IS a decision failure: counts as solve
           // (the default trap — grinding on by inertia).
           commit("solve");
@@ -53,7 +60,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
         return r - 1;
       });
     }, 1000);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, index]);
 
@@ -102,7 +109,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
   if (items.length === 0) {
     return (
       <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
-        No questions available — run <code>pnpm seed</code> first.
+        {t("decide.empty")}
       </p>
     );
   }
@@ -111,21 +118,16 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
     return (
       <section className="mx-auto max-w-2xl rounded-card border border-grid bg-surface p-6 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
-          {items.length} questions · 45 seconds each
+          {t("decide.introTitle", { count: items.length })}
         </h2>
         <p className="mt-2 text-sm text-graphite">
-          Read the question. Do NOT solve it. Commit to a pacing call:{" "}
-          <span className="font-mono font-medium">S</span> solve now,{" "}
-          <span className="font-mono font-medium">G</span> eliminate and take an
-          educated guess, <span className="font-mono font-medium">B</span> bail
-          — pick anything and bank the time. Letting the clock run out counts
-          as an unforced &quot;solve&quot;.
+          {t("decide.introBody", { s: "S", g: "G", b: "B" })}
         </p>
         <button
           onClick={() => setPhase("running")}
           className="mt-4 rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
-          Start · Enter
+          {t("decide.start")}
         </button>
       </section>
     );
@@ -135,12 +137,9 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
     return (
       <section className="mx-auto max-w-2xl rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
         <p className="font-display text-lg font-semibold">
-          {aligned} / {items.length} calls aligned with your record
+          {t("decide.doneTitle", { aligned, total: items.length })}
         </p>
-        <p className="mt-2 text-sm text-graphite">
-          Alignment isn&apos;t obedience — a deliberate stretch is fine. The
-          habit that matters: decide in 45 seconds and never grind by inertia.
-        </p>
+        <p className="mt-2 text-sm text-graphite">{t("decide.doneBody")}</p>
       </section>
     );
   }
@@ -150,8 +149,9 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
     <div className="mx-auto max-w-3xl space-y-3">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs text-graphite">
-          {index + 1} / {items.length} · {SUBTOPIC_LABELS[item.question.subtopic]}{" "}
-          · D{item.question.difficulty}
+          {index + 1} / {items.length} ·{" "}
+          {subtopicLabel(t, item.question.subtopic)} · D
+          {item.question.difficulty}
         </p>
         {phase === "running" && (
           <p
@@ -187,7 +187,7 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
               onClick={() => commit(call)}
               className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              {CALL_LABELS[call]}{" "}
+              {callLabel(t, call)}{" "}
               <span className="font-mono text-xs text-graphite">
                 {call[0].toUpperCase()}
               </span>
@@ -204,18 +204,23 @@ export function DecideClient({ items }: { items: DecideItem[] }) {
           )}
         >
           <p className="text-sm">
-            You called <strong>{CALL_LABELS[lastCall.call]}</strong>. Your
-            record on {SUBTOPIC_LABELS[item.question.subtopic]} D
+            {t("decide.youCalled")}{" "}
+            <strong>{callLabel(t, lastCall.call)}</strong>.{" "}
+            {t("decide.yourRecordOn")}{" "}
+            {subtopicLabel(t, item.question.subtopic)} D
             {item.question.difficulty}:{" "}
             {item.sample > 0
-              ? `${Math.round(item.predicted * 100)}% over ${item.sample} attempts`
-              : `no data yet — difficulty prior ${Math.round(item.predicted * 100)}%`}
-            , which points to{" "}
-            <strong>{CALL_LABELS[item.recommendation]}</strong>.
+              ? t("decide.withSample", {
+                  percent: formatPercent(item.predicted, locale),
+                  sample: item.sample,
+                })
+              : t("decide.noSample", {
+                  percent: formatPercent(item.predicted, locale),
+                })}
+            , {t("decide.whichPointsTo")}{" "}
+            <strong>{callLabel(t, item.recommendation)}</strong>.
           </p>
-          <p className="mt-2 text-xs text-graphite">
-            Enter for the next question
-          </p>
+          <p className="mt-2 text-xs text-graphite">{t("decide.nextHint")}</p>
         </section>
       )}
     </div>

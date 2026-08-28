@@ -19,11 +19,12 @@ import {
 import type { Question } from "@/lib/db/schema";
 import {
   FUNDAMENTAL_SKILLS,
-  SKILL_LABELS,
   type Confidence,
   type FundamentalSkill,
   type SessionFocus,
 } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import { skillLabel } from "@/lib/i18n/labels";
 import { cn, formatSeconds } from "@/lib/utils";
 
 const PULSE_THRESHOLD_SECONDS = 165; // 2:45 decision pulse
@@ -52,6 +53,7 @@ export function TimedClient({
   verifiedTotal: number;
   autoStart?: TimedKind | null;
 }) {
+  const t = useT();
   const [stage, setStage] = useState<Stage>({ kind: "config", error: null });
   const autoStartedRef = useRef(false);
   const [kind, setKind] = useState<TimedKind>("full");
@@ -114,7 +116,10 @@ export function TimedClient({
         focus,
       });
       if (res.error != null || res.sessionId == null || res.mode == null) {
-        setStage({ kind: "config", error: res.error ?? "Could not start." });
+        setStage({
+          kind: "config",
+          error: res.error ?? t("timed.couldNotStart"),
+        });
         return;
       }
       finalizedRef.current = false;
@@ -134,7 +139,7 @@ export function TimedClient({
     } catch {
       setStage({
         kind: "config",
-        error: "Could not start the set — the server did not respond.",
+        error: t("timed.couldNotStartSet"),
       });
     }
   }
@@ -150,11 +155,11 @@ export function TimedClient({
       setStage({ kind: "running" });
       return;
     }
-    const t = setTimeout(
+    const timer = setTimeout(
       () => setStage({ kind: "ritual", countdown: stage.countdown - 1 }),
       1000,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [stage, totalSeconds]);
 
   // ------------------------------------------------------------------ clock
@@ -162,7 +167,7 @@ export function TimedClient({
 
   useEffect(() => {
     if (stage.kind !== "running" && stage.kind !== "review") return;
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       const endsAt = endsAtRef.current;
       if (endsAt == null) return;
       const rem = Math.max(0, (endsAt - Date.now()) / 1000);
@@ -178,7 +183,7 @@ export function TimedClient({
       }
       if (rem <= 0) finalizeRef.current();
     }, 250);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [stage.kind]);
 
   // --------------------------------------------------------------- finalize
@@ -228,11 +233,11 @@ export function TimedClient({
             message:
               e instanceof Error
                 ? e.message
-                : "Saving failed. Your results are still on this screen — retry.",
+                : t("timed.saveFailed"),
           });
         });
     },
-    [sessionId, mode, questions, totalSeconds, focus],
+    [sessionId, mode, questions, totalSeconds, focus, t],
   );
 
   // Keep a live reference for the clock-expiry path.
@@ -251,11 +256,11 @@ export function TimedClient({
   const confirmAnswer = useCallback(() => {
     if (stage.kind !== "running") return;
     if (selected == null) {
-      setHint("You must answer to advance — keys 1–5 or A–E.");
+      setHint(t("timed.mustAnswer"));
       return;
     }
     if (confidence == null) {
-      setHint("Set confidence first — G guess, L lean, K lock.");
+      setHint(t("timed.setConfidence"));
       return;
     }
     const timeSeconds = (Date.now() - questionStartRef.current) / 1000;
@@ -293,6 +298,7 @@ export function TimedClient({
     finalize,
     editRecords,
     bookmarks,
+    t,
   ]);
 
   const toggleBookmark = useCallback(
@@ -355,12 +361,10 @@ export function TimedClient({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
             <h2 className="font-display text-base font-semibold">
-              Full section
+              {t("timed.fullSection")}
             </h2>
             <p className="mt-1 flex-1 text-sm text-graphite">
-              21 questions, 45:00, weighted mix across all four skills.
-              Faithful mechanics: answer to advance, B bookmarks, review
-              screen with up to 3 edits if time remains.
+              {t("timedConfig.fullLede")}
             </p>
             <button
               onClick={() => handleStart("full")}
@@ -370,18 +374,23 @@ export function TimedClient({
                 !enough(21) && "cursor-not-allowed opacity-50",
               )}
             >
-              Start 21-question section
+              {t("timed.startFull")}
             </button>
             {!enough(21) && (
               <p className="mt-2 text-xs text-graphite">
-                Needs 21 verified questions; the bank has {verifiedTotal}.
+                {t("timedConfig.needsQuestions", {
+                  needed: 21,
+                  available: verifiedTotal,
+                })}
               </p>
             )}
           </div>
           <div className="flex flex-col rounded-card border border-grid bg-surface p-5 shadow-ambient">
-            <h2 className="font-display text-base font-semibold">Mini set</h2>
+            <h2 className="font-display text-base font-semibold">
+              {t("timed.miniSet")}
+            </h2>
             <p className="mt-1 text-sm text-graphite">
-              7 questions, 15:00. Mixed or single-skill.
+              {t("timedConfig.miniLede")}
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {(["mix", ...FUNDAMENTAL_SKILLS] as const).map((s) => (
@@ -395,7 +404,7 @@ export function TimedClient({
                       : "border-grid text-graphite hover:border-graphite/50",
                   )}
                 >
-                  {s === "mix" ? "Mixed" : SKILL_LABELS[s]}
+                  {s === "mix" ? t("timedConfig.mixed") : skillLabel(t, s)}
                 </button>
               ))}
             </div>
@@ -408,11 +417,14 @@ export function TimedClient({
                 !enough(7) && "cursor-not-allowed opacity-50",
               )}
             >
-              Start 7-question mini
+              {t("timed.startMini")}
             </button>
             {!enough(7) && (
               <p className="mt-2 text-xs text-graphite">
-                Needs 7 verified questions; the bank has {verifiedTotal}.
+                {t("timedConfig.needsQuestions", {
+                  needed: 7,
+                  available: verifiedTotal,
+                })}
               </p>
             )}
           </div>
@@ -424,7 +436,7 @@ export function TimedClient({
             onChange={(e) => setShowTimer(e.target.checked)}
             className="h-4 w-4 accent-[var(--ballpoint)]"
           />
-          Show the per-question timer (hidden by default, like the real exam)
+          {t("timed.showTimer")}
         </label>
         <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-graphite">
           <input
@@ -433,7 +445,7 @@ export function TimedClient({
             onChange={(e) => setFocus(e.target.checked ? "casual" : "focused")}
             className="h-4 w-4 accent-[var(--ballpoint)]"
           />
-          Casual session — exclude this set from analytics and the daily plan
+          {t("timed.casualSession")}
         </label>
         {focus === "casual" && (
           <p className="text-[11px] text-amber">
@@ -450,7 +462,7 @@ export function TimedClient({
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-3 w-full" />
         <div className="skeleton h-64 w-full rounded-card" />
-        <p className="text-sm text-graphite">Assembling the set…</p>
+        <p className="text-sm text-graphite">{t("timed.assembling")}</p>
       </div>
     );
   }
@@ -480,7 +492,7 @@ export function TimedClient({
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-6 w-40" />
         <div className="skeleton h-48 w-full rounded-card" />
-        <p className="text-sm text-graphite">Marking the section…</p>
+        <p className="text-sm text-graphite">{t("timed.marking")}</p>
       </div>
     );
   }
@@ -493,7 +505,7 @@ export function TimedClient({
           onClick={() => finalize(answers, editRecords, bookmarks)}
           className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
-          Retry saving the session
+          {t("timed.retrySave")}
         </button>
       </div>
     );
@@ -565,7 +577,10 @@ export function TimedClient({
       <div className="mx-auto mt-4 max-w-3xl space-y-4">
         <div className="flex items-center justify-between text-xs text-graphite">
           <span className="font-mono">
-            Question {currentIndex + 1} of {questions.length}
+            {t("runner.questionOf", {
+              n: currentIndex + 1,
+              total: questions.length,
+            })}
           </span>
           <span className="flex items-center gap-3">
             {showTimer && (
@@ -575,7 +590,8 @@ export function TimedClient({
                   elapsedCurrent > PULSE_THRESHOLD_SECONDS && "text-amber",
                 )}
               >
-                {formatSeconds(elapsedCurrent)} on this question
+                {formatSeconds(elapsedCurrent)}{" "}
+                {t("timedConfig.onThisQuestion")}
               </span>
             )}
             <button
@@ -588,7 +604,9 @@ export function TimedClient({
               )}
             >
               <Bookmark size={12} />
-              {bookmarks[currentIndex] ? "Bookmarked" : "Bookmark"}
+              {bookmarks[currentIndex]
+                ? t("timed.bookmarked")
+                : t("timed.bookmark")}
               <span className="font-mono text-[10px] opacity-60">B</span>
             </button>
           </span>
@@ -599,7 +617,7 @@ export function TimedClient({
             <div
               aria-hidden
               className="absolute inset-x-0 top-0 h-px bg-amber"
-              title="Past the 2:45 checkpoint"
+              title={t("timed.pastCheckpoint")}
             />
           )}
           <Md source={question.stemMd} className="text-[16px]" />
@@ -622,8 +640,8 @@ export function TimedClient({
               className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
               {currentIndex + 1 < questions.length
-                ? "Confirm and advance"
-                : "Confirm final answer"}
+                ? t("timed.confirmAndAdvance")
+                : t("timed.confirmFinal")}
               <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
             </button>
           </div>
@@ -634,8 +652,7 @@ export function TimedClient({
           )}
         </div>
         <p className="text-center text-[11px] text-graphite/80">
-          1–5 or A/C/D/E select · B bookmark · G/L/K confidence · Enter
-          confirm — you cannot return until the review screen
+          {t("timedConfig.keyboardHelp")}
         </p>
       </div>
     </>

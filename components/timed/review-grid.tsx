@@ -9,9 +9,10 @@ import type { TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import {
   EDIT_REASONS,
-  EDIT_REASON_LABELS,
   type EditReason,
 } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import { editReasonLabel } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
 const MAX_EDITS = 3;
@@ -44,6 +45,7 @@ export function ReviewGrid({
   ) => void;
   onSubmit: () => void;
 }) {
+  const t = useT();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [pendingIndex, setPendingIndex] = useState<number | null>(null);
   const [reason, setReason] = useState<EditReason | null>(null);
@@ -77,7 +79,11 @@ export function ReviewGrid({
             ← Back to review grid
           </button>
           <span className="font-mono">
-            Question {openIndex + 1} · edits used {editsUsed}/{MAX_EDITS}
+            {t("review.questionEdits", {
+              n: openIndex + 1,
+              used: editsUsed,
+              max: MAX_EDITS,
+            })}
           </span>
         </div>
 
@@ -98,15 +104,14 @@ export function ReviewGrid({
 
           {!editsLeft && (
             <p className="mt-3 text-sm text-graphite">
-              Edit limit reached ({MAX_EDITS}). Answers are locked.
+              {t("review.limitReached", { max: MAX_EDITS })}
             </p>
           )}
 
           {editing && (
             <div className="mt-4 space-y-3 rounded-control border border-amber/50 bg-highlight/50 p-4">
               <p className="text-sm font-medium">
-                You are changing this answer. Name the specific error you
-                found — a feeling is not a reason.
+                {t("review.changingLede")}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {EDIT_REASONS.map((r) => (
@@ -120,7 +125,7 @@ export function ReviewGrid({
                         : "border-grid bg-surface/60 text-graphite hover:border-graphite/50",
                     )}
                   >
-                    {EDIT_REASON_LABELS[r]}
+                    {editReasonLabel(t, r)}
                   </button>
                 ))}
               </div>
@@ -128,7 +133,7 @@ export function ReviewGrid({
                 <textarea
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
-                  placeholder="Name the specific error: which line, which number, which condition you misread…"
+                  placeholder={t("timed.justificationPlaceholder")}
                   rows={2}
                   className="w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
                 />
@@ -160,7 +165,7 @@ export function ReviewGrid({
                     !canCommit && "cursor-not-allowed opacity-50",
                   )}
                 >
-                  Commit the change
+                  {t("timed.commitChange")}
                 </button>
                 <button
                   onClick={() => {
@@ -170,7 +175,7 @@ export function ReviewGrid({
                   }}
                   className="rounded-control border border-grid bg-surface px-4 py-1.5 text-sm hover:border-graphite/50"
                 >
-                  Keep the original answer
+                  {t("timed.keepOriginal")}
                 </button>
               </div>
             </div>
@@ -187,11 +192,13 @@ export function ReviewGrid({
               )}
             >
               <Bookmark size={12} />
-              {bookmarks[openIndex] ? "Bookmarked" : "Bookmark"}
+              {bookmarks[openIndex]
+                ? t("timed.bookmarked")
+                : t("timed.bookmark")}
             </button>
             {editedQuestionIds.has(q.id) && (
               <span className="text-xs text-graphite">
-                Edited this session
+                {t("timed.editedThisSession")}
               </span>
             )}
           </div>
@@ -205,16 +212,13 @@ export function ReviewGrid({
       <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">
-            Review &amp; edit
+            {t("timed.reviewAndEdit")}
           </h2>
           <span className="font-mono text-xs text-graphite">
-            edits used {editsUsed}/{MAX_EDITS}
+            {t("review.editsUsed", { used: editsUsed, max: MAX_EDITS })}
           </span>
         </div>
-        <p className="mt-1 text-sm text-graphite">
-          Your record: quant edits have destroyed more points than they
-          earned. Open a question only if you can name a specific error.
-        </p>
+        <p className="mt-1 text-sm text-graphite">{t("review.yourRecord")}</p>
         <div className="mt-4 grid grid-cols-7 gap-2">
           {questions.map((q, i) => (
             <button
@@ -229,7 +233,7 @@ export function ReviewGrid({
             >
               <span className="font-mono">{i + 1}</span>
               <span className="text-[9px] text-graphite">
-                {answers[i] ? "answered" : "—"}
+                {answers[i] ? t("review.answered") : "—"}
               </span>
               {bookmarks[i] && (
                 <Bookmark
@@ -252,7 +256,7 @@ export function ReviewGrid({
             onClick={onSubmit}
             className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
-            Submit section and see the marking
+            {t("timed.submitSection")}
           </button>
         </div>
       </div>

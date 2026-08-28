@@ -6,11 +6,13 @@ import { withEntitlements } from "@/lib/billing/entitlements";
 import { questions } from "@/lib/db/schema";
 import { dailyAllowance } from "@/lib/billing/entitlements";
 import { todaysDeck } from "@/lib/deck";
-import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
-import { computeDailyPlan, PHASE_LABELS, PHASE_NOTES } from "@/lib/plan";
+import { computeDailyPlan } from "@/lib/plan";
+import type { Key } from "@/lib/i18n";
+import { getI18n } from "@/lib/i18n/server";
+import { formatPercent } from "@/lib/i18n/format";
+import { patternCategoryLabel, skillLabel, skillShortLabel } from "@/lib/i18n/labels";
 import { getSetting } from "@/lib/settings";
-import { SKILL_SHORT_LABELS, SKILL_LABELS } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +22,7 @@ export default async function TodayPage() {
   // Mixed page: a free account lands here too, so it resolves
   // entitlements and adapts rather than redirecting.
   const { sdb, entitlements } = await withEntitlements();
+  const { locale, t } = await getI18n();
   const inputs = await gatherPlanInputs(sdb);
   const plan = computeDailyPlan(inputs);
   const days = await daysToTest(sdb);
@@ -47,16 +50,21 @@ export default async function TodayPage() {
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <p className="text-sm">
-              <span className="font-medium">Gratisnivån.</span>{" "}
+              <span className="font-medium">
+                {t("dashboard.freeTierTitle")}
+              </span>{" "}
               <span className="text-graphite">
-                Alla kapitel, mönsterträningen och{" "}
-                {allowance.limit ?? 0} frågor per dag.
+                {t("dashboard.freeTierBody", { limit: allowance.limit ?? 0 })}
               </span>
             </p>
             <p className="font-mono text-[11px] text-graphite">
-              {allowance.used} / {allowance.limit} i dag ·{" "}
+              {t("dashboard.freeTierUsage", {
+                used: allowance.used,
+                limit: allowance.limit ?? 0,
+              })}{" "}
+              ·{" "}
               <Link href="/konto" className="text-ballpoint underline">
-                se planer
+                {t("dashboard.seePlans")}
               </Link>
             </p>
           </div>
@@ -65,7 +73,9 @@ export default async function TodayPage() {
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold">Today</h1>
+          <h1 className="font-display text-xl font-semibold">
+            {t("dashboard.title")}
+          </h1>
           {days != null ? (
             <p className="mt-1 flex items-baseline gap-2">
               <Odometer
@@ -73,12 +83,12 @@ export default async function TodayPage() {
                 className="font-display text-5xl font-bold"
               />
               <span className="text-sm text-graphite">
-                days to the test
+                {t("dashboard.daysToTest")}
               </span>
             </p>
           ) : (
             <p className="mt-1 text-sm text-amber">
-              Set your test date so the plan can pace itself.
+              {t("dashboard.setTestDate")}
             </p>
           )}
         </div>
@@ -91,7 +101,7 @@ export default async function TodayPage() {
       {firstRun && (
         <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-5 shadow-ambient">
           <h2 className="font-display text-base font-semibold">
-            New here? The loop is simple.
+            {t("dashboard.firstRunTitle")}
           </h2>
           <ol className="mt-2 space-y-1.5 text-sm">
             <li>
@@ -100,11 +110,10 @@ export default async function TodayPage() {
                 href="/learn"
                 className="font-medium text-ballpoint hover:underline"
               >
-                Read a chapter
+                {t("dashboard.firstRunReadLink")}
               </Link>{" "}
               <span className="text-graphite">
-                on a topic you want to sharpen — each one ends with a
-                checklist.
+                {t("dashboard.firstRunReadRest")}
               </span>
             </li>
             <li>
@@ -113,25 +122,23 @@ export default async function TodayPage() {
                 href="/drill"
                 className="font-medium text-ballpoint hover:underline"
               >
-                Drill it immediately
+                {t("dashboard.firstRunDrillLink")}
               </Link>{" "}
               <span className="text-graphite">
-                — every miss is dissected: fastest path, trap anatomy,
-                takeaway.
+                {t("dashboard.firstRunDrillRest")}
               </span>
             </li>
             <li>
               <span className="font-mono text-xs text-ballpoint">3</span>{" "}
               <span className="text-graphite">
-                Come back tomorrow: your misses return as flashcards and
-                spaced redos in{" "}
+                {t("dashboard.firstRunReturn")}{" "}
                 <Link
                   href="/deck"
                   className="font-medium text-ballpoint hover:underline"
                 >
-                  Review
+                  {t("dashboard.firstRunReviewLink")}
                 </Link>
-                , and this page starts planning your days.
+                {t("dashboard.firstRunReturnEnd")}
               </span>
             </li>
           </ol>
@@ -142,14 +149,16 @@ export default async function TodayPage() {
         <section className="rounded-card border border-grid bg-surface px-4 py-3 shadow-ambient">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="rounded-control bg-highlight px-2.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide">
-              {PHASE_LABELS[plan.phase]}
+              {t(`phase.${plan.phase}` as Key)}
             </span>
-            <p className="text-sm text-graphite">{PHASE_NOTES[plan.phase]}</p>
+            <p className="text-sm text-graphite">
+              {t(`phase.${plan.phase}Note` as Key)}
+            </p>
             {plan.mock && (
               <p className={plan.mock.today ? "text-sm font-medium text-ballpoint" : "text-sm text-graphite"}>
                 {plan.mock.today
-                  ? "Official mock today — take it, then import the score report."
-                  : `Next official mock in ${plan.mock.inDays} day${plan.mock.inDays === 1 ? "" : "s"}.`}
+                  ? t("dashboard.mockToday")
+                  : t("dashboard.mockInDays", { days: plan.mock.inDays })}
               </p>
             )}
           </div>
@@ -158,13 +167,13 @@ export default async function TodayPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PlanCard
-          title="Pattern rounds"
+          title={t("dashboard.patternRoundsTitle")}
           body={
             <span>
-              Two lowest-ELO categories:
+              {t("dashboard.patternRoundsBody")}
               <br />
               {plan.patternRounds
-                .map((k) => PATTERN_CATEGORY_LABELS[k])
+                .map((k) => patternCategoryLabel(t, k))
                 .join(" · ")}
             </span>
           }
@@ -176,19 +185,24 @@ export default async function TodayPage() {
                 href={`/patterns?start=${key}`}
                 className="text-sm font-medium text-ballpoint hover:underline"
               >
-                Start round {i + 1}: {PATTERN_CATEGORY_LABELS[key]} →
+                {t("dashboard.startRound", {
+                  n: i + 1,
+                  category: patternCategoryLabel(t, key),
+                })}
               </Link>
             ))}
           </div>
         </PlanCard>
 
         <PlanCard
-          title={`Weighted drill · ${plan.drill.total} questions`}
+          title={t("dashboard.weightedDrillTitle", {
+            count: plan.drill.total,
+          })}
           body={
             <span>
               {plan.drill.bySkill
                 .filter((s) => s.count > 0)
-                .map((s) => `${SKILL_SHORT_LABELS[s.skill]} ${s.count}`)
+                .map((s) => `${skillShortLabel(t, s.skill)} ${s.count}`)
                 .join(" · ")}
             </span>
           }
@@ -198,26 +212,26 @@ export default async function TodayPage() {
               href="/drill?plan=1"
               className="text-sm font-medium text-ballpoint hover:underline"
             >
-              Start today&apos;s drill: {plan.drill.total} questions →
+              {t("dashboard.startTodaysDrill", { count: plan.drill.total })}
             </Link>
           ) : (
             <span className="text-sm text-graphite">
-              The bank is empty — run pnpm seed first.
+              {t("dashboard.bankEmpty")}
             </span>
           )}
         </PlanCard>
 
         <PlanCard
-          title="Review"
+          title={t("dashboard.reviewTitle")}
           body={
             <span>
               {plan.dueRedoCount > 0
-                ? `${plan.dueRedoCount} redo${plan.dueRedoCount === 1 ? "" : "s"} due`
-                : "No redos due"}
+                ? t("dashboard.redosDue", { count: plan.dueRedoCount })
+                : t("dashboard.noRedosDue")}
               {" · "}
               {deckWaiting > 0
-                ? `${deckWaiting} deck card${deckWaiting === 1 ? "" : "s"} waiting`
-                : "deck clear"}
+                ? t("dashboard.deckWaiting", { count: deckWaiting })
+                : t("dashboard.deckClear")}
             </span>
           }
         >
@@ -227,7 +241,7 @@ export default async function TodayPage() {
                 href="/deck"
                 className="text-sm font-medium text-ballpoint hover:underline"
               >
-                Flip the deck: {deckWaiting} card{deckWaiting === 1 ? "" : "s"} →
+                {t("dashboard.flipDeck", { count: deckWaiting })}
               </Link>
             )}
             {plan.dueRedoCount > 0 ? (
@@ -235,28 +249,30 @@ export default async function TodayPage() {
                 href="/queue?start=1"
                 className="text-sm font-medium text-ballpoint hover:underline"
               >
-                Redo all {plan.dueRedoCount} due →
+                {t("dashboard.redoAllDue", { count: plan.dueRedoCount })}
               </Link>
             ) : (
               <Link
                 href="/queue"
                 className="text-sm text-graphite hover:underline"
               >
-                Open the queue →
+                {t("dashboard.openQueue")}
               </Link>
             )}
           </div>
         </PlanCard>
 
         <PlanCard
-          title="Timed set"
+          title={t("dashboard.timedSetTitle")}
           body={
             plan.timedSetToday ? (
-              <span>Scheduled today: full 21-question section.</span>
+              <span>{t("dashboard.timedToday")}</span>
             ) : (
               <span>
-                Next scheduled in {daysUntilTimed}{" "}
-                {daysUntilTimed === 1 ? "day" : "days"} (every {cadence}).
+                {t("dashboard.timedNext", {
+                  days: daysUntilTimed,
+                  cadence,
+                })}
               </span>
             )
           }
@@ -266,11 +282,11 @@ export default async function TodayPage() {
               href="/timed?start=full"
               className="text-sm font-medium text-ballpoint hover:underline"
             >
-              Start 21-question section →
+              {t("dashboard.startFullSection")}
             </Link>
           ) : (
             <Link href="/timed" className="text-sm text-graphite hover:underline">
-              Timed sets →
+              {t("dashboard.timedSetsLink")}
             </Link>
           )}
         </PlanCard>
@@ -278,11 +294,10 @@ export default async function TodayPage() {
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
-          Skill weights driving today&apos;s mix
+          {t("dashboard.weightsTitle")}
         </h2>
         <p className="mt-0.5 text-xs text-graphite">
-          Rolling last-30-attempt accuracy blended 50/50 with the imported
-          baseline; 5% floor keeps every skill in rotation.
+          {t("dashboard.weightsLede")}
         </p>
         <div className="mt-3 space-y-2">
           {plan.drill.bySkill.map(({ skill }) => {
@@ -290,7 +305,7 @@ export default async function TodayPage() {
             const record = inputs.skillAccuracy[skill];
             return (
               <div key={skill} className="flex items-center gap-3 text-sm">
-                <span className="w-64 shrink-0">{SKILL_LABELS[skill]}</span>
+                <span className="w-64 shrink-0">{skillLabel(t, skill)}</span>
                 <div className="h-2 flex-1 rounded-full bg-grid">
                   <div
                     className={cn("h-2 rounded-full bg-ballpoint")}
@@ -298,12 +313,15 @@ export default async function TodayPage() {
                   />
                 </div>
                 <span className="w-12 text-right font-mono text-xs">
-                  {Math.round(weight * 100)}%
+                  {formatPercent(weight, locale)}
                 </span>
                 <span className="w-24 text-right font-mono text-xs text-graphite">
                   {record.total > 0
-                    ? `${record.correct}/${record.total} recent`
-                    : "no data"}
+                    ? t("dashboard.recentRecord", {
+                        correct: record.correct,
+                        total: record.total,
+                      })
+                    : t("dashboard.noData")}
                 </span>
               </div>
             );

@@ -58,10 +58,6 @@ export const FREE_DAILY_QUESTION_LIMIT = 10;
 
 export type Plan = {
   id: PlanId;
-  /** Swedish display name. */
-  name: string;
-  /** One line, on the pricing card. */
-  tagline: string;
   /** VAT-inclusive, in öre. */
   priceOre: number;
   /** How the price is billed. */
@@ -72,62 +68,42 @@ export type Plan = {
   priceIdEnv: string | null;
   features: Feature[];
   dailyQuestionLimit: number | null;
-  /** Sales points, in Swedish, in the order they should be read. */
-  bullets: string[];
+  /** How many sales points this plan's card shows. The words themselves
+   *  live in the message catalog under `billing.plans.<id>.bulletN`
+   *  (ADR 0004) — this module owns prices, not prose. */
+  bulletCount: number;
 };
 
 export const PLANS: Record<PlanId, Plan> = {
   free: {
     id: "free",
-    name: "Gratis",
-    tagline: "Läs allt, träna varje dag, se om metoden passar dig.",
     priceOre: 0,
     billing: "free",
     durationMonths: null,
     priceIdEnv: null,
     features: FREE_FEATURES,
     dailyQuestionLimit: FREE_DAILY_QUESTION_LIMIT,
-    bullets: [
-      "Alla 24 kapitel på svenska",
-      `${FREE_DAILY_QUESTION_LIMIT} frågor per dag ur den verifierade banken`,
-      "Mönsterträning utan begränsning",
-      "Gratis diagnostiskt test med prognos",
-    ],
+    bulletCount: 4,
   },
   monthly: {
     id: "monthly",
-    name: "Månad",
-    tagline: "Hela plattformen, uppsägningsbar när som helst.",
     priceOre: 24_900,
     billing: "recurring_month",
     durationMonths: null,
     priceIdEnv: "STRIPE_PRICE_MONTHLY",
     features: ALL_FEATURES,
     dailyQuestionLimit: null,
-    bullets: [
-      "Obegränsat antal frågor",
-      "Tidsatta set och full sektionssimulering med Review & Edit",
-      "Repetitionskö, minneskort och mästerskapsstegar",
-      "Analys i samma form som ditt riktiga score report",
-      "Whiteboard-genomgång och import av score report",
-    ],
+    bulletCount: 5,
   },
   sprint: {
     id: "sprint",
-    name: "GMAT-sprint",
-    tagline: "Tre månader, ett fast pris, inget som förnyas.",
     priceOre: 59_900,
     billing: "one_time",
     durationMonths: 3,
     priceIdEnv: "STRIPE_PRICE_SPRINT",
     features: ALL_FEATURES,
     dailyQuestionLimit: null,
-    bullets: [
-      "Allt i Månad, i tre månader",
-      "Betalas en gång — ingen förnyelse att komma ihåg",
-      "Motsvarar 200 kr/månad",
-      "Passar dig som redan har ett bokat provdatum",
-    ],
+    bulletCount: 4,
   },
 };
 
@@ -160,7 +136,8 @@ export function vatBreakdown(grossOre: number): VatBreakdown {
   return { grossOre, netOre: grossOre - vatOre, vatOre };
 }
 
-/** "249 kr", "599 kr", "0 kr" — sv-SE, no trailing decimals on whole kronor. */
+/** Kept for tests and for code outside a request; UI code formats through
+ *  `formatCurrency` in lib/i18n/format.ts with the resolved locale. */
 export function formatPrice(ore: number, locale = "sv-SE"): string {
   const kronor = ore / 100;
   return new Intl.NumberFormat(locale, {

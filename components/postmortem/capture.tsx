@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { Camera, ClipboardPaste, Upload, X } from "lucide-react";
+import { useT } from "@/components/i18n-provider";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGES = 3;
@@ -42,6 +43,7 @@ export function ScratchCapture({
   onChange: React.Dispatch<React.SetStateAction<string[]>>;
   disabled?: boolean;
 }) {
+  const t = useT();
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -105,7 +107,7 @@ export function ScratchCapture({
       setCameraOpen(true);
     } catch {
       setCameraError(
-        "Camera unavailable or permission denied — upload a photo or paste from the clipboard instead.",
+        t("capture.cameraDenied"),
       );
     }
   }
@@ -150,7 +152,7 @@ export function ScratchCapture({
           )}
         >
           <Camera size={14} />
-          {cameraOpen ? "Close camera" : "Use the webcam"}
+          {cameraOpen ? t("capture.closeCamera") : t("capture.useWebcam")}
         </button>
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -161,7 +163,7 @@ export function ScratchCapture({
           )}
         >
           <Upload size={14} />
-          Upload a photo
+          {t("capture.uploadPhoto")}
         </button>
         <span className="flex items-center gap-1.5 text-xs text-graphite">
           <ClipboardPaste size={13} />
@@ -202,7 +204,7 @@ export function ScratchCapture({
                 (busy || full) && "opacity-50",
               )}
             >
-              Capture this frame
+              {t("capture.captureFrame")}
             </button>
             {full && (
               <span className="self-center text-xs text-graphite">
@@ -260,7 +262,9 @@ export function ScratchCapture({
           </div>
         )}
       </div>
-      {busy && <p className="text-xs text-graphite">Compressing…</p>}
+      {busy && (
+        <p className="text-xs text-graphite">{t("capture.compressing")}</p>
+      )}
     </div>
   );
 }

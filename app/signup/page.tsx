@@ -5,24 +5,29 @@ import { SignUpForm } from "@/components/auth/forms";
 import { GoogleButton } from "@/components/auth/google-button";
 import { currentUser } from "@/lib/auth/session";
 import { googleConfigured } from "@/lib/auth/google";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata = { title: "Skapa konto – Q86" };
+export async function generateMetadata() {
+  const t = await getT();
+  return { title: `${t("auth.signUp")} – Q86` };
+}
 
 export default async function SignUpPage() {
   if (await currentUser()) redirect("/");
+  const t = await getT();
 
   return (
     <AuthShell
-      title="Skapa konto"
-      lede="Svensk undervisning, engelska frågor — som på provet."
+      title={t("auth.signUp")}
+      lede={t("auth.signUpLede")}
       footer={
         <>
-          Har du redan ett konto?{" "}
+          {t("auth.haveAccount")}{" "}
           <Link href="/login" className="text-ballpoint underline">
-            Logga in
+            {t("auth.signIn")}
           </Link>
         </>
       }

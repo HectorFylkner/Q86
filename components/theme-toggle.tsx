@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/components/i18n-provider";
 
 type Mode = "auto" | "dark" | "light";
 const ORDER: Mode[] = ["auto", "dark", "light"];
-const LABELS: Record<Mode, string> = { auto: "Auto", dark: "Night", light: "Paper" };
 
 function apply(mode: Mode) {
   const root = document.documentElement;
@@ -14,6 +14,7 @@ function apply(mode: Mode) {
 }
 
 export function ThemeToggle() {
+  const t = useT();
   const [mode, setMode] = useState<Mode>("auto");
 
   useEffect(() => {
@@ -28,13 +29,21 @@ export function ThemeToggle() {
     apply(next);
   }
 
+  const label =
+    mode === "auto"
+      ? t("theme.auto")
+      : mode === "dark"
+        ? t("theme.night")
+        : t("theme.paper");
+
   return (
     <button
       onClick={cycle}
-      title="Theme: auto follows your system; Night is the dark desk; Paper is the exam-light default"
+      title={t("theme.hint")}
+      aria-label={t("theme.label")}
       className="rounded-control border border-grid px-2.5 py-1 font-mono text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
     >
-      {LABELS[mode]}
+      {label}
     </button>
   );
 }

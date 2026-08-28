@@ -9,13 +9,8 @@ import { ResultStroke } from "@/components/drill/result-stroke";
 import { startRedoSession } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import {
-  CONFIDENCE_LABELS,
   ERROR_TYPES,
-  ERROR_TYPE_LABELS,
   FUNDAMENTAL_SKILLS,
-  SKILL_LABELS,
-  SKILL_SHORT_LABELS,
-  SUBTOPIC_LABELS,
   type Confidence,
   type Context,
   type ErrorType,
@@ -24,6 +19,17 @@ import {
   type SessionMode,
   type Subtopic,
 } from "@/lib/taxonomy";
+import { useI18n } from "@/components/i18n-provider";
+import type { Key, Translate } from "@/lib/i18n";
+import { dateFnsLocale } from "@/lib/i18n/format";
+import {
+  confidenceLabel,
+  contextLabel,
+  errorTypeLabel,
+  skillLabel,
+  skillShortLabel,
+  subtopicLabel,
+} from "@/lib/i18n/labels";
 import { cn, formatSeconds } from "@/lib/utils";
 
 export type DueRow = {
@@ -53,11 +59,14 @@ export type LogRow = {
   context: Context;
 };
 
-const STAGE_LABELS: Record<number, string> = {
-  0: "stage 0 · +2d",
-  1: "stage 1 · +7d",
-  2: "stage 2 · +21d cold-solve",
+const STAGE_KEYS: Record<number, Key> = {
+  0: "queue.stage0",
+  1: "queue.stage1",
+  2: "queue.stage2",
 };
+
+const stageLabel = (t: Translate, stage: number): string =>
+  stage in STAGE_KEYS ? t(STAGE_KEYS[stage]) : t("queue.stageN", { n: stage });
 
 export function QueueClient({
   due,
@@ -70,6 +79,7 @@ export function QueueClient({
   log: LogRow[];
   autoStart: boolean;
 }) {
+  const { locale, t } = useI18n();
   const router = useRouter();
   const [runner, setRunner] = useState<{
     sessionId: number;
@@ -93,12 +103,12 @@ export function QueueClient({
     try {
       const res = await startRedoSession(questionIds);
       if (res.error != null || res.sessionId == null) {
-        setError(res.error ?? "Could not start the redo run.");
+        setError(res.error ?? t("queue.couldNotStart"));
       } else {
         setRunner({ sessionId: res.sessionId, questions: res.questions });
       }
     } catch {
-      setError("Could not start the redo run — the server did not respond.");
+      setError(t("queue.couldNotStartServer"));
     } finally {
       setStarting(false);
     }
@@ -201,7 +211,7 @@ export function QueueClient({
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
-            Due now · {due.length}
+            {t("queue.dueNow", { count: due.length })}
           </h2>
           {due.length > 0 && (
             <button
@@ -212,35 +222,39 @@ export function QueueClient({
                 starting && "cursor-wait opacity-60",
               )}
             >
-              Redo all {due.length} due
+              {t("queue.redoAll", { count: due.length })}
             </button>
           )}
         </div>
         {due.length === 0 ? (
           <p className="mt-2 text-sm text-graphite">
-            Nothing due. Generate a VOF drill or start a timed set.
+            {t("queue.nothingDue")}
           </p>
         ) : (
           <>
             <p className="mt-1 text-xs text-graphite">
-              Stage-2 items clear only when solved unaided within 2:30 —
-              otherwise they re-enter at stage 1.
+              {t("queue.stageNote")}
             </p>
             <table className="mt-3 w-full text-sm">
               <tbody>
                 {due.map((d) => (
                   <tr key={d.id} className="border-t border-grid">
                     <td className="py-2 pr-3">
-                      {SUBTOPIC_LABELS[d.subtopic]}
+                      {subtopicLabel(t, d.subtopic)}
                       <span className="ml-2 text-xs text-graphite">
-                        {SKILL_SHORT_LABELS[d.skill]} · D{d.difficulty}
+                        {skillShortLabel(t, d.skill)} · D{d.difficulty}
                       </span>
                     </td>
                     <td className="py-2 pr-3 font-mono text-xs text-graphite">
-                      {STAGE_LABELS[d.stage] ?? `stage ${d.stage}`}
+                      {stageLabel(t, d.stage)}
                     </td>
                     <td className="py-2 pr-3 text-xs text-graphite">
-                      due {formatDistanceToNow(new Date(d.dueAt), { addSuffix: true })}
+                      {t("queue.due", {
+                        when: formatDistanceToNow(new Date(d.dueAt), {
+                          addSuffix: true,
+                          locale: dateFnsLocale(locale),
+                        }),
+                      })}
                     </td>
                     <td className="py-2 text-right">
                       <button
@@ -248,7 +262,7 @@ export function QueueClient({
                         disabled={starting}
                         className="text-xs font-medium text-ballpoint hover:underline"
                       >
-                        Redo this one
+                        {t("queue.redoThis")}
                       </button>
                     </td>
                   </tr>
@@ -262,19 +276,22 @@ export function QueueClient({
       {upcoming.length > 0 && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
-            Scheduled · {upcoming.length}
+            {t("queue.scheduled", { count: upcoming.length })}
           </h2>
           <ul className="mt-2 space-y-1">
             {upcoming.map((d) => (
               <li key={d.id} className="flex justify-between text-sm">
                 <span>
-                  {SUBTOPIC_LABELS[d.subtopic]}
+                  {subtopicLabel(t, d.subtopic)}
                   <span className="ml-2 text-xs text-graphite">
-                    {STAGE_LABELS[d.stage] ?? ""}
+                    {stageLabel(t, d.stage)}
                   </span>
                 </span>
                 <span className="font-mono text-xs text-graphite">
-                  {formatDistanceToNow(new Date(d.dueAt), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(d.dueAt), {
+                    addSuffix: true,
+                    locale: dateFnsLocale(locale),
+                  })}
                 </span>
               </li>
             ))}
@@ -285,9 +302,12 @@ export function QueueClient({
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold">
-            Error log
+            {t("queue.errorLog")}
             <span className="ml-2 font-mono text-xs font-normal text-graphite">
-              {filteredLog.length} of {log.length} attempts
+              {t("queue.logCount", {
+                shown: filteredLog.length,
+                total: log.length,
+              })}
             </span>
           </h2>
           <button
@@ -295,50 +315,50 @@ export function QueueClient({
             className="flex items-center gap-1.5 rounded-control border border-grid bg-surface px-3 py-1.5 text-xs hover:border-graphite/50"
           >
             <Download size={13} />
-            Export CSV ({filteredLog.length} rows)
+            {t("queue.exportCsv", { rows: filteredLog.length })}
           </button>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
           <select
-            aria-label="Filter by skill"
+            aria-label={t("queue.filterBySkill")}
             value={skillFilter}
             onChange={(e) =>
               setSkillFilter(e.target.value as FundamentalSkill | "all")
             }
             className="rounded-control border border-grid bg-surface px-2 py-1"
           >
-            <option value="all">All skills</option>
+            <option value="all">{t("drillSetup.allSkills")}</option>
             {FUNDAMENTAL_SKILLS.map((s) => (
               <option key={s} value={s}>
-                {SKILL_LABELS[s]}
+                {skillLabel(t, s)}
               </option>
             ))}
           </select>
           <select
-            aria-label="Filter by error type"
+            aria-label={t("queue.filterByErrorType")}
             value={errorFilter}
             onChange={(e) => setErrorFilter(e.target.value as ErrorType | "all")}
             className="rounded-control border border-grid bg-surface px-2 py-1"
           >
-            <option value="all">All error types</option>
+            <option value="all">{t("queue.allErrorTypes")}</option>
             {ERROR_TYPES.map((et) => (
               <option key={et} value={et}>
-                {ERROR_TYPE_LABELS[et]}
+                {errorTypeLabel(t, et)}
               </option>
             ))}
           </select>
           <select
-            aria-label="Filter by result"
+            aria-label={t("queue.filterByResult")}
             value={resultFilter}
             onChange={(e) =>
               setResultFilter(e.target.value as "all" | "wrong" | "correct")
             }
             className="rounded-control border border-grid bg-surface px-2 py-1"
           >
-            <option value="all">All results</option>
-            <option value="wrong">Wrong only</option>
-            <option value="correct">Correct only</option>
+            <option value="all">{t("queue.allResults")}</option>
+            <option value="wrong">{t("queue.wrongOnly")}</option>
+            <option value="correct">{t("queue.correctOnly")}</option>
           </select>
         </div>
 
@@ -346,15 +366,29 @@ export function QueueClient({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-grid text-left text-xs text-graphite">
-                <th className="py-2 pr-3 font-normal">When</th>
-                <th className="py-2 pr-3 font-normal">Subtopic</th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("queue.columnWhen")}
+                </th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("drillRunner.subtopicColumn")}
+                </th>
                 <th className="py-2 pr-3 font-normal">D</th>
-                <th className="py-2 pr-3 font-normal">Mode</th>
-                <th className="py-2 pr-3 font-normal">Result</th>
-                <th className="py-2 pr-3 font-normal">Time</th>
-                <th className="py-2 pr-3 font-normal">Confidence</th>
-                <th className="py-2 pr-3 font-normal">Error</th>
-                <th className="py-2 font-normal">Notes</th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("queue.columnMode")}
+                </th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("drillRunner.resultColumn")}
+                </th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("drillRunner.timeColumn")}
+                </th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("drillRunner.confidence")}
+                </th>
+                <th className="py-2 pr-3 font-normal">
+                  {t("queue.columnError")}
+                </th>
+                <th className="py-2 font-normal">{t("queue.columnNotes")}</th>
               </tr>
             </thead>
             <tbody>
@@ -363,12 +397,13 @@ export function QueueClient({
                   <td className="py-1.5 pr-3 font-mono text-xs text-graphite">
                     {formatDistanceToNow(new Date(r.createdAt), {
                       addSuffix: true,
+                      locale: dateFnsLocale(locale),
                     })}
                   </td>
                   <td className="py-1.5 pr-3">
-                    {SUBTOPIC_LABELS[r.subtopic]}
+                    {subtopicLabel(t, r.subtopic)}
                     <span className="ml-1.5 text-[10px] text-graphite">
-                      {r.context === "pure" ? "Pure" : "Real"}
+                      {contextLabel(t, r.context)}
                       {r.format === "data_sufficiency" ? " · DS" : ""}
                     </span>
                   </td>
@@ -388,12 +423,12 @@ export function QueueClient({
                     {formatSeconds(r.timeSeconds)}
                   </td>
                   <td className="py-1.5 pr-3 text-xs text-graphite">
-                    {CONFIDENCE_LABELS[r.confidence]}
+                    {confidenceLabel(t, r.confidence)}
                   </td>
                   <td className="py-1.5 pr-3 text-xs">
                     {r.errorType ? (
                       <span className="text-redpen">
-                        {ERROR_TYPE_LABELS[r.errorType]}
+                        {errorTypeLabel(t, r.errorType)}
                       </span>
                     ) : (
                       <span className="text-graphite">—</span>
@@ -410,7 +445,7 @@ export function QueueClient({
                     colSpan={9}
                     className="py-4 text-center text-sm text-graphite"
                   >
-                    No attempts match these filters.
+                    {t("queue.noMatches")}
                   </td>
                 </tr>
               )}

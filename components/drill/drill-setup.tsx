@@ -7,14 +7,14 @@ import type { DrillTiming } from "@/lib/actions";
 import {
   DIFFICULTIES,
   FUNDAMENTAL_SKILLS,
-  SKILL_LABELS,
   SUBTOPICS_BY_SKILL,
-  SUBTOPIC_LABELS,
   type FundamentalSkill,
   type QuestionFormat,
   type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import { skillLabel, subtopicLabel } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
 export type CountRow = {
@@ -46,6 +46,7 @@ export function DrillSetup({
    *  operator rather than to a subscriber (ADR 0001 §2). */
   canGenerate: boolean;
 }) {
+  const t = useT();
   const router = useRouter();
   const [skill, setSkill] = useState<FundamentalSkill | "all">(
     "value_order_factors",
@@ -99,8 +100,8 @@ export function DrillSetup({
   }
 
   async function generateMore() {
-    setGenState({ kind: "working", stage: "Generating questions…" });
-    const stages = ["Generating questions…", "Verifying questions…"];
+    setGenState({ kind: "working", stage: t("drillSetup.generating") });
+    const stages = [t("drillSetup.generating"), t("drillSetup.verifying")];
     let stageIdx = 0;
     const ticker = setInterval(() => {
       stageIdx = (stageIdx + 1) % stages.length;
@@ -136,7 +137,7 @@ export function DrillSetup({
         message:
           e instanceof Error
             ? e.message
-            : "Generation failed. Check ANTHROPIC_API_KEY in .env.local and retry.",
+            : t("drillSetup.generateFailed"),
       });
     } finally {
       clearInterval(ticker);
@@ -152,7 +153,9 @@ export function DrillSetup({
       )}
 
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
-        <h2 className="font-display text-base font-semibold">Skill</h2>
+        <h2 className="font-display text-base font-semibold">
+          {t("drillSetup.skill")}
+        </h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {(["all", ...FUNDAMENTAL_SKILLS] as const).map((s) => (
             <button
@@ -168,15 +171,15 @@ export function DrillSetup({
                   : "border-grid text-graphite hover:border-graphite/50",
               )}
             >
-              {s === "all" ? "All skills" : SKILL_LABELS[s]}
+              {s === "all" ? t("drillSetup.allSkills") : skillLabel(t, s)}
             </button>
           ))}
         </div>
 
         <h2 className="mt-4 font-display text-base font-semibold">
-          Subtopics
+          {t("drillSetup.subtopics")}
           <span className="ml-2 text-xs font-normal text-graphite">
-            none selected = all of them
+            {t("drillSetup.subtopicsHint")}
           </span>
         </h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -191,17 +194,17 @@ export function DrillSetup({
                   : "border-grid text-graphite hover:border-graphite/50",
               )}
             >
-              {SUBTOPIC_LABELS[s]}
+              {subtopicLabel(t, s)}
             </button>
           ))}
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="text-sm font-medium">Difficulty</h3>
+            <h3 className="text-sm font-medium">{t("drillSetup.difficulty")}</h3>
             <div className="mt-1.5 flex items-center gap-2 text-sm">
               <select
-                aria-label="Minimum difficulty"
+                aria-label={t("drillSetup.minDifficulty")}
                 value={diffMin}
                 onChange={(e) => {
                   const v = Number(e.target.value);
@@ -216,9 +219,9 @@ export function DrillSetup({
                   </option>
                 ))}
               </select>
-              <span className="text-graphite">to</span>
+              <span className="text-graphite">{t("drillSetup.to")}</span>
               <select
-                aria-label="Maximum difficulty"
+                aria-label={t("drillSetup.maxDifficulty")}
                 value={diffMax}
                 onChange={(e) => {
                   const v = Number(e.target.value);
@@ -235,12 +238,14 @@ export function DrillSetup({
               </select>
             </div>
             <p className="mt-1 text-[11px] text-graphite">
-              Approximate: D3 ≈ mid official, D5 ≈ hardest.
+              {t("drillSetup.difficultyNote")}
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Questions</h3>
+            <h3 className="text-sm font-medium">
+              {t("drillSetup.questionCount")}
+            </h3>
             <div className="mt-1.5 flex gap-1.5">
               {COUNT_OPTIONS.map((c) => (
                 <button
@@ -260,12 +265,12 @@ export function DrillSetup({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Timing</h3>
+            <h3 className="text-sm font-medium">{t("drillSetup.timing")}</h3>
             <div className="mt-1.5 flex gap-1.5">
               {(
                 [
-                  ["untimed", "Untimed"],
-                  ["soft", "Soft 2:15 target"],
+                  ["untimed", t("drillSetup.untimed")],
+                  ["soft", t("drillSetup.softTarget")],
                 ] as const
               ).map(([value, label]) => (
                 <button
@@ -285,11 +290,11 @@ export function DrillSetup({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Format</h3>
+            <h3 className="text-sm font-medium">{t("drillSetup.format")}</h3>
             <div className="mt-1.5 flex gap-1.5">
               {(
                 [
-                  ["all", "Both"],
+                  ["all", t("drillSetup.bothFormats")],
                   ["problem_solving", "PS"],
                   ["data_sufficiency", "DS · Data Insights"],
                 ] as const
@@ -312,12 +317,14 @@ export function DrillSetup({
         </div>
 
         <div className="mt-4 border-t border-grid pt-4">
-          <h3 className="text-sm font-medium">Session focus</h3>
+          <h3 className="text-sm font-medium">
+            {t("drillSetup.sessionFocus")}
+          </h3>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {(
               [
-                ["focused", "Focused — counts in statistics"],
-                ["casual", "Casual — excluded from statistics"],
+                ["focused", t("drillSetup.focused")],
+                ["casual", t("drillSetup.casual")],
               ] as const
             ).map(([value, label]) => (
               <button
@@ -336,8 +343,7 @@ export function DrillSetup({
           </div>
           {focus === "casual" && (
             <p className="mt-1.5 text-[11px] text-amber">
-              Casual attempts stay out of analytics, calibration, and the daily
-              plan. Misses still join the redo queue.
+              {t("drillSetup.casualNote")}
             </p>
           )}
         </div>
@@ -358,11 +364,11 @@ export function DrillSetup({
               matching === 0 && "cursor-not-allowed opacity-50",
             )}
           >
-            Start drill: {Math.min(count, matching)} questions
+            {t("drillSetup.startDrill", { count: Math.min(count, matching) })}
           </button>
           <span className="text-sm text-graphite">
-            {matching} verified questions match this filter
-            {matching > 0 && matching < count && " — drill clamped to match"}
+            {t("drillSetup.matching", { count: matching })}
+            {matching > 0 && matching < count && t("drillSetup.clamped")}
           </span>
         </div>
       </section>
@@ -370,11 +376,10 @@ export function DrillSetup({
       {canGenerate && (
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-base font-semibold">
-          Generate more questions
+          {t("drillSetup.generateTitle")}
         </h2>
         <p className="mt-1 text-sm text-graphite">
-          Ten fresh questions matching the filter above, each independently
-          verified before it can appear in a drill.
+          {t("drillSetup.generateLede")}
         </p>
         <div className="mt-3 flex items-center gap-3">
           <button
@@ -385,7 +390,7 @@ export function DrillSetup({
               genState.kind === "working" && "cursor-wait opacity-60",
             )}
           >
-            Generate 10 more
+            {t("drillSetup.generateButton")}
           </button>
           {genState.kind === "working" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
@@ -396,12 +401,14 @@ export function DrillSetup({
           {genState.kind === "done" && (
             <span className="text-sm">
               <span className="text-ballpoint">
-                {genState.verified} verified
+                {t("drillSetup.generatedVerified", {
+                  count: genState.verified,
+                })}
               </span>
               {genState.failed > 0 && (
                 <span className="text-graphite">
-                  {" "}
-                  · {genState.failed} failed verification
+                  {" · "}
+                  {t("drillSetup.generatedFailed", { count: genState.failed })}
                 </span>
               )}
             </span>

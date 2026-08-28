@@ -9,22 +9,25 @@ import {
   signUpAction,
   type AuthResult,
 } from "@/lib/auth/actions";
-import { authMessage } from "./messages";
+import { useT } from "@/components/i18n-provider";
+import { authMessage } from "@/lib/auth/messages";
 import { FieldLabel, inputClass, submitClass } from "./auth-shell";
 
 const EMPTY: AuthResult = { error: null };
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
+  const t = useT();
   return (
     <button type="submit" disabled={pending} className={submitClass}>
-      {pending ? "Ett ögonblick…" : label}
+      {pending ? t("auth.working") : label}
     </button>
   );
 }
 
 function Problem({ code }: { code: string | null }) {
-  const message = authMessage(code);
+  const t = useT();
+  const message = authMessage(t, code);
   if (!message) return null;
   return (
     <p role="alert" className="text-sm text-redpen">
@@ -34,15 +37,18 @@ function Problem({ code }: { code: string | null }) {
 }
 
 export function SignUpForm() {
+  const t = useT();
   const [state, action] = useActionState(signUpAction, EMPTY);
   return (
     <form action={action} className="space-y-4">
       <div>
-        <FieldLabel htmlFor="name">Namn (valfritt)</FieldLabel>
+        <FieldLabel htmlFor="name">
+          {t("auth.name", { optional: t("common.optional") })}
+        </FieldLabel>
         <input id="name" name="name" autoComplete="name" className={inputClass} />
       </div>
       <div>
-        <FieldLabel htmlFor="email">E-post</FieldLabel>
+        <FieldLabel htmlFor="email">{t("auth.email")}</FieldLabel>
         <input
           id="email"
           name="email"
@@ -53,7 +59,7 @@ export function SignUpForm() {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="password">Lösenord</FieldLabel>
+        <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
         <input
           id="password"
           name="password"
@@ -63,21 +69,24 @@ export function SignUpForm() {
           autoComplete="new-password"
           className={inputClass}
         />
-        <p className="mt-1 text-[11px] text-graphite">Minst 10 tecken.</p>
+        <p className="mt-1 text-[11px] text-graphite">
+          {t("auth.passwordHint")}
+        </p>
       </div>
       <Problem code={state.error} />
-      <Submit label="Skapa konto" />
+      <Submit label={t("auth.signUp")} />
     </form>
   );
 }
 
 export function SignInForm({ next }: { next?: string }) {
+  const t = useT();
   const [state, action] = useActionState(signInAction, EMPTY);
   return (
     <form action={action} className="space-y-4">
       {next && <input type="hidden" name="next" value={next} />}
       <div>
-        <FieldLabel htmlFor="email">E-post</FieldLabel>
+        <FieldLabel htmlFor="email">{t("auth.email")}</FieldLabel>
         <input
           id="email"
           name="email"
@@ -88,7 +97,7 @@ export function SignInForm({ next }: { next?: string }) {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="password">Lösenord</FieldLabel>
+        <FieldLabel htmlFor="password">{t("auth.password")}</FieldLabel>
         <input
           id="password"
           name="password"
@@ -99,18 +108,19 @@ export function SignInForm({ next }: { next?: string }) {
         />
       </div>
       <Problem code={state.error} />
-      <Submit label="Logga in" />
+      <Submit label={t("auth.signIn")} />
     </form>
   );
 }
 
 export function ForgotPasswordForm() {
+  const t = useT();
   const [state, action] = useActionState(requestPasswordResetAction, EMPTY);
   const submitted = state !== EMPTY && state.error === null;
   return (
     <form action={action} className="space-y-4">
       <div>
-        <FieldLabel htmlFor="email">E-post</FieldLabel>
+        <FieldLabel htmlFor="email">{t("auth.email")}</FieldLabel>
         <input
           id="email"
           name="email"
@@ -122,23 +132,21 @@ export function ForgotPasswordForm() {
       </div>
       <Problem code={state.error} />
       {submitted && (
-        <p className="text-sm text-ballpoint">
-          Om adressen har ett konto är ett mejl med en återställningslänk på
-          väg. Länken gäller i 30 minuter.
-        </p>
+        <p className="text-sm text-ballpoint">{t("auth.forgotSent")}</p>
       )}
-      <Submit label="Skicka återställningslänk" />
+      <Submit label={t("auth.forgotSubmit")} />
     </form>
   );
 }
 
 export function ResetPasswordForm({ token }: { token: string }) {
+  const t = useT();
   const [state, action] = useActionState(resetPasswordAction, EMPTY);
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="token" value={token} />
       <div>
-        <FieldLabel htmlFor="password">Nytt lösenord</FieldLabel>
+        <FieldLabel htmlFor="password">{t("auth.newPassword")}</FieldLabel>
         <input
           id="password"
           name="password"
@@ -148,10 +156,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
           autoComplete="new-password"
           className={inputClass}
         />
-        <p className="mt-1 text-[11px] text-graphite">Minst 10 tecken.</p>
+        <p className="mt-1 text-[11px] text-graphite">
+          {t("auth.passwordHint")}
+        </p>
       </div>
       <Problem code={state.error} />
-      <Submit label="Spara nytt lösenord" />
+      <Submit label={t("auth.resetSubmit")} />
     </form>
   );
 }

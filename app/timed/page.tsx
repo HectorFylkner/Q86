@@ -1,6 +1,7 @@
 import { count, eq } from "drizzle-orm";
 import { TimedClient } from "@/components/timed/timed-client";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getT } from "@/lib/i18n/server";
 import { questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export default async function TimedPage({
   searchParams: Promise<{ start?: string }>;
 }) {
   const { sdb } = await requireFeature("timed");
+  const t = await getT();
   const { start } = await searchParams;
   const verifiedTotal =
     (
@@ -24,7 +26,9 @@ export default async function TimedPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-xl font-semibold">Timed sets</h1>
+      <h1 className="font-display text-xl font-semibold">
+        {t("pages.timed")}
+      </h1>
       <TimedClient
         verifiedTotal={verifiedTotal}
         autoStart={start === "full" || start === "mini" ? start : null}

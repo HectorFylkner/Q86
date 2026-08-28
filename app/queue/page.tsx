@@ -2,6 +2,7 @@ import { and, desc, eq, gt, lte } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getT } from "@/lib/i18n/server";
 import { attempts, questions, redoQueue } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ export default async function QueuePage({
   searchParams: Promise<{ start?: string }>;
 }) {
   const { sdb } = await requireFeature("queue");
+  const t = await getT();
   const { start } = await searchParams;
   const now = new Date();
 
@@ -87,7 +89,7 @@ export default async function QueuePage({
     <div className="space-y-4">
       <SectionTabs group="review" />
       <h1 className="font-display text-xl font-semibold">
-        Redo queue &amp; error log
+        {t("pages.queue")}
       </h1>
       <QueueClient
         due={due}

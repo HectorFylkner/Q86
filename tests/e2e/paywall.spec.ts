@@ -18,16 +18,16 @@ test.describe("free tier", () => {
     await signUp(page, uniqueEmail("gratis"));
 
     await page.goto("/learn");
-    await expect(page.getByRole("heading", { name: "Learn" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Lär" })).toBeVisible();
 
     await page.goto("/patterns");
     await expect(
-      page.getByRole("heading", { name: "Pattern trainer" }),
+      page.getByRole("heading", { name: "Mönsterträning" }),
     ).toBeVisible();
 
     await page.goto("/drill");
     await expect(
-      page.getByRole("button", { name: /^Start drill/ }),
+      page.getByRole("button", { name: /^Starta träning/ }),
     ).toBeVisible();
 
     // The dashboard says what the free tier is, without nagging.
@@ -121,7 +121,7 @@ test.describe("free tier", () => {
 
   test("can always reach the account page and export", async ({ page }) => {
     await signUp(page, uniqueEmail("export-gratis"));
-    await expect(appNav(page).getByRole("link", { name: "Today" })).toBeVisible();
+    await expect(appNav(page).getByRole("link", { name: "I dag" })).toBeVisible();
     await page.goto("/konto");
     await expect(
       page.getByRole("link", { name: /Ladda ner mina uppgifter/ }),

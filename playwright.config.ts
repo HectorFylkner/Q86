@@ -51,7 +51,11 @@ export default defineConfig({
   webServer: {
     command: `pnpm start -p ${PORT}`,
     url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse: a leftover server serves whatever `.next` it started
+    // with, against whatever database file it opened. Reusing one has
+    // produced both a false green (an old bundle passing) and a false red
+    // (a server holding a deleted database), so every run starts its own.
+    reuseExistingServer: false,
     timeout: 180_000,
     stdout: "pipe",
     stderr: "pipe",

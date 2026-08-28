@@ -12,10 +12,16 @@ unverified.
 
 ## Current milestone
 
-**M2 — Billing and entitlements.** Complete, except for one thing only the
-owner can do: a purchase against Stripe's own test mode. There are no
-Stripe keys in this environment, so that step is written up as a runbook in
-`docs/BILLING.md` rather than claimed as verified.
+**M3 — Swedish localization.** Complete. sv-SE is the default with English
+behind a toggle, no user-facing string is hard-coded, dates/numbers/prices
+format as sv-SE, the locale is stored on the account, and all 24 lesson
+chapters exist in Swedish with the English originals kept behind the
+toggle. The exam-fidelity boundary holds: question stems, answer choices
+and Data Sufficiency statements are English in both locales.
+
+M2's one open item is unchanged — a purchase against Stripe's own test
+mode needs keys this environment does not have, and is written up as a
+runbook in `docs/BILLING.md` rather than claimed as verified.
 
 ## Milestone status
 
@@ -24,7 +30,7 @@ Stripe keys in this environment, so that step is written up as a runbook in
 | M0 | Decision record | ✅ done | see git log |
 | M1 | Multi-tenancy and accounts | ✅ done | see git log |
 | M2 | Billing and entitlements | ✅ done (see the Stripe caveat) | see git log |
-| M3 | Swedish localization | ⬜ not started | — |
+| M3 | Swedish localization | ✅ done | see git log |
 | M4 | Public site and acquisition funnel | ⬜ not started | — |
 | M5 | Retention | ⬜ not started | — |
 | M6 | Operations | ⬜ not started | — |
@@ -54,10 +60,39 @@ Commands run in this session and what they printed.
 | `pnpm test` (vitest) | **83 passed**, 7 files, 0 failed | M2 |
 | `pnpm build` | `✓ Compiled successfully` | M2 |
 | `npx playwright test` | **16 passed**, 0 failed | M2 |
+| `npx tsc --noEmit` | exit 0, no output | M3 |
+| `pnpm lint` | exit 0 — **0 errors**, 25 warnings (all pre-existing, all in `scripts/author/*.mjs`) | M3 |
+| `pnpm test` (vitest) | **102 passed**, 8 files, 0 failed | M3 |
+| `pnpm build` | `✓ Compiled successfully in 12.0s` | M3 |
+| `npx playwright test` | **19 passed**, 0 failed, 28.6s | M3 |
 
 ## Known broken
 
 Nothing known broken.
+
+## Bugs M3 found in earlier work
+
+Two of these were shipped by M1/M2 and only surfaced when the production
+build was rerun; both now have a structural test that fails on the exact
+regression (each verified non-vacuous by planting the bug and watching the
+rule fire).
+
+- **`lib/i18n/index.ts` imported `next/headers`.** The catalogs and the
+  translator cross into client components, so `pnpm build` failed with
+  "You're importing a component that needs next/headers". Request-scoped
+  resolution moved to `lib/i18n/server.ts`; `lib/i18n/index.ts` is now
+  free of server-only imports. Guarded by *keeps next/headers out of every
+  module a client component imports*, which walks the import graph from
+  every `"use client"` file and stops at `"use server"` RPC boundaries.
+- **`authMessage()` was exported from a `"use client"` module and called by
+  a server component.** `tsc` and `next build` both accept this; it fails
+  at request time with "Attempted to call authMessage() from the server".
+  It moved to `lib/auth/messages.ts`. Guarded by *never calls a function
+  exported from a client module on the server*.
+- **The E2E suite was green against a stale build.** `pnpm start` serves
+  whatever `.next` holds, so the first M3 Playwright run exercised M2's
+  bundle and passed while the current code could not even compile. The
+  gate now always runs `pnpm build` before `npx playwright test`.
 
 ## Unverified — needs the owner
 
@@ -92,9 +127,17 @@ browser. The seven-step procedure to close the gap is in
   - `bootstrap-upgrade.test.ts` (M2) — a `db:push` database from before
     accounts existed, booted by today's code: it adopts a migration
     ledger, catches up, and keeps its history.
-- **Playwright** (`npx playwright test`) — 9 tests against a production
+  - `i18n.test.ts` (M3) — catalog completeness in both locales, sv-SE
+    `Intl` output, Accept-Language parsing, every taxonomy value labelled,
+    GMAT terminology left in English inside the Swedish catalog, every
+    question stem in the bank still English, and the two module-boundary
+    rules above.
+- **Playwright** (`npx playwright test`) — end-to-end against a production
   build. Chromium is resolved from `PLAYWRIGHT_BROWSERS_PATH`; nothing is
-  downloaded.
+  downloaded. `language.spec.ts` (M3) covers the toggle: a new account
+  starts Swedish, the choice persists across navigation and a fresh
+  sign-in, and a chapter's prose translates while its worked example stays
+  in the exam's English.
 
 ## Decisions taken during M1 that change the product
 
@@ -130,6 +173,34 @@ browser. The seven-step procedure to close the gap is in
   It previously only ever migrated an empty one, which meant M2's tables
   would never have reached a running deployment. Databases with no ledger
   adopt one once and then follow the normal path.
+
+## Decisions taken during M3 that change the product
+
+- **Swedish is unconditional for anyone who has not chosen otherwise, and
+  `Accept-Language` is not consulted at all.** ADR 0004 originally ended
+  the chain with the header; implementing it showed the header is the
+  wrong signal here, because a large share of Swedish users run an
+  English-language browser and would have been served an English site.
+  Resolution is now account → `q86_locale` cookie → sv. Two consequences
+  are implemented alongside it: the language toggle appears on the
+  credential screens (not only in the signed-in header), so an English
+  reader can switch before signing up; and `signUpAction` passes the
+  resolved locale to `createUser`, so an account is created in the
+  language its signup form was read in. ADR 0004 carries the revision.
+- **The chapter files moved under a locale directory.** `content/lessons/`
+  is now `content/lessons/en/` and `content/lessons/sv/`, and a missing
+  Swedish chapter falls back to English with a banner saying so. No parser
+  change was needed: the `##` headings and `**Example n**` markers are
+  structural, and the displayed section titles come from the catalog, so a
+  Swedish chapter keeps the English scaffolding verbatim.
+- **The exam-fidelity boundary is a tested rule, not a convention.**
+  Question stems, answer choices and Data Sufficiency statements stay in
+  English; the interface, lesson prose, solution commentary, coaching and
+  error-taxonomy labels are Swedish. The language toggle says so in its
+  own tooltip rather than leaving it to be discovered.
+- **No locale segment in the URL.** The app is served from unprefixed
+  paths and the public site will be Swedish at the root, because the
+  search intent Q86 targets is Swedish (ADR 0004).
 
 ## Baseline facts established by reading the code
 

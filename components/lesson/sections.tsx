@@ -68,7 +68,18 @@ export function CoreIdeas({
 }
 
 /** "Trigger cues" — phrase → method pairs as recognition cards. */
-export function CueGrid({ cues }: { cues: Cue[] }) {
+/**
+ * Labels are passed in rather than read from a hook: this module renders
+ * KaTeX through <Md>, and making it a client component to reach `useT()`
+ * would ship the whole maths renderer to the browser for two words.
+ */
+export function CueGrid({
+  cues,
+  labels,
+}: {
+  cues: Cue[];
+  labels: { see: string; act: string };
+}) {
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {cues.map((cue, i) => (
@@ -77,13 +88,13 @@ export function CueGrid({ cues }: { cues: Cue[] }) {
           className="flex flex-col rounded-card border border-grid bg-surface p-4 shadow-ambient sm:px-5"
         >
           <p className="font-mono text-[10px] uppercase tracking-wider text-graphite">
-            When you see
+            {labels.see}
           </p>
           <Md source={cue.see} className="mt-1 text-sm font-medium" />
           {cue.act && (
             <>
               <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-ballpoint">
-                → Reach for
+                {labels.act}
               </p>
               <Md source={cue.act} className="mt-1 text-sm text-graphite" />
             </>

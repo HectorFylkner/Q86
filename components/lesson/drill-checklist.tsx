@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Md } from "@/components/math";
+import { useT } from "@/components/i18n-provider";
 
 /** localStorage key per chapter; value {c: checked indexes, t: item count}.
  *  The Learn index reads the same keys to show readiness badges. */
@@ -26,6 +27,7 @@ export function DrillChecklist({
    *  the test to the primary action (read → drill → prove it). */
   test?: ChecklistTestState;
 }) {
+  const t = useT();
   const [checked, setChecked] = useState<boolean[]>(() =>
     items.map(() => false),
   );
@@ -65,9 +67,7 @@ export function DrillChecklist({
   return (
     <div className="rounded-card border border-grid bg-surface shadow-ambient">
       <div className="flex items-center justify-between gap-3 border-b border-grid px-4 py-3 sm:px-5">
-        <p className="text-sm text-graphite">
-          Tick each one honestly — then go prove it.
-        </p>
+        <p className="text-sm text-graphite">{t("lesson.checklistLede")}</p>
         <span className="font-mono text-xs text-graphite">
           {done}/{items.length}
         </span>
@@ -114,17 +114,20 @@ export function DrillChecklist({
         <p className="text-sm">
           {test?.passed ? (
             <span className="font-medium text-ballpoint">
-              Test passed ✓{test.lastScore ? ` · last ${test.lastScore}` : ""}
+              {t("lesson.checklistTestPassed")}
+              {test.lastScore
+                ? ` · ${t("lesson.checklistLastScore", { score: test.lastScore })}`
+                : ""}
             </span>
           ) : all ? (
             <span className="font-medium text-ballpoint">
-              All checked — prove it on the test.
+              {t("lesson.checklistAllDone")}
             </span>
           ) : (
             <span className="text-graphite">
               {test?.lastScore
-                ? `Last test: ${test.lastScore} — the bar is 6/8.`
-                : "The drill will tell you if the ticks were honest."}
+                ? t("lesson.checklistLastTest", { score: test.lastScore })
+                : t("lesson.checklistHonest")}
             </span>
           )}
         </p>
@@ -137,7 +140,7 @@ export function DrillChecklist({
                 : "inline-flex min-h-[44px] items-center rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
             }
           >
-            Drill this now →
+            {t("lesson.drillNow")}
           </Link>
           {test && (
             <Link
@@ -148,7 +151,7 @@ export function DrillChecklist({
                   : "inline-flex min-h-[44px] items-center rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
               }
             >
-              {test.passed ? "Retake the test" : "Chapter test →"}
+              {test.passed ? t("lesson.retakeTest") : t("lesson.chapterTest")}
             </Link>
           )}
         </div>

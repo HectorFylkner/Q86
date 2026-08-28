@@ -33,7 +33,7 @@ test.describe("accounts", () => {
     const email = uniqueEmail("nykund");
 
     await signUp(page, email);
-    await expect(appNav(page).getByRole("link", { name: "Today" })).toBeVisible();
+    await expect(appNav(page).getByRole("link", { name: "I dag" })).toBeVisible();
 
     await signOut(page);
     await page.goto("/");
@@ -41,7 +41,7 @@ test.describe("accounts", () => {
 
     await signIn(page, email);
     await page.waitForURL("/");
-    await expect(appNav(page).getByRole("link", { name: "Today" })).toBeVisible();
+    await expect(appNav(page).getByRole("link", { name: "I dag" })).toBeVisible();
   });
 
   test("rejects a wrong password without revealing whether the account exists", async ({
@@ -104,14 +104,14 @@ test.describe("tenant isolation in the browser", () => {
     await signUpPaid(alice, aliceEmail);
 
     await alice.goto("/drill");
-    await alice.getByRole("button", { name: /^Start drill/ }).click();
+    await alice.getByRole("button", { name: /^Starta träning/ }).click();
     await answerCurrentQuestion(alice);
-    await alice.getByRole("button", { name: /Send to post-mortem/ }).click();
+    await alice.getByRole("button", { name: /Skicka till genomgång/ }).click();
     await alice.waitForURL(/\/postmortem\/\d+$/);
     const href = new URL(alice.url()).pathname;
     expect(href).toMatch(/^\/postmortem\/\d+$/);
     await expect(
-      alice.getByRole("heading", { name: "Whiteboard post-mortem" }),
+      alice.getByRole("heading", { name: "Whiteboard-genomgång" }),
     ).toBeVisible();
 
     // Bob signs up in a separate browser context and tries that exact URL.

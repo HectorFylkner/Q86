@@ -33,10 +33,11 @@ Locale persists on the account.**
   key set and `en` must satisfy the same type. A missing English string is
   a compile error, not a runtime blank.
 - Locale resolution order: the signed-in account's `locale` column →
-  a `q86_locale` cookie (so the marketing site works before signup) →
-  `Accept-Language` → `sv`.
+  a `q86_locale` cookie (so the public site works before signup) → `sv`.
+  **`Accept-Language` is deliberately not consulted** (revised during M3;
+  see "Revision" below).
 - Formatting goes through `Intl` with the resolved locale: `sv-SE` gives
-  `28 augusti 2026`, `1 234,5`, and `249,00 kr`. A small `lib/i18n/format.ts`
+  `28 augusti 2026`, `1 234,5`, and `1 495,00 kr`. A small `lib/i18n/format.ts`
   wraps the three cases the product actually uses (date, number, currency)
   so no component constructs an `Intl` formatter itself.
 - The application shell is served from unprefixed paths (`/drill`,
@@ -44,6 +45,33 @@ Locale persists on the account.**
   correct SEO decision, because the search intent we target is Swedish
   ("GMAT förberedelse", "plugga inför GMAT", "GMAT vs Högskoleprovet") —
   with English available through the same toggle.
+
+## Revision — M3: `Accept-Language` removed from the chain
+
+The original order ended `… → Accept-Language → sv`. Implementing it
+showed the header is the wrong signal for this market: a large share of
+Swedish users run an English-language browser or operating system, so an
+anonymous visitor from Stockholm would be served an English landing page,
+an English login form, and — because a new account inherited its locale
+from the request — an English account thereafter. The header measures
+which language someone's software is in, not which language they want to
+be taught in, and for a product sold to Swedish GMAT candidates those come
+apart often enough to matter.
+
+Swedish is therefore unconditional for anyone who has not chosen
+otherwise. Three things follow, and all three are implemented:
+
+1. The language toggle appears on the credential screens (`AuthShell`),
+   not only in the signed-in header. Without it an English reader arriving
+   at `/login` would have no way to switch.
+2. `signUpAction` passes the resolved locale to `createUser`, so an
+   account is created in whatever language its signup form was read in.
+3. A unit rule (`tests/unit/i18n.test.ts`, "never consults
+   Accept-Language") reads `lib/i18n/locale.ts` with comments stripped and
+   fails if the header comes back.
+
+**Cost of reversing:** low. Re-adding a header check is a few lines in
+`getLocale()` and deleting one test.
 
 **The exam-fidelity boundary, which is absolute:**
 

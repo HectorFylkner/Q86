@@ -13,17 +13,21 @@ import { finishSession, logAttempt, tagAttempt } from "@/lib/actions";
 import { CHAPTER_TEST_BAR } from "@/lib/chapter-test-config";
 import type { Question } from "@/lib/db/schema";
 import {
-  DIFFICULTY_LABELS,
   ERROR_TYPES,
-  ERROR_TYPE_LABELS,
-  SKILL_LABELS,
-  SUBTOPIC_LABELS,
   type Confidence,
   type Difficulty,
   type ErrorType,
   type SessionFocus,
   type Subtopic,
 } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import {
+  confidenceLabel,
+  difficultyLabel,
+  errorTypeLabel,
+  skillLabel,
+  subtopicLabel,
+} from "@/lib/i18n/labels";
 import { cn, formatSeconds, percent } from "@/lib/utils";
 
 const SOFT_TARGET_SECONDS = 135; // soft 2:15 target
@@ -57,6 +61,7 @@ export function QuestionRunner({
   test?: Subtopic | null;
   onRestart?: () => void;
 }) {
+  const t = useT();
   const router = useRouter();
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"answering" | "revealed" | "done">(
@@ -74,21 +79,21 @@ export function QuestionRunner({
 
   useEffect(() => {
     if (phase !== "answering" || timing !== "soft") return;
-    const t = setInterval(
+    const timer = setInterval(
       () => setElapsed((Date.now() - startRef.current) / 1000),
       250,
     );
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [phase, timing, index]);
 
   const submit = useCallback(() => {
     if (phase !== "answering") return;
     if (selected == null) {
-      setHint("Pick an answer — keys 1–5 or A–E.");
+      setHint(t("drillRunner.pickAnswer"));
       return;
     }
     if (confidence == null) {
-      setHint("Set confidence first — G guess, L lean, K lock.");
+      setHint(t("drillRunner.setConfidence"));
       return;
     }
     const timeSeconds = (Date.now() - startRef.current) / 1000;
@@ -126,7 +131,7 @@ export function QuestionRunner({
           r.map((res, i) => (i === index ? { ...res, saveFailed: true } : res)),
         );
       });
-  }, [phase, selected, confidence, question, sessionId, mode, focus, index]);
+  }, [phase, selected, confidence, question, sessionId, mode, focus, index, t]);
 
   const next = useCallback(() => {
     if (phase !== "revealed") return;
@@ -237,26 +242,35 @@ export function QuestionRunner({
             )}
           >
             <h2 className="font-display text-lg font-semibold">
-              {passed ? "Chapter test passed" : "Not passed yet"}
+              {passed
+                ? t("drillRunner.chapterTestPassed")
+                : t("drillRunner.notPassedYet")}
             </h2>
             <p className="mt-1 text-sm text-graphite">
               {passed
-                ? `${correct}/${results.length} — this chapter now shows as passed on the Learn index. Keep it warm with drills; retakes can't demote you.`
-                : `${correct}/${results.length}, and the bar is ${bar}/${results.length}. Post-mortem the misses below, revisit the trap gallery, then retake.`}
+                ? t("drillRunner.passedBody", {
+                    correct,
+                    total: results.length,
+                  })
+                : t("drillRunner.notPassedBody", {
+                    correct,
+                    total: results.length,
+                    bar,
+                  })}
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
                 href={`/learn/${test}`}
                 className="rounded-control border border-grid bg-surface px-4 py-2 text-sm transition-colors hover:border-graphite/50"
               >
-                Back to the chapter
+                {t("drillRunner.backToChapter")}
               </Link>
               {!passed && (
                 <Link
                   href={`/drill?test=${test}`}
                   className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ballpoint/90"
                 >
-                  Retake with fresh questions →
+                  {t("drillRunner.retakeFresh")}
                 </Link>
               )}
             </div>
@@ -265,15 +279,21 @@ export function QuestionRunner({
         <div className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
           <h2 className="font-display text-lg font-semibold">
             {test != null
-              ? "The paper trail"
+              ? t("drillRunner.paperTrail")
               : mode === "redo"
-                ? "Redo complete"
-                : "Drill complete"}
+                ? t("drillRunner.redoComplete")
+                : t("drillRunner.drillComplete")}
           </h2>
           <div className="mt-3 flex flex-wrap gap-6">
-            <Stat label="Accuracy" value={`${percent(correct, results.length)}%`} />
-            <Stat label="Correct" value={`${correct}/${results.length}`} />
-            <Stat label="Avg time" value={formatSeconds(avg)} />
+            <Stat
+              label={t("common.accuracy")}
+              value={`${percent(correct, results.length)}%`}
+            />
+            <Stat
+              label={t("common.correct")}
+              value={`${correct}/${results.length}`}
+            />
+            <Stat label={t("common.averageTime")} value={formatSeconds(avg)} />
           </div>
         </div>
         <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
@@ -281,10 +301,18 @@ export function QuestionRunner({
             <thead>
               <tr className="border-b border-grid text-left text-xs text-graphite">
                 <th className="px-3 py-2 font-normal">#</th>
-                <th className="px-3 py-2 font-normal">Subtopic</th>
-                <th className="px-3 py-2 font-normal">Result</th>
-                <th className="px-3 py-2 font-normal">Time</th>
-                <th className="px-3 py-2 font-normal">Confidence</th>
+                <th className="px-3 py-2 font-normal">
+                  {t("drillRunner.subtopicColumn")}
+                </th>
+                <th className="px-3 py-2 font-normal">
+                  {t("drillRunner.resultColumn")}
+                </th>
+                <th className="px-3 py-2 font-normal">
+                  {t("drillRunner.timeColumn")}
+                </th>
+                <th className="px-3 py-2 font-normal">
+                  {t("drillRunner.confidence")}
+                </th>
                 <th className="px-3 py-2 font-normal" />
               </tr>
             </thead>
@@ -294,7 +322,9 @@ export function QuestionRunner({
                 return (
                   <tr key={i} className="border-b border-grid last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{i + 1}</td>
-                    <td className="px-3 py-2">{SUBTOPIC_LABELS[q.subtopic]}</td>
+                    <td className="px-3 py-2">
+                      {subtopicLabel(t, q.subtopic)}
+                    </td>
                     <td className="px-3 py-2">
                       <ResultStroke kind={r.correct ? "check" : "cross"} size={14} />
                     </td>
@@ -302,7 +332,7 @@ export function QuestionRunner({
                       {formatSeconds(r.timeSeconds)}
                     </td>
                     <td className="px-3 py-2 text-xs text-graphite">
-                      {r.confidence}
+                      {confidenceLabel(t, r.confidence)}
                     </td>
                     <td className="px-3 py-2 text-right">
                       {!r.correct && r.attemptId != null && (
@@ -310,7 +340,7 @@ export function QuestionRunner({
                           href={`/postmortem/${r.attemptId}`}
                           className="text-xs text-ballpoint hover:underline"
                         >
-                          Post-mortem
+                          {t("drillRunner.postmortemLink")}
                         </Link>
                       )}
                     </td>
@@ -326,14 +356,14 @@ export function QuestionRunner({
               onClick={onRestart}
               className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              Set up another drill
+              {t("drillRunner.setUpAnother")}
             </button>
           )}
           <Link
             href="/"
             className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
-            Back to today
+            {t("drillRunner.backToToday")}
           </Link>
         </div>
       </div>
@@ -348,11 +378,14 @@ export function QuestionRunner({
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 text-xs text-graphite">
           <span className="font-mono">
-            Question {index + 1} of {questions.length}
+            {t("runner.questionOf", {
+              n: index + 1,
+              total: questions.length,
+            })}
           </span>
-          <Chip>{SKILL_LABELS[question.fundamentalSkill]}</Chip>
-          <Chip>{SUBTOPIC_LABELS[question.subtopic]}</Chip>
-          <Chip>{DIFFICULTY_LABELS[question.difficulty as Difficulty]}</Chip>
+          <Chip>{skillLabel(t, question.fundamentalSkill)}</Chip>
+          <Chip>{subtopicLabel(t, question.subtopic)}</Chip>
+          <Chip>{difficultyLabel(t, question.difficulty as Difficulty)}</Chip>
           {question.format === "data_sufficiency" && <Chip>DS</Chip>}
         </div>
         {timing === "soft" && !revealed && (
@@ -398,7 +431,7 @@ export function QuestionRunner({
               onClick={submit}
               className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
-              Confirm answer
+              {t("drillRunner.confirmAnswer")}
               <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
             </button>
           </div>
@@ -411,8 +444,7 @@ export function QuestionRunner({
         )}
         {currentResult?.saveFailed && (
           <p className="mt-2 text-sm text-redpen" role="alert">
-            This attempt was not saved — check that the dev server can reach
-            ./data/q86.db.
+            {t("drillRunner.notSaved")}
           </p>
         )}
       </motion.div>
@@ -421,7 +453,9 @@ export function QuestionRunner({
         <>
           {!currentResult.correct && (
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-graphite">Tag the miss (keys 1–6):</span>
+              <span className="text-graphite">
+                {t("drillRunner.tagTheMiss")}
+              </span>
               {ERROR_TYPES.map((et, i) => (
                 <button
                   key={et}
@@ -436,7 +470,7 @@ export function QuestionRunner({
                   )}
                 >
                   <span className="mr-1 font-mono opacity-60">{i + 1}</span>
-                  {ERROR_TYPE_LABELS[et]}
+                  {errorTypeLabel(t, et)}
                 </button>
               ))}
             </div>
@@ -454,14 +488,16 @@ export function QuestionRunner({
                 currentResult.attemptId == null && "opacity-50",
               )}
             >
-              Send to post-mortem
+              {t("drillRunner.sendToPostmortem")}
               <span className="ml-2 font-mono text-[10px] text-graphite">P</span>
             </button>
             <button
               onClick={next}
               className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
-              {index + 1 < questions.length ? "Next question" : "Finish"}
+              {index + 1 < questions.length
+                ? t("drillRunner.nextQuestion")
+                : t("drillRunner.finish")}
               <span className="ml-2 font-mono text-[10px] opacity-70">N</span>
             </button>
           </div>

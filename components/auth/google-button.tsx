@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useT } from "@/components/i18n-provider";
 
 /** Rendered only when GOOGLE_CLIENT_ID/SECRET are configured, so a
  *  deployment without them never shows a button that cannot work. */
 export function GoogleButton({ next }: { next?: string }) {
+  const t = useT();
   const href = next
     ? `/api/auth/google?next=${encodeURIComponent(next)}`
     : "/api/auth/google";
@@ -11,7 +15,7 @@ export function GoogleButton({ next }: { next?: string }) {
       <div className="my-5 flex items-center gap-3">
         <span className="h-px flex-1 bg-grid" />
         <span className="text-[11px] uppercase tracking-wide text-graphite">
-          eller
+          {t("auth.orDivider")}
         </span>
         <span className="h-px flex-1 bg-grid" />
       </div>
@@ -37,7 +41,7 @@ export function GoogleButton({ next }: { next?: string }) {
             d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58Z"
           />
         </svg>
-        Fortsätt med Google
+        {t("auth.google")}
       </Link>
     </>
   );

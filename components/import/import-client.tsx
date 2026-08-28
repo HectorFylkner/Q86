@@ -4,11 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveBaselineReport } from "@/lib/actions";
 import type { ParsedReport } from "@/lib/ai/schemas";
-import {
-  CONTEXT_LABELS,
-  DOMAIN_LABELS,
-  SKILL_LABELS,
-} from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import type { Key } from "@/lib/i18n";
+import { contextLabel, domainLabel, skillLabel } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
 type Stage =
@@ -19,13 +17,16 @@ type Stage =
   | { kind: "saved" }
   | { kind: "error"; message: string };
 
-const SECTION_LABELS: Record<string, string> = {
-  quant: "Quantitative Reasoning",
-  verbal: "Verbal Reasoning",
-  data_insights: "Data Insights",
+/** GMAT section names, kept in English inside Swedish prose because that
+ *  is how they appear on the report the reader is holding. */
+const SECTION_KEYS: Record<string, Key> = {
+  quant: "importer.sectionQuant",
+  verbal: "importer.sectionVerbal",
+  data_insights: "importer.sectionDataInsights",
 };
 
 export function ImportClient() {
+  const t = useT();
   const router = useRouter();
   const [rawText, setRawText] = useState("");
   const [stage, setStage] = useState<Stage>({ kind: "editing" });
@@ -52,7 +53,7 @@ export function ImportClient() {
         message:
           e instanceof Error
             ? e.message
-            : "Parsing failed. Check ANTHROPIC_API_KEY and retry.",
+            : t("importer.parseFailed"),
       });
     }
   }
@@ -67,7 +68,7 @@ export function ImportClient() {
     } catch {
       setStage({
         kind: "error",
-        message: "Saving failed — the parsed report was not stored. Retry.",
+        message: t("importer.saveFailed"),
       });
     }
   }
@@ -79,13 +80,9 @@ export function ImportClient() {
     <div className="space-y-5">
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
-          Paste the score report text
+          {t("importer.pasteTitle")}
         </h2>
-        <p className="mt-1 text-xs text-graphite">
-          Copy everything from the official report page — scores, percentile
-          tables, per-question timing if you have it. The parsed result is
-          shown for confirmation before anything is saved.
-        </p>
+        <p className="mt-1 text-xs text-graphite">{t("importer.pasteLede")}</p>
         <textarea
           value={rawText}
           onChange={(e) => {
@@ -94,7 +91,7 @@ export function ImportClient() {
               setStage({ kind: "editing" });
           }}
           rows={10}
-          placeholder="Paste the raw report text here…"
+          placeholder={t("importer.pastePlaceholder")}
           className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 font-mono text-xs placeholder:text-graphite/60"
         />
         <div className="mt-3 flex items-center gap-3">
@@ -107,17 +104,17 @@ export function ImportClient() {
                 "cursor-not-allowed opacity-50",
             )}
           >
-            Parse the report
+            {t("importer.parseButton")}
           </button>
           {stage.kind === "parsing" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
-              Reading the report…
+              {t("importer.parsing")}
             </span>
           )}
           {stage.kind === "saved" && (
             <span className="text-sm text-ballpoint">
-              Baseline saved — the daily plan now blends it into the weights.
+              {t("importer.saved")}
             </span>
           )}
           {stage.kind === "error" && (
@@ -129,18 +126,22 @@ export function ImportClient() {
       {parsed && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
-            Parsed result — confirm before saving
+            {t("importer.parsedTitle")}
           </h2>
 
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div>
-              <h3 className="text-xs font-medium text-graphite">Sections</h3>
+              <h3 className="text-xs font-medium text-graphite">
+                {t("importer.sections")}
+              </h3>
               <table className="mt-1 w-full text-sm">
                 <tbody>
                   {parsed.sections.map((s) => (
                     <tr key={s.section} className="border-t border-grid">
                       <td className="py-1.5 pr-2">
-                        {SECTION_LABELS[s.section] ?? s.section}
+                        {s.section in SECTION_KEYS
+                          ? t(SECTION_KEYS[s.section])
+                          : s.section}
                       </td>
                       <td className="py-1.5 pr-2 font-mono">
                         {s.scaled_score ?? "—"}
@@ -152,7 +153,7 @@ export function ImportClient() {
                   ))}
                   {parsed.total_score != null && (
                     <tr className="border-t border-grid font-medium">
-                      <td className="py-1.5 pr-2">Total</td>
+                      <td className="py-1.5 pr-2">{t("importer.total")}</td>
                       <td className="py-1.5 font-mono" colSpan={2}>
                         {parsed.total_score}
                       </td>
@@ -164,22 +165,24 @@ export function ImportClient() {
 
             <div>
               <h3 className="text-xs font-medium text-graphite">
-                Quant fundamental skills
+                {t("importer.quantSkills")}
               </h3>
               <table className="mt-1 w-full text-sm">
                 <tbody>
                   {parsed.fundamental_skills.map((s) => (
                     <tr key={s.skill} className="border-t border-grid">
-                      <td className="py-1.5 pr-2">{SKILL_LABELS[s.skill]}</td>
+                      <td className="py-1.5 pr-2">
+                        {skillLabel(t, s.skill)}
+                      </td>
                       <td className="py-1.5 font-mono">
-                        {s.percentile}th pct
+                        {t("importer.percentile", { value: s.percentile })}
                       </td>
                     </tr>
                   ))}
                   {parsed.fundamental_skills.length === 0 && (
                     <tr>
                       <td className="py-1.5 text-xs text-graphite">
-                        None found in the text.
+                        {t("importer.noneInText")}
                       </td>
                     </tr>
                   )}
@@ -187,28 +190,35 @@ export function ImportClient() {
               </table>
 
               <h3 className="mt-3 text-xs font-medium text-graphite">
-                Domains &amp; contexts
+                {t("importer.domainsContexts")}
               </h3>
               <p className="mt-1 text-sm">
                 {[
                   ...parsed.content_domains.map(
-                    (d) => `${DOMAIN_LABELS[d.domain]} ${d.percentile}th`,
+                    (d) =>
+                      `${domainLabel(t, d.domain)} ${t("importer.percentile", {
+                        value: d.percentile,
+                      })}`,
                   ),
                   ...parsed.contexts.map(
-                    (c) => `${CONTEXT_LABELS[c.context]} ${c.percentile}th`,
+                    (c) =>
+                      `${contextLabel(t, c.context)} ${t("importer.percentile", {
+                        value: c.percentile,
+                      })}`,
                   ),
-                ].join(" · ") || "None found."}
+                ].join(" · ") || t("importer.noneFound")}
               </p>
 
               {parsed.per_question_rows.length > 0 && (
                 <p className="mt-3 text-xs text-graphite">
-                  {parsed.per_question_rows.length} per-question timing rows
-                  captured.
+                  {t("importer.timingRows", {
+                    count: parsed.per_question_rows.length,
+                  })}
                 </p>
               )}
               {parsed.test_date && (
                 <p className="mt-1 text-xs text-graphite">
-                  Test date: {parsed.test_date}
+                  {t("importer.testDate", { date: parsed.test_date })}
                 </p>
               )}
             </div>
@@ -224,14 +234,14 @@ export function ImportClient() {
               )}
             >
               {stage.kind === "saving"
-                ? "Saving…"
-                : "Confirm and save as baseline"}
+                ? t("common.saving")
+                : t("importer.confirmSave")}
             </button>
             <button
               onClick={() => setStage({ kind: "editing" })}
               className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              Discard the parse
+              {t("importer.discard")}
             </button>
           </div>
         </section>

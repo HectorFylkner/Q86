@@ -11,20 +11,25 @@ import type { CoachResponse } from "@/lib/ai/schemas";
 import type { Attempt, Question } from "@/lib/db/schema";
 import {
   ERROR_TYPES,
-  ERROR_TYPE_LABELS,
   ALL_SUBTOPICS,
-  SUBTOPIC_LABELS,
-  SKILL_LABELS,
-  CONFIDENCE_LABELS,
   type ErrorType,
   type Subtopic,
 } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import type { Key } from "@/lib/i18n";
+import {
+  confidenceLabel,
+  contextLabel,
+  errorTypeLabel,
+  skillLabel,
+  subtopicLabel,
+} from "@/lib/i18n/labels";
 import { cn, formatSeconds } from "@/lib/utils";
 
-const COACH_STAGES = [
-  "Reading the whiteboard…",
-  "Classifying the miss…",
-  "Writing the prescription…",
+const COACH_STAGE_KEYS: Key[] = [
+  "postmortem.stageReading",
+  "postmortem.stageClassifying",
+  "postmortem.stagePrescribing",
 ];
 
 type CoachState =
@@ -50,6 +55,7 @@ export function PostmortemClient({
    *  operator's tool, not a subscriber's (ADR 0001 §2). */
   canGenerate: boolean;
 }) {
+  const t = useT();
   const [images, setImages] = useState<string[]>([]);
   const [coachState, setCoachState] = useState<CoachState>({ kind: "idle" });
   const [twinState, setTwinState] = useState<TwinState>({ kind: "idle" });
@@ -67,14 +73,17 @@ export function PostmortemClient({
   // Cycle the loading stage text.
   useEffect(() => {
     if (coachState.kind !== "running") return;
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       setCoachState((s) =>
         s.kind === "running"
-          ? { kind: "running", stageIndex: (s.stageIndex + 1) % COACH_STAGES.length }
+          ? {
+              kind: "running",
+              stageIndex: (s.stageIndex + 1) % COACH_STAGE_KEYS.length,
+            }
           : s,
       );
     }, 6000);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [coachState.kind]);
 
   async function runCoach() {
@@ -103,7 +112,7 @@ export function PostmortemClient({
         message:
           e instanceof Error
             ? e.message
-            : "The coach call failed. Check ANTHROPIC_API_KEY and retry.",
+            : t("postmortem.coachFailed"),
       });
     }
   }
@@ -135,7 +144,7 @@ export function PostmortemClient({
       setTwinState({
         kind: "error",
         message:
-          e instanceof Error ? e.message : "Twin generation failed. Retry.",
+          e instanceof Error ? e.message : t("postmortem.twinError"),
       });
     }
   }
@@ -161,12 +170,18 @@ export function PostmortemClient({
     <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex flex-wrap items-center gap-2 text-xs text-graphite">
         <Chip tone={attempt.correct ? "blue" : "red"}>
-          {attempt.correct ? "Correct" : "Wrong"}
+          {attempt.correct
+            ? t("postmortem.correct")
+            : t("postmortem.wrong")}
         </Chip>
         <Chip>{formatSeconds(attempt.timeSeconds)}</Chip>
-        <Chip>{CONFIDENCE_LABELS[attempt.confidence]} confidence</Chip>
-        <Chip>{SKILL_LABELS[question.fundamentalSkill]}</Chip>
-        <Chip>{SUBTOPIC_LABELS[question.subtopic]}</Chip>
+        <Chip>
+          {t("postmortem.confidenceChip", {
+            level: confidenceLabel(t, attempt.confidence),
+          })}
+        </Chip>
+        <Chip>{skillLabel(t, question.fundamentalSkill)}</Chip>
+        <Chip>{subtopicLabel(t, question.subtopic)}</Chip>
       </div>
 
       <details
@@ -174,7 +189,7 @@ export function PostmortemClient({
         open
       >
         <summary className="cursor-pointer font-display text-sm font-semibold">
-          The question
+          {t("postmortem.theQuestion")}
         </summary>
         <div className="mt-3 space-y-4 border-t border-grid pt-3">
           <Md source={question.stemMd} className="text-[15px]" />
@@ -190,11 +205,10 @@ export function PostmortemClient({
 
       <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">
-          Scratch work
+          {t("postmortem.scratchWork")}
         </h2>
         <p className="mb-3 mt-1 text-sm text-graphite">
-          Photograph exactly what you wrote — the coach finds the line where
-          the work left the rails.
+          {t("postmortem.scratchLede")}
         </p>
         <ScratchCapture
           images={images}
@@ -212,13 +226,13 @@ export function PostmortemClient({
             )}
           >
             {coach || attempt.aiFeedbackMd
-              ? "Re-run the post-mortem"
-              : "Run the post-mortem"}
+              ? t("postmortem.rerunCoach")
+              : t("postmortem.runCoach")}
           </button>
           {coachState.kind === "running" && (
             <span className="flex items-center gap-2 text-sm text-graphite">
               <span className="skeleton h-3 w-3 rounded-full" />
-              {COACH_STAGES[coachState.stageIndex]}
+              {t(COACH_STAGE_KEYS[coachState.stageIndex])}
             </span>
           )}
           {coachState.kind === "error" && (
@@ -239,7 +253,7 @@ export function PostmortemClient({
       {!coach && attempt.aiFeedbackMd && coachState.kind !== "running" && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="mb-2 font-display text-sm font-semibold">
-            Saved post-mortem
+            {t("postmortem.savedPostmortem")}
           </h2>
           <Md source={attempt.aiFeedbackMd} className="text-[15px]" />
         </section>
@@ -252,25 +266,24 @@ export function PostmortemClient({
           transition={{ duration: 0.15 }}
           className="space-y-4 rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
-          <CoachBlock title="Divergence point" tone="red">
+          <CoachBlock title={t("postmortem.divergencePoint")} tone="red">
             <Md source={coach.divergence_point_md} className="text-[15px]" />
           </CoachBlock>
-          <CoachBlock title="Diagnosis">
+          <CoachBlock title={t("postmortem.diagnosis")}>
             <Md source={coach.diagnosis_md} className="text-[15px]" />
           </CoachBlock>
-          <CoachBlock title="Fastest path vs. your path" tone="blue">
+          <CoachBlock title={t("postmortem.fastestVsYours")} tone="blue">
             <Md source={coach.fastest_path_md} className="text-[15px]" />
           </CoachBlock>
-          <CoachBlock title="Trigger cue">
+          <CoachBlock title={t("postmortem.triggerCue")}>
             <Md source={coach.trigger_cue_md} className="text-[15px]" />
           </CoachBlock>
-          <CoachBlock title="Prescription">
+          <CoachBlock title={t("postmortem.prescription")}>
             <p className="text-[15px]">
-              {coach.prescription.count} questions of{" "}
-              <span className="font-medium">
-                {SUBTOPIC_LABELS[coach.prescription.subtopic]}
-              </span>
-              .
+              {t("prescriptionLine.text", {
+                count: coach.prescription.count,
+                subtopic: subtopicLabel(t, coach.prescription.subtopic),
+              })}
             </p>
           </CoachBlock>
           <div className="rounded-control bg-highlight px-3 py-2 text-sm font-medium">
@@ -282,9 +295,9 @@ export function PostmortemClient({
       {(coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
-            Classification
+            {t("postmortem.classification")}
             <span className="ml-2 text-xs font-normal text-graphite">
-              AI-suggested — confirm or override before it enters the log
+              {t("postmortem.classificationHint")}
             </span>
           </h2>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -302,13 +315,13 @@ export function PostmortemClient({
                     : "border-grid text-graphite hover:border-graphite/50",
                 )}
               >
-                {ERROR_TYPE_LABELS[et]}
+                {errorTypeLabel(t, et)}
               </button>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <label className="text-xs text-graphite" htmlFor="subtag">
-              Failed subtopic
+              {t("postmortem.failedSubtopic")}
             </label>
             <select
               id="subtag"
@@ -322,7 +335,7 @@ export function PostmortemClient({
               <option value="">—</option>
               {ALL_SUBTOPICS.map((s) => (
                 <option key={s} value={s}>
-                  {SUBTOPIC_LABELS[s]}
+                  {subtopicLabel(t, s)}
                 </option>
               ))}
             </select>
@@ -333,7 +346,7 @@ export function PostmortemClient({
               setNotes(e.target.value);
               setConfirmState("unsaved");
             }}
-            placeholder="Your own note on this miss (optional)"
+            placeholder={t("postmortem.notePlaceholder")}
             rows={2}
             className="mt-3 w-full rounded-control border border-grid bg-surface px-3 py-2 text-sm placeholder:text-graphite/60"
           />
@@ -347,14 +360,16 @@ export function PostmortemClient({
                   "opacity-50",
               )}
             >
-              Confirm classification
+              {t("postmortem.confirmClassification")}
             </button>
             {confirmState === "saved" && (
-              <span className="text-sm text-ballpoint">Logged.</span>
+              <span className="text-sm text-ballpoint">
+                {t("postmortem.logged")}
+              </span>
             )}
             {confirmState === "error" && (
               <span className="text-sm text-redpen">
-                Saving failed — retry.
+                {t("settings.saveFailed")}
               </span>
             )}
           </div>
@@ -363,11 +378,16 @@ export function PostmortemClient({
 
       {canGenerate && (coach || attempt.aiFeedbackMd) && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h2 className="font-display text-sm font-semibold">Twin drills</h2>
+          <h2 className="font-display text-sm font-semibold">
+            {t("postmortem.twinTitle")}
+          </h2>
           <p className="mt-1 text-sm text-graphite">
-            Two fresh twins of this question — same math skeleton, opposite
-            context ({question.context === "pure" ? "real" : "pure"}). Both
-            verified before they can appear.
+            {t("postmortem.twinLede", {
+              context: contextLabel(
+                t,
+                question.context === "pure" ? "real" : "pure",
+              ),
+            })}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {twinState.kind !== "done" && (
@@ -379,13 +399,13 @@ export function PostmortemClient({
                   twinState.kind === "working" && "cursor-wait opacity-60",
                 )}
               >
-                Queue two verified twin drills
+                {t("postmortem.twinQueue")}
               </button>
             )}
             {twinState.kind === "working" && (
               <span className="flex items-center gap-2 text-sm text-graphite">
                 <span className="skeleton h-3 w-3 rounded-full" />
-                Generating and verifying twins…
+                {t("postmortem.twinWorking")}
               </span>
             )}
             {twinState.kind === "error" && (
@@ -395,12 +415,15 @@ export function PostmortemClient({
               <>
                 <span className="text-sm">
                   <span className="text-ballpoint">
-                    {twinState.verified} twins verified
+                    {t("postmortem.twinVerified", {
+                      count: twinState.verified,
+                    })}
                   </span>
                   {twinState.failed > 0 && (
                     <span className="text-graphite">
                       {" "}
-                      · {twinState.failed} failed verification
+                      ·{" "}
+                      {t("postmortem.twinFailed", { count: twinState.failed })}
                     </span>
                   )}
                 </span>
@@ -409,7 +432,7 @@ export function PostmortemClient({
                     href={`/drill?qids=${twinState.ids.join(",")}`}
                     className="rounded-control bg-ballpoint px-4 py-1.5 text-sm font-medium text-white hover:bg-ballpoint/90"
                   >
-                    Drill the twins now
+                    {t("postmortem.twinDrill")}
                   </Link>
                 )}
               </>

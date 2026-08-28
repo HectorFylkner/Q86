@@ -10,13 +10,14 @@ import type { AnswerRecord } from "@/components/timed/timed-client";
 import type { SaveTimedResponse, TimedEditInput } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
 import { pacingRead, TIME_BENCH, type PacedItem } from "@/lib/pacing";
+import type { Difficulty } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
 import {
-  CONTEXT_LABELS,
-  DOMAIN_LABELS,
-  EDIT_REASON_LABELS,
-  SKILL_LABELS,
-  type Difficulty,
-} from "@/lib/taxonomy";
+  contextLabel,
+  domainLabel,
+  editReasonLabel,
+  skillLabel,
+} from "@/lib/i18n/labels";
 import { CHOICE_LETTERS, cn, formatSeconds, percent } from "@/lib/utils";
 
 const STROKE_STAGGER_SECONDS = 0.04;
@@ -38,6 +39,7 @@ export function MarkingSummary({
   saved: SaveTimedResponse;
   onRestart: () => void;
 }) {
+  const t = useT();
   const [showStats, setShowStats] = useState(false);
 
   const answered = answers.filter(Boolean).length;
@@ -52,11 +54,11 @@ export function MarkingSummary({
   const notReached = questions.length - answered;
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => setShowStats(true),
       questions.length * STROKE_STAGGER_SECONDS * 1000 + 600,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [questions.length]);
 
   const editByQuestionId = new Map<number, TimedEditInput>();
@@ -64,18 +66,30 @@ export function MarkingSummary({
 
   return (
     <div className="space-y-5">
-      <h2 className="font-display text-lg font-semibold">Section marked</h2>
+      <h2 className="font-display text-lg font-semibold">
+        {t("marking.sectionMarked")}
+      </h2>
 
       <div className="overflow-x-auto rounded-card border border-grid bg-surface shadow-ambient">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-grid text-left text-xs text-graphite">
-              <th className="px-3 py-2 font-normal">Q#</th>
-              <th className="px-3 py-2 font-normal">Time</th>
-              <th className="px-3 py-2 font-normal">Result</th>
-              <th className="px-3 py-2 font-normal">Domain</th>
-              <th className="px-3 py-2 font-normal">Context</th>
-              <th className="px-3 py-2 font-normal">Skill</th>
+              <th className="px-3 py-2 font-normal">{t("marking.columnQ")}</th>
+              <th className="px-3 py-2 font-normal">
+                {t("drillRunner.timeColumn")}
+              </th>
+              <th className="px-3 py-2 font-normal">
+                {t("drillRunner.resultColumn")}
+              </th>
+              <th className="px-3 py-2 font-normal">
+                {t("marking.columnDomain")}
+              </th>
+              <th className="px-3 py-2 font-normal">
+                {t("marking.columnContext")}
+              </th>
+              <th className="px-3 py-2 font-normal">
+                {t("marking.columnSkill")}
+              </th>
               <th className="px-3 py-2 font-normal" />
             </tr>
           </thead>
@@ -114,23 +128,27 @@ export function MarkingSummary({
                                 : "border-redpen/50 text-redpen",
                             )}
                           >
-                            edited {CHOICE_LETTERS[edit.fromIndex]}→
-                            {CHOICE_LETTERS[edit.toIndex]}
+                            {t("marking.editedFromTo", {
+                              from: CHOICE_LETTERS[edit.fromIndex],
+                              to: CHOICE_LETTERS[edit.toIndex],
+                            })}
                           </span>
                         )}
                       </span>
                     ) : (
-                      <span className="text-xs text-graphite">not reached</span>
+                      <span className="text-xs text-graphite">
+                        {t("marking.notReachedCell")}
+                      </span>
                     )}
                   </td>
                   <td className="px-3 py-2 text-xs">
-                    {DOMAIN_LABELS[q.contentDomain]}
+                    {domainLabel(t, q.contentDomain)}
                   </td>
                   <td className="px-3 py-2 text-xs">
-                    {CONTEXT_LABELS[q.context]}
+                    {contextLabel(t, q.context)}
                   </td>
                   <td className="px-3 py-2 text-xs">
-                    {SKILL_LABELS[q.fundamentalSkill]}
+                    {skillLabel(t, q.fundamentalSkill)}
                   </td>
                   <td className="px-3 py-2 text-right">
                     {a && !correct && attemptId != null && (
@@ -138,7 +156,7 @@ export function MarkingSummary({
                         href={`/postmortem/${attemptId}`}
                         className="text-xs text-ballpoint hover:underline"
                       >
-                        Post-mortem
+                        {t("drillRunner.postmortemLink")}
                       </Link>
                     )}
                   </td>
@@ -158,25 +176,25 @@ export function MarkingSummary({
         >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <StatCard
-              label="Section accuracy"
+              label={t("marking.sectionAccuracy")}
               value={`${percent(correctCount, questions.length)}%`}
             />
             <StatCard
-              label="Correct"
+              label={t("common.correct")}
               value={`${correctCount}/${questions.length}`}
             />
             <StatCard
-              label="Time violations (>2:45)"
+              label={t("marking.timeViolations")}
               value={String(violations)}
               tone={violations > 0 ? "amber" : undefined}
             />
             <StatCard
-              label="Sub-60s wrong"
+              label={t("marking.sub60Wrong")}
               value={String(sub60Wrong)}
               tone={sub60Wrong > 0 ? "red" : undefined}
             />
             <StatCard
-              label="Edit net (this session)"
+              label={t("marking.editNetSession")}
               value={signed(saved.sessionEditNet)}
               tone={
                 saved.sessionEditNet < 0
@@ -187,7 +205,7 @@ export function MarkingSummary({
               }
             />
             <StatCard
-              label="Edit net (lifetime)"
+              label={t("marking.editNetLifetime")}
               value={signed(saved.lifetimeEditNet)}
               tone={
                 saved.lifetimeEditNet < 0
@@ -201,8 +219,7 @@ export function MarkingSummary({
 
           {notReached > 0 && (
             <p className="text-sm text-redpen">
-              {notReached} questions were never reached — the clock beat you
-              to them.
+              {t("marking.notReachedNote", { count: notReached })}
             </p>
           )}
 
@@ -212,7 +229,7 @@ export function MarkingSummary({
           {edits.length > 0 && (
             <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
               <h3 className="font-display text-sm font-semibold">
-                Edits this session
+                {t("marking.editsThisSession")}
               </h3>
               <ul className="mt-2 space-y-2">
                 {edits.map((e, i) => {
@@ -223,17 +240,17 @@ export function MarkingSummary({
                   const toCorrect = e.toIndex === q.correctIndex;
                   const outcome = toCorrect
                     ? fromCorrect
-                      ? "no change"
-                      : "fixed a wrong answer (+1)"
+                      ? t("marking.outcomeNoChange")
+                      : t("marking.outcomeFixed")
                     : fromCorrect
-                      ? "destroyed a correct answer (−1)"
-                      : "wrong either way (0)";
+                      ? t("marking.outcomeDestroyed")
+                      : t("marking.outcomeWrongEither");
                   return (
                     <li key={i} className="text-sm">
                       <span className="font-mono text-xs">Q{qNum}</span>{" "}
                       {CHOICE_LETTERS[e.fromIndex]}→
                       {CHOICE_LETTERS[e.toIndex]} ·{" "}
-                      {EDIT_REASON_LABELS[e.reason]} ·{" "}
+                      {editReasonLabel(t, e.reason)} ·{" "}
                       <span
                         className={cn(
                           toCorrect && !fromCorrect && "text-ballpoint",
@@ -257,13 +274,13 @@ export function MarkingSummary({
               onClick={onRestart}
               className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
             >
-              Set up another timed set
+              {t("marking.setUpAnother")}
             </button>
             <Link
               href="/"
               className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
             >
-              Back to today
+              {t("drillRunner.backToToday")}
             </Link>
           </div>
         </motion.div>
@@ -281,14 +298,17 @@ export function MarkingSummary({
                 className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
               >
                 <summary className="cursor-pointer text-sm font-medium">
-                  Q{i + 1} — you picked {CHOICE_LETTERS[a.selectedIndex]},
-                  correct is {CHOICE_LETTERS[q.correctIndex]}
+                  {t("marking.reviewSummary", {
+                    n: i + 1,
+                    picked: CHOICE_LETTERS[a.selectedIndex],
+                    correct: CHOICE_LETTERS[q.correctIndex],
+                  })}
                 </summary>
                 <div className="mt-3 space-y-3 border-t border-grid pt-3">
                   <Md source={q.stemMd} className="text-[15px]" />
                   <div>
                     <h4 className="mb-1 font-display text-xs font-semibold text-ballpoint">
-                      Fastest path
+                      {t("drill.fastestPath")}
                     </h4>
                     <Md source={q.fastestPathMd} className="text-sm" />
                   </div>
@@ -318,6 +338,7 @@ function PacingCard({
   answers: (AnswerRecord | null)[];
   saved: SaveTimedResponse;
 }) {
+  const t = useT();
   const items: PacedItem[] = questions.flatMap((q, i) => {
     const a = answers[i];
     if (!a) return [];
@@ -335,11 +356,10 @@ function PacingCard({
 
   return (
     <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-      <h3 className="font-display text-sm font-semibold">Pacing read</h3>
-      <p className="mt-0.5 text-xs text-graphite">
-        Benchmarks by difficulty — harder questions earn more of the
-        128s/question budget.
-      </p>
+      <h3 className="font-display text-sm font-semibold">
+        {t("marking.pacingRead")}
+      </h3>
+      <p className="mt-0.5 text-xs text-graphite">{t("marking.pacingLede")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {read.byDifficulty.map((row) => {
           const over = row.avgSeconds > row.benchSeconds * 1.2;
@@ -353,42 +373,53 @@ function PacingCard({
                 under && "text-graphite",
               )}
             >
-              D{row.difficulty} · you {formatSeconds(row.avgSeconds)} · bench{" "}
-              {formatSeconds(row.benchSeconds)} · ×{row.n}
+              {t("marking.pacingRow", {
+                difficulty: row.difficulty,
+                yours: formatSeconds(row.avgSeconds),
+                bench: formatSeconds(row.benchSeconds),
+                n: row.n,
+              })}
             </span>
           );
         })}
       </div>
       {read.sinks.length > 0 && (
         <p className="mt-3 text-sm">
-          <span className="font-medium text-amber">Time sinks:</span>{" "}
+          <span className="font-medium text-amber">
+            {t("marking.timeSinks")}
+          </span>{" "}
           <span className="text-graphite">
             {read.sinks
               .slice(0, 4)
-              .map(
-                (s) =>
-                  `Q${s.index + 1} (${formatSeconds(s.timeSeconds)} on D${s.difficulty}, bench ${formatSeconds(TIME_BENCH[s.difficulty])})`,
+              .map((s) =>
+                t("marking.sinkItem", {
+                  n: s.index + 1,
+                  time: formatSeconds(s.timeSeconds),
+                  difficulty: s.difficulty,
+                  bench: formatSeconds(TIME_BENCH[s.difficulty]),
+                }),
               )
               .join(" · ")}
-            {" — "}every sink past 1.5× benchmark is a bail you didn&apos;t
-            take.
+            {t("marking.timeSinksNote")}
           </span>
         </p>
       )}
       {read.rushedWrong.length > 0 && (
         <p className="mt-2 text-sm">
-          <span className="font-medium text-redpen">Rushed and wrong:</span>{" "}
+          <span className="font-medium text-redpen">
+            {t("marking.rushedWrong")}
+          </span>{" "}
           <span className="text-graphite">
             {read.rushedWrong
               .map((s) => `Q${s.index + 1} (${formatSeconds(s.timeSeconds)})`)
               .join(" · ")}
-            {" — "}seconds saved there were spent on the sinks.
+            {t("marking.rushedWrongNote")}
           </span>
         </p>
       )}
       {read.sinks.length === 0 && read.rushedWrong.length === 0 && (
         <p className="mt-3 text-sm text-ballpoint">
-          Clean pacing — no sinks, no panic answers.
+          {t("marking.cleanPacing")}
         </p>
       )}
     </div>

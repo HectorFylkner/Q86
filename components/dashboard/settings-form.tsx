@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/i18n-provider";
 import { saveSetting } from "@/lib/actions";
 
 export function SettingsForm({
@@ -11,6 +12,7 @@ export function SettingsForm({
   testDate: string | null;
   cadence: number;
 }) {
+  const t = useT();
   const router = useRouter();
   const [date, setDate] = useState(testDate ?? "");
   const [cadenceDays, setCadenceDays] = useState(String(cadence));
@@ -33,7 +35,7 @@ export function SettingsForm({
   return (
     <div className="flex flex-wrap items-end gap-3">
       <label className="flex flex-col gap-1 text-xs text-graphite">
-        Test date
+        {t("settings.testDate")}
         <input
           type="date"
           value={date}
@@ -45,7 +47,7 @@ export function SettingsForm({
         />
       </label>
       <label className="flex flex-col gap-1 text-xs text-graphite">
-        Timed set every
+        {t("settings.timedSetEvery")}
         <select
           value={cadenceDays}
           onChange={(e) => {
@@ -56,7 +58,7 @@ export function SettingsForm({
         >
           {[2, 3, 4, 7].map((d) => (
             <option key={d} value={d}>
-              {d} days
+              {d} {t("common.days")}
             </option>
           ))}
         </select>
@@ -66,11 +68,13 @@ export function SettingsForm({
         disabled={state === "saving"}
         className="rounded-control border border-grid bg-surface px-3 py-1.5 text-sm hover:border-graphite/50"
       >
-        {state === "saving" ? "Saving…" : "Save settings"}
+        {state === "saving" ? t("common.saving") : t("settings.saveSettings")}
       </button>
-      {state === "saved" && <span className="text-xs text-ballpoint">Saved.</span>}
+      {state === "saved" && (
+        <span className="text-xs text-ballpoint">{t("common.saved")}</span>
+      )}
       {state === "error" && (
-        <span className="text-xs text-redpen">Saving failed — retry.</span>
+        <span className="text-xs text-redpen">{t("settings.saveFailed")}</span>
       )}
     </div>
   );

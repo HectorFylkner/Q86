@@ -18,18 +18,19 @@ import {
   YAxis,
 } from "recharts";
 import type { AnalyticsData, MirrorBar } from "@/lib/analytics";
+import { ERROR_TYPES, type EditReason } from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
 import {
-  EDIT_REASON_LABELS,
-  ERROR_TYPES,
-  ERROR_TYPE_LABELS,
-  SKILL_LABELS,
-  SUBTOPIC_LABELS,
-  type EditReason,
-} from "@/lib/taxonomy";
+  editReasonLabel,
+  errorTypeLabel,
+  skillLabel,
+  subtopicLabel,
+} from "@/lib/i18n/labels";
 import { cn, percent } from "@/lib/utils";
 import { useChartTokens } from "@/components/use-chart-tokens";
 
 export function AnalyticsClient({ data }: { data: AnalyticsData }) {
+  const t = useT();
   // Charts follow the active theme (SVG attrs cannot use CSS variables).
   const {
     ink: INK,
@@ -63,20 +64,29 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
     <div className="space-y-6">
       {/* 1 — score-report mirror */}
       <Section
-        title="Score-report mirror"
-        subtitle={`Accuracy by domain, context, and fundamental skill — same cuts as the official report. ${data.attemptCount} attempts.`}
+        title={t("analytics.mirrorTitle")}
+        subtitle={t("analytics.mirrorSubtitle", { count: data.attemptCount })}
       >
         <div className="grid gap-6 lg:grid-cols-3">
-          <MirrorGroup title="Content domain" bars={data.mirror.domains} />
-          <MirrorGroup title="Context" bars={data.mirror.contexts} />
-          <MirrorGroup title="Fundamental skill" bars={data.mirror.skills} />
+          <MirrorGroup
+            title={t("analytics.contentDomain")}
+            bars={data.mirror.domains}
+          />
+          <MirrorGroup
+            title={t("analytics.context")}
+            bars={data.mirror.contexts}
+          />
+          <MirrorGroup
+            title={t("analytics.fundamentalSkill")}
+            bars={data.mirror.skills}
+          />
         </div>
       </Section>
 
       {/* 2 — heatmap */}
       <Section
-        title="Miss heatmap"
-        subtitle="Classified wrong answers: subtopic × error type."
+        title={t("analytics.heatmapTitle")}
+        subtitle={t("analytics.heatmapSubtitle")}
       >
         {data.heatmap.rows.length === 0 ? (
           <p className="text-sm text-graphite">
@@ -89,14 +99,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <thead>
                 <tr>
                   <th className="pr-3 text-left text-xs font-normal text-graphite">
-                    Subtopic
+                    {t("drillRunner.subtopicColumn")}
                   </th>
                   {ERROR_TYPES.map((et) => (
                     <th
                       key={et}
                       className="px-1 pb-1 text-center text-[10px] font-normal text-graphite"
                     >
-                      {ERROR_TYPE_LABELS[et]}
+                      {errorTypeLabel(t, et)}
                     </th>
                   ))}
                 </tr>
@@ -105,7 +115,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 {data.heatmap.rows.map((row) => (
                   <tr key={row.subtopic}>
                     <td className="whitespace-nowrap pr-3 text-xs">
-                      {SUBTOPIC_LABELS[row.subtopic]}
+                      {subtopicLabel(t, row.subtopic)}
                     </td>
                     {ERROR_TYPES.map((et) => {
                       const count = row.counts[et];
@@ -114,7 +124,11 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                       return (
                         <td key={et} className="p-0.5">
                           <div
-                            title={`${SUBTOPIC_LABELS[row.subtopic]} × ${ERROR_TYPE_LABELS[et]}: ${count}`}
+                            title={t("analytics.heatmapCell", {
+                              subtopic: subtopicLabel(t, row.subtopic),
+                              errorType: errorTypeLabel(t, et),
+                              count,
+                            })}
                             className="flex h-8 w-16 items-center justify-center rounded-[4px] border border-grid font-mono text-xs"
                             style={{
                               backgroundColor:
@@ -141,19 +155,21 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 2b — accuracy × difficulty matrix */}
       <Section
-        title="Accuracy by difficulty"
-        subtitle="Where exactly each subtopic breaks: accuracy per difficulty tier, focused attempts only."
+        title={t("analytics.difficultyTitle")}
+        subtitle={t("analytics.difficultySubtitle")}
       >
         {data.difficultyMatrix.length === 0 ? (
           <p className="text-sm text-graphite">
-            No attempts yet — the matrix fills in as you train.
+            {t("analytics.noAttemptsYet")}
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-xs">
               <thead>
                 <tr className="text-left text-graphite">
-                  <th className="py-1 pr-2 font-medium">Subtopic</th>
+                  <th className="py-1 pr-2 font-medium">
+                    {t("drillRunner.subtopicColumn")}
+                  </th>
                   {[2, 3, 4, 5].map((d) => (
                     <th key={d} className="w-24 py-1 pr-2 font-medium">
                       D{d}
@@ -164,7 +180,9 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <tbody>
                 {data.difficultyMatrix.map((row) => (
                   <tr key={row.subtopic} className="border-t border-grid">
-                    <td className="py-1.5 pr-2">{SUBTOPIC_LABELS[row.subtopic]}</td>
+                    <td className="py-1.5 pr-2">
+                      {subtopicLabel(t, row.subtopic)}
+                    </td>
                     {[2, 3, 4, 5].map((d) => {
                       const cell = row.cells[d];
                       if (!cell || cell.total === 0) {
@@ -205,8 +223,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 2c — training volume calendar */}
       <Section
-        title="Training volume"
-        subtitle="Focused attempts per day, last 12 weeks. Consistency beats intensity."
+        title={t("analytics.volumeTitle")}
+        subtitle={t("analytics.volumeSubtitle")}
       >
         <div className="flex flex-wrap items-end gap-[3px]">
           {data.volume.map((day) => {
@@ -221,7 +239,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             return (
               <div
                 key={day.date}
-                title={`${day.date}: ${day.count} attempt${day.count === 1 ? "" : "s"}`}
+                title={t("analytics.volumeCell", {
+                  date: day.date,
+                  count: day.count,
+                })}
                 className={cn("h-4 w-4 rounded-[3px]", level)}
               />
             );
@@ -235,17 +256,17 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 3 — time vs accuracy scatter */}
       <Section
-        title="Time vs. accuracy"
-        subtitle="Every attempt is a dot. The shaded zones are the two documented failure modes."
+        title={t("analytics.scatterTitle")}
+        subtitle={t("analytics.scatterSubtitle")}
       >
         <div className="mb-3 flex flex-wrap gap-4">
           <ZoneStat
-            label="Attempts past 2:45"
+            label={t("analytics.pastCheckpoint")}
             value={data.zones.over245}
             tone="amber"
           />
           <ZoneStat
-            label="Sub-60s wrong answers"
+            label={t("analytics.sub60Wrong")}
             value={data.zones.sub60Wrong}
             tone="red"
           />
@@ -256,7 +277,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <XAxis
               type="number"
               dataKey="time"
-              name="Time"
+              name={t("analytics.axisTime")}
               unit="s"
               domain={[0, "dataMax"]}
               tick={AXIS_TICK}
@@ -266,14 +287,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <YAxis
               type="number"
               dataKey="difficulty"
-              name="Difficulty"
+              name={t("analytics.axisDifficulty")}
               domain={[0.5, 5.5]}
               ticks={[1, 2, 3, 4, 5]}
               tick={AXIS_TICK}
               stroke={GRID}
               tickLine={false}
               label={{
-                value: "difficulty",
+                value: t("analytics.axisDifficulty").toLowerCase(),
                 angle: -90,
                 position: "insideLeft",
                 fill: GRAPHITE,
@@ -285,7 +306,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               fill={AMBER}
               fillOpacity={0.07}
               label={{
-                value: "past 2:45",
+                value: t("analytics.zonePast245"),
                 position: "insideTopRight",
                 fill: AMBER,
                 fontSize: 11,
@@ -297,7 +318,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               fill={REDPEN}
               fillOpacity={0.05}
               label={{
-                value: "sub-60s",
+                value: t("analytics.zoneSub60"),
                 position: "insideTopLeft",
                 fill: REDPEN,
                 fontSize: 11,
@@ -307,7 +328,9 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
               cursor={{ stroke: GRAPHITE, strokeDasharray: "3 3" }}
               contentStyle={tooltipStyle}
               formatter={(value: number, name: string) =>
-                name === "Time" ? [`${value}s`, "Time"] : [value, "Difficulty"]
+                name === t("analytics.axisTime")
+                  ? [`${value}s`, t("analytics.axisTime")]
+                  : [value, t("analytics.axisDifficulty")]
               }
             />
             <Scatter
@@ -335,12 +358,12 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 4 — edit ledger */}
       <Section
-        title="Edit ledger"
-        subtitle="Every Review & Edit answer change, lifetime."
+        title={t("analytics.ledgerTitle")}
+        subtitle={t("analytics.ledgerSubtitle")}
       >
         <div className="mb-3 flex flex-wrap gap-4">
           <ZoneStat
-            label="Lifetime net points from edits"
+            label={t("analytics.lifetimeNet")}
             value={data.editLedger.lifetimeNet}
             tone={
               data.editLedger.lifetimeNet < 0
@@ -351,19 +374,22 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             }
             signed
           />
-          <ZoneStat label="Edits made" value={data.editLedger.total} />
           <ZoneStat
-            label="Fixed a wrong answer"
+            label={t("analytics.editsMade")}
+            value={data.editLedger.total}
+          />
+          <ZoneStat
+            label={t("analytics.fixedWrong")}
             value={data.editLedger.improved}
             tone="blue"
           />
           <ZoneStat
-            label="Destroyed a correct answer"
+            label={t("analytics.destroyedCorrect")}
             value={data.editLedger.destroyed}
             tone="red"
           />
           <ZoneStat
-            label="Lock-confidence correct answers changed"
+            label={t("analytics.lockChanged")}
             value={data.editLedger.lockCorrectChanged}
             tone="red"
           />
@@ -373,11 +399,21 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-grid text-left text-xs text-graphite">
-                  <th className="py-2 pr-3 font-normal">When</th>
-                  <th className="py-2 pr-3 font-normal">Subtopic</th>
-                  <th className="py-2 pr-3 font-normal">Reason</th>
-                  <th className="py-2 pr-3 font-normal">Outcome</th>
-                  <th className="py-2 font-normal">Justification</th>
+                  <th className="py-2 pr-3 font-normal">
+                    {t("analytics.columnWhen")}
+                  </th>
+                  <th className="py-2 pr-3 font-normal">
+                    {t("drillRunner.subtopicColumn")}
+                  </th>
+                  <th className="py-2 pr-3 font-normal">
+                    {t("analytics.columnReason")}
+                  </th>
+                  <th className="py-2 pr-3 font-normal">
+                    {t("analytics.columnOutcome")}
+                  </th>
+                  <th className="py-2 font-normal">
+                    {t("analytics.columnJustification")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -389,10 +425,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                       })}
                     </td>
                     <td className="py-1.5 pr-3 text-xs">
-                      {SUBTOPIC_LABELS[e.subtopic]}
+                      {subtopicLabel(t, e.subtopic)}
                     </td>
                     <td className="py-1.5 pr-3 text-xs">
-                      {EDIT_REASON_LABELS[e.reason as EditReason] ?? e.reason}
+                      {editReasonLabel(t, e.reason as EditReason)}
                     </td>
                     <td
                       className={cn(
@@ -402,10 +438,10 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
                       )}
                     >
                       {e.toCorrect && !e.fromCorrect
-                        ? "+1 fixed"
+                        ? t("analytics.outcomeFixed")
                         : e.fromCorrect && !e.toCorrect
-                          ? "−1 destroyed"
-                          : "0 neutral"}
+                          ? t("analytics.outcomeDestroyed")
+                          : t("analytics.outcomeNeutral")}
                     </td>
                     <td className="max-w-md py-1.5 text-xs text-graphite">
                       “{e.justification}”
@@ -420,8 +456,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 5 — calibration */}
       <Section
-        title="Calibration"
-        subtitle="Accuracy by pre-answer confidence: expected vs. actual."
+        title={t("analytics.calibrationTitle")}
+        subtitle={t("analytics.calibrationSubtitle")}
       >
         <ResponsiveContainer width="100%" height={240}>
           <BarChart
@@ -457,14 +493,14 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             />
             <Bar
               dataKey="expected"
-              name="Expected"
+              name={t("analytics.expected")}
               fill={GRAPHITE}
               fillOpacity={0.35}
               radius={[4, 4, 0, 0]}
             />
             <Bar
               dataKey="actual"
-              name="Actual"
+              name={t("analytics.actual")}
               fill={BALLPOINT}
               radius={[4, 4, 0, 0]}
             />
@@ -479,8 +515,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* 6 — rolling trend */}
       <Section
-        title="Rolling 7-day accuracy by skill"
-        subtitle="Each point is the trailing 7-day accuracy on that day; gaps mean no attempts in the window."
+        title={t("analytics.trendTitle")}
+        subtitle={t("analytics.trendSubtitle")}
       >
         <ResponsiveContainer width="100%" height={280}>
           <LineChart
@@ -506,7 +542,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <Line
               type="monotone"
               dataKey="value_order_factors"
-              name={SKILL_LABELS.value_order_factors}
+              name={skillLabel(t, "value_order_factors")}
               stroke={REDPEN}
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
@@ -515,7 +551,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <Line
               type="monotone"
               dataKey="equal_unequal_alg"
-              name={SKILL_LABELS.equal_unequal_alg}
+              name={skillLabel(t, "equal_unequal_alg")}
               stroke={BALLPOINT}
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
@@ -524,7 +560,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <Line
               type="monotone"
               dataKey="rates_ratio_percent"
-              name={SKILL_LABELS.rates_ratio_percent}
+              name={skillLabel(t, "rates_ratio_percent")}
               stroke={AMBER}
               strokeWidth={2}
               dot={{ r: 2, strokeWidth: 0 }}
@@ -533,7 +569,7 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
             <Line
               type="monotone"
               dataKey="counting_sets_series_prob_stats"
-              name={SKILL_LABELS.counting_sets_series_prob_stats}
+              name={skillLabel(t, "counting_sets_series_prob_stats")}
               stroke={GRAPHITE}
               strokeWidth={2}
               strokeDasharray="5 3"
@@ -552,18 +588,21 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
       {/* 7 — redo compliance + pattern ELO */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
-          title="Redo-queue compliance"
-          subtitle="Spaced redos: what's open, overdue, and cleared."
+          title={t("analytics.redoTitle")}
+          subtitle={t("analytics.redoSubtitle")}
         >
           <div className="flex flex-wrap gap-4">
-            <ZoneStat label="Open" value={data.redoCompliance.open} />
             <ZoneStat
-              label="Overdue"
+              label={t("analytics.redoOpen")}
+              value={data.redoCompliance.open}
+            />
+            <ZoneStat
+              label={t("analytics.redoOverdue")}
               value={data.redoCompliance.overdue}
               tone={data.redoCompliance.overdue > 0 ? "amber" : undefined}
             />
             <ZoneStat
-              label="Cleared (cold-solved)"
+              label={t("analytics.redoCleared")}
               value={data.redoCompliance.cleared}
               tone="blue"
             />
@@ -571,8 +610,8 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         </Section>
 
         <Section
-          title="Pattern-trainer ELO"
-          subtitle="Per-category rating; the line marks the 1200 start."
+          title={t("analytics.eloTitle")}
+          subtitle={t("analytics.eloSubtitle")}
         >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart

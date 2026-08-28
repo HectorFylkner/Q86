@@ -1,52 +1,24 @@
 import Link from "next/link";
 import { PlanCards } from "@/components/billing/plan-cards";
 import { PortalButton } from "@/components/billing/portal-button";
-import {
-  dailyAllowance,
-  withEntitlements,
-} from "@/lib/billing/entitlements";
+import { dailyAllowance, withEntitlements } from "@/lib/billing/entitlements";
 import { FEATURES, PLANS, type Feature } from "@/lib/billing/pricing";
 import { stripeConfigured, stripeIsLive } from "@/lib/billing/stripe";
+import type { Key } from "@/lib/i18n";
+import { getI18n } from "@/lib/i18n/server";
+import { formatDate } from "@/lib/i18n/format";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata = { title: "Konto – Q86" };
+export async function generateMetadata() {
+  const { t } = await getI18n();
+  return { title: `${t("account.title")} – Q86` };
+}
 
-/** What each gated feature is called when the paywall names it. */
-const FEATURE_LABELS: Record<Feature, string> = {
-  learn: "kapitlen",
-  drill: "träningen",
-  patterns: "mönsterträningen",
-  diagnostic: "diagnosen",
-  timed: "tidsatta set och sektionssimulering",
-  queue: "repetitionskön",
-  deck: "minneskorten",
-  analytics: "analysen",
-  mastery: "mästerskapsstegarna",
-  decide: "beslutsövningarna",
-  plan: "dagsplanen",
-  coach: "whiteboard-genomgången",
-  import: "import av score report",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  none: "Ingen prenumeration",
-  trialing: "Provperiod",
-  active: "Aktiv",
-  past_due: "Betalning misslyckades",
-  canceled: "Uppsagd",
-  incomplete: "Ofullständig",
-  unpaid: "Obetald",
-  expired: "Avslutad",
-};
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(date);
+/** Capitalises the first letter of a Swedish or English noun phrase. */
+function sentenceCase(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default async function AccountPage({
@@ -55,6 +27,7 @@ export default async function AccountPage({
   searchParams: Promise<{ las?: string; betalning?: string }>;
 }) {
   const { user, sdb, entitlements } = await withEntitlements();
+  const { locale, t } = await getI18n();
   const { las, betalning } = await searchParams;
   const allowance = await dailyAllowance(sdb, entitlements);
 
@@ -66,7 +39,9 @@ export default async function AccountPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-xl font-semibold">Konto</h1>
+        <h1 className="font-display text-xl font-semibold">
+          {t("account.title")}
+        </h1>
         <p className="mt-1 font-mono text-xs text-graphite">{user.email}</p>
       </div>
 
@@ -75,26 +50,26 @@ export default async function AccountPage({
           role="status"
           className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-4 text-sm"
         >
-          Tack — betalningen är registrerad. Om planen nedan inte har
-          uppdaterats ännu tar Stripe några sekunder på sig; ladda om sidan.
+          {t("account.paymentDone")}
         </p>
       )}
       {betalning === "avbruten" && (
         <p role="status" className="text-sm text-graphite">
-          Kassan avbröts. Inget har debiterats.
+          {t("account.paymentCancelled")}
         </p>
       )}
 
       {blocked && (
         <div className="rounded-card border border-amber/50 bg-amber/5 p-4">
           <h2 className="font-display text-sm font-semibold">
-            {FEATURE_LABELS[blocked].charAt(0).toUpperCase() +
-              FEATURE_LABELS[blocked].slice(1)} ingår inte i din plan
+            {t("account.lockedTitle", {
+              feature: sentenceCase(t(`account.feature.${blocked}` as Key)),
+            })}
           </h2>
           <p className="mt-1 text-sm text-graphite">
-            Gratisnivån innehåller kapitlen, mönsterträningen och{" "}
-            {PLANS.free.dailyQuestionLimit} frågor per dag. Resten öppnas med
-            Månad eller GMAT-sprint.
+            {t("account.lockedBody", {
+              limit: PLANS.free.dailyQuestionLimit ?? 0,
+            })}
           </p>
         </div>
       )}
@@ -103,34 +78,36 @@ export default async function AccountPage({
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
             <h2 className="font-display text-base font-semibold">
-              {PLANS[entitlements.plan].name}
+              {t(`billing.plans.${entitlements.plan}.name` as Key)}
             </h2>
             <p className="mt-0.5 font-mono text-[11px] text-graphite">
-              {STATUS_LABELS[entitlements.status] ?? entitlements.status}
+              {t(`account.status.${entitlements.status}` as Key)}
               {entitlements.currentPeriodEnd && (
                 <>
                   {" · "}
                   {entitlements.cancelAtPeriodEnd
-                    ? "avslutas"
+                    ? t("account.endsOn")
                     : entitlements.plan === "sprint"
-                      ? "gäller till"
-                      : "förnyas"}{" "}
-                  {formatDate(entitlements.currentPeriodEnd)}
+                      ? t("account.validUntil")
+                      : t("account.renews")}{" "}
+                  {formatDate(entitlements.currentPeriodEnd, locale)}
                 </>
               )}
             </p>
           </div>
           {allowance.limit != null && (
             <p className="font-mono text-[11px] text-graphite">
-              {allowance.used} / {allowance.limit} frågor i dag
+              {t("account.usedToday", {
+                used: allowance.used,
+                limit: allowance.limit,
+              })}
             </p>
           )}
         </div>
 
         {entitlements.needsAttention && (
           <p role="alert" className="mt-3 text-sm text-redpen">
-            Stripe kunde inte dra betalningen. Uppdatera kortet nedan innan
-            perioden går ut, så behåller du tillgången.
+            {t("account.paymentProblem")}
           </p>
         )}
 
@@ -142,11 +119,10 @@ export default async function AccountPage({
       </section>
 
       <section>
-        <h2 className="font-display text-base font-semibold">Planer</h2>
-        <p className="mt-1 text-sm text-graphite">
-          Alla priser i svenska kronor, inklusive moms. Uppsägning när som
-          helst, direkt i betalportalen.
-        </p>
+        <h2 className="font-display text-base font-semibold">
+          {t("billing.plansHeading")}
+        </h2>
+        <p className="mt-1 text-sm text-graphite">{t("billing.plansLede")}</p>
         <div className="mt-4">
           <PlanCards
             currentPlan={entitlements.plan}
@@ -156,25 +132,23 @@ export default async function AccountPage({
         </div>
         {stripeConfigured() && !stripeIsLive() && (
           <p className="mt-4 font-mono text-[11px] text-amber">
-            Testläge: inga riktiga betalningar går igenom. Använd Stripes
-            testkort 4242 4242 4242 4242.
+            {t("billing.testMode")}
           </p>
         )}
       </section>
 
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
-        <h2 className="font-display text-sm font-semibold">Dina uppgifter</h2>
-        <p className="mt-1 text-sm text-graphite">
-          Du kan när som helst ladda ner allt Q86 sparar om dig, som en
-          JSON-fil.
-        </p>
+        <h2 className="font-display text-sm font-semibold">
+          {t("account.dataTitle")}
+        </h2>
+        <p className="mt-1 text-sm text-graphite">{t("account.dataLede")}</p>
         <div className="mt-3">
           <Link
             href="/api/export"
             download
             className="rounded-control border border-grid px-4 py-2 text-sm transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
           >
-            Ladda ner mina uppgifter ↓
+            {t("account.dataDownload")}
           </Link>
         </div>
       </section>

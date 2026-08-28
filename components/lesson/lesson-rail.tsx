@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { cn } from "@/lib/utils";
 
 export type RailItem = { id: string; label: string };
@@ -52,6 +53,7 @@ export function ReadingProgress() {
 
 /** "On this page" scroll-spy nav for the desktop side rail. */
 export function LessonRail({ items }: { items: RailItem[] }) {
+  const t = useT();
   const [active, setActive] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -85,9 +87,9 @@ export function LessonRail({ items }: { items: RailItem[] }) {
   }, [items]);
 
   return (
-    <nav aria-label="On this page" className="space-y-0.5">
+    <nav aria-label={t("lesson.onThisPage")} className="space-y-0.5">
       <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-graphite">
-        On this page
+        {t("lesson.onThisPage")}
       </p>
       {items.map((it) => (
         <a

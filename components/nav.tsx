@@ -2,34 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/components/i18n-provider";
+import { LocaleToggle } from "@/components/locale-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Key } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /** Seven destinations; grouped sections carry their own tab bars.
  *  `routes` lists every path that should light the entry up. */
-const LINKS = [
-  { href: "/", label: "Today", routes: ["/"] },
-  { href: "/learn", label: "Learn", routes: ["/learn"] },
-  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
-  { href: "/timed", label: "Timed", routes: ["/timed"] },
-  { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
-  { href: "/patterns", label: "Trainers", routes: ["/patterns", "/decide"] },
+const LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
+  { href: "/", key: "nav.today", routes: ["/"] },
+  { href: "/learn", key: "nav.learn", routes: ["/learn"] },
+  { href: "/drill", key: "nav.drill", routes: ["/drill", "/postmortem"] },
+  { href: "/timed", key: "nav.timed", routes: ["/timed"] },
+  { href: "/deck", key: "nav.review", routes: ["/deck", "/queue"] },
+  { href: "/patterns", key: "nav.trainers", routes: ["/patterns", "/decide"] },
   {
     href: "/mastery",
-    label: "Progress",
+    key: "nav.progress",
     routes: ["/mastery", "/analytics", "/import"],
   },
 ];
 
 /** The daily loop, thumb-reachable on phones. */
-const TAB_LINKS = [
-  { href: "/", label: "Today", routes: ["/"] },
-  { href: "/drill", label: "Drill", routes: ["/drill", "/postmortem"] },
-  { href: "/timed", label: "Timed", routes: ["/timed"] },
-  { href: "/deck", label: "Review", routes: ["/deck", "/queue"] },
+const TAB_LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
+  { href: "/", key: "nav.today", routes: ["/"] },
+  { href: "/drill", key: "nav.drill", routes: ["/drill", "/postmortem"] },
+  { href: "/timed", key: "nav.timed", routes: ["/timed"] },
+  { href: "/deck", key: "nav.review", routes: ["/deck", "/queue"] },
   {
     href: "/analytics",
-    label: "Stats",
+    key: "nav.stats",
     routes: ["/analytics", "/mastery", "/import"],
   },
 ];
@@ -42,6 +45,7 @@ function isActive(routes: string[], pathname: string): boolean {
 
 export function Nav({ userEmail }: { userEmail: string }) {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <header className="sticky top-0 z-40 border-b border-grid bg-paper/90 backdrop-blur-sm">
@@ -52,11 +56,11 @@ export function Nav({ userEmail }: { userEmail: string }) {
         >
           Q86
           <span className="ml-2 hidden text-xs font-normal text-graphite sm:inline">
-            the target is the name
+            {t("nav.tagline")}
           </span>
         </Link>
         <nav
-          aria-label="Primary"
+          aria-label={t("nav.primary")}
           className="flex flex-1 items-center gap-1 overflow-x-auto"
         >
           {LINKS.map((link) => {
@@ -72,11 +76,12 @@ export function Nav({ userEmail }: { userEmail: string }) {
                     : "text-graphite hover:bg-highlight/60 hover:text-ink",
                 )}
               >
-                {link.label}
+                {t(link.key)}
               </Link>
             );
           })}
         </nav>
+        <LocaleToggle compact />
         <ThemeToggle />
         <AccountMenu email={userEmail} />
       </div>
@@ -89,6 +94,7 @@ export function Nav({ userEmail }: { userEmail: string }) {
  * logout endpoint can be triggered by any page that can embed an image.
  */
 function AccountMenu({ email }: { email: string }) {
+  const t = useT();
   return (
     <div className="flex shrink-0 items-center gap-2">
       <span
@@ -101,14 +107,14 @@ function AccountMenu({ email }: { email: string }) {
         href="/konto"
         className="rounded-control border border-grid px-2.5 py-1 text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
       >
-        Konto
+        {t("nav.account")}
       </Link>
       <form action="/api/auth/logout" method="POST">
         <button
           type="submit"
           className="rounded-control border border-grid px-2.5 py-1 text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
         >
-          Logga ut
+          {t("nav.signOut")}
         </button>
       </form>
     </div>
@@ -120,9 +126,10 @@ function AccountMenu({ email }: { email: string }) {
  *  header-relative positioning. */
 export function BottomTabs() {
   const pathname = usePathname();
+  const t = useT();
   return (
       <nav
-        aria-label="Quick access"
+        aria-label={t("nav.quickAccess")}
         className="fixed inset-x-0 bottom-0 z-40 flex border-t border-grid bg-paper/95 backdrop-blur-sm sm:hidden"
       >
         {TAB_LINKS.map((link) => {
@@ -136,7 +143,7 @@ export function BottomTabs() {
                 active ? "font-semibold text-ballpoint" : "text-graphite",
               )}
             >
-              {link.label}
+              {t(link.key)}
             </Link>
           );
         })}

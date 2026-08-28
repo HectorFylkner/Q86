@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Md } from "@/components/math";
 import { ResultStroke } from "@/components/drill/result-stroke";
+import { useT } from "@/components/i18n-provider";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
 
 export function ChoiceList({
@@ -18,8 +19,13 @@ export function ChoiceList({
   correctIndex: number;
   onSelect: (index: number) => void;
 }) {
+  const t = useT();
   return (
-    <div role="radiogroup" aria-label="Answer choices" className="space-y-2">
+    <div
+      role="radiogroup"
+      aria-label={t("lesson.answerChoices")}
+      className="space-y-2"
+    >
       {choices.map((choice, i) => {
         const isSelected = selected === i;
         const isCorrect = revealed && i === correctIndex;

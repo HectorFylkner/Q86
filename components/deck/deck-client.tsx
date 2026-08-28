@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Md } from "@/components/math";
+import { useI18n } from "@/components/i18n-provider";
 import { gradeDeckCard } from "@/lib/actions";
+import { dateFnsLocale } from "@/lib/i18n/format";
+import { subtopicLabel } from "@/lib/i18n/labels";
 import type { DeckCard } from "@/lib/deck";
 import type { ReviewGrade } from "@/lib/srs";
 import { cn } from "@/lib/utils";
@@ -20,6 +23,7 @@ function days(n: number): string {
 }
 
 export function DeckClient({ cards }: { cards: DeckCard[] }) {
+  const { locale, t } = useI18n();
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [, startTransition] = useTransition();
@@ -61,15 +65,12 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
   if (cards.length === 0) {
     return (
       <section className="rounded-card border border-grid bg-surface p-6 text-center shadow-ambient">
-        <p className="text-sm text-graphite">
-          Nothing due — the deck builds itself from questions you miss, and
-          cards you&apos;ve graded return when their interval comes up.
-        </p>
+        <p className="text-sm text-graphite">{t("deck.empty")}</p>
         <Link
           href="/drill"
           className="mt-3 inline-block rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
         >
-          Go drill →
+          {t("deck.goDrill")}
         </Link>
       </section>
     );
@@ -79,13 +80,9 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
     return (
       <section className="rounded-card border border-ballpoint/40 bg-ballpoint/5 p-6 text-center shadow-ambient">
         <p className="font-display text-base font-semibold">
-          Deck done — {cards.length} takeaway{cards.length === 1 ? "" : "s"}{" "}
-          graded.
+          {t("deck.done", { count: cards.length })}
         </p>
-        <p className="mt-1 text-sm text-graphite">
-          Two minutes that compound. The cards you knew are scheduled out;
-          the ones you forgot return tomorrow.
-        </p>
+        <p className="mt-1 text-sm text-graphite">{t("deck.doneNote")}</p>
       </section>
     );
   }
@@ -94,7 +91,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
     <div className="mx-auto max-w-2xl space-y-3">
       <p className="text-center font-mono text-xs text-graphite">
         {index + 1} / {cards.length}
-        {card.state === "new" && " · new"}
+        {card.state === "new" && ` · ${t("deck.new")}`}
       </p>
       <button
         onClick={advance}
@@ -104,14 +101,20 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
         )}
       >
         <p className="font-mono text-[10px] uppercase tracking-wide text-graphite">
-          {flipped ? "Takeaway" : "Trigger cue"} · {card.subtopicLabel} ·
-          missed {formatDistanceToNow(new Date(card.missedAgo), { addSuffix: true })}
+          {flipped ? t("deck.takeaway") : t("deck.triggerCue")} ·{" "}
+          {subtopicLabel(t, card.subtopic)} ·{" "}
+          {t("deck.missed", {
+            when: formatDistanceToNow(new Date(card.missedAgo), {
+              addSuffix: true,
+              locale: dateFnsLocale(locale),
+            }),
+          })}
         </p>
         <div className="mt-2 text-[15px]">
           <Md source={flipped ? card.back : card.front} />
         </div>
         {!flipped && (
-          <p className="mt-3 text-xs text-graphite">Enter to flip</p>
+          <p className="mt-3 text-xs text-graphite">{t("deck.flipHint")}</p>
         )}
       </button>
       {flipped ? (
@@ -121,7 +124,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               onClick={() => grade("forgot")}
               className="min-h-[44px] rounded-control border border-redpen/40 px-3 py-2 text-sm font-medium text-redpen transition-colors hover:bg-redpen/10"
             >
-              Forgot{" "}
+              {t("deck.forgot")}{" "}
               <span className="font-mono text-[11px] opacity-70">
                 {days(card.intervals.forgot)} · 1
               </span>
@@ -130,7 +133,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               onClick={() => grade("hard")}
               className="min-h-[44px] rounded-control border border-amber/50 px-3 py-2 text-sm font-medium text-amber transition-colors hover:bg-amber/10"
             >
-              Hard{" "}
+              {t("deck.hard")}{" "}
               <span className="font-mono text-[11px] opacity-70">
                 {days(card.intervals.hard)} · 2
               </span>
@@ -139,7 +142,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               onClick={() => grade("good")}
               className="min-h-[44px] rounded-control border border-ballpoint/50 px-3 py-2 text-sm font-medium text-ballpoint transition-colors hover:bg-ballpoint/10"
             >
-              Good{" "}
+              {t("deck.good")}{" "}
               <span className="font-mono text-[11px] opacity-70">
                 {days(card.intervals.good)} · 3
               </span>
@@ -150,7 +153,7 @@ export function DeckClient({ cards }: { cards: DeckCard[] }) {
               href={`/drill?qids=${card.questionId}`}
               className="text-xs font-medium text-ballpoint hover:underline"
             >
-              Re-solve the question this came from →
+              {t("deck.resolve")}
             </Link>
           </p>
         </>

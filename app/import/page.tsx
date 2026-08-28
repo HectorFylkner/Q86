@@ -1,16 +1,19 @@
 import { desc } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
-import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getI18n } from "@/lib/i18n/server";
+import { formatDate } from "@/lib/i18n/format";
+import { skillShortLabel } from "@/lib/i18n/labels";
 import { baselineReports } from "@/lib/db/schema";
-import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
+import type { FundamentalSkill } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function ImportPage() {
   const { sdb } = await requireFeature("import");
+  const { locale, t } = await getI18n();
   const reports = await sdb.q
     .select()
     .from(baselineReports)
@@ -22,7 +25,7 @@ export default async function ImportPage() {
     <div className="space-y-5">
       <SectionTabs group="progress" />
       <h1 className="font-display text-xl font-semibold">
-        Score-report import
+        {t("pages.import")}
       </h1>
       <ImportClient />
 
@@ -30,12 +33,10 @@ export default async function ImportPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-sm font-semibold">
-              Backup your data
+              {t("pages.importBackupTitle")}
             </h2>
             <p className="mt-0.5 text-xs text-graphite">
-              One JSON file with everything Q86 holds about your account:
-              attempts, sessions, deck scheduling, flags and settings. This
-              is also the GDPR data export.
+              {t("pages.importBackupLede")}
             </p>
           </div>
           <a
@@ -43,7 +44,7 @@ export default async function ImportPage() {
             download
             className="rounded-control border border-grid px-4 py-2 text-sm font-medium transition-colors hover:border-ballpoint/50 hover:text-ballpoint"
           >
-            Download backup ↓
+            {t("pages.importBackupButton")}
           </a>
         </div>
       </section>
@@ -51,11 +52,10 @@ export default async function ImportPage() {
       {reports.length > 0 && (
         <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
           <h2 className="font-display text-sm font-semibold">
-            Imported baselines · {reports.length}
+            {t("pages.importBaselines", { count: reports.length })}
           </h2>
           <p className="mt-0.5 text-xs text-graphite">
-            The most recent import seeds the daily plan&apos;s weakness
-            weights.
+            {t("pages.importBaselinesLede")}
           </p>
           <ul className="mt-2 space-y-1.5">
             {reports.map((r) => {
@@ -74,17 +74,19 @@ export default async function ImportPage() {
               return (
                 <li key={r.id} className="flex flex-wrap gap-x-3 text-sm">
                   <span className="font-mono text-xs text-graphite">
-                    {format(new Date(r.createdAt), "yyyy-MM-dd")}
+                    {formatDate(new Date(r.createdAt), locale, "numeric")}
                   </span>
                   <span>
-                    {parsed.test_date ? `test ${parsed.test_date} · ` : ""}
+                    {parsed.test_date
+                      ? `${t("pages.importTest", { date: parsed.test_date })} · `
+                      : ""}
                     Quant {quant?.scaled_score ?? "—"}
                   </span>
                   <span className="text-xs text-graphite">
                     {(parsed.fundamental_skills ?? [])
                       .map(
                         (s) =>
-                          `${SKILL_SHORT_LABELS[s.skill]} ${s.percentile}th`,
+                          `${skillShortLabel(t, s.skill)} ${s.percentile}`,
                       )
                       .join(" · ")}
                   </span>

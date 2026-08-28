@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { FlagButton } from "@/components/drill/flag-button";
+import { useI18n } from "@/components/i18n-provider";
 import { Md } from "@/components/math";
 import { getQuestionHistory, type QuestionHistoryRow } from "@/lib/actions";
 import type { Question } from "@/lib/db/schema";
+import { dateFnsLocale } from "@/lib/i18n/format";
 import { CHOICE_LETTERS, cn } from "@/lib/utils";
 
 /**
@@ -20,6 +22,7 @@ export function SolutionPanel({
   question: Question;
   selectedIndex: number | null;
 }) {
+  const { locale, t } = useI18n();
   const traps = Object.entries(question.trapMap ?? {})
     .map(([k, v]) => ({ index: Number(k), text: v }))
     .filter((t) => t.index !== question.correctIndex && t.text)
@@ -50,7 +53,7 @@ export function SolutionPanel({
     >
       <section>
         <h3 className="mb-1.5 font-display text-sm font-semibold text-ballpoint">
-          Fastest path
+          {t("drill.fastestPath")}
         </h3>
         <Md source={question.fastestPathMd} className="text-[15px]" />
       </section>
@@ -62,7 +65,7 @@ export function SolutionPanel({
       {traps.length > 0 && (
         <section className="border-t border-grid pt-3">
           <h3 className="mb-1.5 font-display text-sm font-semibold text-redpen">
-            Trap anatomy
+            {t("drill.trapAnatomy")}
           </h3>
           <ul className="space-y-1.5">
             {traps.map((trap) => (
@@ -98,7 +101,7 @@ export function SolutionPanel({
       {priorAttempts.length > 0 && (
         <section className="mt-4 border-t border-grid pt-3">
           <h3 className="font-display text-xs font-semibold text-graphite">
-            Your history on this question
+            {t("drill.yourHistory")}
           </h3>
           <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite">
             {priorAttempts.map((a, i) => (
@@ -117,6 +120,7 @@ export function SolutionPanel({
                 <span>
                   {formatDistanceToNow(new Date(a.createdAt), {
                     addSuffix: true,
+                    locale: dateFnsLocale(locale),
                   })}
                   {a.mode === "redo" && " · redo"}
                   {a.focus === "casual" && " · casual"}

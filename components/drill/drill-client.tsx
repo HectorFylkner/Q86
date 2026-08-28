@@ -7,6 +7,7 @@ import {
   startDrillWithQuestions,
   type DrillTiming,
 } from "@/lib/actions";
+import { useT } from "@/components/i18n-provider";
 import type { Question } from "@/lib/db/schema";
 import type { SessionFocus, Subtopic } from "@/lib/taxonomy";
 import { DrillSetup, type CountRow, type DrillConfigValue } from "./drill-setup";
@@ -37,6 +38,7 @@ export function DrillClient({
   autoStartTest?: Subtopic | null;
   canGenerate: boolean;
 }) {
+  const t = useT();
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const autoStartedRef = useRef(false);
 
@@ -65,7 +67,7 @@ export function DrillClient({
     startChapterTest(autoStartTest)
       .then((res) => {
         if (res.error != null || res.sessionId == null) {
-          setStage({ kind: "setup", error: res.error ?? "Could not start." });
+          setStage({ kind: "setup", error: res.error ?? t("drill.couldNotStart") });
         } else {
           setStage({
             kind: "running",
@@ -80,10 +82,10 @@ export function DrillClient({
       .catch(() =>
         setStage({
           kind: "setup",
-          error: "Could not start the test — the server did not respond.",
+          error: t("drill.couldNotStartTest"),
         }),
       );
-  }, [autoStartTest]);
+  }, [autoStartTest, t]);
 
   // Twin drills and coach prescriptions arrive as /drill?qids=…
   useEffect(() => {
@@ -93,7 +95,7 @@ export function DrillClient({
     startDrillWithQuestions(autoStartIds)
       .then((res) => {
         if (res.error != null || res.sessionId == null) {
-          setStage({ kind: "setup", error: res.error ?? "Could not start." });
+          setStage({ kind: "setup", error: res.error ?? t("drill.couldNotStart") });
         } else {
           setStage({
             kind: "running",
@@ -107,10 +109,10 @@ export function DrillClient({
       .catch(() =>
         setStage({
           kind: "setup",
-          error: "Could not start the drill — the server did not respond.",
+          error: t("drill.couldNotStartDrill"),
         }),
       );
-  }, [autoStartIds]);
+  }, [autoStartIds, t]);
 
   async function handleStart(config: DrillConfigValue) {
     setStage({ kind: "loading" });
@@ -130,7 +132,7 @@ export function DrillClient({
     } catch {
       setStage({
         kind: "setup",
-        error: "Could not start the drill — the server did not respond.",
+        error: t("drill.couldNotStartDrill"),
       });
     }
   }
@@ -140,7 +142,7 @@ export function DrillClient({
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="skeleton h-6 w-48" />
         <div className="skeleton h-64 w-full rounded-card" />
-        <p className="text-sm text-graphite">Selecting questions…</p>
+        <p className="text-sm text-graphite">{t("drill.selecting")}</p>
       </div>
     );
   }

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/components/i18n-provider";
+import type { Key } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /** The grouped sections behind the consolidated top nav. Each page in a
@@ -9,19 +11,19 @@ import { cn } from "@/lib/utils";
  *  reads as one place with views, not separate destinations. */
 export const SECTION_GROUPS = {
   review: [
-    { href: "/deck", label: "Takeaway deck" },
-    { href: "/queue", label: "Redo queue" },
+    { href: "/deck", key: "sections.deck" },
+    { href: "/queue", key: "sections.queue" },
   ],
   trainers: [
-    { href: "/patterns", label: "Mental math" },
-    { href: "/decide", label: "Decision triage" },
+    { href: "/patterns", key: "sections.patterns" },
+    { href: "/decide", key: "sections.decide" },
   ],
   progress: [
-    { href: "/mastery", label: "Mastery" },
-    { href: "/analytics", label: "Analytics" },
-    { href: "/import", label: "Import & backup" },
+    { href: "/mastery", key: "sections.mastery" },
+    { href: "/analytics", key: "sections.analytics" },
+    { href: "/import", key: "sections.import" },
   ],
-} as const;
+} as const satisfies Record<string, ReadonlyArray<{ href: string; key: Key }>>;
 
 export function SectionTabs({
   group,
@@ -29,8 +31,12 @@ export function SectionTabs({
   group: keyof typeof SECTION_GROUPS;
 }) {
   const pathname = usePathname();
+  const t = useT();
   return (
-    <nav aria-label="Section" className="flex gap-5 border-b border-grid">
+    <nav
+      aria-label={t("nav.sectionLabel")}
+      className="flex gap-5 border-b border-grid"
+    >
       {SECTION_GROUPS[group].map((tab) => {
         const active = pathname.startsWith(tab.href);
         return (
@@ -45,7 +51,7 @@ export function SectionTabs({
                 : "border-transparent text-graphite hover:text-ink",
             )}
           >
-            {tab.label}
+            {t(tab.key)}
           </Link>
         );
       })}

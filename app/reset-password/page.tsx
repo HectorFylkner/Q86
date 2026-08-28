@@ -1,42 +1,42 @@
 import Link from "next/link";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { ResetPasswordForm } from "@/components/auth/forms";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata = { title: "Nytt lösenord – Q86" };
+export async function generateMetadata() {
+  const t = await getT();
+  return { title: `${t("auth.resetTitle")} – Q86` };
+}
 
 export default async function ResetPasswordPage({
   searchParams,
 }: {
   searchParams: Promise<{ token?: string }>;
 }) {
+  const t = await getT();
   const { token } = await searchParams;
 
   if (!token) {
     return (
       <AuthShell
-        title="Länken saknas"
-        lede="Öppna länken från mejlet, eller begär en ny återställning."
+        title={t("auth.resetMissingTitle")}
+        lede={t("auth.resetMissingLede")}
         footer={
           <Link href="/forgot-password" className="text-ballpoint underline">
-            Begär en ny länk
+            {t("auth.requestNewLink")}
           </Link>
         }
       >
-        <p className="text-sm text-graphite">
-          Adressen innehöll ingen återställningstoken.
-        </p>
+        <p className="text-sm text-graphite">{t("auth.resetMissingBody")}</p>
       </AuthShell>
     );
   }
 
   return (
-    <AuthShell
-      title="Välj ett nytt lösenord"
-      lede="Alla andra inloggade enheter loggas ut när du sparar."
-    >
+    <AuthShell title={t("auth.resetTitle")} lede={t("auth.resetLede")}>
       <ResetPasswordForm token={token} />
     </AuthShell>
   );

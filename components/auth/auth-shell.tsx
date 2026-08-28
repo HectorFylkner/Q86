@@ -1,9 +1,16 @@
 import Link from "next/link";
+import { LocaleToggle } from "@/components/locale-toggle";
 
 /**
  * The frame every credential screen shares. Deliberately narrow and
  * unadorned: the app's graph-paper ground shows through, the card is the
  * only surface, and nothing competes with the form.
+ *
+ * The language toggle belongs here and not only in the signed-in header:
+ * an anonymous visitor is served Swedish unconditionally (ADR 0004), so
+ * without it an English reader would have no way to change the language
+ * before creating an account — and the account inherits whatever the
+ * signup form was read in.
  */
 export function AuthShell({
   title,
@@ -18,12 +25,15 @@ export function AuthShell({
 }) {
   return (
     <div className="mx-auto mt-10 w-full max-w-[26rem] sm:mt-16">
-      <Link
-        href="/"
-        className="font-display text-2xl font-bold tracking-tight text-ink"
-      >
-        Q86
-      </Link>
+      <div className="flex items-center justify-between gap-4">
+        <Link
+          href="/"
+          className="font-display text-2xl font-bold tracking-tight text-ink"
+        >
+          Q86
+        </Link>
+        <LocaleToggle compact />
+      </div>
       <div className="mt-4 rounded-card border border-grid bg-surface p-6 shadow-ambient">
         <h1 className="font-display text-lg font-semibold">{title}</h1>
         <p className="mt-1 text-sm text-graphite">{lede}</p>

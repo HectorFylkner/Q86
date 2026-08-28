@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/components/i18n-provider";
+import { formatCurrency } from "@/lib/i18n/format";
+import type { Key } from "@/lib/i18n";
 import {
-  formatPrice,
   monthlyEquivalentOre,
   PLAN_ORDER,
   PLANS,
@@ -25,6 +27,7 @@ export function PlanCards({
   billingEnabled: boolean;
   highlight?: PlanId;
 }) {
+  const { locale, t } = useI18n();
   const [busy, setBusy] = useState<PlanId | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,19 +42,16 @@ export function PlanCards({
       });
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 503) {
-        setError(
-          "Betalningar är inte aktiverade på den här servern ännu. " +
-            "Hör av dig så öppnar vi ett konto åt dig manuellt.",
-        );
+        setError(t("billing.checkoutUnavailable"));
         return;
       }
       if (!res.ok || !body.url) {
-        setError("Det gick inte att öppna kassan. Försök igen om en stund.");
+        setError(t("billing.checkoutFailed"));
         return;
       }
       window.location.href = body.url;
     } catch {
-      setError("Det gick inte att nå betalningstjänsten. Kontrollera nätet.");
+      setError(t("billing.checkoutUnreachable"));
     } finally {
       setBusy(null);
     }
@@ -65,6 +65,16 @@ export function PlanCards({
           const vat = vatBreakdown(plan.priceOre);
           const isCurrent = id === currentPlan;
           const featured = id === (highlight ?? "sprint");
+          const name = t(`billing.plans.${id}.name` as Key);
+          const bullets = Array.from(
+            { length: plan.bulletCount },
+            (_unused, index) =>
+              t(`billing.plans.${id}.bullet${index + 1}` as Key, {
+                limit: plan.dailyQuestionLimit ?? 0,
+                monthly: formatCurrency(monthlyEquivalentOre(plan), locale),
+              }),
+          );
+
           return (
             <section
               key={id}
@@ -74,42 +84,53 @@ export function PlanCards({
               )}
             >
               <div className="flex items-baseline justify-between gap-2">
-                <h3 className="font-display text-base font-semibold">
-                  {plan.name}
-                </h3>
+                <h3 className="font-display text-base font-semibold">{name}</h3>
                 {isCurrent && (
                   <span className="rounded-control bg-highlight px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-ink">
-                    Din plan
+                    {t("billing.yourPlan")}
                   </span>
                 )}
               </div>
 
-              <p className="mt-1 text-sm text-graphite">{plan.tagline}</p>
+              <p className="mt-1 text-sm text-graphite">
+                {t(`billing.plans.${id}.tagline` as Key)}
+              </p>
 
               <div className="mt-4">
                 <span className="font-display text-3xl font-semibold tabular-nums">
-                  {formatPrice(plan.priceOre)}
+                  {formatCurrency(plan.priceOre, locale)}
                 </span>
                 {plan.billing === "recurring_month" && (
-                  <span className="ml-1 text-sm text-graphite">/ månad</span>
+                  <span className="ml-1 text-sm text-graphite">
+                    {t("billing.perMonth")}
+                  </span>
                 )}
                 {plan.billing === "one_time" && (
                   <span className="ml-1 text-sm text-graphite">
-                    / {plan.durationMonths} månader
+                    {t("billing.forMonths", {
+                      months: plan.durationMonths ?? 0,
+                    })}
                   </span>
                 )}
               </div>
               <p className="mt-1 font-mono text-[11px] text-graphite">
                 {plan.priceOre === 0
-                  ? "Ingen betalning, inget kort"
-                  : `inkl. ${formatPrice(vat.vatOre)} moms` +
+                  ? t("billing.noPayment")
+                  : t("billing.vatIncluded", {
+                      amount: formatCurrency(vat.vatOre, locale),
+                    }) +
                     (plan.billing === "one_time"
-                      ? ` · ${formatPrice(monthlyEquivalentOre(plan))}/mån`
+                      ? ` · ${t("billing.monthlyEquivalent", {
+                          amount: formatCurrency(
+                            monthlyEquivalentOre(plan),
+                            locale,
+                          ),
+                        })}`
                       : "")}
               </p>
 
               <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                {plan.bullets.map((bullet) => (
+                {bullets.map((bullet) => (
                   <li key={bullet} className="flex gap-2">
                     <span aria-hidden="true" className="text-ballpoint">
                       ·
@@ -122,11 +143,13 @@ export function PlanCards({
               <div className="mt-5">
                 {id === "free" ? (
                   <p className="text-center font-mono text-[11px] text-graphite">
-                    {isCurrent ? "Aktiv" : "Alltid tillgänglig"}
+                    {isCurrent
+                      ? t("billing.active")
+                      : t("billing.alwaysAvailable")}
                   </p>
                 ) : isCurrent ? (
                   <p className="text-center font-mono text-[11px] text-graphite">
-                    Hantera nedan
+                    {t("billing.manageBelow")}
                   </p>
                 ) : (
                   <button
@@ -140,7 +163,9 @@ export function PlanCards({
                       (busy !== null || !billingEnabled) && "opacity-60",
                     )}
                   >
-                    {busy === id ? "Öppnar kassan…" : `Välj ${plan.name}`}
+                    {busy === id
+                      ? t("billing.openingCheckout")
+                      : t("billing.choose", { plan: name })}
                   </button>
                 )}
               </div>
@@ -150,10 +175,7 @@ export function PlanCards({
       </div>
 
       {!billingEnabled && (
-        <p className="mt-4 text-sm text-amber">
-          Betalningar är inte konfigurerade på den här installationen, så
-          knapparna är inaktiva. Gratisnivån fungerar som vanligt.
-        </p>
+        <p className="mt-4 text-sm text-amber">{t("billing.unconfigured")}</p>
       )}
       {error && (
         <p role="alert" className="mt-4 text-sm text-redpen">

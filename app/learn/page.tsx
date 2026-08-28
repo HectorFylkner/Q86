@@ -2,22 +2,20 @@ import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
 import { requireFeature } from "@/lib/billing/entitlements";
 import { chapterTestStates } from "@/lib/chapter-tests";
+import { getI18n } from "@/lib/i18n/server";
+import { skillLabel } from "@/lib/i18n/labels";
 import { listLessons } from "@/lib/lessons";
-import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
+import { FUNDAMENTAL_SKILLS } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const METHOD = [
-  { step: "Read", detail: "the core ideas and cues" },
-  { step: "Attempt", detail: "each example before revealing" },
-  { step: "Tick", detail: "the pre-drill checklist honestly" },
-  { step: "Drill", detail: "the same subtopic while it's warm" },
-];
+const METHOD = ["read", "attempt", "tick", "drill"] as const;
 
 export default async function LearnPage() {
   const { sdb } = await requireFeature("learn");
-  const lessons = listLessons();
+  const { locale, t } = await getI18n();
+  const lessons = listLessons(locale);
   const tests = await chapterTestStates(sdb);
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;
   let chapterNo = 0;
@@ -26,12 +24,16 @@ export default async function LearnPage() {
     <div className="space-y-5">
       <div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="font-display text-xl font-semibold">Learn</h1>
+          <h1 className="font-display text-xl font-semibold">
+            {t("learn.title")}
+          </h1>
           <p className="text-xs text-graphite">
-            {lessons.length} concept chapters, one per drillable subtopic
-            {passedCount > 0 &&
-              ` — ${passedCount} test${passedCount === 1 ? "" : "s"} passed`}
-            .
+            {passedCount > 0
+              ? t("learn.ledeWithTests", {
+                  count: lessons.length,
+                  passed: passedCount,
+                })
+              : t("learn.lede", { count: lessons.length })}
           </p>
         </div>
         <div className="mt-1">
@@ -40,17 +42,19 @@ export default async function LearnPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {METHOD.map((m, i) => (
+        {METHOD.map((step, i) => (
           <div
-            key={m.step}
+            key={step}
             className="rounded-card border border-grid bg-surface px-3.5 py-3 shadow-ambient"
           >
             <p className="font-mono text-[10px] text-ballpoint">
               {String(i + 1).padStart(2, "0")}
             </p>
-            <p className="mt-0.5 text-sm font-medium">{m.step}</p>
+            <p className="mt-0.5 text-sm font-medium">
+              {t(`learn.method.${step}Step`)}
+            </p>
             <p className="mt-0.5 text-xs leading-snug text-graphite">
-              {m.detail}
+              {t(`learn.method.${step}Detail`)}
             </p>
           </div>
         ))}
@@ -58,7 +62,7 @@ export default async function LearnPage() {
 
       {lessons.length === 0 && (
         <p className="rounded-card border border-grid bg-surface p-6 text-sm text-graphite shadow-ambient">
-          Chapters are being written — check back shortly.
+          {t("learn.empty")}
         </p>
       )}
 
@@ -69,10 +73,10 @@ export default async function LearnPage() {
           <section key={skill}>
             <div className="mb-2 flex items-baseline gap-2">
               <h2 className="font-display text-sm font-semibold">
-                {SKILL_LABELS[skill]}
+                {skillLabel(t, skill)}
               </h2>
               <span className="font-mono text-[11px] text-graphite">
-                {group.length} chapters
+                {t("learn.chapters", { count: group.length })}
               </span>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -92,13 +96,19 @@ export default async function LearnPage() {
                         {lesson.title}
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-baseline gap-x-3 font-mono text-[11px] text-graphite">
-                        <span>~{lesson.minutes} min</span>
+                        <span>
+                          ~{lesson.minutes} {t("common.minutes")}
+                        </span>
                         {tests[lesson.subtopic]?.passed ? (
-                          <span className="text-ballpoint">✓ test passed</span>
+                          <span className="text-ballpoint">
+                            {t("learn.testPassed")}
+                          </span>
                         ) : tests[lesson.subtopic] ? (
                           <span className="text-amber">
-                            test {tests[lesson.subtopic]!.lastCorrect}/
-                            {tests[lesson.subtopic]!.lastTotal}
+                            {t("learn.testScore", {
+                              correct: tests[lesson.subtopic]!.lastCorrect,
+                              total: tests[lesson.subtopic]!.lastTotal,
+                            })}
                           </span>
                         ) : null}
                         <ReadBadge subtopic={lesson.subtopic} />

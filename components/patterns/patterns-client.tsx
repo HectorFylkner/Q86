@@ -15,11 +15,13 @@ import {
 import {
   generateFor,
   PATTERN_CATEGORIES,
-  PATTERN_CATEGORY_LABELS,
   type PatternCategoryKey,
   type PatternItem,
 } from "@/lib/generators";
 import { mulberry32 } from "@/lib/generators/rng";
+import { useI18n } from "@/components/i18n-provider";
+import { formatNumber, formatPercent } from "@/lib/i18n/format";
+import { patternCategoryLabel } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
 const ROUND_SECONDS = 90;
@@ -58,6 +60,7 @@ export function PatternsClient({
   mixedBest: number;
   autoStart?: Selection | null;
 }) {
+  const { locale, t } = useI18n();
   const router = useRouter();
   const [stage, setStage] = useState<Stage>({ kind: "setup", error: null });
   const [selection, setSelection] = useState<Selection>(autoStart ?? "mixed");
@@ -148,20 +151,20 @@ export function PatternsClient({
         setStage({
           kind: "setup",
           error:
-            "The round could not be saved — the server did not respond. Ratings are unchanged.",
+            t("patterns.saveFailed"),
         }),
       );
-  }, [selection, router]);
+  }, [selection, router, t]);
 
   // Clock.
   useEffect(() => {
     if (stage.kind !== "running") return;
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       const rem = Math.max(0, (endsAtRef.current - Date.now()) / 1000);
       setRemaining(rem);
       if (rem <= 0) finishRound();
     }, 100);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [stage.kind, finishRound]);
 
   const submitAnswer = useCallback(
@@ -226,11 +229,10 @@ export function PatternsClient({
           <div className="flex items-center gap-1.5 text-sm">
             <Flame size={15} className="text-amber" />
             <span className="font-mono font-medium">{dayStreak}</span>
-            <span className="text-graphite">day streak</span>
+            <span className="text-graphite">{t("patterns.dayStreak")}</span>
           </div>
           <span className="text-sm text-graphite">
-            90-second rounds · answers computed by code, instant and always
-            correct
+            {t("patternsMore.roundsLede")}
           </span>
         </div>
 
@@ -244,12 +246,14 @@ export function PatternsClient({
                 : "border-grid bg-surface hover:border-graphite/50",
             )}
           >
-            <span className="font-display text-sm font-semibold">Mixed</span>
+            <span className="font-display text-sm font-semibold">
+              {t("patterns.mixed")}
+            </span>
             <span className="mt-1 text-xs text-graphite">
-              All nine categories, shuffled
+              {t("patterns.mixedLede")}
             </span>
             <span className="mt-2 font-mono text-xs text-graphite">
-              best round {mixedBest}
+              {t("patternsMore.bestRound", { count: mixedBest })}
             </span>
           </button>
           {stats.map((s) => (
@@ -264,18 +268,23 @@ export function PatternsClient({
               )}
             >
               <span className="font-display text-sm font-semibold">
-                {s.label}
+                {patternCategoryLabel(t, s.key)}
               </span>
               <span className="mt-1 flex items-baseline gap-2">
                 <Odometer
                   text={String(s.rating)}
                   className="font-mono text-lg font-medium"
                 />
-                <span className="text-[10px] text-graphite">ELO</span>
+                <span className="text-[10px] text-graphite">
+                  {t("patterns.elo")}
+                </span>
               </span>
               <span className="mt-1 font-mono text-xs text-graphite">
-                best {s.bestRound} · streak {s.streak} ·{" "}
-                {s.attempts} answered
+                {t("patternsMore.bestStreakAnswered", {
+                  best: s.bestRound,
+                  streak: s.streak,
+                  answered: s.attempts,
+                })}
               </span>
             </button>
           ))}
@@ -290,12 +299,13 @@ export function PatternsClient({
           )}
         >
           {isSaving
-            ? "Saving the round…"
-            : `Start 90-second round: ${
-                selection === "mixed"
-                  ? "Mixed"
-                  : PATTERN_CATEGORY_LABELS[selection]
-              }`}
+            ? t("patterns.saving")
+            : t("patternsMore.startRound", {
+                category:
+                  selection === "mixed"
+                    ? t("patterns.mixed")
+                    : patternCategoryLabel(t, selection),
+              })}
         </button>
       </div>
     );
@@ -317,22 +327,32 @@ export function PatternsClient({
             transition={{ duration: 0.15 }}
             className="rounded-control border border-ballpoint/50 bg-highlight px-3 py-2 text-sm font-medium text-ballpoint"
           >
-            New personal best: {result.personalBest.current} (previous{" "}
-            {result.personalBest.previous}).
+            {t("patternsMore.newPersonalBest", {
+              current: result.personalBest.current,
+              previous: result.personalBest.previous,
+            })}
           </motion.p>
         )}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatTile label="Score" text={String(score)} />
+          <StatTile label={t("patterns.score")} text={String(score)} />
           <StatTile
-            label="Accuracy"
-            text={`${answered > 0 ? Math.round((score / answered) * 100) : 0}%`}
+            label={t("common.accuracy")}
+            text={formatPercent(answered > 0 ? score / answered : 0, locale)}
           />
-          <StatTile label="Avg time" text={`${(avgMs / 1000).toFixed(1)}s`} />
-          <StatTile label="Day streak" text={String(result.dayStreak)} />
+          <StatTile
+            label={t("common.averageTime")}
+            text={`${formatNumber(avgMs / 1000, locale)}s`}
+          />
+          <StatTile
+            label={t("patterns.dayStreak")}
+            text={String(result.dayStreak)}
+          />
         </div>
 
         <div className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
-          <h3 className="font-display text-sm font-semibold">Rating changes</h3>
+          <h3 className="font-display text-sm font-semibold">
+            {t("patterns.ratingChanges")}
+          </h3>
           <ul className="mt-2 space-y-2">
             {Object.keys(result.newRatings).map((category) => {
               const oldR = Math.round(result.oldRatings[category]);
@@ -341,9 +361,7 @@ export function PatternsClient({
               return (
                 <li key={category} className="flex items-center gap-3 text-sm">
                   <span className="w-56">
-                    {PATTERN_CATEGORY_LABELS[
-                      category as PatternCategoryKey
-                    ] ?? category}
+                    {patternCategoryLabel(t, category as PatternCategoryKey)}
                   </span>
                   <Odometer
                     text={String(newR)}
@@ -362,7 +380,9 @@ export function PatternsClient({
                     {delta > 0 ? `+${delta}` : delta}
                   </span>
                   <span className="font-mono text-xs text-graphite">
-                    streak {result.categoryStreaks[category] ?? 0}
+                    {t("patternsMore.streakShort", {
+                      count: result.categoryStreaks[category] ?? 0,
+                    })}
                   </span>
                 </li>
               );
@@ -375,13 +395,13 @@ export function PatternsClient({
             onClick={startRound}
             className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
           >
-            Another round
+            {t("patterns.anotherRound")}
           </button>
           <button
             onClick={() => setStage({ kind: "setup", error: null })}
             className="rounded-control border border-grid bg-surface px-4 py-2 text-sm hover:border-graphite/50"
           >
-            Change category
+            {t("patterns.changeCategory")}
           </button>
         </div>
       </div>
@@ -398,7 +418,9 @@ export function PatternsClient({
         </span>
         <span>
           <span className="font-medium">{score}</span>
-          <span className="text-graphite"> / {answered} correct</span>
+          <span className="text-graphite">
+            {t("patternsMore.correctOf", { answered })}
+          </span>
         </span>
       </div>
       <div className="h-[3px] w-full rounded-full bg-grid">
@@ -411,7 +433,7 @@ export function PatternsClient({
       {active && (
         <div className="rounded-card border border-grid bg-surface p-6 shadow-ambient">
           <div className="text-xs text-graphite">
-            {PATTERN_CATEGORY_LABELS[active.category]}
+            {patternCategoryLabel(t, active.category)}
           </div>
           <div className="mt-2 min-h-16 text-lg">
             <Md source={active.item.prompt} />
@@ -422,7 +444,9 @@ export function PatternsClient({
               <ResultStroke kind={feedback.correct ? "check" : "cross"} />
               {!feedback.correct && (
                 <span className="flex items-center gap-1.5 text-sm">
-                  <span className="text-graphite">Answer:</span>
+                  <span className="text-graphite">
+                    {t("patterns.answerLabel")}
+                  </span>
                   <Md source={feedback.answer} />
                 </span>
               )}
@@ -456,15 +480,15 @@ export function PatternsClient({
                 onChange={(e) => setTyped(e.target.value)}
                 inputMode="decimal"
                 autoComplete="off"
-                aria-label="Your answer"
-                placeholder="Type the number"
+                aria-label={t("patterns.yourAnswer")}
+                placeholder={t("patterns.typeNumber")}
                 className="w-44 rounded-control border border-grid bg-surface px-3 py-2 font-mono text-lg"
               />
               <button
                 type="submit"
                 className="rounded-control bg-ballpoint px-4 py-2 text-sm font-medium text-white hover:bg-ballpoint/90"
               >
-                Answer
+                {t("patterns.answer")}
                 <span className="ml-2 font-mono text-[10px] opacity-70">↵</span>
               </button>
             </form>
@@ -473,8 +497,8 @@ export function PatternsClient({
       )}
       <p className="text-center text-[11px] text-graphite/80">
         {active?.item.options
-          ? "Keys 1–4 answer"
-          : "Type the number, Enter answers"}
+          ? t("patterns.keysAnswer")
+          : t("patterns.typeNumberHint")}
       </p>
     </div>
   );

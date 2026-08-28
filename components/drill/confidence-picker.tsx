@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  CONFIDENCES,
-  CONFIDENCE_LABELS,
-  type Confidence,
-} from "@/lib/taxonomy";
+import { useT } from "@/components/i18n-provider";
+import { confidenceLabel } from "@/lib/i18n/labels";
+import { CONFIDENCES, type Confidence } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
 const KEY_HINTS: Record<Confidence, string> = {
@@ -22,10 +20,17 @@ export function ConfidencePicker({
   onChange: (c: Confidence) => void;
   disabled?: boolean;
 }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-graphite">Confidence</span>
-      <div className="flex gap-1" role="radiogroup" aria-label="Confidence">
+      <span className="text-xs text-graphite">
+        {t("drillRunner.confidence")}
+      </span>
+      <div
+        className="flex gap-1"
+        role="radiogroup"
+        aria-label={t("drillRunner.confidence")}
+      >
         {CONFIDENCES.map((c) => (
           <button
             key={c}
@@ -41,7 +46,7 @@ export function ConfidencePicker({
               disabled && "opacity-50",
             )}
           >
-            {CONFIDENCE_LABELS[c]}
+            {confidenceLabel(t, c)}
             <span className="ml-1.5 font-mono text-[10px] opacity-60">
               {KEY_HINTS[c]}
             </span>

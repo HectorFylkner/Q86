@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { SectionTabs } from "@/components/section-tabs";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getI18n } from "@/lib/i18n/server";
+import { formatPercent } from "@/lib/i18n/format";
+import { skillLabel, subtopicLabel } from "@/lib/i18n/labels";
 import { computeLadders, MASTERY_BAR, MIN_ATTEMPTS } from "@/lib/mastery";
 import {
   FUNDAMENTAL_SKILLS,
-  SKILL_LABELS,
-  SUBTOPIC_LABELS,
 } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ export const runtime = "nodejs";
 
 export default async function MasteryPage() {
   const { sdb } = await requireFeature("mastery");
+  const { locale, t } = await getI18n();
   const ladders = await computeLadders(sdb);
   const masteredCount = ladders.filter((l) => l.mastered).length;
 
@@ -21,11 +23,16 @@ export default async function MasteryPage() {
     <div className="space-y-4">
       <SectionTabs group="progress" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="font-display text-xl font-semibold">Mastery ladders</h1>
+        <h1 className="font-display text-xl font-semibold">
+          {t("pages.mastery")}
+        </h1>
         <p className="text-xs text-graphite">
-          A rung clears at ≥{Math.round(MASTERY_BAR * 100)}% over your last 10
-          attempts (minimum {MIN_ATTEMPTS}). {masteredCount} of{" "}
-          {ladders.length} ladders fully climbed.
+          {t("pages.masteryLede", {
+            bar: formatPercent(MASTERY_BAR, locale),
+            minimum: MIN_ATTEMPTS,
+            mastered: masteredCount,
+            total: ladders.length,
+          })}
         </p>
       </div>
 
@@ -35,7 +42,7 @@ export default async function MasteryPage() {
           className="rounded-card border border-grid bg-surface p-4 shadow-ambient"
         >
           <h2 className="font-display text-sm font-semibold">
-            {SKILL_LABELS[skill]}
+            {skillLabel(t, skill)}
           </h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ladders
@@ -52,11 +59,11 @@ export default async function MasteryPage() {
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="text-sm font-medium">
-                      {SUBTOPIC_LABELS[ladder.subtopic]}
+                      {subtopicLabel(t, ladder.subtopic)}
                     </h3>
                     {ladder.mastered && (
                       <span className="font-mono text-[10px] font-semibold text-ballpoint">
-                        CLIMBED
+                        {t("pages.masteryClimbed")}
                       </span>
                     )}
                   </div>

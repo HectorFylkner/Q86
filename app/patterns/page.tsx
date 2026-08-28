@@ -2,6 +2,7 @@ import { count } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { PatternsClient, type CategoryStats } from "@/components/patterns/patterns-client";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getT } from "@/lib/i18n/server";
 import { eloRatings, patternAttempts } from "@/lib/db/schema";
 import { ELO_START } from "@/lib/elo";
 import { PATTERN_CATEGORIES } from "@/lib/generators";
@@ -26,6 +27,7 @@ export default async function PatternsPage({
       ? ("mixed" as const)
       : null;
   const { sdb } = await requireFeature("patterns");
+  const t = await getT();
   const ratings = new Map(
     (await sdb.rows(eloRatings)).map((r) => [r.category, r.rating]),
   );
@@ -54,7 +56,9 @@ export default async function PatternsPage({
   return (
     <div className="space-y-4">
       <SectionTabs group="trainers" />
-      <h1 className="font-display text-xl font-semibold">Pattern trainer</h1>
+      <h1 className="font-display text-xl font-semibold">
+        {t("pages.patterns")}
+      </h1>
       <PatternsClient
         stats={stats}
         dayStreak={await computeDayStreak(sdb)}

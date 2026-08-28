@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { sendEmail } from "../email/send.ts";
+import { translator } from "../i18n/index.ts";
+import { isLocale, DEFAULT_LOCALE } from "../i18n/types.ts";
+import { getLocale } from "../i18n/locale.ts";
 import { endAllSessions, endSession, startSession } from "./session.ts";
 import { verifyPassword, passwordProblem } from "./password.ts";
 import {
@@ -51,6 +54,9 @@ export async function signUpAction(
     email,
     password,
     name: name.length > 0 ? name : null,
+    // Whatever language they filled this form in is the language they
+    // want the product in; the toggle on the form set the cookie.
+    locale: await getLocale(),
   });
   await startSession(user.id);
   redirect(AFTER_SIGN_IN);
@@ -90,22 +96,13 @@ export async function requestPasswordResetAction(
   if (user) {
     const token = await issueToken(user.id, "password_reset");
     const link = `${baseUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+    // The account's own language, not the requesting browser's: a reset is
+    // read in an inbox, possibly on another device.
+    const t = translator(isLocale(user.locale) ? user.locale : DEFAULT_LOCALE);
     await sendEmail({
       to: normaliseEmail(email),
-      subject: "Återställ ditt lösenord – Q86",
-      text: [
-        "Hej,",
-        "",
-        "Du har begärt att återställa lösenordet till ditt Q86-konto.",
-        "Klicka på länken nedan inom 30 minuter:",
-        "",
-        link,
-        "",
-        "Om du inte begärde detta kan du ignorera mejlet. Ditt lösenord",
-        "ändras inte förrän länken används.",
-        "",
-        "Q86",
-      ].join("\n"),
+      subject: t("auth.resetEmail.subject"),
+      text: t("auth.resetEmail.body", { link }),
     });
   }
   // Always the same answer, whether or not the address exists.

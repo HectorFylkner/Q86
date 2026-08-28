@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { PostmortemClient } from "@/components/postmortem/postmortem-client";
 import { requireFeature } from "@/lib/billing/entitlements";
+import { getT } from "@/lib/i18n/server";
 import { attempts, questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ export default async function PostmortemPage({
   params: Promise<{ attemptId: string }>;
 }) {
   const { user, sdb } = await requireFeature("coach");
+  const t = await getT();
   const { attemptId } = await params;
   const id = Number(attemptId);
   if (!Number.isInteger(id)) notFound();
@@ -32,7 +34,7 @@ export default async function PostmortemPage({
   return (
     <div className="space-y-4">
       <h1 className="font-display text-xl font-semibold">
-        Whiteboard post-mortem
+        {t("pages.postmortem")}
       </h1>
       <PostmortemClient
         attempt={attempt}

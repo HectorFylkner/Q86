@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useT } from "@/components/i18n-provider";
 import { flagQuestion } from "@/lib/actions";
+import { flagReasonLabel } from "@/lib/i18n/labels";
 import {
   FLAG_REASONS,
-  FLAG_REASON_LABELS,
   type FlagReason,
 } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 /** Compact content-QC control: flag the current question with a reason
  *  and optional note. Flags land in the review list on Analytics. */
 export function FlagButton({ questionId }: { questionId: number }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<FlagReason | null>(null);
   const [note, setNote] = useState("");
@@ -21,7 +23,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
   if (sent) {
     return (
       <p className="text-xs text-graphite">
-        Flagged — it&apos;s waiting in the review list on Analytics.
+        {t("drill.flagged")}
       </p>
     );
   }
@@ -33,7 +35,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
         onClick={() => setOpen(true)}
         className="text-xs text-graphite transition-colors hover:text-redpen"
       >
-        Something wrong with this question? Flag it
+        {t("drill.flagPrompt")}
       </button>
     );
   }
@@ -53,7 +55,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
                 : "border-grid text-graphite hover:border-graphite/50 hover:text-ink",
             )}
           >
-            {FLAG_REASON_LABELS[r]}
+            {flagReasonLabel(t, r)}
           </button>
         ))}
       </div>
@@ -62,7 +64,7 @@ export function FlagButton({ questionId }: { questionId: number }) {
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="What looks wrong? (optional)"
+          placeholder={t("drill.flagNote")}
           className="min-w-0 flex-1 text-sm"
         />
         <button
@@ -77,14 +79,14 @@ export function FlagButton({ questionId }: { questionId: number }) {
           }}
           className="rounded-control border border-redpen/50 px-3 py-1.5 text-sm font-medium text-redpen transition-colors hover:bg-redpen/10 disabled:opacity-40"
         >
-          {pending ? "Flagging…" : "Flag question"}
+          {pending ? t("drill.flagging") : t("drill.flagSubmit")}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="text-xs text-graphite hover:text-ink"
         >
-          Cancel
+          {t("common.cancel")}
         </button>
       </div>
     </div>
