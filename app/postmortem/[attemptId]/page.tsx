@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { PostmortemClient } from "@/components/postmortem/postmortem-client";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { attempts, questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export default async function PostmortemPage({
 }: {
   params: Promise<{ attemptId: string }>;
 }) {
-  const { user, sdb } = await requireScoped();
+  const { user, sdb } = await requireFeature("coach");
   const { attemptId } = await params;
   const id = Number(attemptId);
   if (!Number.isInteger(id)) notFound();

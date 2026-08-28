@@ -1,7 +1,7 @@
 import path from "node:path";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { db } from "@/lib/db";
-import { questions } from "@/lib/db/schema";
+import { questions, subscriptions } from "@/lib/db/schema";
 import { createUser } from "@/lib/auth/users";
 import { createSession, SESSION_COOKIE } from "@/lib/auth/session";
 import { __clearCookies, __setCookie } from "./next-headers";
@@ -188,6 +188,31 @@ export async function seedQuestions(): Promise<number[]> {
 
 export type TestAccount = { id: string; email: string; token: string };
 
+/**
+ * Put an account on a paid plan without going through Stripe. Tests about
+ * tenant isolation should not also be tests about billing: they need an
+ * account that can reach every feature, so the isolation they assert is
+ * across the whole data surface rather than across the free subset.
+ */
+export async function grantPaidPlan(
+  userId: string,
+  plan: "monthly" | "sprint" = "monthly",
+): Promise<void> {
+  const values = {
+    userId,
+    plan,
+    status: "active" as const,
+    currentPeriodEnd: new Date(Date.now() + 365 * 86_400_000),
+    cancelAtPeriodEnd: false,
+    updatedAt: new Date(),
+  };
+  await db
+    .insert(subscriptions)
+    .values(values)
+    .onConflictDoUpdate({ target: subscriptions.userId, set: values })
+    .run();
+}
+
 export async function makeAccount(
   email: string,
   role: "user" | "admin" = "user",
@@ -200,6 +225,16 @@ export async function makeAccount(
   });
   const token = await createSession(user.id);
   return { id: user.id, email: user.email, token };
+}
+
+/** An account that can reach every feature. */
+export async function makePaidAccount(
+  email: string,
+  role: "user" | "admin" = "user",
+): Promise<TestAccount> {
+  const account = await makeAccount(email, role);
+  await grantPaidPlan(account.id);
+  return account;
 }
 
 /** Make subsequent server-action calls run as this account. */

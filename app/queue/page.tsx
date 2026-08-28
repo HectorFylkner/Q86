@@ -1,7 +1,7 @@
 import { and, desc, eq, gt, lte } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { QueueClient, type DueRow, type LogRow } from "@/components/queue/queue-client";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { attempts, questions, redoQueue } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export default async function QueuePage({
 }: {
   searchParams: Promise<{ start?: string }>;
 }) {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("queue");
   const { start } = await searchParams;
   const now = new Date();
 

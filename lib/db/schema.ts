@@ -107,6 +107,81 @@ export const authTokens = sqliteTable(
   (t) => [index("auth_tokens_user_idx").on(t.userId, t.kind)],
 );
 
+
+// ---------------------------------------------------------------------------
+// Billing (ADR 0003). One row per account; written only by the webhook and
+// the checkout handler, read through the entitlement resolver.
+// ---------------------------------------------------------------------------
+
+export const subscriptions = sqliteTable(
+  "subscriptions",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    stripeCustomerId: text("stripe_customer_id"),
+    stripeSubscriptionId: text("stripe_subscription_id"),
+    plan: text("plan").$type<"free" | "monthly" | "sprint">().notNull(),
+    // Mirrors Stripe's subscription status, plus "none" before any purchase
+    // and "expired" for a fixed-length plan whose window has closed.
+    status: text("status")
+      .$type<
+        | "none"
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "incomplete"
+        | "unpaid"
+        | "expired"
+      >()
+      .notNull()
+      .default("none"),
+    /** Access runs until this instant, for both recurring and fixed plans. */
+    currentPeriodEnd: integer("current_period_end", { mode: "timestamp_ms" }),
+    cancelAtPeriodEnd: integer("cancel_at_period_end", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    trialEndsAt: integer("trial_ends_at", { mode: "timestamp_ms" }),
+    /**
+     * The Stripe event that last wrote this row, and when Stripe created it.
+     * Out-of-order webhook delivery is resolved by refusing to apply an
+     * event older than the one already recorded.
+     */
+    lastEventId: text("last_event_id"),
+    lastEventAt: integer("last_event_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("subscriptions_customer_idx").on(t.stripeCustomerId),
+    index("subscriptions_subscription_idx").on(t.stripeSubscriptionId),
+  ],
+);
+
+/**
+ * The idempotency ledger. Every processed Stripe event id is written here
+ * inside the same transaction that applies it, so a replay finds its id
+ * present and returns without re-applying (ADR 0003).
+ */
+export const stripeEvents = sqliteTable("stripe_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  /** Stripe's own creation time, used for ordering. */
+  stripeCreatedAt: integer("stripe_created_at", { mode: "timestamp_ms" }).notNull(),
+  receivedAt: integer("received_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  /** Which account it resolved to, when it resolved to one. */
+  userId: text("user_id"),
+  /** Short note when an event was accepted but deliberately not applied. */
+  outcome: text("outcome").notNull().default("applied"),
+});
+
 export const questions = sqliteTable(
   "questions",
   {
@@ -381,6 +456,8 @@ export const questionFlags = sqliteTable(
 );
 
 export type AppSetting = typeof appSettings.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type StripeEvent = typeof stripeEvents.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type AuthSession = typeof authSessions.$inferSelect;

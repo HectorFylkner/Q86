@@ -22,6 +22,8 @@ const PUBLIC_PREFIXES = [
   "/forgot-password",
   "/reset-password",
   "/api/auth/",
+  // Stripe authenticates itself with a webhook signature, not a cookie.
+  "/api/billing/webhook",
 ];
 
 function isPublic(pathname: string): boolean {

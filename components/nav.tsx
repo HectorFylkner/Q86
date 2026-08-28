@@ -97,6 +97,12 @@ function AccountMenu({ email }: { email: string }) {
       >
         {email}
       </span>
+      <Link
+        href="/konto"
+        className="rounded-control border border-grid px-2.5 py-1 text-xs text-graphite transition-colors hover:border-graphite/50 hover:text-ink"
+      >
+        Konto
+      </Link>
       <form action="/api/auth/logout" method="POST">
         <button
           type="submit"

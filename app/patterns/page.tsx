@@ -1,7 +1,7 @@
 import { count } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { PatternsClient, type CategoryStats } from "@/components/patterns/patterns-client";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { eloRatings, patternAttempts } from "@/lib/db/schema";
 import { ELO_START } from "@/lib/elo";
 import { PATTERN_CATEGORIES } from "@/lib/generators";
@@ -25,7 +25,7 @@ export default async function PatternsPage({
     : start === "mixed"
       ? ("mixed" as const)
       : null;
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("patterns");
   const ratings = new Map(
     (await sdb.rows(eloRatings)).map((r) => [r.category, r.rating]),
   );

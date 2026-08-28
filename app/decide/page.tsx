@@ -1,13 +1,13 @@
 import { DecideClient } from "@/components/decide/decide-client";
 import { SectionTabs } from "@/components/section-tabs";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { buildDecideRound } from "@/lib/decide";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function DecidePage() {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("decide");
   const items = await buildDecideRound(sdb, 8);
 
   return (

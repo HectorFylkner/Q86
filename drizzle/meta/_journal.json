@@ -22,6 +22,13 @@
       "when": 1787908035125,
       "tag": "0002_multitenant",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1787909865701,
+      "tag": "0003_billing",
+      "breakpoints": true
     }
   ]
 }

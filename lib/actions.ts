@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { requireAdmin, requireScoped } from "./auth/session.ts";
+import {
+  DailyLimitError,
+  dailyAllowance,
+  gateAction,
+} from "./billing/entitlements.ts";
 import { db } from "./db/index.ts";
 import type { ScopedDb } from "./db/scoped.ts";
 import {
@@ -60,8 +65,21 @@ export async function startDrill(config: {
   timing: DrillTiming;
   focus?: SessionFocus;
 }): Promise<StartDrillResult> {
-  const { sdb } = await requireScoped();
-  const picked = await selectQuestions(sdb, config.filter, config.count);
+  const { sdb, entitlements } = await gateAction("drill");
+  const allowance = await dailyAllowance(sdb, entitlements);
+  if (allowance.remaining === 0) {
+    return {
+      error: `Dagens gräns på ${allowance.limit} frågor är nådd. Uppgradera för obegränsad träning, eller kom tillbaka i morgon.`,
+      sessionId: null,
+      questions: [],
+    };
+  }
+  // A free account gets what is left of today rather than an error.
+  const wanted =
+    allowance.remaining == null
+      ? config.count
+      : Math.min(config.count, allowance.remaining);
+  const picked = await selectQuestions(sdb, config.filter, wanted);
   if (picked.length === 0) {
     return {
       error:
@@ -81,7 +99,7 @@ export async function startDrill(config: {
 export async function startChapterTest(
   subtopic: Subtopic,
 ): Promise<StartDrillResult> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("drill");
   const picked = await selectChapterTest(sdb, subtopic);
   if (picked.length < 4) {
     return {
@@ -100,7 +118,7 @@ export async function startChapterTest(
 export async function startRedoSession(
   questionIds: number[],
 ): Promise<StartDrillResult> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("queue");
   if (questionIds.length === 0) {
     return { error: "Nothing due to redo.", sessionId: null, questions: [] };
   }
@@ -127,7 +145,7 @@ export async function startRedoSession(
 export async function startDrillWithQuestions(
   questionIds: number[],
 ): Promise<StartDrillResult> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("drill");
   if (questionIds.length === 0) {
     return { error: "No questions to drill.", sessionId: null, questions: [] };
   }
@@ -165,7 +183,13 @@ export async function logAttempt(input: {
   confidence: Confidence;
   focus?: SessionFocus;
 }): Promise<{ attemptId: number; correct: boolean }> {
-  const { sdb } = await requireScoped();
+  const { sdb, entitlements } = await gateAction("drill");
+  // Re-checked here as well as at session start: a client that replays
+  // this call must not be able to spend more than the day's allowance.
+  const allowance = await dailyAllowance(sdb, entitlements);
+  if (allowance.remaining === 0) {
+    throw new DailyLimitError(allowance.limit as number);
+  }
   const q = await sdb.q
     .select()
     .from(questions)
@@ -217,6 +241,14 @@ export type QuestionHistoryRow = {
   focus: SessionFocus;
   createdAt: Date;
 };
+
+/**
+ * The actions below stay on `requireScoped()` rather than `gateAction()`
+ * on purpose: reading your own history, tagging your own miss, closing
+ * your own session, changing a preference, and reporting a bad question
+ * are not features to sell. A free account that finds an error in the bank
+ * must be able to say so.
+ */
 
 /** Every recorded attempt on one question, newest first (max 12). */
 export async function getQuestionHistory(
@@ -278,7 +310,7 @@ export async function startTimedSet(config: {
   showTimer: boolean;
   focus?: SessionFocus;
 }): Promise<StartTimedResult> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("timed");
   const total = config.kind === "full" ? 21 : 7;
   const picked = await selectTimedSet(sdb, total, config.skill);
   if (picked.length < total) {
@@ -330,7 +362,7 @@ export async function saveTimedSession(input: {
   notReachedCount: number;
   focus?: SessionFocus;
 }): Promise<SaveTimedResponse> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("timed");
   if (input.edits.length > 3) {
     throw new Error("A section allows at most 3 edits.");
   }
@@ -480,7 +512,7 @@ export async function savePatternRound(input: {
   category: string; // a category key or "mixed"
   items: PatternRoundItem[];
 }): Promise<PatternRoundResult> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("patterns");
   const score = input.items.filter((i) => i.correct).length;
 
   // Previous best round score for this selection, from session summaries.
@@ -566,7 +598,7 @@ export async function saveDecisionRound(input: {
   aligned: number;
   calls: Array<{ questionId: number; call: string; recommendation: string }>;
 }): Promise<void> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("decide");
   await sdb.add(sessions, {
     mode: "pattern",
     config: { kind: "decision" },
@@ -596,7 +628,7 @@ export async function saveBaselineReport(input: {
   rawText: string;
   parsed: ParsedReport;
 }): Promise<{ id: number }> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("import");
   const row = await sdb.insert(baselineReports, {
     rawText: input.rawText,
     parsed: input.parsed as unknown as Record<string, unknown>,
@@ -612,7 +644,7 @@ export async function gradeDeckCard(
   questionId: number,
   grade: ReviewGrade,
 ): Promise<void> {
-  const { sdb } = await requireScoped();
+  const { sdb } = await gateAction("deck");
   const existing = await sdb.row(
     deckReviews,
     eq(deckReviews.questionId, questionId),

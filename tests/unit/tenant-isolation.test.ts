@@ -23,7 +23,7 @@ import { chapterTestStates } from "@/lib/chapter-tests";
 import { getSetting } from "@/lib/settings";
 import {
   asUser,
-  makeAccount,
+  makePaidAccount,
   migrateTestDb,
   seedQuestions,
   type TestAccount,
@@ -49,8 +49,10 @@ describe("tenant isolation", () => {
   beforeAll(async () => {
     await migrateTestDb();
     qids = await seedQuestions();
-    alice = await makeAccount("alice@example.com");
-    bob = await makeAccount("bob@example.com");
+    // Both on a paid plan: this file is about isolation, not the paywall,
+    // so both accounts must be able to reach every feature.
+    alice = await makePaidAccount("alice@example.com");
+    bob = await makePaidAccount("bob@example.com");
 
     // --- Alice builds a history through the real server actions ---------
     asUser(alice);

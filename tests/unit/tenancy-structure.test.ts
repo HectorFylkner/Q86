@@ -35,6 +35,11 @@ const RAW_DB_ALLOWLIST = [
   // retiring a question affects everyone, so the operator must see every
   // account's reports. The component refuses to render for non-admins.
   "components/analytics/flags-card.tsx",
+  // Billing is written by Stripe, not by a request: the webhook resolves
+  // the owner from a customer id, which is a lookup across accounts by
+  // definition. See the OWNED_TABLES note below for why that is safe.
+  "lib/billing/entitlements.ts",
+  "lib/billing/webhook.ts",
 ];
 
 /** Identifiers of the ten user-owned tables, as imported in application code. */
@@ -142,11 +147,24 @@ describe("tenancy choke point", () => {
       const body = block.slice(0, block.indexOf("\n);"));
       if (/text\("user_id"\)/.test(body)) declared.add(name);
     }
-    // The identity tables carry a user_id but are not user content: they
-    // describe the owner rather than belonging to one.
-    for (const identity of ["auth_sessions", "auth_accounts", "auth_tokens"]) {
-      declared.delete(identity);
-    }
+    // Tables that carry a user_id without being user content, each for a
+    // stated reason. Anything else that grows an owner column has to be
+    // registered in OWNED_TABLES or this test fails.
+    const NOT_USER_CONTENT = {
+      // Identity: these describe an owner rather than belonging to one.
+      auth_sessions: "session records",
+      auth_accounts: "federated identity links",
+      auth_tokens: "single-use credentials",
+      // Billing: `subscriptions` is keyed BY the owner, so there is no way
+      // to read a row without naming whose it is — the primary key is the
+      // tenant predicate. It is written by Stripe webhooks, which have no
+      // session to scope to.
+      subscriptions: "billing state, primary-keyed by owner",
+      // An operator ledger. Its user_id is a trace of which account an
+      // event resolved to, not a claim of ownership (it has no foreign key).
+      stripe_events: "webhook idempotency ledger",
+    } as const;
+    for (const table of Object.keys(NOT_USER_CONTENT)) declared.delete(table);
 
     const { OWNED_TABLE_NAMES } = await import("@/lib/db/scoped");
     expect([...declared].sort()).toEqual([...OWNED_TABLE_NAMES].sort());

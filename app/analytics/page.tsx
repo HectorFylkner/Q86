@@ -2,13 +2,13 @@ import { AnalyticsClient } from "@/components/analytics/analytics-client";
 import { SectionTabs } from "@/components/section-tabs";
 import { FlagsCard } from "@/components/analytics/flags-card";
 import { gatherAnalytics } from "@/lib/analytics";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function AnalyticsPage() {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("analytics");
   const data = await gatherAnalytics(sdb);
 
   return (

@@ -1,3 +1,4 @@
+import path from "node:path";
 import { expect, type Page } from "@playwright/test";
 
 /** A distinct address per test, so runs never collide in the shared
@@ -66,4 +67,52 @@ export async function answerCurrentQuestion(
   await expect(
     page.getByRole("button", { name: /Send to post-mortem/ }),
   ).toBeEnabled();
+}
+
+/**
+ * Put an account on a paid plan by writing to the end-to-end database
+ * directly.
+ *
+ * This is the test harness editing its own fixture, not a product
+ * backdoor: there is no route, action or flag in the application that does
+ * this. Granting a plan through the product requires Stripe, and no test
+ * environment here has keys — see docs/BILLING.md for the manual
+ * test-mode procedure.
+ */
+export async function grantPaidPlan(
+  email: string,
+  plan: "monthly" | "sprint" = "monthly",
+): Promise<void> {
+  const { createClient } = await import("@libsql/client");
+  const dbPath = path.join(process.cwd(), "data", "e2e.db");
+  const client = createClient({ url: `file:${dbPath}` });
+  try {
+    const user = await client.execute({
+      sql: "select id from users where email = ?",
+      args: [email.toLowerCase()],
+    });
+    if (user.rows.length === 0) {
+      throw new Error(`grantPaidPlan: no account for ${email}`);
+    }
+    const userId = String(user.rows[0].id);
+    const periodEnd = Date.now() + 365 * 24 * 60 * 60 * 1000;
+    await client.execute({
+      sql: `insert into subscriptions
+              (user_id, plan, status, current_period_end, cancel_at_period_end)
+            values (?, ?, 'active', ?, 0)
+            on conflict(user_id) do update set
+              plan = excluded.plan,
+              status = 'active',
+              current_period_end = excluded.current_period_end`,
+      args: [userId, plan, periodEnd],
+    });
+  } finally {
+    client.close();
+  }
+}
+
+/** Sign up and immediately put the account on a paid plan. */
+export async function signUpPaid(page: Page, email: string): Promise<void> {
+  await signUp(page, email);
+  await grantPaidPlan(email);
 }

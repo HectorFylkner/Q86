@@ -10,12 +10,22 @@ import {
 } from "./seed-bank.ts";
 
 /**
- * Self-provisioning: on a fresh database (local file or a brand-new Turso
- * instance) the first server boot applies the schema and loads the
- * committed 180-question bank, so deploying never requires terminal
- * steps. Databases created earlier via `pnpm db:push` are left to the
- * scripts (they have no migration ledger to build on), and every step is
- * idempotent, so repeated cold starts are safe.
+ * Self-provisioning: the first server boot brings the database to the
+ * current schema and loads the committed question bank, so deploying never
+ * requires a terminal step. Every step is idempotent, so repeated cold
+ * starts are safe.
+ *
+ * Three shapes arrive here, and all three end up on the same path:
+ *
+ *   Empty — run every migration.
+ *   Created by a previous boot — it has drizzle's ledger, so run the
+ *     migrations it has not seen. This is what applies each new milestone's
+ *     schema to a running deployment.
+ *   Created by `pnpm db:push` — no ledger to build on. Guarded DDL brings
+ *     it to the shape migration 0001 leaves behind, the ledger is then
+ *     stamped with 0000 and 0001, and it joins the normal path. Adopting
+ *     the ledger once is what stops this branch from having to mirror
+ *     every future migration by hand.
  */
 let ready: Promise<void> | null = null;
 
@@ -27,22 +37,33 @@ export function ensureDbReady(): Promise<void> {
   return ready;
 }
 
-async function provision(): Promise<void> {
-  const existing = await client.execute(
-    "select name from sqlite_master where type = 'table' and name = 'questions'",
-  );
-  const hasTables = existing.rows.length > 0;
+const MIGRATIONS_FOLDER = path.join(process.cwd(), "drizzle");
 
-  if (!hasTables) {
-    await migrate(db, {
-      migrationsFolder: path.join(process.cwd(), "drizzle"),
-    });
-    console.log("Q86 bootstrap: schema applied to empty database.");
-  } else {
-    // Existing databases never re-run migrate() (db:push-created ones
-    // have no ledger to build on), so late additions land as guarded
-    // DDL mirroring the migration files. Idempotent by construction.
-    await evolveSchema();
+async function tableExists(name: string): Promise<boolean> {
+  const found = await client.execute({
+    sql: "select name from sqlite_master where type = 'table' and name = ?",
+    args: [name],
+  });
+  return found.rows.length > 0;
+}
+
+async function provision(): Promise<void> {
+  const hasTables = await tableExists("questions");
+  const hasLedger = await tableExists("__drizzle_migrations");
+
+  if (hasTables && !hasLedger) {
+    await adoptLedger();
+  }
+
+  const before = hasTables ? await appliedMigrationCount() : 0;
+  await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  const after = await appliedMigrationCount();
+  if (after > before) {
+    console.log(
+      hasTables
+        ? `Q86 bootstrap: applied ${after - before} migration(s).`
+        : "Q86 bootstrap: schema applied to empty database.",
+    );
   }
 
   // User-retired questions stay unverified, so the expected count shrinks
@@ -57,12 +78,21 @@ async function provision(): Promise<void> {
   }
 }
 
+async function appliedMigrationCount(): Promise<number> {
+  if (!(await tableExists("__drizzle_migrations"))) return 0;
+  const row = await client.execute(
+    "select count(*) as n from __drizzle_migrations",
+  );
+  return Number(row.rows[0].n);
+}
+
 /**
- * Databases created by `pnpm db:push` have no migration ledger for
- * `migrate()` to build on, so late schema additions land here as guarded,
- * idempotent DDL that mirrors the migration files.
+ * Bring a ledger-less database (one created by `pnpm db:push`) to the shape
+ * migration 0001 leaves behind, then write 0000 and 0001 into drizzle's
+ * ledger so `migrate()` continues from there. Called once per database;
+ * after it, this branch never runs again.
  */
-async function evolveSchema(): Promise<void> {
+async function adoptLedger(): Promise<void> {
   await client.execute(`create table if not exists deck_reviews (
     question_id integer primary key not null,
     ease real default 2.5 not null,
@@ -89,41 +119,24 @@ async function evolveSchema(): Promise<void> {
     "create index if not exists question_flags_status_idx on question_flags (status)",
   );
 
-  // Last, so the tenancy rebuild finds every table it has to convert —
-  // including the two this function may just have created.
-  await applyTenancyIfMissing();
-}
-
-/**
- * The multi-tenancy conversion for ledger-less databases. Rather than
- * restating 60 statements in TypeScript — a second source of truth that
- * would drift — this replays drizzle/0002_multitenant.sql itself through
- * `client.migrate()`, which is the libSQL entry point that runs a batch
- * with foreign-key enforcement off. The file is written to be safe on a
- * populated database: rows are moved to a legacy owner that it creates
- * only when there is data to own.
- */
-async function applyTenancyIfMissing(): Promise<void> {
-  const columns = await client.execute("pragma table_info(attempts)");
-  if (columns.rows.some((row) => row.name === "user_id")) return;
-
-  const file = path.join(process.cwd(), "drizzle", "0002_multitenant.sql");
-  if (!fs.existsSync(file)) {
-    throw new Error(
-      "Q86 bootstrap: this database predates multi-tenancy and " +
-        "drizzle/0002_multitenant.sql is missing, so it cannot be converted.",
-    );
+  await client.execute(`create table if not exists __drizzle_migrations (
+    id SERIAL PRIMARY KEY,
+    hash text NOT NULL,
+    created_at numeric
+  )`);
+  const journal = JSON.parse(
+    fs.readFileSync(path.join(MIGRATIONS_FOLDER, "meta", "_journal.json"), "utf8"),
+  ) as { entries: Array<{ idx: number; when: number; tag: string }> };
+  // Only 0000 and 0001 describe the shape reached above; everything later
+  // is left for migrate() to apply.
+  for (const entry of journal.entries.filter((e) => e.idx <= 1)) {
+    await client.execute({
+      sql: "insert into __drizzle_migrations (hash, created_at) values (?, ?)",
+      args: [entry.tag, entry.when],
+    });
   }
-  const statements = fs
-    .readFileSync(file, "utf8")
-    .split("--> statement-breakpoint")
-    .map((statement) => statement.trim())
-    .filter((statement) => statement.length > 0);
-
-  await client.migrate(statements);
   console.log(
-    `Q86 bootstrap: multi-tenancy applied (${statements.length} statements). ` +
-      "Existing data belongs to the legacy owner account — claim it with " +
-      "`pnpm claim-owner`.",
+    "Q86 bootstrap: adopted the migration ledger for a db:push database.",
   );
 }
+

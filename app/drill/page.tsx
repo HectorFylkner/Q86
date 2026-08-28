@@ -1,7 +1,7 @@
 import { count, eq } from "drizzle-orm";
 import { DrillClient } from "@/components/drill/drill-client";
 import type { CountRow } from "@/components/drill/drill-setup";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { questions } from "@/lib/db/schema";
 import { ALL_SUBTOPICS, type Subtopic } from "@/lib/taxonomy";
 
@@ -19,7 +19,7 @@ export default async function DrillPage({
     test?: string;
   }>;
 }) {
-  const { user, sdb } = await requireScoped();
+  const { user, sdb } = await requireFeature("drill");
   const { qids, plan, sub, d, test } = await searchParams;
   let autoStartIds =
     qids

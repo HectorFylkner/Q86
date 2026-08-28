@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Q86 \u2014 personal GMAT Focus quant training platform",
+  "description": "Q86 — personal GMAT Focus quant training platform",
   "engines": {
     "node": ">=22.6"
   },
@@ -39,6 +39,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",
+    "stripe": "^22.6.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {

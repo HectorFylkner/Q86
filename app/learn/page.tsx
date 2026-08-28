@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LearnPrepared, ReadBadge } from "@/components/lesson/learn-progress";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { chapterTestStates } from "@/lib/chapter-tests";
 import { listLessons } from "@/lib/lessons";
 import { FUNDAMENTAL_SKILLS, SKILL_LABELS } from "@/lib/taxonomy";
@@ -16,7 +16,7 @@ const METHOD = [
 ];
 
 export default async function LearnPage() {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("learn");
   const lessons = listLessons();
   const tests = await chapterTestStates(sdb);
   const passedCount = lessons.filter((l) => tests[l.subtopic]?.passed).length;

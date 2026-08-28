@@ -1,13 +1,13 @@
 import { DeckClient } from "@/components/deck/deck-client";
 import { SectionTabs } from "@/components/section-tabs";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { todaysDeck } from "@/lib/deck";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function DeckPage() {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("deck");
   const { cards, due, fresh, scheduled } = await todaysDeck(sdb);
 
   return (

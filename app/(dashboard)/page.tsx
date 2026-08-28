@@ -2,8 +2,9 @@ import Link from "next/link";
 import { count, eq } from "drizzle-orm";
 import { Odometer } from "@/components/odometer";
 import { SettingsForm } from "@/components/dashboard/settings-form";
-import { requireScoped } from "@/lib/auth/session";
+import { withEntitlements } from "@/lib/billing/entitlements";
 import { questions } from "@/lib/db/schema";
+import { dailyAllowance } from "@/lib/billing/entitlements";
 import { todaysDeck } from "@/lib/deck";
 import { PATTERN_CATEGORY_LABELS } from "@/lib/generators";
 import { daysToTest, gatherPlanInputs } from "@/lib/plan-server";
@@ -16,7 +17,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function TodayPage() {
-  const { sdb } = await requireScoped();
+  // Mixed page: a free account lands here too, so it resolves
+  // entitlements and adapts rather than redirecting.
+  const { sdb, entitlements } = await withEntitlements();
   const inputs = await gatherPlanInputs(sdb);
   const plan = computeDailyPlan(inputs);
   const days = await daysToTest(sdb);
@@ -32,6 +35,7 @@ export default async function TodayPage() {
   const daysUntilTimed = plan.timedSetToday
     ? 0
     : cadence - (inputs.dayIndex % cadence);
+  const allowance = await dailyAllowance(sdb, entitlements);
   const deck = await todaysDeck(sdb);
   const deckWaiting = deck.due + deck.fresh;
   const firstRun =
@@ -39,6 +43,26 @@ export default async function TodayPage() {
 
   return (
     <div className="space-y-6">
+      {!entitlements.paid && (
+        <section className="rounded-card border border-grid bg-surface p-4 shadow-ambient">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <p className="text-sm">
+              <span className="font-medium">Gratisnivån.</span>{" "}
+              <span className="text-graphite">
+                Alla kapitel, mönsterträningen och{" "}
+                {allowance.limit ?? 0} frågor per dag.
+              </span>
+            </p>
+            <p className="font-mono text-[11px] text-graphite">
+              {allowance.used} / {allowance.limit} i dag ·{" "}
+              <Link href="/konto" className="text-ballpoint underline">
+                se planer
+              </Link>
+            </p>
+          </div>
+        </section>
+      )}
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-xl font-semibold">Today</h1>

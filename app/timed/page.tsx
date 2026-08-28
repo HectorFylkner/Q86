@@ -1,6 +1,6 @@
 import { count, eq } from "drizzle-orm";
 import { TimedClient } from "@/components/timed/timed-client";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { questions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export default async function TimedPage({
 }: {
   searchParams: Promise<{ start?: string }>;
 }) {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("timed");
   const { start } = await searchParams;
   const verifiedTotal =
     (

@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { answerCurrentQuestion, choices, signUp, uniqueEmail } from "./helpers";
+import {
+  answerCurrentQuestion,
+  choices,
+  signUp,
+  signUpPaid,
+  uniqueEmail,
+} from "./helpers";
 
 /**
  * A drill from setup to summary against the real committed bank, on a
@@ -7,7 +13,10 @@ import { answerCurrentQuestion, choices, signUp, uniqueEmail } from "./helpers";
  * core loop; if it breaks, nothing else matters.
  */
 test("a new account can run a drill end to end", async ({ page }) => {
-  await signUp(page, uniqueEmail("drill"));
+  // Paid, so the run can end where a paying customer's does: the redo
+  // queue and the analytics page. The free tier's own limits are covered
+  // in paywall.spec.ts.
+  await signUpPaid(page, uniqueEmail("drill"));
 
   await page.goto("/drill");
   await expect(

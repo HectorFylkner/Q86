@@ -5,6 +5,7 @@ import {
   signIn,
   signOut,
   signUp,
+  signUpPaid,
   TEST_PASSWORD,
   uniqueEmail,
 } from "./helpers";
@@ -97,7 +98,10 @@ test.describe("tenant isolation in the browser", () => {
     // Alice signs up and records one attempt, giving her an attempt id.
     const aliceContext = await browser.newContext();
     const alice = await aliceContext.newPage();
-    await signUp(alice, uniqueEmail("alice"));
+    // Paid: the post-mortem is a paid feature, and this test is about
+    // whether Bob can reach Alice's copy of it, not about the paywall.
+    const aliceEmail = uniqueEmail("alice");
+    await signUpPaid(alice, aliceEmail);
 
     await alice.goto("/drill");
     await alice.getByRole("button", { name: /^Start drill/ }).click();
@@ -113,13 +117,14 @@ test.describe("tenant isolation in the browser", () => {
     // Bob signs up in a separate browser context and tries that exact URL.
     const bobContext = await browser.newContext();
     const bob = await bobContext.newPage();
-    await signUp(bob, uniqueEmail("bob"));
+    await signUpPaid(bob, uniqueEmail("bob"));
 
     const response = await bob.goto(href as string);
     expect(response?.status()).toBe(404);
 
     // And his own pages show none of her work.
     await bob.goto("/queue");
+    await expect(bob.getByText(aliceEmail)).toHaveCount(0);
     await expect(bob.getByText(/alice/i)).toHaveCount(0);
 
     await aliceContext.close();

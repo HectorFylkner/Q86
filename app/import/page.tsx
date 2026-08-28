@@ -2,7 +2,7 @@ import { desc } from "drizzle-orm";
 import { SectionTabs } from "@/components/section-tabs";
 import { format } from "date-fns";
 import { ImportClient } from "@/components/import/import-client";
-import { requireScoped } from "@/lib/auth/session";
+import { requireFeature } from "@/lib/billing/entitlements";
 import { baselineReports } from "@/lib/db/schema";
 import { SKILL_SHORT_LABELS, type FundamentalSkill } from "@/lib/taxonomy";
 
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function ImportPage() {
-  const { sdb } = await requireScoped();
+  const { sdb } = await requireFeature("import");
   const reports = await sdb.q
     .select()
     .from(baselineReports)
