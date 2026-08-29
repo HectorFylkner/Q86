@@ -44,7 +44,7 @@ test.describe("language", () => {
 
     await signOut(page);
     await signIn(page, email);
-    await page.waitForURL("/");
+    await page.waitForURL("/idag");
     await expect(appNav(page, "Primary").getByRole("link", { name: "Today" })).toBeVisible();
 
     await localeButton(page, "sv").click();
@@ -64,7 +64,7 @@ test.describe("language", () => {
     await page.getByLabel("Email").fill(uniqueEmail("english"));
     await page.getByLabel("Password").fill("provlosenord-2026");
     await page.getByRole("button", { name: "Create account" }).click();
-    await page.waitForURL("/");
+    await page.waitForURL("/idag");
 
     await expect(
       appNav(page, "Primary").getByRole("link", { name: "Today" }),

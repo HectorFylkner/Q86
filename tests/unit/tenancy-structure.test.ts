@@ -40,6 +40,13 @@ const RAW_DB_ALLOWLIST = [
   // definition. See the OWNED_TABLES note below for why that is safe.
   "lib/billing/entitlements.ts",
   "lib/billing/webhook.ts",
+  // The public site reads the shared, un-owned bank with no account in
+  // hand: the free diagnostic serves questions to a stranger, and the
+  // landing page counts them. Neither writes anything, and neither can
+  // reach a user-owned table — the OWNED_TABLES rule below still applies
+  // to both files.
+  "lib/diagnostic.ts",
+  "app/(marketing)/page.tsx",
 ];
 
 /** Identifiers of the ten user-owned tables, as imported in application code. */

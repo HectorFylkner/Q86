@@ -36,11 +36,13 @@ test.describe("accounts", () => {
     await expect(appNav(page).getByRole("link", { name: "I dag" })).toBeVisible();
 
     await signOut(page);
-    await page.goto("/");
+    // The dashboard is no longer at the root: "/" is the public landing
+    // page, and the application starts at /idag.
+    await page.goto("/idag");
     await expect(page).toHaveURL(/\/login/);
 
     await signIn(page, email);
-    await page.waitForURL("/");
+    await page.waitForURL("/idag");
     await expect(appNav(page).getByRole("link", { name: "I dag" })).toBeVisible();
   });
 

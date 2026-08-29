@@ -15,8 +15,27 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 const SESSION_COOKIE = "q86_session";
 
-/** Reachable without a session. Everything else redirects to /login. */
+/**
+ * Reachable without a session. Everything else redirects to /login.
+ *
+ * From M4 this list carries the public site as well as the credential
+ * screens. `tests/unit/paywall-structure.test.ts` checks it against the
+ * filesystem in both directions: a page under app/(marketing) that is
+ * missing here would 302 to the login form, and an application page that
+ * appeared here would be served to strangers.
+ */
 const PUBLIC_PREFIXES = [
+  // The public site.
+  "/priser",
+  "/diagnos",
+  "/guider",
+  "/integritetspolicy",
+  "/kopvillkor",
+  "/angerratt",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/opengraph-image",
+  // Credential screens.
   "/login",
   "/signup",
   "/forgot-password",
@@ -27,6 +46,9 @@ const PUBLIC_PREFIXES = [
 ];
 
 function isPublic(pathname: string): boolean {
+  // The landing page is public, but only exactly "/" — the application
+  // lives at /idag, so this cannot be written as a prefix.
+  if (pathname === "/") return true;
   return PUBLIC_PREFIXES.some(
     (prefix) =>
       pathname === prefix.replace(/\/$/, "") || pathname.startsWith(prefix),
@@ -46,8 +68,7 @@ export function middleware(request: NextRequest) {
 
   const url = request.nextUrl.clone();
   url.pathname = "/login";
-  url.search =
-    pathname === "/" ? "" : `?next=${encodeURIComponent(pathname)}`;
+  url.search = `?next=${encodeURIComponent(pathname)}`;
   return NextResponse.redirect(url);
 }
 

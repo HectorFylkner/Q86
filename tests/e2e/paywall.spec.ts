@@ -31,7 +31,7 @@ test.describe("free tier", () => {
     ).toBeVisible();
 
     // The dashboard says what the free tier is, without nagging.
-    await page.goto("/");
+    await page.goto("/idag");
     await expect(page.getByText("Gratisnivån.")).toBeVisible();
     await expect(page.getByText(/0 \/ 10 i dag/)).toBeVisible();
   });

@@ -31,7 +31,7 @@ export async function signUp(
   await page.getByLabel(EMAIL_FIELD).fill(email);
   await page.getByLabel(PASSWORD_FIELD).fill(password);
   await page.getByRole("button", { name: SIGN_UP }).click();
-  await page.waitForURL("/");
+  await page.waitForURL("/idag");
 }
 
 export async function signIn(

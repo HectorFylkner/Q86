@@ -16,7 +16,7 @@ export async function generateMetadata() {
 }
 
 export default async function SignUpPage() {
-  if (await currentUser()) redirect("/");
+  if (await currentUser()) redirect("/idag");
   const t = await getT();
 
   return (

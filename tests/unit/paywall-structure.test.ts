@@ -10,20 +10,27 @@ import { describe, expect, it } from "vitest";
 
 const ROOT = process.cwd();
 
-/** Reachable without a session at all. */
+/**
+ * Reachable without a session at all: the credential screens, plus the
+ * whole public site. Everything under app/(marketing) is public by
+ * definition, so it is matched by prefix rather than enumerated — but the
+ * middleware test below then checks each of those routes individually.
+ */
 const PUBLIC_PAGES = [
-  "app/login/page.tsx",
-  "app/signup/page.tsx",
-  "app/forgot-password/page.tsx",
-  "app/reset-password/page.tsx",
+  "app/(auth)/login/page.tsx",
+  "app/(auth)/signup/page.tsx",
+  "app/(auth)/forgot-password/page.tsx",
+  "app/(auth)/reset-password/page.tsx",
 ];
+
+const PUBLIC_PAGE_PREFIX = "app/(marketing)/";
 
 /**
  * Pages that serve free and paid accounts alike. They may not use
  * `requireFeature`, but they must still resolve entitlements — a page that
  * asks no question about the plan is a page that has forgotten it.
  */
-const MIXED_PAGES = ["app/(dashboard)/page.tsx", "app/konto/page.tsx"];
+const MIXED_PAGES = ["app/(app)/idag/page.tsx", "app/(app)/konto/page.tsx"];
 
 /** Routes that authenticate by something other than a session cookie. */
 const PUBLIC_ROUTES = [
@@ -63,6 +70,7 @@ describe("paywall coverage", () => {
     const ungated: string[] = [];
     for (const page of filesUnder("app", /^page\.tsx$/)) {
       if (PUBLIC_PAGES.includes(page)) continue;
+      if (page.startsWith(PUBLIC_PAGE_PREFIX)) continue;
       const source = read(page);
       if (MIXED_PAGES.includes(page)) {
         if (!source.includes("withEntitlements(")) {
@@ -94,6 +102,60 @@ describe("paywall coverage", () => {
         exists: true,
       });
     }
+  });
+
+  /**
+   * Two ways to get the public site wrong, and the middleware is where
+   * both show up: a marketing page missing from PUBLIC_PREFIXES redirects
+   * a stranger to a login form, and an application path appearing there
+   * would serve someone else's product to anyone.
+   */
+  describe("the middleware's public list", () => {
+    const middleware = read("middleware.ts");
+    const prefixes = Array.from(
+      middleware
+        .slice(middleware.indexOf("const PUBLIC_PREFIXES"))
+        .slice(0, middleware.slice(middleware.indexOf("const PUBLIC_PREFIXES")).indexOf("];"))
+        .matchAll(/"([^"]+)"/g),
+    ).map((m) => m[1]);
+
+    /** "/priser/page.tsx" from "app/(marketing)/priser/page.tsx". */
+    function routeOf(page: string): string {
+      const inner = page
+        .slice(PUBLIC_PAGE_PREFIX.length)
+        .replace(/\/?page\.tsx$/, "");
+      return inner === "" ? "/" : `/${inner}`;
+    }
+
+    it("covers every page on the public site", () => {
+      const uncovered: string[] = [];
+      for (const page of filesUnder("app", /^page\.tsx$/)) {
+        if (!page.startsWith(PUBLIC_PAGE_PREFIX)) continue;
+        const route = routeOf(page).replace(/\/\[[^\]]+\]$/, "");
+        if (route === "/") continue; // handled by an explicit branch
+        if (!prefixes.some((prefix) => route.startsWith(prefix))) {
+          uncovered.push(`${route} (${page})`);
+        }
+      }
+      expect(uncovered).toEqual([]);
+    });
+
+    it("exposes the landing page and nothing else at the root", () => {
+      // "/" cannot be a prefix — every application path starts with it —
+      // so the middleware special-cases the exact path. If that branch
+      // disappears, the landing page becomes a redirect.
+      expect(middleware).toContain('if (pathname === "/") return true;');
+    });
+
+    it("lets no application route into the public list", () => {
+      const appRoutes = filesUnder("app", /^page\.tsx$/)
+        .filter((page) => page.startsWith("app/(app)/"))
+        .map((page) => `/${page.slice("app/(app)/".length).replace(/\/page\.tsx$/, "")}`);
+      const leaked = appRoutes.filter((route) =>
+        prefixes.some((prefix) => route.startsWith(prefix)),
+      );
+      expect(leaked).toEqual([]);
+    });
   });
 
   it("writes no price anywhere but the pricing module", () => {

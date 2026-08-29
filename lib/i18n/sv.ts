@@ -977,8 +977,265 @@ export const sv = {
   },
 
   fallback: {
+    textInOtherLanguage:
+      "Den här texten finns ännu inte på svenska, så du läser originalet.",
     chapterInEnglish:
       "Det här kapitlet finns ännu inte på svenska, så du läser den " +
       "engelska originaltexten.",
+  },
+
+  site: {
+    nav: {
+      product: "Plattformen",
+      pricing: "Priser",
+      diagnostic: "Gratis diagnos",
+      guides: "Guider",
+      signIn: "Logga in",
+      start: "Kom igång",
+      menu: "Meny",
+    },
+    hero: {
+      eyebrow: "GMAT Focus · Quantitative Reasoning",
+      title: "Kvantdelen är inte ett minne. Den är ett mönster.",
+      lede:
+        "Q86 är en svensk träningsplattform för GMAT Focus kvantdel. " +
+        "Undervisningen är på svenska; frågorna är på engelska, precis som " +
+        "på provet. Varje fråga i banken är verifierad innan den släpps in.",
+      primary: "Gör diagnosen — 12 frågor, inget konto",
+      secondary: "Se vad som ingår",
+      note: "Ingen betalning, ingen e-postadress, inga cookies för att börja.",
+    },
+    proof: {
+      questions: "verifierade frågor i banken",
+      chapters: "konceptkapitel på svenska",
+      skills: "fundamental skills som provet mäter",
+      subtopics: "delmoment att träna var för sig",
+    },
+    problem: {
+      title: "Varför svenska sökande fastnar på kvantdelen",
+      body:
+        "De flesta som pluggar inför GMAT gör fler frågor och hoppas att " +
+        "något ska lossna. Problemet är sällan mängden. Det är att felen " +
+        "aldrig blir namngivna: du vet att du missade, men inte om det var " +
+        "en lucka i innehållet, en felaktig uppställning, ett räknefel, en " +
+        "felläsning, tidspress eller en ren gissning. Sex olika fel, sex " +
+        "olika åtgärder — och utan namn på felet blir åtgärden alltid " +
+        "\"öva mer\".",
+      answer:
+        "Q86 tvingar fram namnet. Varje missat försök klassificeras innan " +
+        "det lämnar skärmen, och dagsplanen viktas om efter det du faktiskt " +
+        "gör fel.",
+    },
+    pillars: {
+      title: "Tre saker plattformen gör som ett frågehäfte inte kan",
+      verifiedTitle: "En bank som inte får bli sämre",
+      verifiedBody:
+        "Varje fråga passerar en författargrind innan den blir sökbar: " +
+        "svaret räknas om numeriskt, distraktorerna måste motsvara ett " +
+        "namngivet misstag, och en fråga som inte klarar kontrollen släpps " +
+        "aldrig in. Banken växer bara med det som håller.",
+      taxonomyTitle: "Fel med namn, inte magkänsla",
+      taxonomyBody:
+        "Sex feltyper, nio mönsterkategorier, 24 delmoment. Varje försök " +
+        "loggas med säkerhetsnivå och tidsåtgång, så skillnaden mellan " +
+        "\"kunde inte\" och \"hann inte\" syns i statistiken i stället " +
+        "för att gissas fram.",
+      planTitle: "En plan som räknas fram, inte känns fram",
+      planBody:
+        "Dagsplanen är deterministisk: samma indata ger samma plan. Den " +
+        "väger in din träffsäkerhet per skill, det du importerat från en " +
+        "score report och hur långt det är kvar till provdagen.",
+    },
+    method: {
+      title: "Slingan",
+      lede: "Fyra steg som upprepas tills mönstret sitter.",
+      readTitle: "Läs kapitlet",
+      readBody:
+        "24 kapitel på svenska, ett per delmoment: kärnidéer, lösta " +
+        "exempel, igenkänningssignaler, fällgalleri och snabbgrepp.",
+      drillTitle: "Träna viktat",
+      drillBody:
+        "Frågorna väljs efter var du är svagast just nu, inte efter " +
+        "kapitelordningen.",
+      markTitle: "Märk missen",
+      markBody:
+        "Varje fel får en feltyp innan du går vidare. Det tar fem sekunder " +
+        "och är hela poängen.",
+      returnTitle: "Möt frågan igen",
+      returnBody:
+        "Missar hamnar i repetitionskön och i minneskorten, med " +
+        "intervallrepetition tills de sitter.",
+    },
+    bank: {
+      title: "Om frågebanken",
+      body:
+        "Frågorna är skrivna för att likna det officiella materialet i " +
+        "form och svårighet, och de är på engelska eftersom provet är på " +
+        "engelska. De är inte officiella GMAT-frågor och påstår inte att " +
+        "vara det. Kalibreringen sker mot officiellt GMAC-material; " +
+        "träningen sker här.",
+    },
+    honesty: {
+      title: "Vad Q86 inte lovar",
+      noGuarantee:
+        "Ingen poänggaranti. Ingen plattform kan lova en siffra på ett " +
+        "prov den inte skriver åt dig.",
+      noOfficial:
+        "Ingen koppling till GMAC. Q86 är oberoende, och GMAT™ och GMAT " +
+        "Focus Edition™ tillhör GMAC.",
+      noTestimonials:
+        "Inga omdömen och inga användarsiffror på den här sidan. " +
+        "Plattformen är ny, och påhittade siffror hade varit enkla att " +
+        "skriva och omöjliga att försvara.",
+      noVerbal:
+        "Ingen verbal- eller Data Insights-träning. Q86 gör kvantdelen, " +
+        "och bara den.",
+    },
+    cta: {
+      title: "Börja med diagnosen",
+      body:
+        "Tolv frågor över de fyra fundamental skills. Du får en uppskattad " +
+        "kvantnivå, det delmoment som ser svagast ut och första veckan av " +
+        "planen — utan att skapa ett konto.",
+      button: "Starta diagnosen",
+      alt: "eller läs guiderna först",
+    },
+    footer: {
+      product: "Plattformen",
+      resources: "Läsning",
+      legal: "Villkor",
+      privacy: "Integritetspolicy",
+      terms: "Köpvillkor",
+      withdrawal: "Ångerrätt",
+      contact: "Kontakt",
+      contactBody: "Frågor om kontot eller betalningen: {email}",
+      rights: "Q86",
+    },
+  },
+
+  pricing: {
+    title: "Priser",
+    lede:
+      "Ett gratisläge som är användbart i sig, och två betalda som öppnar " +
+      "resten. Alla priser i kronor, inklusive moms.",
+    vatNote: "Alla priser inklusive {rate} moms.",
+    perMonth: "per månad",
+    once: "engångsbetalning",
+    forMonths: "för {months} månader",
+    monthlyEquivalent: "motsvarar {amount} per månad",
+    free: "0 kr",
+    choose: "Välj {plan}",
+    current: "Din plan",
+    startFree: "Börja gratis",
+    faqTitle: "Vanliga frågor om betalningen",
+    faq: {
+      cancelQ: "Kan jag avsluta när jag vill?",
+      cancelA:
+        "Ja. Månadsplanen avslutas i Stripes kundportal och gäller ut den " +
+        "period du redan betalat för. Ingen bindningstid.",
+      sprintQ: "Vad händer när GMAT-sprinten tar slut?",
+      sprintA:
+        "Den är en engångsbetalning för tre månader och förnyas inte " +
+        "automatiskt. När perioden är slut faller kontot tillbaka till " +
+        "gratisläget med all din historik kvar.",
+      vatQ: "Ingår moms?",
+      vatA:
+        "Ja. Priserna som visas är slutpriser för privatpersoner i " +
+        "Sverige, inklusive {rate} moms. Kvitto kommer från Stripe.",
+      refundQ: "Får jag ångra köpet?",
+      refundA:
+        "Digitalt innehåll som levereras direkt omfattas av ångerrätt " +
+        "enligt distansavtalslagen, men du samtycker vid köpet till att " +
+        "leveransen påbörjas genast och att ångerrätten därmed upphör. " +
+        "Villkoren står i klartext i kassan och på sidan om ångerrätt.",
+      dataQ: "Vad händer med mina uppgifter om jag slutar?",
+      dataA:
+        "Du kan ladda ner allt kontot innehåller som en JSON-fil, och du " +
+        "kan radera kontot permanent. Båda finns under Konto.",
+    },
+  },
+
+  diagnostic: {
+    title: "Gratis diagnos",
+    lede:
+      "Tolv frågor, tre per fundamental skill. Ingen inloggning, ingen " +
+      "e-postadress, inget sparas. Räkna med 20–25 minuter.",
+    startButton: "Starta diagnosen",
+    progress: "Fråga {n} av {total}",
+    skillLabel: "Fundamental skill",
+    next: "Nästa",
+    finish: "Se resultatet",
+    back: "Föregående",
+    unanswered: "Obesvarad",
+    skip: "Hoppa över",
+    resultTitle: "Din diagnos",
+    estimateLabel: "Uppskattad kvantnivå",
+    estimateRange: "Q{low}–Q{high}",
+    estimateCaveat:
+      "En uppskattning från tolv frågor, inte en prognos. Intervallet är " +
+      "brett med flit: ett smalare tal hade låtit säkrare än underlaget " +
+      "tillåter.",
+    correctOf: "{correct} rätt av {total}",
+    perSkillTitle: "Per fundamental skill",
+    weakestTitle: "Svagast just nu",
+    weakestSubtopic: "Inom {skill} ser {subtopic} svagast ut.",
+    weakestSkillOnly:
+      "{skill} är den svagaste av de fyra, men inget enskilt delmoment " +
+      "sticker ut i underlaget.",
+    perfect:
+      "Alla tolv rätt. Diagnosen kan inte skilja på nivåer här uppe — " +
+      "tidsatta set och de svåraste delmomenten gör det.",
+    planTitle: "Första veckan, om du började i dag",
+    planLede:
+      "Det här är den riktiga dagsplanen, räknad på diagnosen som enda " +
+      "underlag. Den ritas om varje dag när du tränar.",
+    planDay: "Dag {n}",
+    planRead: "Läs {subtopic}",
+    planDrill: "{count} viktade frågor",
+    planPatterns: "Mönsterrundor: {categories}",
+    planTimed: "Tidsatt set",
+    planReview: "Repetition av gårdagens missar",
+    ctaTitle: "Ta med resultatet in i en plan",
+    ctaBody:
+      "Ett konto sparar diagnosen som utgångsläge, låser upp alla 24 " +
+      "kapitel och tio frågor om dagen — utan betalning.",
+    ctaButton: "Skapa konto",
+    ctaSecondary: "Se vad ett betalt konto lägger till",
+    retake: "Gör om diagnosen",
+    bankNote:
+      "Frågorna kommer ur samma verifierade bank som träningen använder.",
+  },
+
+  guides: {
+    title: "Guider",
+    lede:
+      "Fyra texter om GMAT Focus kvantdel som är värda att läsa även om du " +
+      "aldrig skapar ett konto här.",
+    readingTime: "{minutes} min läsning",
+    updated: "Uppdaterad {date}",
+    backToGuides: "← Alla guider",
+    ctaTitle: "Vill du veta var du står?",
+    ctaBody: "Diagnosen tar 20 minuter och kräver inget konto.",
+    ctaButton: "Gör diagnosen",
+  },
+
+  legal: {
+    updated: "Senast uppdaterad {date}",
+    privacyTitle: "Integritetspolicy",
+    termsTitle: "Köpvillkor",
+    withdrawalTitle: "Ångerrätt",
+    ownerPlaceholder:
+      "Uppgifter om företaget bakom Q86 fylls i innan lansering.",
+  },
+
+  cookies: {
+    title: "Cookies",
+    body:
+      "Q86 använder nödvändiga cookies för inloggning och språkval. " +
+      "Analys är anonym och sätter inga cookies förrän du säger ja.",
+    accept: "Godkänn analys",
+    reject: "Bara nödvändiga",
+    more: "Läs mer",
+    settings: "Cookie-inställningar",
   },
 } as const;

@@ -28,7 +28,7 @@ export type AuthResult = { error: string | null };
 const OK: AuthResult = { error: null };
 
 /** Where a signed-in user lands. Kept here so every flow agrees. */
-const AFTER_SIGN_IN = "/";
+const AFTER_SIGN_IN = "/idag";
 
 export async function signUpAction(
   _previous: AuthResult,
@@ -82,7 +82,9 @@ export async function signInAction(
 
 export async function signOutAction(): Promise<void> {
   await endSession();
-  redirect("/");
+  // The login form, not the landing page: someone who just signed out on a
+  // shared machine wants the door shut, not a sales pitch.
+  redirect("/login");
 }
 
 export async function requestPasswordResetAction(

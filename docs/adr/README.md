@@ -10,7 +10,8 @@ and they are amended (never silently contradicted) when reality disagrees.
 | [0001](0001-database-and-tenancy.md) | Database engine and tenancy model | Accepted |
 | [0002](0002-authentication.md) | Authentication and session management | Accepted |
 | [0003](0003-payments.md) | Payment provider, pricing currency, and Swedish VAT | Accepted |
-| [0004](0004-internationalization.md) | Localization approach and the exam-fidelity boundary | Accepted |
+| [0004](0004-internationalization.md) | Localization approach and the exam-fidelity boundary | Accepted (revised in M3) |
+| [0005](0005-public-site-and-routing.md) | The public site, the route split, and where the application lives | Accepted |
 
 ## Format
 

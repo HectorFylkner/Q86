@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 /** Seven destinations; grouped sections carry their own tab bars.
  *  `routes` lists every path that should light the entry up. */
 const LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
-  { href: "/", key: "nav.today", routes: ["/"] },
+  { href: "/idag", key: "nav.today", routes: ["/idag"] },
   { href: "/learn", key: "nav.learn", routes: ["/learn"] },
   { href: "/drill", key: "nav.drill", routes: ["/drill", "/postmortem"] },
   { href: "/timed", key: "nav.timed", routes: ["/timed"] },
@@ -26,7 +26,7 @@ const LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
 
 /** The daily loop, thumb-reachable on phones. */
 const TAB_LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
-  { href: "/", key: "nav.today", routes: ["/"] },
+  { href: "/idag", key: "nav.today", routes: ["/idag"] },
   { href: "/drill", key: "nav.drill", routes: ["/drill", "/postmortem"] },
   { href: "/timed", key: "nav.timed", routes: ["/timed"] },
   { href: "/deck", key: "nav.review", routes: ["/deck", "/queue"] },
@@ -38,9 +38,7 @@ const TAB_LINKS: Array<{ href: string; key: Key; routes: string[] }> = [
 ];
 
 function isActive(routes: string[], pathname: string): boolean {
-  return routes.some((r) =>
-    r === "/" ? pathname === "/" : pathname.startsWith(r),
-  );
+  return routes.some((r) => pathname.startsWith(r));
 }
 
 export function Nav({ userEmail }: { userEmail: string }) {
@@ -51,7 +49,7 @@ export function Nav({ userEmail }: { userEmail: string }) {
     <header className="sticky top-0 z-40 border-b border-grid bg-paper/90 backdrop-blur-sm">
       <div className="mx-auto flex h-14 w-full max-w-[1120px] items-center gap-6 px-4 sm:px-6">
         <Link
-          href="/"
+          href="/idag"
           className="font-display text-lg font-bold tracking-tight text-ink"
         >
           Q86

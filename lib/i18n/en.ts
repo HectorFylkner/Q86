@@ -963,8 +963,269 @@ export const en: Widen<typeof sv> = {
   },
 
   fallback: {
+    textInOtherLanguage:
+      "This text is not available in English yet, so you are reading the " +
+      "original.",
     chapterInEnglish:
       "This chapter is not available in Swedish yet, so you are reading the " +
       "English original.",
+  },
+
+  site: {
+    nav: {
+      product: "The platform",
+      pricing: "Pricing",
+      diagnostic: "Free diagnostic",
+      guides: "Guides",
+      signIn: "Sign in",
+      start: "Get started",
+      menu: "Menu",
+    },
+    hero: {
+      eyebrow: "GMAT Focus \u00b7 Quantitative Reasoning",
+      title: "The quant section is not a memory. It is a pattern.",
+      lede:
+        "Q86 is a Swedish training platform for the GMAT Focus quant " +
+        "section. The instruction is in Swedish; the questions are in " +
+        "English, exactly as on the exam. Every question in the bank is " +
+        "verified before it is admitted.",
+      primary: "Take the diagnostic \u2014 12 questions, no account",
+      secondary: "See what is included",
+      note: "No payment, no email address, no cookies to begin.",
+    },
+    proof: {
+      questions: "verified questions in the bank",
+      chapters: "concept chapters in Swedish",
+      skills: "fundamental skills the exam measures",
+      subtopics: "subtopics you can drill separately",
+    },
+    problem: {
+      title: "Why Swedish candidates stall on the quant section",
+      body:
+        "Most people preparing for the GMAT do more questions and hope " +
+        "something clicks. The problem is rarely volume. It is that the " +
+        "mistakes are never named: you know you missed, but not whether it " +
+        "was a content gap, a wrong setup, an arithmetic slip, a misread, " +
+        "time pressure or a guess. Six different failures, six different " +
+        "fixes \u2014 and with no name for the failure, the fix is always " +
+        "\"do more questions\".",
+      answer:
+        "Q86 forces the name. Every missed attempt is classified before it " +
+        "leaves the screen, and the daily plan re-weights around what you " +
+        "actually get wrong.",
+    },
+    pillars: {
+      title: "Three things a platform can do that a question book cannot",
+      verifiedTitle: "A bank that cannot get worse",
+      verifiedBody:
+        "Every question passes an authoring gate before it becomes " +
+        "searchable: the answer is recomputed numerically, each distractor " +
+        "must correspond to a named mistake, and a question that fails the " +
+        "check is never admitted. The bank only grows by what holds up.",
+      taxonomyTitle: "Named errors, not a feeling",
+      taxonomyBody:
+        "Six error types, nine pattern categories, 24 subtopics. Every " +
+        "attempt is logged with a confidence level and a time, so the " +
+        "difference between \"could not\" and \"ran out of time\" shows " +
+        "up in the data instead of being guessed at.",
+      planTitle: "A plan that is computed, not felt",
+      planBody:
+        "The daily plan is deterministic: the same inputs give the same " +
+        "plan. It weighs your accuracy per skill, whatever you imported " +
+        "from a score report, and how far away the test date is.",
+    },
+    method: {
+      title: "The loop",
+      lede: "Four steps, repeated until the pattern sticks.",
+      readTitle: "Read the chapter",
+      readBody:
+        "24 chapters, one per subtopic: core ideas, worked examples, " +
+        "trigger cues, a trap gallery and speed moves.",
+      drillTitle: "Drill by weight",
+      drillBody:
+        "Questions are chosen by where you are weakest right now, not by " +
+        "chapter order.",
+      markTitle: "Mark the miss",
+      markBody:
+        "Every error gets an error type before you move on. It takes five " +
+        "seconds and it is the whole point.",
+      returnTitle: "Meet the question again",
+      returnBody:
+        "Misses go into the redo queue and the takeaway deck, on spaced " +
+        "repetition until they stick.",
+    },
+    bank: {
+      title: "About the question bank",
+      body:
+        "The questions are written to match the official material in form " +
+        "and difficulty, and they are in English because the exam is in " +
+        "English. They are not official GMAT questions and do not claim to " +
+        "be. Calibration is against official GMAC material; the training " +
+        "happens here.",
+    },
+    honesty: {
+      title: "What Q86 does not promise",
+      noGuarantee:
+        "No score guarantee. No platform can promise a number on an exam " +
+        "it does not sit for you.",
+      noOfficial:
+        "No affiliation with GMAC. Q86 is independent, and GMAT\u2122 and " +
+        "GMAT Focus Edition\u2122 belong to GMAC.",
+      noTestimonials:
+        "No testimonials and no user counts on this page. The platform is " +
+        "new, and invented numbers would have been easy to write and " +
+        "impossible to defend.",
+      noVerbal:
+        "No verbal or Data Insights training. Q86 does the quant section, " +
+        "and only that.",
+    },
+    cta: {
+      title: "Start with the diagnostic",
+      body:
+        "Twelve questions across the four fundamental skills. You get an " +
+        "estimated quant band, the subtopic that looks weakest and the " +
+        "first week of the plan \u2014 without creating an account.",
+      button: "Start the diagnostic",
+      alt: "or read the guides first",
+    },
+    footer: {
+      product: "Platform",
+      resources: "Reading",
+      legal: "Terms",
+      privacy: "Privacy policy",
+      terms: "Terms of purchase",
+      withdrawal: "Right of withdrawal",
+      contact: "Contact",
+      contactBody: "Questions about your account or a payment: {email}",
+      rights: "Q86",
+    },
+  },
+
+  pricing: {
+    title: "Pricing",
+    lede:
+      "A free tier that is useful on its own, and two paid ones that open " +
+      "the rest. All prices in kronor, VAT included.",
+    vatNote: "All prices include {rate} VAT.",
+    perMonth: "per month",
+    once: "one-time payment",
+    forMonths: "for {months} months",
+    monthlyEquivalent: "works out to {amount} per month",
+    free: "0 kr",
+    choose: "Choose {plan}",
+    current: "Your plan",
+    startFree: "Start free",
+    faqTitle: "Common questions about payment",
+    faq: {
+      cancelQ: "Can I cancel whenever I want?",
+      cancelA:
+        "Yes. The monthly plan is cancelled in Stripe's customer portal " +
+        "and runs to the end of the period you have already paid for. No " +
+        "lock-in.",
+      sprintQ: "What happens when the GMAT sprint ends?",
+      sprintA:
+        "It is a one-time payment for three months and does not renew " +
+        "automatically. When the period ends the account falls back to the " +
+        "free tier with all of your history intact.",
+      vatQ: "Is VAT included?",
+      vatA:
+        "Yes. The prices shown are final prices for private individuals in " +
+        "Sweden, including {rate} VAT. The receipt comes from Stripe.",
+      refundQ: "Can I change my mind after buying?",
+      refundA:
+        "Digital content delivered immediately is covered by the right of " +
+        "withdrawal under the Swedish Distance Contracts Act, but at " +
+        "checkout you consent to delivery beginning at once and to the " +
+        "right of withdrawal lapsing as a result. The terms are stated " +
+        "plainly at checkout and on the withdrawal page.",
+      dataQ: "What happens to my data if I stop?",
+      dataA:
+        "You can download everything the account holds as a JSON file, and " +
+        "you can delete the account permanently. Both are under Account.",
+    },
+  },
+
+  diagnostic: {
+    title: "Free diagnostic",
+    lede:
+      "Twelve questions, three per fundamental skill. No sign-in, no email " +
+      "address, nothing stored. Expect 20\u201325 minutes.",
+    startButton: "Start the diagnostic",
+    progress: "Question {n} of {total}",
+    skillLabel: "Fundamental skill",
+    next: "Next",
+    finish: "See the result",
+    back: "Previous",
+    unanswered: "Unanswered",
+    skip: "Skip",
+    resultTitle: "Your diagnostic",
+    estimateLabel: "Estimated quant band",
+    estimateRange: "Q{low}\u2013Q{high}",
+    estimateCaveat:
+      "An estimate from twelve questions, not a prediction. The interval " +
+      "is deliberately wide: a narrower number would sound more certain " +
+      "than the evidence allows.",
+    correctOf: "{correct} correct out of {total}",
+    perSkillTitle: "By fundamental skill",
+    weakestTitle: "Weakest right now",
+    weakestSubtopic: "Within {skill}, {subtopic} looks weakest.",
+    weakestSkillOnly:
+      "{skill} is the weakest of the four, but no single subtopic stands " +
+      "out in this sample.",
+    perfect:
+      "Twelve out of twelve. The diagnostic cannot separate levels up " +
+      "here \u2014 timed sets and the hardest subtopics can.",
+    planTitle: "The first week, if you started today",
+    planLede:
+      "This is the real daily plan, computed with the diagnostic as its " +
+      "only input. It is redrawn every day as you train.",
+    planDay: "Day {n}",
+    planRead: "Read {subtopic}",
+    planDrill: "{count} weighted questions",
+    planPatterns: "Pattern rounds: {categories}",
+    planTimed: "Timed set",
+    planReview: "Review yesterday's misses",
+    ctaTitle: "Take the result into a plan",
+    ctaBody:
+      "An account saves the diagnostic as your baseline, unlocks all 24 " +
+      "chapters and ten questions a day \u2014 with no payment.",
+    ctaButton: "Create account",
+    ctaSecondary: "See what a paid account adds",
+    retake: "Retake the diagnostic",
+    bankNote:
+      "The questions come from the same verified bank the training uses.",
+  },
+
+  guides: {
+    title: "Guides",
+    lede:
+      "Four pieces about the GMAT Focus quant section, worth reading even " +
+      "if you never create an account here.",
+    readingTime: "{minutes} min read",
+    updated: "Updated {date}",
+    backToGuides: "\u2190 All guides",
+    ctaTitle: "Want to know where you stand?",
+    ctaBody: "The diagnostic takes 20 minutes and needs no account.",
+    ctaButton: "Take the diagnostic",
+  },
+
+  legal: {
+    updated: "Last updated {date}",
+    privacyTitle: "Privacy policy",
+    termsTitle: "Terms of purchase",
+    withdrawalTitle: "Right of withdrawal",
+    ownerPlaceholder:
+      "Details of the company behind Q86 are to be filled in before launch.",
+  },
+
+  cookies: {
+    title: "Cookies",
+    body:
+      "Q86 uses necessary cookies for sign-in and language choice. " +
+      "Analytics are anonymous and set no cookies until you say yes.",
+    accept: "Accept analytics",
+    reject: "Necessary only",
+    more: "Read more",
+    settings: "Cookie settings",
   },
 };

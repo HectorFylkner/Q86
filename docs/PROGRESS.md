@@ -12,6 +12,16 @@ unverified.
 
 ## Current milestone
 
+**M4 — Public site and acquisition funnel.** Complete. The application
+moved out of the root: `/` is now the Swedish landing page and the
+dashboard lives at `/idag`. The public surface is the landing page,
+`/priser`, the free diagnostic at `/diagnos`, four guides under `/guider`,
+and the three legal pages. SEO, a sitemap, a robots file, a rendered Open
+Graph card and article structured data are in place, and cookie consent
+gates any non-essential script before it loads.
+
+### Previously
+
 **M3 — Swedish localization.** Complete. sv-SE is the default with English
 behind a toggle, no user-facing string is hard-coded, dates/numbers/prices
 format as sv-SE, the locale is stored on the account, and all 24 lesson
@@ -31,7 +41,7 @@ runbook in `docs/BILLING.md` rather than claimed as verified.
 | M1 | Multi-tenancy and accounts | ✅ done | see git log |
 | M2 | Billing and entitlements | ✅ done (see the Stripe caveat) | see git log |
 | M3 | Swedish localization | ✅ done | see git log |
-| M4 | Public site and acquisition funnel | ⬜ not started | — |
+| M4 | Public site and acquisition funnel | ✅ done | see git log |
 | M5 | Retention | ⬜ not started | — |
 | M6 | Operations | ⬜ not started | — |
 | M7 | Marketing kit | ⬜ not started | — |
@@ -65,6 +75,11 @@ Commands run in this session and what they printed.
 | `pnpm test` (vitest) | **102 passed**, 8 files, 0 failed | M3 |
 | `pnpm build` | `✓ Compiled successfully in 12.0s` | M3 |
 | `npx playwright test` | **19 passed**, 0 failed, 28.6s | M3 |
+| `npx tsc --noEmit` | exit 0, no output | M4 |
+| `pnpm lint` | exit 0 — **0 errors**, 25 warnings (all pre-existing, all in `scripts/author/*.mjs`) | M4 |
+| `pnpm test` (vitest) | **118 passed**, 9 files, 0 failed | M4 |
+| `pnpm build` | `✓ Compiled successfully in 18.7s`; 4 guide pages prerendered, sitemap/robots/OG card static | M4 |
+| `npx playwright test` | **27 passed**, 0 failed, 37.6s | M4 |
 
 ## Known broken
 
@@ -127,6 +142,12 @@ browser. The seven-step procedure to close the gap is in
   - `bootstrap-upgrade.test.ts` (M2) — a `db:push` database from before
     accounts existed, booted by today's code: it adopts a migration
     ledger, catches up, and keeps its history.
+  - `diagnostic.test.ts` (M4) — the diagnostic set is balanced, stable
+    and stripped of the answer key; the band is an interval; the weakest
+    skill is named from the answers; the plan preview is seven days from
+    the real planner and weights toward the weakest skill. Plus two
+    content rules: no score guarantee anywhere on the public site, and
+    the GMAC disclaimer present in the shared footer copy.
   - `i18n.test.ts` (M3) — catalog completeness in both locales, sv-SE
     `Intl` output, Accept-Language parsing, every taxonomy value labelled,
     GMAT terminology left in English inside the Swedish catalog, every
@@ -202,6 +223,51 @@ browser. The seven-step procedure to close the gap is in
   paths and the public site will be Swedish at the root, because the
   search intent Q86 targets is Swedish (ADR 0004).
 
+## Decisions taken during M4 that change the product
+
+- **The application moved off the root.** `/` is the public landing page
+  and the dashboard is `/idag`. A crawler and a stranger now always see
+  the marketing page at the root instead of a redirect to a login form,
+  which is the whole point of the SEO work. `AFTER_SIGN_IN` and every
+  in-app "back to today" link moved with it; signing out goes to `/login`
+  rather than the landing page, because someone signing out on a shared
+  machine wants the door shut, not a sales pitch.
+- **Route groups replaced one shared shell.** `app/(app)/` carries the
+  signed-in chrome, `app/(marketing)/` the public chrome, `app/(auth)/`
+  the bare ground. The root layout is now only the ground, the fonts and
+  the providers — a landing page needs full-bleed sections and the app
+  needs a fixed measure, and one layout could not do both.
+- **The diagnostic writes nothing and needs no account.** Twelve
+  questions, three per fundamental skill, chosen by a stable rule so two
+  readers can compare notes. Correct answers never reach the browser:
+  scoring is a server action that re-reads the key from the bank, which
+  also means the endpoint cannot be used to dump it. An E2E test asserts
+  `correctIndex`, `solutionMd` and `trapMap` are absent from the page.
+- **The plan preview is the real planner.** `previewWeek()` calls the
+  product's own `computeDailyPlan` with the diagnostic as its only input,
+  rather than sketching a plausible-looking week. A preview that did not
+  match what the account would actually get would be a lie told at the
+  moment of sign-up.
+- **The reported band is an interval, deliberately wide.** Difficulty-
+  weighted accuracy mapped linearly onto 60–90, ±3, with the caveat shown
+  next to the number. Twelve questions do not support a point estimate,
+  and claiming they do is exactly what marknadsföringslagen exists to
+  stop.
+- **A second Markdown renderer, not a change to the first.**
+  `components/site/article.tsx` handles tables, rules and links for the
+  guides and legal pages. `components/math.tsx` renders question stems and
+  lesson chapters and was left alone: this milestone had no business
+  touching the exam-critical path to gain a table.
+- **Consent gates the script, it does not hide it.** No analytics script
+  is inserted until consent is `granted`; refusing is one click at the same
+  visual weight as accepting; the choice lives in `localStorage` rather
+  than in a cookie, and the footer can reopen the dialog. M6 will read
+  `q86-consent-analytics` before loading anything.
+- **The legal pages are content files, not components.** They live in
+  `content/legal/sv/` so the owner's lawyer can read and edit them without
+  opening a `.tsx` file. The company details are a stated placeholder
+  rather than an invented company.
+
 ## Baseline facts established by reading the code
 
 - 11 tables in `lib/db/schema.ts`; none carries an owner column.
@@ -239,7 +305,18 @@ are the items only the owner can provide, collected as they arise:
   whichever provider M5 targets.
 - **A human review of the legal pages** (integritetspolicy, köpvillkor,
   ångerrätt) before launch. They are written to be correct and specific,
-  not to substitute for advice.
+  not to substitute for advice, and they live as Markdown in
+  `content/legal/sv/` so a lawyer can edit them without touching code.
+- **The company details behind Q86** — legal name, organisationsnummer,
+  VAT number and postal address. All three legal pages currently carry an
+  explicit placeholder saying the details will be filled in before launch;
+  the placeholder is deliberate, because inventing a company would be
+  worse than admitting the gap. `NEXT_PUBLIC_SUPPORT_EMAIL` sets the
+  contact address (it defaults to `hej@q86.se`, which does not yet exist).
+- **A static Space Grotesk cut at `app/fonts/space-grotesk-og.ttf`** if
+  the Open Graph card should use the display face. The card renders today
+  with the system stack, because Satori cannot parse the variable WOFF2
+  the app itself uses; the code falls back rather than failing the build.
 - **Google OAuth credentials** — a client id and secret from a Google Cloud
   project (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`), with
   `<origin>/api/auth/google/callback` registered as the redirect URI. Until

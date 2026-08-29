@@ -21,7 +21,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  if (await currentUser()) redirect("/");
+  if (await currentUser()) redirect("/idag");
   const t = await getT();
   const { next, error } = await searchParams;
   const problem = authMessage(t, error ?? null);

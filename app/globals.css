@@ -228,3 +228,188 @@ input[type="date"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Editorial surface — the public site.
+
+   Same tokens as the application (paper, ink, graphite, ballpoint, red pen)
+   pushed toward print: a heavier display setting, hairline rules doing the
+   dividing that cards do inside the app, and a measure that changes with
+   the role of the text rather than staying at one width. The graph-paper
+   ground is switched off here; a marketing page is not scratch work.
+--------------------------------------------------------------------------- */
+
+.editorial {
+  --rule: color-mix(in srgb, var(--ink) 14%, transparent);
+  --rule-strong: color-mix(in srgb, var(--ink) 60%, transparent);
+  background-color: var(--paper);
+  background-image: none;
+}
+
+/* The one place the grid survives: a narrow band behind the hero, so the
+   lineage to the app's scratch-paper ground is visible without the whole
+   page reading as graph paper. */
+.editorial-grid-band {
+  background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 23px,
+      color-mix(in srgb, var(--grid) 55%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 55%, transparent) 24px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 23px,
+      color-mix(in srgb, var(--grid) 55%, transparent) 23px,
+      color-mix(in srgb, var(--grid) 55%, transparent) 24px
+    );
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Display type. Space Grotesk needs tightening as it grows; below ~28px it
+   needs none, so the tracking is tied to the step rather than applied flat. */
+.editorial h1,
+.editorial .display-xl {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.033em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.editorial h2,
+.editorial .display-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.editorial h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+}
+
+/* The eyebrow: mono, spaced, the same voice as the app's data chips. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+/* Hairlines instead of cards. A section is separated by a rule and space,
+   the way a page is, and the first rule of a group is heavier. */
+.rule-top {
+  border-top: 1px solid var(--rule);
+}
+.rule-top-strong {
+  border-top: 2px solid var(--rule-strong);
+}
+
+/* Reading measure for prose: guides and legal text, not marketing slabs. */
+.measure {
+  max-width: 68ch;
+}
+.measure-tight {
+  max-width: 54ch;
+}
+
+/* Long-form article body. Applied once on a wrapper; nothing inside needs
+   a class, which is what makes the guides writable as plain markdown. */
+.article {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+.article > * + * {
+  margin-top: 1.1em;
+}
+.article h2 {
+  margin-top: 2.2em;
+  font-size: 1.5rem;
+}
+.article h3 {
+  margin-top: 1.8em;
+  font-size: 1.15rem;
+}
+.article ul,
+.article ol {
+  padding-left: 1.25rem;
+}
+.article li + li {
+  margin-top: 0.4em;
+}
+.article ul {
+  list-style: disc;
+}
+.article ol {
+  list-style: decimal;
+}
+.article a {
+  color: var(--ballpoint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.article strong {
+  font-weight: 650;
+}
+.article blockquote {
+  border-left: 2px solid var(--rule-strong);
+  padding-left: 1rem;
+  color: var(--graphite);
+}
+.article code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--highlight);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+.article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.article th,
+.article td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.article th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+/* A wide table inside prose scrolls rather than pushing the page sideways. */
+.article .table-scroll {
+  overflow-x: auto;
+}
+
+/* The single decorated moment in the type: the hero's key phrase, marked
+   the way the red pen marks an answer in the app. */
+.marked {
+  position: relative;
+  white-space: nowrap;
+}
+.marked::after {
+  content: "";
+  position: absolute;
+  left: -0.06em;
+  right: -0.06em;
+  bottom: 0.06em;
+  height: 0.34em;
+  background: color-mix(in srgb, var(--highlight) 92%, var(--amber));
+  border-radius: 2px;
+  z-index: -1;
+}
