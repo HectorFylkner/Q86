@@ -12,6 +12,19 @@ unverified.
 
 ## Current milestone
 
+**M7 — Marketing kit.** Complete, and nothing has been posted anywhere.
+`docs/marketing/` holds the positioning, the messaging rules with the
+basis for every claim, a launch checklist in dependency order, and drafts
+for five channels. Ten rules in `tests/unit/marketing.test.ts` enforce the
+honesty constraints in CI rather than leaving them in a README.
+
+**All seven milestones are done.** What remains is the list under "What
+the owner still has to supply", which is entirely credentials, a domain,
+a lawyer's read of the legal pages and an accountant's read of the moms
+assumption.
+
+### Previously
+
 **M6 — Operations.** Complete. Every call to the three endpoints that
 spend money is metered with the provider's own token counts and refused
 at four thresholds; `/admin` shows what the deployment is configured to
@@ -69,7 +82,7 @@ runbook in `docs/BILLING.md` rather than claimed as verified.
 | M4 | Public site and acquisition funnel | ✅ done | see git log |
 | M5 | Retention | ✅ done | see git log |
 | M6 | Operations | ✅ done | see git log |
-| M7 | Marketing kit | ⬜ not started | — |
+| M7 | Marketing kit | ✅ done | see git log |
 
 ---
 
@@ -117,6 +130,11 @@ Commands run in this session and what they printed.
 | `npx playwright test` | **35 passed**, 0 failed, 47.8s | M6 |
 | `pnpm verify-bank` | `360 questions`, `All bank questions pass mechanical verification`, exit 0 | M6 |
 | `pnpm restore <864 kB backup>` | `21 table(s)`, `users: 22`, `attempts: 4`, `questions: 360`; refused a second run without `--force`; moved the old file aside with it | M6 |
+| `npx tsc --noEmit` | exit 0, no output | M7 |
+| `pnpm lint` | exit 0 — **0 errors**, 25 warnings (all pre-existing) | M7 |
+| `pnpm test` (vitest) | **168 passed**, 13 files, 0 failed | M7 |
+| `pnpm build` | `✓ Compiled successfully in 13.2s` | M7 |
+| `npx playwright test` | **35 passed**, 0 failed, 47.1s | M7 |
 | `npx drizzle-kit generate --name retention` | produced an additive 0004 (4 nullable columns, 2 tables); kept as generated | M5 |
 
 ## Known broken
@@ -180,6 +198,10 @@ browser. The seven-step procedure to close the gap is in
   - `bootstrap-upgrade.test.ts` (M2) — a `db:push` database from before
     accounts existed, booted by today's code: it adopts a migration
     ledger, catches up, and keeps its history.
+  - `marketing.test.ts` (M7) — the ten honesty rules over
+    `docs/marketing/`, including that the README still says nothing has
+    been posted and that no draft quotes a price the pricing module does
+    not hold.
   - `ops.test.ts` (M6) — cost arithmetic rounds up so a cap cannot
     under-count; rate limits are per account and per route; a failed call
     is still metered; the per-account and global caps both trip; last
@@ -381,6 +403,27 @@ browser. The seven-step procedure to close the gap is in
   empty file passes `integrity_check`, which the script's own testing
   exposed), prints the counts it found, and moves the existing database
   aside rather than deleting it.
+
+## Decisions taken during M7 that change the product
+
+- **Nothing was posted.** No account was created on any platform, no
+  message was sent, and no listing was bought. `docs/marketing/` is
+  drafts for a person to edit and post themselves.
+- **The honesty constraints are tested, not documented.**
+  `tests/unit/marketing.test.ts` fails on a score guarantee, an invented
+  user count, a fabricated testimonial, an implied GMAC association, a
+  channel draft with no authorship disclosure, a link placeholder in a
+  block that does not say who wrote it, and a price that disagrees with
+  `lib/billing/pricing.ts`. Each verified by planting exactly what it
+  forbids.
+- **A paid listing is the one exemption from the disclosure rule**, and
+  it is named in the test with its reason: a directory entry is
+  understood to be advertising, so there is nothing being passed off as a
+  neutral recommendation.
+- **Two real omissions in the copy were found by those rules** — the
+  Flashback draft carried no trademark line, and the rule that accepted
+  "Admin har godkänt" as a disclosure was wrong, because permission from
+  a moderator is not a statement of authorship.
 
 ## Baseline facts established by reading the code
 
