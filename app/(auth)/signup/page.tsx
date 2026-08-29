@@ -15,9 +15,16 @@ export async function generateMetadata() {
   return { title: `${t("auth.signUp")} – Q86` };
 }
 
-export default async function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ kod?: string }>;
+}) {
   if (await currentUser()) redirect("/idag");
   const t = await getT();
+  // A referral link carries the code, so nobody has to retype it. It is
+  // pre-filled, never hidden: the field stays editable and visible.
+  const { kod } = await searchParams;
 
   return (
     <AuthShell
@@ -32,7 +39,7 @@ export default async function SignUpPage() {
         </>
       }
     >
-      <SignUpForm />
+      <SignUpForm referral={kod} />
       {googleConfigured() && <GoogleButton />}
     </AuthShell>
   );

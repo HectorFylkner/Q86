@@ -12,6 +12,7 @@ and they are amended (never silently contradicted) when reality disagrees.
 | [0003](0003-payments.md) | Payment provider, pricing currency, and Swedish VAT | Accepted |
 | [0004](0004-internationalization.md) | Localization approach and the exam-fidelity boundary | Accepted (revised in M3) |
 | [0005](0005-public-site-and-routing.md) | The public site, the route split, and where the application lives | Accepted |
+| [0006](0006-retention-and-outbound-mail.md) | Granted access, outbound mail, and what a shared card contains | Accepted |
 
 ## Format
 

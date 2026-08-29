@@ -11,6 +11,7 @@ import {
 } from "@/lib/auth/actions";
 import { useT } from "@/components/i18n-provider";
 import { authMessage } from "@/lib/auth/messages";
+import { REFERRAL_DAYS } from "@/lib/retention/terms";
 import { FieldLabel, inputClass, submitClass } from "./auth-shell";
 
 const EMPTY: AuthResult = { error: null };
@@ -36,7 +37,7 @@ function Problem({ code }: { code: string | null }) {
   );
 }
 
-export function SignUpForm() {
+export function SignUpForm({ referral }: { referral?: string }) {
   const t = useT();
   const [state, action] = useActionState(signUpAction, EMPTY);
   return (
@@ -71,6 +72,23 @@ export function SignUpForm() {
         />
         <p className="mt-1 text-[11px] text-graphite">
           {t("auth.passwordHint")}
+        </p>
+      </div>
+      <div>
+        <FieldLabel htmlFor="referral">
+          {t("referral.fieldLabel", { optional: t("common.optional") })}
+        </FieldLabel>
+        <input
+          id="referral"
+          name="referral"
+          defaultValue={referral ?? ""}
+          autoCapitalize="characters"
+          autoComplete="off"
+          spellCheck={false}
+          className={inputClass}
+        />
+        <p className="mt-1 text-[11px] text-graphite">
+          {t("referral.fieldHint", { days: REFERRAL_DAYS })}
         </p>
       </div>
       <Problem code={state.error} />

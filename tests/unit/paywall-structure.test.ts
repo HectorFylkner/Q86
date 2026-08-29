@@ -131,7 +131,10 @@ describe("paywall coverage", () => {
       const uncovered: string[] = [];
       for (const page of filesUnder("app", /^page\.tsx$/)) {
         if (!page.startsWith(PUBLIC_PAGE_PREFIX)) continue;
-        const route = routeOf(page).replace(/\/\[[^\]]+\]$/, "");
+        // Ask the question a real request asks: substitute a value for a
+        // dynamic segment, so "/kort/[code]" is tested as "/kort/abc" and
+        // a prefix of "/kort/" counts as covering it.
+        const route = routeOf(page).replace(/\[[^\]]+\]/g, "abc");
         if (route === "/") continue; // handled by an explicit branch
         if (!prefixes.some((prefix) => route.startsWith(prefix))) {
           uncovered.push(`${route} (${page})`);

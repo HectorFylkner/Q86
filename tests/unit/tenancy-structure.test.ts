@@ -47,6 +47,22 @@ const RAW_DB_ALLOWLIST = [
   // to both files.
   "lib/diagnostic.ts",
   "app/(marketing)/page.tsx",
+  // Retention. None of these runs inside a scoped request:
+  //   grants.ts pays out a referral during signup, before the new
+  //     account has a session, and mints codes on `users`;
+  //   share.ts serves a public progress card to a visitor who has no
+  //     account of their own;
+  //   activity.ts and lifecycle.ts run from a cron sweep across every
+  //     account, which is what a weekly digest is;
+  //   onboarding.ts stamps `users.onboarded_at`, which is identity, not
+  //     content — the same reason lib/auth/users.ts is here.
+  // Every query in all five binds the account id as a parameter, and the
+  // OWNED_TABLES rule below still forbids them touching a content table.
+  "lib/retention/grants.ts",
+  "lib/retention/share.ts",
+  "lib/retention/activity.ts",
+  "lib/retention/lifecycle.ts",
+  "lib/retention/onboarding.ts",
 ];
 
 /** Identifiers of the ten user-owned tables, as imported in application code. */
@@ -170,6 +186,14 @@ describe("tenancy choke point", () => {
       // An operator ledger. Its user_id is a trace of which account an
       // event resolved to, not a claim of ownership (it has no foreign key).
       stripe_events: "webhook idempotency ledger",
+      // Retention: both are written outside any request — a referral pays
+      // out during signup, before a session exists, and the lifecycle
+      // dispatcher runs from a cron with no session at all. Every read of
+      // either takes the account id as a bound parameter, and nothing in
+      // the product renders one account's grants or mail history to
+      // another.
+      access_grants: "granted access, written outside a request",
+      email_log: "lifecycle send ledger",
     } as const;
     for (const table of Object.keys(NOT_USER_CONTENT)) declared.delete(table);
 

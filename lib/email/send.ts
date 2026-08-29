@@ -1,11 +1,18 @@
 /**
- * Outbound mail. M1 needs exactly one message (the password-reset link) and
- * has no sending domain yet, so delivery is a seam rather than a provider:
- * in development and test the message is written to the server log and
- * captured in `lastSentEmail()`, which is what the reset test asserts on.
- * M5 replaces `deliver()` with a real transport and adds the lifecycle
- * messages; nothing else in the codebase has to change.
+ * Outbound mail.
+ *
+ * Every message in the product goes through `sendEmail`. Where it actually
+ * goes is decided in `./transport.ts` by environment: with no
+ * `RESEND_API_KEY` the message is logged and kept in memory, which is what
+ * tests assert on and what makes "this build sends nothing" a property of
+ * the configuration rather than a promise.
+ *
+ * The in-memory ring is deliberately small and is not a delivery record —
+ * `email_log` is, and it is what the lifecycle dispatcher reads to avoid
+ * sending the same message twice.
  */
+
+import { deliver } from "./transport.ts";
 
 export type OutboundEmail = {
   to: string;
@@ -29,6 +36,15 @@ export function clearSentEmails(): void {
 export async function sendEmail(message: OutboundEmail): Promise<void> {
   recent.push(message);
   if (recent.length > 50) recent.shift();
+
+  const result = await deliver(message);
+  if (result.delivered) return;
+
+  if (result.reason === "failed") {
+    // Surfaced rather than swallowed: a lifecycle run that cannot deliver
+    // should fail visibly, not quietly mark the message as sent.
+    throw new Error(`Email delivery failed: ${result.detail ?? "unknown"}`);
+  }
   if (process.env.NODE_ENV !== "test") {
     console.log(
       `[email] to=${message.to} subject=${JSON.stringify(message.subject)}\n${message.text}`,

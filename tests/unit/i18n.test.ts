@@ -315,29 +315,59 @@ describe("module boundaries", () => {
     expect(offenders).toEqual([]);
   });
 
-  // The reverse: a server-only import inside the shared catalog module
-  // breaks the *client* build, which is how it was first found.
-  it("keeps next/headers out of every module a client component imports", () => {
+  /**
+   * The reverse direction: a server-only import anywhere in the graph a
+   * client component reaches breaks the *client* build.
+   *
+   * Both of the failures this rule was written for looked harmless at the
+   * import site — a catalog module that also resolved the locale, and a
+   * form that wanted one number from a module that also talks to the
+   * database. Neither is caught by `tsc`; both fail `next build`, and one
+   * of them only at request time.
+   */
+  const SERVER_ONLY = [
+    /from "next\/headers"/,
+    /from "node:crypto"/,
+    /from "node:fs"/,
+    /from "node:path"/,
+    // The database client itself, in either import form.
+    /from "@\/lib\/db"/,
+    /from "[^"]*\/db\/index\.ts"/,
+  ];
+
+  it("keeps server-only modules out of every client component's import graph", () => {
     const clientModules = [
       ...walk("app", /\.tsx?$/),
       ...walk("components", /\.tsx?$/),
     ].filter(isClientModule);
 
     const seen = new Set<string>();
-    const queue = [...clientModules];
+    const queue = clientModules.map((rel) => ({ rel, via: [rel] }));
     const offenders: string[] = [];
 
     while (queue.length > 0) {
-      const rel = queue.pop() as string;
+      const { rel, via } = queue.pop() as { rel: string; via: string[] };
       if (seen.has(rel)) continue;
       seen.add(rel);
       const src = read(rel);
-      if (/from "next\/headers"/.test(src)) offenders.push(rel);
-      for (const [, , spec] of src.matchAll(
+      for (const pattern of SERVER_ONLY) {
+        if (pattern.test(src)) {
+          // The path is the useful half of the message: the offending
+          // file is rarely the one someone edited.
+          offenders.push(`${rel} (${pattern}) via ${via.join(" -> ")}`);
+        }
+      }
+      for (const [, typeOnly, spec] of src.matchAll(
         /import\s+(type\s+)?[^"]*from\s+"([^"]+)"/g,
       )) {
+        // `import type` is erased before bundling, so it cannot pull a
+        // server module into the browser — following it would report a
+        // path the bundler never walks.
+        if (typeOnly) continue;
         const target = resolveImport(spec, rel);
-        if (target && !isServerActionModule(target)) queue.push(target);
+        if (target && !isServerActionModule(target)) {
+          queue.push({ rel: target, via: [...via, target] });
+        }
       }
     }
     expect(offenders).toEqual([]);

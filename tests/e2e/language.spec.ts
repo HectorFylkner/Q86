@@ -64,7 +64,9 @@ test.describe("language", () => {
     await page.getByLabel("Email").fill(uniqueEmail("english"));
     await page.getByLabel("Password").fill("provlosenord-2026");
     await page.getByRole("button", { name: "Create account" }).click();
-    await page.waitForURL("/idag");
+    // Signup lands on onboarding; the language must have followed.
+    await page.waitForURL("/valkommen");
+    await page.goto("/idag");
 
     await expect(
       appNav(page, "Primary").getByRole("link", { name: "Today" }),

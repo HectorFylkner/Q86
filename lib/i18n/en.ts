@@ -1228,4 +1228,157 @@ export const en: Widen<typeof sv> = {
     more: "Read more",
     settings: "Cookie settings",
   },
+
+  email: {
+    signOff: "Q86",
+    footer:
+      "You are getting this because you have a Q86 account. Change what " +
+      "you receive under Account: {settingsUrl}",
+    footerNoOptOut:
+      "This is a transactional message about your account and cannot be " +
+      "unsubscribed from.",
+    welcome: {
+      subject: "Welcome to Q86 \u2014 start by setting a test date",
+      body:
+        "Hi{name},\n\n" +
+        "Your account is ready. One piece of advice before you start: set " +
+        "a test date, even a provisional one. The daily plan is computed " +
+        "from how far away it is, and without a date it becomes a general " +
+        "recommendation rather than a schedule.\n\n" +
+        "Set a date and see your first week: {onboardingUrl}\n\n" +
+        "Three things worth knowing:\n\n" +
+        "1. The questions are in English. The instruction is in Swedish. " +
+        "That is how the exam works, and drilling translated questions " +
+        "trains the wrong thing.\n" +
+        "2. Mark every miss with an error type before you move on. It " +
+        "takes five seconds and it is what lets the plan change.\n" +
+        "3. The free tier goes further than you think: all 24 chapters, " +
+        "the pattern trainer, and ten questions a day.\n\n" +
+        "Good luck.",
+    },
+    endingSoon: {
+      subject: "Your Q86 access ends in {days} days",
+      body:
+        "Hi{name},\n\n" +
+        "Your {planName} runs out on {date}. After that the account falls " +
+        "back to the free tier \u2014 all of your history, cards and redo " +
+        "queue stay, but timed sets, the analytics and the daily plan " +
+        "lock.\n\n" +
+        "Extend or change: {accountUrl}\n\n" +
+        "If you would rather not extend, do nothing. Nothing renews " +
+        "unless you chose it.",
+    },
+    streakRecovery: {
+      subject: "Your {streak}-day streak broke yesterday",
+      body:
+        "Hi{name},\n\n" +
+        "You trained {streak} days in a row and missed yesterday. That is " +
+        "nothing to be embarrassed about; it is why the redo queue " +
+        "exists.\n\n" +
+        "If you have ten minutes: do yesterday's misses. They are at the " +
+        "front of the queue and they are what pays back most.\n\n" +
+        "{queueUrl}\n\n" +
+        "If today does not happen either: drop the target to five " +
+        "questions. A streak that restarts is still a streak.",
+    },
+    weekly: {
+      subject: "Your week in Q86: {attempts} questions, {accuracy} correct",
+      body:
+        "Hi{name},\n\n" +
+        "Here is how the week went:\n\n" +
+        "\u00b7 {attempts} questions answered\n" +
+        "\u00b7 {accuracy} correct\n" +
+        "\u00b7 {days} training days out of 7\n" +
+        "\u00b7 {reviewed} reviews\n\n" +
+        "{weakestLine}\n\n" +
+        "{testDateLine}\n\n" +
+        "Next week: {todayUrl}",
+      weakest: "Weakest right now: {skill}. The plan already weights there.",
+      weakestNone:
+        "Nothing stands out this week, which usually means it is time for " +
+        "a timed set.",
+      testDate: "There are {days} days until your test date.",
+      testDateNone:
+        "You have no test date set. Even a provisional one sharpens the " +
+        "plan: {settingsUrl}",
+    },
+    referral: {
+      subject: "{name} started training with your code",
+      body:
+        "Hi,\n\n" +
+        "Someone created an account with your invite code. You both get " +
+        "{days} days of full access, and yours have already been added.\n\n" +
+        "{accountUrl}",
+    },
+  },
+
+  onboarding: {
+    title: "Before you start",
+    lede:
+      "Two questions. The answers shape the daily plan, and you can change " +
+      "both at any time under Account.",
+    dateLabel: "When are you sitting the exam?",
+    dateHint:
+      "A provisional date is fine. The plan counts backwards from it, and " +
+      "a guess produces a sharper plan than no date at all.",
+    noDateLabel: "I do not know yet",
+    noDateHint:
+      "Then the plan runs level: no build-up, no exam-like weeks. Set a " +
+      "date later and it is redrawn.",
+    cadenceLabel: "How often do you want a timed set?",
+    cadenceEvery: "Every {days} days",
+    submit: "Show my first week",
+    skip: "Skip",
+    weekTitle: "Your first week",
+    weekLede:
+      "Computed from your answers. It is redrawn every day as you train " +
+      "\u2014 this is the starting point, not a schedule in stone.",
+    start: "Start with day 1",
+    daysToTest: "{days} days left",
+    noTestDate: "No test date set",
+  },
+
+  progressCard: {
+    title: "Progress card",
+    lede:
+      "A shareable image with your numbers. No email address, no name and " +
+      "no individual questions \u2014 just the totals.",
+    create: "Create link",
+    revoke: "Revoke the link",
+    revoked: "The link is revoked. Old links no longer work.",
+    copy: "Copy link",
+    copied: "Copied",
+    shareNote:
+      "Anyone with the link can see the card. Revoke it whenever you want.",
+    streakDays: "day streak",
+    questions: "questions",
+    accuracy: "correct",
+    chapters: "chapters read",
+    daysToTest: "days to the exam",
+    heading: "{days}-day streak",
+    subheading: "Q86 \u00b7 GMAT Focus Quant",
+    notFound: "This card does not exist, or the link has been revoked.",
+    ownCta: "This is how your card looks to other people.",
+    visitorCta: "Train the quant section with the same tools",
+  },
+
+  referral: {
+    title: "Invite someone",
+    lede:
+      "Give away {days} days of full access. You get the same number when " +
+      "someone creates an account with your code.",
+    yourCode: "Your code",
+    yourLink: "Your link",
+    copy: "Copy",
+    copied: "Copied",
+    count: "{count} people have used your code",
+    countNone: "Nobody has used your code yet",
+    grantedUntil: "You have full access until {date} thanks to invitations",
+    fieldLabel: "Invite code ({optional})",
+    fieldHint: "Got a code? You both get {days} days.",
+    invalid: "That code is not recognised. The account is created anyway.",
+    honesty:
+      "No money changes hands. This gives time in the product, not cash, " +
+      "and there is no limit on how many people you can invite.",
+  },
 };

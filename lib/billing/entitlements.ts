@@ -1,9 +1,9 @@
-import { and, eq, gte, isNull } from "drizzle-orm";
+import { and, desc, eq, gt, gte, isNull } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { requireScoped, type SessionUser } from "../auth/session.ts";
 import { db } from "../db/index.ts";
 import { ScopedDb } from "../db/scoped.ts";
-import { attempts, subscriptions } from "../db/schema.ts";
+import { accessGrants, attempts, subscriptions } from "../db/schema.ts";
 import {
   PLANS,
   type Feature,
@@ -45,6 +45,12 @@ export type Entitlements = {
   trialEndsAt: Date | null;
   /** True when Stripe is unhappy and the customer should update a card. */
   needsAttention: boolean;
+  /**
+   * Set when access comes from a granted period (a referral reward or a
+   * goodwill grant) rather than from a payment. The account page says so
+   * rather than letting someone believe they are subscribed.
+   */
+  grantedUntil: Date | null;
 };
 
 const FREE: Omit<Entitlements, "features"> & { features: ReadonlySet<Feature> } = {
@@ -58,6 +64,7 @@ const FREE: Omit<Entitlements, "features"> & { features: ReadonlySet<Feature> } 
   cancelAtPeriodEnd: false,
   trialEndsAt: null,
   needsAttention: false,
+  grantedUntil: null,
 };
 
 /** Statuses that grant access while the paid period is still running. */
@@ -89,14 +96,45 @@ export async function resolveEntitlements(
     .from(subscriptions)
     .where(eq(subscriptions.userId, userId))
     .get();
-  if (!row) return { ...FREE };
+
+  // Granted days (referrals, goodwill) are read here rather than written
+  // into the subscription row, so a webhook arriving later cannot wipe
+  // them and a grant cannot be mistaken for a payment. Both paths still
+  // converge on this one function — a page cannot forget the paywall by
+  // forgetting grants either (ADR 0003).
+  const grant = await db
+    .select({ expiresAt: accessGrants.expiresAt, plan: accessGrants.plan })
+    .from(accessGrants)
+    .where(and(eq(accessGrants.userId, userId), gt(accessGrants.expiresAt, now)))
+    .orderBy(desc(accessGrants.expiresAt))
+    .get();
+  const grantedUntil = grant?.expiresAt ?? null;
+
+  if (!row) {
+    if (!grant) return { ...FREE };
+    return {
+      ...FREE,
+      effectivePlan: grant.plan,
+      paid: true,
+      features: new Set(PLANS[grant.plan].features),
+      dailyQuestionLimit: PLANS[grant.plan].dailyQuestionLimit,
+      grantedUntil,
+    };
+  }
 
   const plan = row.plan;
   const status = row.status;
   const withinPeriod =
     row.currentPeriodEnd == null || row.currentPeriodEnd.getTime() > now.getTime();
-  const paid = plan !== "free" && GRANTING.has(status) && withinPeriod;
-  const effectivePlan: PlanId = paid ? plan : "free";
+  const purchased = plan !== "free" && GRANTING.has(status) && withinPeriod;
+  const paid = purchased || grant != null;
+  // A purchase outranks a grant: someone who bought the sprint plan keeps
+  // the sprint plan's features even while a referral grant is running.
+  const effectivePlan: PlanId = purchased
+    ? plan
+    : grant
+      ? grant.plan
+      : "free";
 
   return {
     plan,
@@ -109,6 +147,7 @@ export async function resolveEntitlements(
     cancelAtPeriodEnd: row.cancelAtPeriodEnd,
     trialEndsAt: row.trialEndsAt,
     needsAttention: ATTENTION.has(status),
+    grantedUntil,
   };
 }
 

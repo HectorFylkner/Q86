@@ -29,6 +29,7 @@ const PUBLIC_PREFIXES = [
   "/priser",
   "/diagnos",
   "/guider",
+  "/kort/",
   "/integritetspolicy",
   "/kopvillkor",
   "/angerratt",

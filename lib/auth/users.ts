@@ -44,6 +44,7 @@ export async function createUser(input: {
   locale?: "sv" | "en";
   role?: "user" | "admin";
   emailVerified?: boolean;
+  referredBy?: string | null;
 }): Promise<User> {
   const now = new Date();
   return db
@@ -55,6 +56,7 @@ export async function createUser(input: {
       name: input.name ?? null,
       locale: input.locale ?? "sv",
       role: input.role ?? "user",
+      referredBy: input.referredBy ?? null,
       emailVerifiedAt: input.emailVerified ? now : null,
       createdAt: now,
       updatedAt: now,

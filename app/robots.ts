@@ -15,6 +15,10 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           "/api/",
+          // A shared progress card is for the people it was shared
+          // with; the owner chose an audience, not publication.
+          "/kort/",
+          "/valkommen",
           "/idag",
           "/learn",
           "/drill",

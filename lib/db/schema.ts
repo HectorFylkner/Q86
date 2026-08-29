@@ -41,6 +41,19 @@ export const users = sqliteTable(
     name: text("name"),
     locale: text("locale").$type<"sv" | "en">().notNull().default("sv"),
     role: text("role").$type<"user" | "admin">().notNull().default("user"),
+    /**
+     * The code this account hands out. Generated on first use rather than
+     * at signup, so an account that never opens the referral card never
+     * gets one — and an unused code is not a thing to leak.
+     */
+    referralCode: text("referral_code"),
+    /** The account whose code was used at signup, if any. Never changes. */
+    referredBy: text("referred_by"),
+    /** Opaque token behind a public progress card. Null until asked for,
+     *  and regenerating it revokes every link already shared. */
+    shareCode: text("share_code"),
+    /** When onboarding was completed; null means it has not been. */
+    onboardedAt: integer("onboarded_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -48,7 +61,11 @@ export const users = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (t) => [uniqueIndex("users_email_idx").on(t.email)],
+  (t) => [
+    uniqueIndex("users_email_idx").on(t.email),
+    uniqueIndex("users_referral_code_idx").on(t.referralCode),
+    uniqueIndex("users_share_code_idx").on(t.shareCode),
+  ],
 );
 
 /** One row per signed-in browser. `id` is sha256(raw token). */
@@ -181,6 +198,69 @@ export const stripeEvents = sqliteTable("stripe_events", {
   /** Short note when an event was accepted but deliberately not applied. */
   outcome: text("outcome").notNull().default("applied"),
 });
+
+/**
+ * Access granted outside Stripe: referral days for both sides, and the
+ * occasional goodwill grant when something went wrong.
+ *
+ * A grant is additive and never revokes anything. `resolveEntitlements`
+ * treats an unexpired grant exactly as it treats a paid period, which
+ * keeps the paywall a single function (ADR 0003) instead of two.
+ */
+export const accessGrants = sqliteTable(
+  "access_grants",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    reason: text("reason")
+      .$type<"referral_inviter" | "referral_invitee" | "goodwill">()
+      .notNull(),
+    /** Which plan's features the grant confers. */
+    plan: text("plan").$type<"monthly" | "sprint">().notNull().default("monthly"),
+    days: integer("days").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    /** The account that caused the grant, for referrals. */
+    sourceUserId: text("source_user_id"),
+    /** Free text for a goodwill grant; empty otherwise. */
+    note: text("note").notNull().default(""),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("access_grants_user_idx").on(t.userId),
+    // One referral reward per pair, per side. The unique index is the
+    // enforcement: a retry cannot double-pay a referrer.
+    uniqueIndex("access_grants_pair_idx").on(t.userId, t.reason, t.sourceUserId),
+  ],
+);
+
+/**
+ * Which lifecycle message has already gone to whom, for which window.
+ *
+ * The id is `<userId>:<kind>:<window>`, so idempotency is the primary key
+ * rather than a query: a dispatcher that runs twice in the same week
+ * conflicts on insert and skips. That is the same shape as the Stripe
+ * event ledger, for the same reason.
+ */
+export const emailLog = sqliteTable(
+  "email_log",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    /** Which occurrence this was: an ISO week, a date, or "once". */
+    window: text("window").notNull(),
+    sentAt: integer("sent_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [index("email_log_user_idx").on(t.userId, t.kind)],
+);
 
 export const questions = sqliteTable(
   "questions",

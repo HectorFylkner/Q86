@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Q86 — personal GMAT Focus quant training platform",
+  "description": "Q86 \u2014 personal GMAT Focus quant training platform",
   "engines": {
     "node": ">=22.6"
   },
@@ -22,7 +22,8 @@
     "dev-account": "node --experimental-strip-types scripts/accounts.ts --dev",
     "test:e2e": "playwright test",
     "test:unit": "vitest run",
-    "migrate:multitenant": "node --experimental-strip-types scripts/migrate-multitenant.ts"
+    "migrate:multitenant": "node --experimental-strip-types scripts/migrate-multitenant.ts",
+    "email:lifecycle": "node --experimental-strip-types scripts/lifecycle-emails.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

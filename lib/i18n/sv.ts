@@ -1238,4 +1238,155 @@ export const sv = {
     more: "Läs mer",
     settings: "Cookie-inställningar",
   },
+
+  email: {
+    signOff: "Q86",
+    footer:
+      "Du får det här mejlet för att du har ett Q86-konto. Ändra vad du " +
+      "får under Konto: {settingsUrl}",
+    footerNoOptOut:
+      "Det här är ett transaktionsmejl om ditt konto och går inte att " +
+      "avregistrera sig från.",
+    welcome: {
+      subject: "Välkommen till Q86 — börja med att sätta ett provdatum",
+      body:
+        "Hej{name},\n\n" +
+        "Kontot är klart. Ett råd innan du börjar: sätt ett provdatum, " +
+        "även ett preliminärt. Dagsplanen räknas fram ur hur långt det är " +
+        "kvar, och utan datum blir den en generell rekommendation i " +
+        "stället för ett schema.\n\n" +
+        "Sätt datum och se första veckan: {onboardingUrl}\n\n" +
+        "Tre saker som är värda att veta:\n\n" +
+        "1. Frågorna är på engelska. Undervisningen är på svenska. Så ser " +
+        "provet ut, och att träna på översatta frågor tränar fel sak.\n" +
+        "2. Märk varje miss med en feltyp innan du går vidare. Det tar " +
+        "fem sekunder och är det som gör att planen kan ändra sig.\n" +
+        "3. Gratisnivån räcker längre än du tror: alla 24 kapitel, " +
+        "mönsterträningen och tio frågor om dagen.\n\n" +
+        "Lycka till.",
+    },
+    endingSoon: {
+      subject: "Din tillgång till Q86 tar slut om {days} dagar",
+      body:
+        "Hej{name},\n\n" +
+        "Din {planName} löper ut {date}. Efter det går kontot tillbaka " +
+        "till gratisnivån — all din historik, dina kort och din " +
+        "repetitionskö finns kvar, men tidsatta set, analysen och " +
+        "dagsplanen låses.\n\n" +
+        "Förlänga eller ändra: {accountUrl}\n\n" +
+        "Vill du inte förlänga behöver du inte göra någonting. Inget " +
+        "förnyas automatiskt utan att du valt det.",
+    },
+    streakRecovery: {
+      subject: "Din svit på {streak} dagar bröts i går",
+      body:
+        "Hej{name},\n\n" +
+        "Du tränade {streak} dagar i rad och missade i går. Det är " +
+        "ingenting att skämmas för; det är därför repetitionskön finns.\n\n" +
+        "Om du bara har tio minuter: gör gårdagens missar. De ligger " +
+        "först i kön och är det som ger mest tillbaka.\n\n" +
+        "{queueUrl}\n\n" +
+        "Kommer du inte igång i dag heller: sänk ambitionen till fem " +
+        "frågor. En svit som börjar om är fortfarande en svit.",
+    },
+    weekly: {
+      subject: "Veckan i Q86: {attempts} frågor, {accuracy} rätt",
+      body:
+        "Hej{name},\n\n" +
+        "Så här såg veckan ut:\n\n" +
+        "· {attempts} besvarade frågor\n" +
+        "· {accuracy} rätt\n" +
+        "· {days} träningsdagar av 7\n" +
+        "· {reviewed} repetitioner\n\n" +
+        "{weakestLine}\n\n" +
+        "{testDateLine}\n\n" +
+        "Nästa vecka: {todayUrl}",
+      weakest: "Svagast just nu: {skill}. Planen viktar dit redan.",
+      weakestNone:
+        "Inget område sticker ut den här veckan, vilket brukar betyda att " +
+        "det är dags för ett tidsatt set.",
+      testDate: "Det är {days} dagar kvar till provdatumet.",
+      testDateNone:
+        "Du har inget provdatum satt. Även ett preliminärt gör planen " +
+        "skarpare: {settingsUrl}",
+    },
+    referral: {
+      subject: "{name} började träna med din kod",
+      body:
+        "Hej,\n\n" +
+        "Någon skapade ett konto med din inbjudningskod. Ni får båda " +
+        "{days} dagars full tillgång, och dina dagar är redan tillagda.\n\n" +
+        "{accountUrl}",
+    },
+  },
+
+  onboarding: {
+    title: "Innan du börjar",
+    lede:
+      "Två frågor. Svaren avgör hur dagsplanen ser ut, och du kan ändra " +
+      "båda när som helst under Konto.",
+    dateLabel: "När skriver du provet?",
+    dateHint:
+      "Ett preliminärt datum duger. Planen räknar bakåt från det, och en " +
+      "gissning ger en skarpare plan än inget datum alls.",
+    noDateLabel: "Jag vet inte än",
+    noDateHint:
+      "Då körs planen i sitt jämna läge: ingen upptrappning, inga " +
+      "provlika veckor. Sätt ett datum senare så ritas den om.",
+    cadenceLabel: "Hur ofta vill du göra ett tidsatt set?",
+    cadenceEvery: "Var {days}:e dag",
+    submit: "Visa min första vecka",
+    skip: "Hoppa över",
+    weekTitle: "Din första vecka",
+    weekLede:
+      "Räknad ur dina svar. Den ritas om varje dag när du tränar — det " +
+      "här är utgångsläget, inte ett schema i sten.",
+    start: "Börja med dag 1",
+    daysToTest: "{days} dagar kvar",
+    noTestDate: "Inget provdatum satt",
+  },
+
+  progressCard: {
+    title: "Framstegskort",
+    lede:
+      "En delbar bild med dina siffror. Ingen e-postadress, inget namn " +
+      "och inga enskilda frågor — bara sammanräkningen.",
+    create: "Skapa länk",
+    revoke: "Återkalla länken",
+    revoked: "Länken är återkallad. Gamla länkar fungerar inte längre.",
+    copy: "Kopiera länk",
+    copied: "Kopierad",
+    shareNote:
+      "Vem som helst med länken kan se kortet. Återkalla den när du vill.",
+    streakDays: "dagars svit",
+    questions: "frågor",
+    accuracy: "rätt",
+    chapters: "kapitel lästa",
+    daysToTest: "dagar till provet",
+    heading: "{days} dagars svit",
+    subheading: "Q86 · GMAT Focus Quant",
+    notFound: "Kortet finns inte, eller så har länken återkallats.",
+    ownCta: "Så här ser ditt kort ut för andra.",
+    visitorCta: "Träna kvantdelen med samma verktyg",
+  },
+
+  referral: {
+    title: "Bjud in någon",
+    lede:
+      "Ge bort {days} dagars full tillgång. Du får lika många när någon " +
+      "skapar ett konto med din kod.",
+    yourCode: "Din kod",
+    yourLink: "Din länk",
+    copy: "Kopiera",
+    copied: "Kopierad",
+    count: "{count} personer har använt din kod",
+    countNone: "Ingen har använt din kod än",
+    grantedUntil: "Du har full tillgång till {date} tack vare inbjudningar",
+    fieldLabel: "Inbjudningskod ({optional})",
+    fieldHint: "Har du fått en kod? Ni får båda {days} dagar.",
+    invalid: "Koden känns inte igen. Kontot skapas ändå.",
+    honesty:
+      "Ingen betalning byter händer. Det här ger tid i produkten, inte " +
+      "pengar, och det finns ingen gräns på hur många du kan bjuda in.",
+  },
 } as const;

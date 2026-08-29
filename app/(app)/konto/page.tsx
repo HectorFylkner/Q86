@@ -6,6 +6,15 @@ import { FEATURES, PLANS, type Feature } from "@/lib/billing/pricing";
 import { stripeConfigured, stripeIsLive } from "@/lib/billing/stripe";
 import type { Key } from "@/lib/i18n";
 import { getI18n } from "@/lib/i18n/server";
+import {
+  ProgressCardPanel,
+  ReferralPanel,
+} from "@/components/retention/share-controls";
+import { REFERRAL_DAYS, referralCount } from "@/lib/retention/grants";
+import { currentShareCode } from "@/lib/retention/share";
+import { SITE_ORIGIN } from "@/lib/site";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { formatDate } from "@/lib/i18n/format";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +39,17 @@ export default async function AccountPage({
   const { locale, t } = await getI18n();
   const { las, betalning } = await searchParams;
   const allowance = await dailyAllowance(sdb, entitlements);
+
+  // Read, never mint: an account that has not asked for a referral or a
+  // share code does not get one just by opening this page.
+  const codes = await sdb.q
+    .select({ referral: users.referralCode })
+    .from(users)
+    .where(eq(users.id, user.id))
+    .get();
+  const referralCode = codes?.referral ?? null;
+  const shareCode = await currentShareCode(user.id);
+  const referrals = await referralCount(user.id);
 
   const blocked =
     las && (FEATURES as readonly string[]).includes(las)
@@ -136,6 +156,16 @@ export default async function AccountPage({
           </p>
         )}
       </section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ReferralPanel
+          initialCode={referralCode}
+          count={referrals}
+          days={REFERRAL_DAYS}
+          origin={SITE_ORIGIN}
+        />
+        <ProgressCardPanel initialCode={shareCode} origin={SITE_ORIGIN} />
+      </div>
 
       <section className="rounded-card border border-grid bg-surface p-5 shadow-ambient">
         <h2 className="font-display text-sm font-semibold">

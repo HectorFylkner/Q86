@@ -22,6 +22,14 @@ const SIGN_UP = /^(Skapa konto|Create account)$/;
 const SIGN_IN = /^(Logga in|Sign in)$/;
 const SIGN_OUT = /^(Logga ut|Sign out)$/;
 
+/**
+ * Sign up and land in the application.
+ *
+ * A real signup goes to onboarding first (M5), which every test but the
+ * onboarding spec wants to skip — so this helper follows that redirect and
+ * then walks on to the dashboard, which is where the rest of the suite
+ * expects to start.
+ */
 export async function signUp(
   page: Page,
   email: string,
@@ -31,7 +39,21 @@ export async function signUp(
   await page.getByLabel(EMAIL_FIELD).fill(email);
   await page.getByLabel(PASSWORD_FIELD).fill(password);
   await page.getByRole("button", { name: SIGN_UP }).click();
-  await page.waitForURL("/idag");
+  await page.waitForURL("/valkommen");
+  await page.goto("/idag");
+}
+
+/** Sign up and stop at onboarding, for the tests that are about it. */
+export async function signUpToOnboarding(
+  page: Page,
+  email: string,
+  password = TEST_PASSWORD,
+): Promise<void> {
+  await page.goto("/signup");
+  await page.getByLabel(EMAIL_FIELD).fill(email);
+  await page.getByLabel(PASSWORD_FIELD).fill(password);
+  await page.getByRole("button", { name: SIGN_UP }).click();
+  await page.waitForURL("/valkommen");
 }
 
 export async function signIn(

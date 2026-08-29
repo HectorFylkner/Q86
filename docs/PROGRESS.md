@@ -12,6 +12,20 @@ unverified.
 
 ## Current milestone
 
+**M5 — Retention.** Complete. Onboarding takes a test date and a
+timed-set cadence and shows the first week the real planner produces.
+Four Swedish lifecycle messages (welcome, access ending, streak recovery,
+weekly progress) go out through a dispatcher whose idempotency is a
+primary key. A progress card is shareable behind a rotatable token and
+carries no identifying data. Referral codes grant 14 days to both sides
+through `access_grants`, read by the same entitlement function as a
+purchase.
+
+Nothing in this build sends live mail: with no `RESEND_API_KEY` every
+message is written to the log instead, which is how the tests observe it.
+
+### Previously
+
 **M4 — Public site and acquisition funnel.** Complete. The application
 moved out of the root: `/` is now the Swedish landing page and the
 dashboard lives at `/idag`. The public surface is the landing page,
@@ -42,7 +56,7 @@ runbook in `docs/BILLING.md` rather than claimed as verified.
 | M2 | Billing and entitlements | ✅ done (see the Stripe caveat) | see git log |
 | M3 | Swedish localization | ✅ done | see git log |
 | M4 | Public site and acquisition funnel | ✅ done | see git log |
-| M5 | Retention | ⬜ not started | — |
+| M5 | Retention | ✅ done | see git log |
 | M6 | Operations | ⬜ not started | — |
 | M7 | Marketing kit | ⬜ not started | — |
 
@@ -80,6 +94,12 @@ Commands run in this session and what they printed.
 | `pnpm test` (vitest) | **118 passed**, 9 files, 0 failed | M4 |
 | `pnpm build` | `✓ Compiled successfully in 18.7s`; 4 guide pages prerendered, sitemap/robots/OG card static | M4 |
 | `npx playwright test` | **27 passed**, 0 failed, 37.6s | M4 |
+| `npx tsc --noEmit` | exit 0, no output | M5 |
+| `pnpm lint` | exit 0 — **0 errors**, 25 warnings (all pre-existing) | M5 |
+| `pnpm test` (vitest) | **141 passed**, 11 files, 0 failed | M5 |
+| `pnpm build` | `✓ Compiled successfully in 13.4s` | M5 |
+| `npx playwright test` | **31 passed**, 0 failed, 45.8s | M5 |
+| `npx drizzle-kit generate --name retention` | produced an additive 0004 (4 nullable columns, 2 tables); kept as generated | M5 |
 
 ## Known broken
 
@@ -142,6 +162,17 @@ browser. The seven-step procedure to close the gap is in
   - `bootstrap-upgrade.test.ts` (M2) — a `db:push` database from before
     accounts existed, booted by today's code: it adopts a migration
     ledger, catches up, and keeps its history.
+  - `retention.test.ts` (M5) — referral codes mint once and resolve
+    case-insensitively; a payout cannot happen twice or to oneself and
+    stacks onto the end of an existing grant; a grant unlocks paid
+    features through `resolveEntitlements` and stops the moment it
+    expires; the progress card contains no identifying field and revoking
+    breaks an already-shared link; the dispatcher welcomes once, digests
+    once per ISO week, warns only about a window that will actually
+    close, and mourns only a streak that existed.
+  - `migration-retention.test.ts` (M5) — 0004 applied to a populated
+    pre-M5 database: rows preserved, new columns null, new tables empty,
+    two accounts able to share a null code, no FK violations.
   - `diagnostic.test.ts` (M4) — the diagnostic set is balanced, stable
     and stripped of the answer key; the band is an interval; the weakest
     skill is named from the answers; the plan preview is seven days from
@@ -268,6 +299,35 @@ browser. The seven-step procedure to close the gap is in
   opening a `.tsx` file. The company details are a stated placeholder
   rather than an invented company.
 
+## Decisions taken during M5 that change the product
+
+- **Signup now lands on onboarding, not the dashboard.** `/valkommen` asks
+  two questions — a test date and a timed-set cadence — and then shows the
+  week those answers produce, computed by the same `computeDailyPlan` the
+  dashboard runs. It can be skipped in one click.
+- **Access can come from a grant as well as a purchase.**
+  `access_grants` is additive and is never written by Stripe, so a webhook
+  cannot wipe a referral reward and a grant cannot be mistaken for a
+  payment. `resolveEntitlements` returns `grantedUntil` beside `paid`, and
+  a purchase outranks a grant when both are live.
+- **A referral pays 14 days to each side, once, enforced by an index.**
+  The unique key is `(user_id, reason, source_user_id)`, so a retry or a
+  double submit cannot pay twice; self-referral is refused. Codes and
+  share tokens are minted on first request rather than at signup.
+- **Lifecycle mail claims its window before it sends.** Every message
+  writes `<userId>:<kind>:<window>` into `email_log` first, so the
+  dispatcher is safe to run hourly, twice, or replayed. Losing a message
+  to a delivery failure after the claim is the deliberate trade: a missing
+  weekly digest is invisible, a duplicate is not.
+- **The progress card publishes totals and nothing else.** Streak,
+  question count, accuracy, chapters passed. No email, no name, no
+  question, no answer, and the weakest subtopic is deliberately left off
+  because the card gets shared into group chats. Revoking rotates the
+  token and breaks every link already posted; card pages are `noindex`.
+- **`REFERRAL_DAYS` lives in `lib/retention/terms.ts`**, a module with no
+  imports, because the signup form needs the number and `grants.ts`
+  reaches `node:crypto` and the database.
+
 ## Baseline facts established by reading the code
 
 - 11 tables in `lib/db/schema.ts`; none carries an owner column.
@@ -301,8 +361,14 @@ are the items only the owner can provide, collected as they arise:
   before live keys are used.
 - **A domain**, and a decision on whether the app and the marketing site
   share it.
-- **An email-sending domain** with SPF, DKIM and DMARC, plus an account at
-  whichever provider M5 targets.
+- **An email-sending domain** with SPF, DKIM and DMARC, plus a Resend
+  account: `RESEND_API_KEY` and `EMAIL_FROM` (a verified sender on that
+  domain). Until both are set, every lifecycle message is written to the
+  log instead of delivered — no build in this repository has ever sent
+  mail. `lib/email/transport.ts` is the only file that would change for a
+  different provider.
+- **A scheduler for `pnpm email:lifecycle`**, once an hour. It is safe to
+  run more often; every send is claimed by a primary key first.
 - **A human review of the legal pages** (integritetspolicy, köpvillkor,
   ångerrätt) before launch. They are written to be correct and specific,
   not to substitute for advice, and they live as Markdown in

@@ -16,6 +16,12 @@ import {
   setPassword,
 } from "./users.ts";
 import { isEmailShaped, normaliseEmail } from "./tokens.ts";
+import {
+  payReferral,
+  REFERRAL_DAYS,
+  userByReferralCode,
+} from "../retention/grants.ts";
+import { sendReferralNotice } from "../retention/lifecycle.ts";
 
 /**
  * The credential flows. Every one of them returns a machine-readable error
@@ -29,6 +35,8 @@ const OK: AuthResult = { error: null };
 
 /** Where a signed-in user lands. Kept here so every flow agrees. */
 const AFTER_SIGN_IN = "/idag";
+/** Where a brand-new account lands: onboarding, once. */
+const AFTER_SIGN_UP = "/valkommen";
 
 export async function signUpAction(
   _previous: AuthResult,
@@ -50,6 +58,11 @@ export async function signUpAction(
     return { error: "email_taken" };
   }
 
+  // An invite code is optional and never blocks the signup: a typo costs
+  // the referrer their days, not the new account its existence.
+  const code = String(form.get("referral") ?? "").trim();
+  const inviter = code.length > 0 ? await userByReferralCode(code) : null;
+
   const user = await createUser({
     email,
     password,
@@ -57,9 +70,21 @@ export async function signUpAction(
     // Whatever language they filled this form in is the language they
     // want the product in; the toggle on the form set the cookie.
     locale: await getLocale(),
+    referredBy: inviter?.id ?? null,
   });
+
+  if (inviter) {
+    await payReferral(inviter.id, user.id);
+    // Best effort: a mail failure must not undo an account that exists.
+    await sendReferralNotice(
+      inviter.id,
+      name.length > 0 ? name : email.split("@")[0],
+      REFERRAL_DAYS,
+    ).catch(() => undefined);
+  }
+
   await startSession(user.id);
-  redirect(AFTER_SIGN_IN);
+  redirect(AFTER_SIGN_UP);
 }
 
 export async function signInAction(
