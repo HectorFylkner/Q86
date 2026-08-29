@@ -12,6 +12,17 @@ unverified.
 
 ## Current milestone
 
+**M6 — Operations.** Complete. Every call to the three endpoints that
+spend money is metered with the provider's own token counts and refused
+at four thresholds; `/admin` shows what the deployment is configured to
+do, what it has cost this month, every account's state and the open
+question flags; errors report through one dependency-free seam; page
+counting is cookieless and therefore unaffected by the banner; backup has
+a matching restore with real guards; and CI runs lint, typecheck, tests,
+the bank verifier and Playwright on every push.
+
+### Previously
+
 **M5 — Retention.** Complete. Onboarding takes a test date and a
 timed-set cadence and shows the first week the real planner produces.
 Four Swedish lifecycle messages (welcome, access ending, streak recovery,
@@ -57,7 +68,7 @@ runbook in `docs/BILLING.md` rather than claimed as verified.
 | M3 | Swedish localization | ✅ done | see git log |
 | M4 | Public site and acquisition funnel | ✅ done | see git log |
 | M5 | Retention | ✅ done | see git log |
-| M6 | Operations | ⬜ not started | — |
+| M6 | Operations | ✅ done | see git log |
 | M7 | Marketing kit | ⬜ not started | — |
 
 ---
@@ -99,6 +110,13 @@ Commands run in this session and what they printed.
 | `pnpm test` (vitest) | **141 passed**, 11 files, 0 failed | M5 |
 | `pnpm build` | `✓ Compiled successfully in 13.4s` | M5 |
 | `npx playwright test` | **31 passed**, 0 failed, 45.8s | M5 |
+| `npx tsc --noEmit` | exit 0, no output | M6 |
+| `pnpm lint` | exit 0 — **0 errors**, 25 warnings (all pre-existing) | M6 |
+| `pnpm test` (vitest) | **158 passed**, 12 files, 0 failed | M6 |
+| `pnpm build` | `✓ Compiled successfully in 13.8s` | M6 |
+| `npx playwright test` | **35 passed**, 0 failed, 47.8s | M6 |
+| `pnpm verify-bank` | `360 questions`, `All bank questions pass mechanical verification`, exit 0 | M6 |
+| `pnpm restore <864 kB backup>` | `21 table(s)`, `users: 22`, `attempts: 4`, `questions: 360`; refused a second run without `--force`; moved the old file aside with it | M6 |
 | `npx drizzle-kit generate --name retention` | produced an additive 0004 (4 nullable columns, 2 tables); kept as generated | M5 |
 
 ## Known broken
@@ -162,6 +180,12 @@ browser. The seven-step procedure to close the gap is in
   - `bootstrap-upgrade.test.ts` (M2) — a `db:push` database from before
     accounts existed, booted by today's code: it adopts a migration
     ledger, catches up, and keeps its history.
+  - `ops.test.ts` (M6) — cost arithmetic rounds up so a cap cannot
+    under-count; rate limits are per account and per route; a failed call
+    is still metered; the per-account and global caps both trip; last
+    month does not count against this one; every route reaching
+    `getModel()` both refuses and meters; the page counter covers the
+    public site only and stores no identifying column.
   - `retention.test.ts` (M5) — referral codes mint once and resolve
     case-insensitively; a payout cannot happen twice or to oneself and
     stacks onto the end of an existing grant; a grant unlocks paid
@@ -328,6 +352,36 @@ browser. The seven-step procedure to close the gap is in
   imports, because the signup form needs the number and `grants.ts`
   reaches `node:crypto` and the database.
 
+## Decisions taken during M6 that change the product
+
+- **The three AI endpoints now refuse before they spend.** Four
+  thresholds in order: calls per hour, calls per day, monthly cost per
+  account (default 50 kr), monthly cost across the whole service (default
+  2 000 kr). A refusal is a `429` with a machine-readable reason that the
+  interface turns into a sentence in the reader's language.
+- **A failed call is metered too**, because it reached the provider and
+  was billed. A meter that counted only successes would under-report
+  exactly when something is going wrong.
+- **`PipelineResult` gained a `usage` field** so `/api/generate` meters
+  honestly rather than estimating. Additive — nothing in the authoring
+  gate reads it — but it is a change to the exam-critical path and is
+  called out in ADR 0007 for that reason.
+- **Page counting stores no identifier at all.** No account id, no
+  session, no IP, no hash of an IP; nothing read from or written to the
+  visitor's device. That is why it needs no consent and keeps working
+  when someone declines the banner, and it is stated in the privacy
+  policy rather than assumed. The cost is real: it cannot tell a
+  returning visitor from a new one.
+- **`/admin` is gated by role, not by plan.** `requireFeature` is the
+  wrong check for an operator surface; the structural test now has an
+  explicit admin list so "no requireFeature" cannot smuggle an ungated
+  page past it.
+- **`pnpm restore` exists and refuses to be careless**: it verifies the
+  backup before touching the live file, rejects a file with no tables (an
+  empty file passes `integrity_check`, which the script's own testing
+  exposed), prints the counts it found, and moves the existing database
+  aside rather than deleting it.
+
 ## Baseline facts established by reading the code
 
 - 11 tables in `lib/db/schema.ts`; none carries an owner column.
@@ -367,6 +421,12 @@ are the items only the owner can provide, collected as they arise:
   log instead of delivered — no build in this repository has ever sent
   mail. `lib/email/transport.ts` is the only file that would change for a
   different provider.
+- **A Sentry DSN** (`SENTRY_DSN`) if errors should go anywhere but the
+  log. Without it nothing leaves the machine.
+- **A decision on the AI caps.** `AI_USER_MONTHLY_CAP_ORE` (50 kr) and
+  `AI_GLOBAL_MONTHLY_CAP_ORE` (2 000 kr) are defaults chosen to be
+  generous for a real user and ruinous for a script; they are the
+  emergency brake and should be set deliberately before launch.
 - **A scheduler for `pnpm email:lifecycle`**, once an hour. It is safe to
   run more often; every send is claimed by a primary key first.
 - **A human review of the legal pages** (integritetspolicy, köpvillkor,

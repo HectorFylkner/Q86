@@ -6,6 +6,7 @@ import { saveBaselineReport } from "@/lib/actions";
 import type { ParsedReport } from "@/lib/ai/schemas";
 import { useT } from "@/components/i18n-provider";
 import type { Key } from "@/lib/i18n";
+import { limitMessage } from "@/lib/ops/limit-message";
 import { contextLabel, domainLabel, skillLabel } from "@/lib/i18n/labels";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +43,10 @@ export function ImportClient() {
       const body = (await res.json()) as {
         parsed?: ParsedReport;
         error?: string;
+        reason?: string;
       };
+      const limited = limitMessage(t, body);
+      if (limited) throw new Error(limited);
       if (!res.ok || !body.parsed) {
         throw new Error(body.error ?? `Parsing failed (${res.status}).`);
       }

@@ -262,6 +262,67 @@ export const emailLog = sqliteTable(
   (t) => [index("email_log_user_idx").on(t.userId, t.kind)],
 );
 
+/**
+ * Metered use of the endpoints that cost money.
+ *
+ * One row per call, with the tokens the provider reported and the cost
+ * those tokens imply in öre. Keeping the raw numbers rather than a running
+ * total means a price change is a re-read, not a lost history, and an
+ * operator can answer "what did last month actually cost" without
+ * reconciling against an invoice.
+ *
+ * `user_id` has no foreign key on purpose: a deleted account must not take
+ * the operator's spend record with it, and the row is a cost record rather
+ * than user content.
+ */
+export const apiUsage = sqliteTable(
+  "api_usage",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id").notNull(),
+    /** "generate" | "coach" | "parse-report" — the route, not the path. */
+    route: text("route").notNull(),
+    /** YYYY-MM in UTC, so a month's spend is one indexed lookup. */
+    month: text("month").notNull(),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    /** What the call cost, in öre, at the prices in lib/ops/costs.ts. */
+    costOre: integer("cost_ore").notNull().default(0),
+    /** False when the call failed; still metered, because a failed call
+     *  that reached the provider was still billed. */
+    ok: integer("ok", { mode: "boolean" }).notNull().default(true),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("api_usage_month_idx").on(t.userId, t.month),
+    index("api_usage_recent_idx").on(t.userId, t.createdAt),
+  ],
+);
+
+/**
+ * Cookieless, aggregate page counts.
+ *
+ * One row per path per day, incremented server-side. It holds no
+ * identifier of any kind — no user id, no IP, no session, no device — so
+ * it is not personal data and nothing is read from or written to the
+ * visitor's device. That is what lets it keep working when someone
+ * declines the cookie banner, and it is stated in the privacy policy
+ * rather than assumed.
+ */
+export const pageViews = sqliteTable(
+  "page_views",
+  {
+    /** `<day>:<path>`, so an increment is one upsert with no read. */
+    id: text("id").primaryKey(),
+    day: text("day").notNull(),
+    path: text("path").notNull(),
+    views: integer("views").notNull().default(0),
+  },
+  (t) => [index("page_views_day_idx").on(t.day)],
+);
+
 export const questions = sqliteTable(
   "questions",
   {

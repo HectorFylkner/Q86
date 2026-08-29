@@ -63,6 +63,16 @@ const RAW_DB_ALLOWLIST = [
   "lib/retention/activity.ts",
   "lib/retention/lifecycle.ts",
   "lib/retention/onboarding.ts",
+  // Operations. All three are cross-tenant by definition:
+  //   admin.ts is the operator surface's reader — the page above it
+  //     gates on requireAdmin(), which paywall-structure.test.ts checks;
+  //   budget.ts meters and caps spend per account and across the whole
+  //     service, and is called from route handlers before any session
+  //     scoping would help;
+  //   analytics.ts counts paths with no account attached at all.
+  "lib/ops/admin.ts",
+  "lib/ops/budget.ts",
+  "lib/ops/analytics.ts",
 ];
 
 /** Identifiers of the ten user-owned tables, as imported in application code. */
@@ -194,6 +204,10 @@ describe("tenancy choke point", () => {
       // another.
       access_grants: "granted access, written outside a request",
       email_log: "lifecycle send ledger",
+      // Operations: a cost record, not user content. Its user_id has no
+      // foreign key on purpose — deleting an account must not delete the
+      // operator's record of what that account cost.
+      api_usage: "metered spend, no foreign key",
     } as const;
     for (const table of Object.keys(NOT_USER_CONTENT)) declared.delete(table);
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { generateObject } from "ai";
+import { recordUsage, refuseIfOverBudget } from "@/lib/ops/guard";
+import { generateObject, type LanguageModelUsage } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { NotAuthenticatedError, requireScoped } from "@/lib/auth/session";
@@ -76,9 +77,15 @@ export async function POST(request: Request) {
       ? (question.trapMap?.[String(attempt.selectedIndex)] ?? null)
       : null;
 
+  // Rate and cost guard before the call, never after: the point is to
+  // avoid spending, not to record having spent.
+  const refusal = await refuseIfOverBudget(sdb.userId, "coach");
+  if (refusal) return refusal;
+
   let coach;
+  let usage: LanguageModelUsage | undefined;
   try {
-    const { object } = await withRetry(async () =>
+    const { object, usage: reported } = await withRetry(async () =>
       generateObject({
         model: await getModel(),
         temperature: 0.2,
@@ -112,7 +119,13 @@ export async function POST(request: Request) {
       }),
     );
     coach = object;
+    usage = reported;
+    await recordUsage(sdb.userId, "coach", usage, true);
   } catch (e) {
+    // A failed call still reached the provider and was still billed, so
+    // it is still metered — a meter that only counted successes would
+    // under-report exactly when something is going wrong.
+    await recordUsage(sdb.userId, "coach", usage, false);
     const message = e instanceof Error ? e.message : "The coach call failed.";
     return NextResponse.json(
       { error: `Post-mortem failed after retries: ${message}` },

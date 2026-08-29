@@ -1389,4 +1389,56 @@ export const sv = {
       "Ingen betalning byter händer. Det här ger tid i produkten, inte " +
       "pengar, och det finns ingen gräns på hur många du kan bjuda in.",
   },
+
+  admin: {
+    title: "Drift",
+    lede:
+      "Vad den här installationen är konfigurerad att göra, vad den har " +
+      "kostat den här månaden, vilka konton som finns, och vad som väntar " +
+      "på granskning.",
+    configTitle: "Konfiguration",
+    countsTitle: "Läget",
+    accounts: "konton",
+    paid: "betalande",
+    granted: "med tilldelad tid",
+    openFlags: "öppna flaggor",
+    bankVerified: "verifierade frågor",
+    bankRetired: "pensionerade frågor",
+    emailsWeek: "mejl senaste veckan",
+    spendTitle: "AI-kostnad {month}",
+    spendOf: "{spent} av taket {cap}",
+    route: "Slutpunkt",
+    calls: "Anrop",
+    failed: "Fel",
+    cost: "Kostnad",
+    accountsTitle: "Konton",
+    account: "Konto",
+    created: "Skapat",
+    plan: "Plan",
+    until: "Till",
+    attempts: "Försök",
+    viaGrant: "tilldelad tid",
+    viewsTitle: "Sidvisningar, 30 dagar",
+    viewsNote:
+      "Aggregerad räkning utan cookies: ingen identifierare sparas, " +
+      "ingenting läses från besökarens enhet, och siffran påverkas därför " +
+      "inte av cookie-samtycket.",
+    viewsEmpty: "Inga visningar registrerade än.",
+  },
+
+  limits: {
+    rate_hour:
+      "Du har använt den här funktionen många gånger den senaste timmen. " +
+      "Försök igen om en stund.",
+    rate_day:
+      "Dagens gräns för den här funktionen är nådd. Den återställs i " +
+      "morgon.",
+    user_cap:
+      "Månadens tak för AI-funktioner är nått på det här kontot. Det " +
+      "återställs vid månadsskiftet.",
+    global_cap:
+      "AI-funktionerna är tillfälligt pausade för hela tjänsten. Det är " +
+      "ett kostnadstak, inte ett fel — resten av plattformen fungerar som " +
+      "vanligt.",
+  },
 } as const;

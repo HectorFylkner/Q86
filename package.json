@@ -23,7 +23,9 @@
     "test:e2e": "playwright test",
     "test:unit": "vitest run",
     "migrate:multitenant": "node --experimental-strip-types scripts/migrate-multitenant.ts",
-    "email:lifecycle": "node --experimental-strip-types scripts/lifecycle-emails.ts"
+    "email:lifecycle": "node --experimental-strip-types scripts/lifecycle-emails.ts",
+    "restore": "node --experimental-strip-types scripts/restore.ts",
+    "verify-bank": "node --experimental-strip-types scripts/verify-bank.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

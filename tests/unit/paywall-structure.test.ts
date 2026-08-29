@@ -32,6 +32,15 @@ const PUBLIC_PAGE_PREFIX = "app/(marketing)/";
  */
 const MIXED_PAGES = ["app/(app)/idag/page.tsx", "app/(app)/konto/page.tsx"];
 
+/**
+ * Pages gated by role rather than by plan. `requireFeature` is the wrong
+ * gate for an operator surface: an admin's entitlements are irrelevant,
+ * and the page reads across every account, so the check has to be
+ * `requireAdmin()`. It is listed here so that "no requireFeature" cannot
+ * become a way to smuggle an ungated page past the rule.
+ */
+const ADMIN_PAGES = ["app/(app)/admin/page.tsx"];
+
 /** Routes that authenticate by something other than a session cookie. */
 const PUBLIC_ROUTES = [
   "app/api/auth/google/route.ts",
@@ -65,13 +74,32 @@ function filesUnder(dir: string, match: RegExp): string[] {
 const read = (file: string): string =>
   fs.readFileSync(path.join(ROOT, file), "utf8");
 
+/**
+ * The file with its comments removed.
+ *
+ * Every guard rule below asks whether a call is present, and a doc comment
+ * naming the guard satisfies a substring search just as well as the call
+ * does — which makes the rule pass on a page that no longer gates. Found
+ * by deleting a real gate and watching the test stay green.
+ */
+const codeOf = (file: string): string =>
+  read(file)
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/.*$/gm, "");
+
 describe("paywall coverage", () => {
   it("gates every page, or lists it as public or mixed on purpose", () => {
     const ungated: string[] = [];
     for (const page of filesUnder("app", /^page\.tsx$/)) {
       if (PUBLIC_PAGES.includes(page)) continue;
       if (page.startsWith(PUBLIC_PAGE_PREFIX)) continue;
-      const source = read(page);
+      const source = codeOf(page);
+      if (ADMIN_PAGES.includes(page)) {
+        if (!source.includes("requireAdmin(")) {
+          ungated.push(`${page} (listed as admin, but never checks the role)`);
+        }
+        continue;
+      }
       if (MIXED_PAGES.includes(page)) {
         if (!source.includes("withEntitlements(")) {
           ungated.push(`${page} (mixed, but never resolves entitlements)`);
@@ -89,14 +117,19 @@ describe("paywall coverage", () => {
     const open: string[] = [];
     for (const route of filesUnder("app", /^route\.ts$/)) {
       if (PUBLIC_ROUTES.includes(route)) continue;
-      const source = read(route);
+      const source = codeOf(route);
       if (!GUARDS.some((guard) => source.includes(guard))) open.push(route);
     }
     expect(open).toEqual([]);
   });
 
   it("keeps the public and mixed lists honest — no stale entries", () => {
-    for (const file of [...PUBLIC_PAGES, ...MIXED_PAGES, ...PUBLIC_ROUTES]) {
+    for (const file of [
+      ...PUBLIC_PAGES,
+      ...MIXED_PAGES,
+      ...ADMIN_PAGES,
+      ...PUBLIC_ROUTES,
+    ]) {
       expect({ file, exists: fs.existsSync(path.join(ROOT, file)) }).toEqual({
         file,
         exists: true,
@@ -192,7 +225,7 @@ describe("paywall coverage", () => {
       "flagQuestion",
       "resolveFlag", // admin-gated instead
     ];
-    const source = read("lib/actions.ts");
+    const source = codeOf("lib/actions.ts");
     const exported = [
       ...source.matchAll(/export async function (\w+)/g),
     ].map((m) => m[1]);

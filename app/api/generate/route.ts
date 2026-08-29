@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordUsage, refuseIfOverBudget } from "@/lib/ops/guard";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { NotAuthenticatedError, requireAdmin } from "@/lib/auth/session";
@@ -119,8 +120,9 @@ export async function POST(request: Request) {
   // this endpoint extends the bank for everyone. ADR 0001 §2 keeps the bank
   // global and unforked, which makes generation an operator action: a
   // subscriber can flag a question, but cannot add one.
+  let admin;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch (e) {
     if (e instanceof NotAuthenticatedError) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
@@ -177,6 +179,11 @@ export async function POST(request: Request) {
     specs = buildSpecs(body, body.count ?? 10);
   }
 
+  // Even an admin endpoint gets the guard: a runaway batch loop spends
+  // the operator's money faster than a subscriber ever could.
+  const refusal = await refuseIfOverBudget(admin.id, "generate");
+  if (refusal) return refusal;
+
   // Isolate item failures: one thrown pipeline task must not abort the
   // batch while sibling workers keep inserting.
   const results: PipelineResult[] = await runPool(
@@ -187,6 +194,9 @@ export async function POST(request: Request) {
         return {
           ok: false,
           attemptsUsed: 0,
+          // The call threw before any usage came back, so nothing is
+          // known to have been billed for this spec.
+          usage: { inputTokens: 0, outputTokens: 0 },
           failures: [
             `API error after retries: ${e instanceof Error ? e.message : String(e)}`,
           ],
@@ -194,6 +204,23 @@ export async function POST(request: Request) {
       }
     }),
     3,
+  );
+
+  // One meter row for the batch, summed across every spec including the
+  // ones that failed verification — a discarded candidate was generated
+  // and billed like any other.
+  const spent = results.reduce(
+    (total, r) => ({
+      inputTokens: total.inputTokens + r.usage.inputTokens,
+      outputTokens: total.outputTokens + r.usage.outputTokens,
+    }),
+    { inputTokens: 0, outputTokens: 0 },
+  );
+  await recordUsage(
+    admin.id,
+    "generate",
+    spent,
+    results.some((r) => r.ok),
   );
 
   const verified = results.filter((r) => r.ok);

@@ -17,6 +17,7 @@ import {
 } from "@/lib/taxonomy";
 import { useT } from "@/components/i18n-provider";
 import type { Key } from "@/lib/i18n";
+import { limitMessage } from "@/lib/ops/limit-message";
 import {
   confidenceLabel,
   contextLabel,
@@ -97,7 +98,12 @@ export function PostmortemClient({
       const body = (await res.json()) as {
         coach?: CoachResponse;
         error?: string;
+        reason?: string;
       };
+      // A rate limit or a cost cap is not a fault; it gets its own
+      // sentence, in the reader's language, rather than a raw error.
+      const limited = limitMessage(t, body);
+      if (limited) throw new Error(limited);
       if (!res.ok || !body.coach) {
         throw new Error(body.error ?? `Coach failed with status ${res.status}.`);
       }

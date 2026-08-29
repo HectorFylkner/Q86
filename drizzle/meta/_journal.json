@@ -36,6 +36,13 @@
       "when": 1787961875673,
       "tag": "0004_retention",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1787963528056,
+      "tag": "0005_operations",
+      "breakpoints": true
     }
   ]
 }

@@ -17,15 +17,27 @@ const GENERATOR_TEMPERATURE = 0.7;
 /** §8.2: mismatch → regenerate (max 2 retries), else discard. */
 const MAX_GENERATION_ATTEMPTS = 3;
 
+/**
+ * What the generation calls in one pipeline run cost, summed across
+ * attempts and retries.
+ *
+ * Reported so `/api/generate` can meter honestly rather than estimate.
+ * Additive: nothing in the authoring gate reads it, and a caller that
+ * ignores it behaves exactly as before.
+ */
+export type PipelineUsage = { inputTokens: number; outputTokens: number };
+
 export type PipelineSuccess = {
   ok: true;
   question: Question;
   attemptsUsed: number;
+  usage: PipelineUsage;
 };
 export type PipelineFailure = {
   ok: false;
   attemptsUsed: number;
   failures: string[];
+  usage: PipelineUsage;
 };
 export type PipelineResult = PipelineSuccess | PipelineFailure;
 
@@ -81,6 +93,9 @@ export async function createVerifiedQuestion(
   model?: LanguageModel,
 ): Promise<PipelineResult> {
   const failures: string[] = [];
+  // Accumulated across every attempt, including the ones that failed —
+  // a discarded candidate was still generated and still billed.
+  const spent: PipelineUsage = { inputTokens: 0, outputTokens: 0 };
 
   let twinSource: Question | null = null;
   if (opts.twinOf != null) {
@@ -95,6 +110,7 @@ export async function createVerifiedQuestion(
         ok: false,
         attemptsUsed: 0,
         failures: [`twin source question ${opts.twinOf} not found`],
+        usage: { inputTokens: 0, outputTokens: 0 },
       };
     }
   }
@@ -108,7 +124,7 @@ export async function createVerifiedQuestion(
         })
       : generatorUser(spec);
 
-    const { object: raw } = await withRetry(async () =>
+    const { object: raw, usage } = await withRetry(async () =>
       generateObject({
         model: model ?? (await getModel()),
         temperature: GENERATOR_TEMPERATURE,
@@ -127,6 +143,9 @@ export async function createVerifiedQuestion(
         ],
       }),
     );
+
+    spent.inputTokens += usage?.inputTokens ?? 0;
+    spent.outputTokens += usage?.outputTokens ?? 0;
 
     const processed = postProcess(raw, spec);
     if (typeof processed === "string") {
@@ -173,12 +192,13 @@ export async function createVerifiedQuestion(
       .returning()
       .get();
 
-    return { ok: true, question, attemptsUsed: attempt };
+    return { ok: true, question, attemptsUsed: attempt, usage: spent };
   }
 
   return {
     ok: false,
     attemptsUsed: MAX_GENERATION_ATTEMPTS,
     failures,
+    usage: spent,
   };
 }

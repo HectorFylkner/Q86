@@ -13,6 +13,7 @@ and they are amended (never silently contradicted) when reality disagrees.
 | [0004](0004-internationalization.md) | Localization approach and the exam-fidelity boundary | Accepted (revised in M3) |
 | [0005](0005-public-site-and-routing.md) | The public site, the route split, and where the application lives | Accepted |
 | [0006](0006-retention-and-outbound-mail.md) | Granted access, outbound mail, and what a shared card contains | Accepted |
+| [0007](0007-operations.md) | Cost caps, error reporting, and analytics that survive a refusal | Accepted |
 
 ## Format
 

@@ -1381,4 +1381,55 @@ export const en: Widen<typeof sv> = {
       "No money changes hands. This gives time in the product, not cash, " +
       "and there is no limit on how many people you can invite.",
   },
+
+  admin: {
+    title: "Operations",
+    lede:
+      "What this deployment is configured to do, what it has cost this " +
+      "month, which accounts exist, and what is waiting for triage.",
+    configTitle: "Configuration",
+    countsTitle: "State",
+    accounts: "accounts",
+    paid: "paying",
+    granted: "on granted time",
+    openFlags: "open flags",
+    bankVerified: "verified questions",
+    bankRetired: "retired questions",
+    emailsWeek: "emails in the last week",
+    spendTitle: "AI spend {month}",
+    spendOf: "{spent} of a {cap} cap",
+    route: "Endpoint",
+    calls: "Calls",
+    failed: "Failed",
+    cost: "Cost",
+    accountsTitle: "Accounts",
+    account: "Account",
+    created: "Created",
+    plan: "Plan",
+    until: "Until",
+    attempts: "Attempts",
+    viaGrant: "granted time",
+    viewsTitle: "Page views, 30 days",
+    viewsNote:
+      "Cookieless aggregate counting: no identifier is stored, nothing is " +
+      "read from the visitor's device, and the number is therefore " +
+      "unaffected by the cookie banner.",
+    viewsEmpty: "No views recorded yet.",
+  },
+
+  limits: {
+    rate_hour:
+      "You have used this feature many times in the last hour. Try again " +
+      "shortly.",
+    rate_day:
+      "Today's limit for this feature has been reached. It resets " +
+      "tomorrow.",
+    user_cap:
+      "This account has reached its monthly cap for AI features. It " +
+      "resets at the start of the month.",
+    global_cap:
+      "AI features are temporarily paused across the service. That is a " +
+      "cost cap, not a fault \u2014 the rest of the platform works as " +
+      "usual.",
+  },
 };

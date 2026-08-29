@@ -56,10 +56,23 @@ function isPublic(pathname: string): boolean {
   );
 }
 
+/**
+ * A server component cannot see its own pathname, so the middleware puts
+ * it on the request. The public site's aggregate counter reads it from
+ * there (M6); nothing else depends on it.
+ */
+export const PATH_HEADER = "x-q86-path";
+
+function withPath(request: NextRequest): NextResponse {
+  const headers = new Headers(request.headers);
+  headers.set(PATH_HEADER, request.nextUrl.pathname);
+  return NextResponse.next({ request: { headers } });
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (isPublic(pathname)) return NextResponse.next();
-  if (request.cookies.get(SESSION_COOKIE)?.value) return NextResponse.next();
+  if (isPublic(pathname)) return withPath(request);
+  if (request.cookies.get(SESSION_COOKIE)?.value) return withPath(request);
 
   // API routes get a 401 rather than an HTML redirect, so a fetch from the
   // client sees a status it can act on.
