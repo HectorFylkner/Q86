@@ -1,83 +1,161 @@
-# Putting Q86 on the web (no terminal needed)
+# Deploying Q86
 
-The app sets itself up on its first visit: it creates its database
-tables and loads all 180 verified questions automatically. That means
-deployment is entirely point-and-click in the browser — two free
-accounts, roughly ten minutes.
+Two supported ways. **Vercel + Turso** is the documented path and needs no
+terminal. **Docker on a host with a disk** (Fly.io, Railway, a VPS) is the
+alternative and keeps everything in one SQLite file on a volume.
 
-You will create:
+Whichever you pick, the app provisions itself on first boot: the Next.js
+instrumentation hook applies pending migrations through drizzle's ledger
+and loads the 360-question bank. Both steps are idempotent, so redeploys
+and restarts are safe and an existing database is migrated, never
+recreated.
 
-1. a **Turso** account — holds your database (question bank, attempt
-   history, everything) in the cloud, free tier;
-2. a **Vercel** account — serves the website itself, free tier.
+> **Do not run `pnpm db:push` against a deployment.** It creates today's
+> tables without a migration ledger. The boot path now detects that and
+> recovers, but the supported route is migrations, and `db:push` is for a
+> throwaway local database only.
 
-## Step 1 — Turso (the database)
+---
 
-1. Go to <https://app.turso.tech> and sign up (easiest with your
-   GitHub account).
-2. Create a database: name it `q86`, pick the region closest to you
-   (e.g. Stockholm).
-3. On the database's page, copy two things into a note:
-   - the **URL** — starts with `libsql://…`
-   - a **token** — look for "Create token" / "Generate token" and copy
-     the long string it gives you.
+## Before you deploy anything
 
-## Step 2 — Vercel (the website)
+`docs/marketing/launch-checklist.md` is the ordered list, and several
+items there gate a *public* launch rather than a deploy. The minimum for a
+deploy that works at all:
 
-1. Go to <https://vercel.com/new> and sign up with your **GitHub**
-   account, so Vercel can see your repositories.
-2. Import the **Q86** repository. Vercel recognizes it as a Next.js
-   app — change nothing.
-3. Before pressing Deploy, open **Environment Variables** and add:
+- A database (Turso, or a volume).
+- `NEXT_PUBLIC_SITE_URL` set to the URL it will actually be served from.
+  Password-reset links, referral links, canonical tags, the sitemap and
+  the Open Graph URLs all resolve against it; unset, they point at
+  `http://localhost:3000`.
 
-   | Name | Value |
-   | --- | --- |
-   | `TURSO_DATABASE_URL` | the `libsql://…` URL from step 1 |
-   | `TURSO_AUTH_TOKEN` | the token from step 1 |
-   | `NEXT_PUBLIC_SITE_URL` | `https://<your-project>.vercel.app` — used in password-reset links |
+Everything else degrades honestly: without Stripe the pricing page says
+payments are not configured, without a mail key messages are logged
+instead of sent, without an Anthropic key the three AI endpoints answer
+500 and the rest of the product works.
 
-   Optional: `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to offer Google
-   sign-in (register `<your URL>/api/auth/google/callback` as the redirect
-   URI); `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` for the AI features
-   (coach, twins, report import).
+---
 
-   There is no site-wide password any more. Q86 has real accounts: the
-   first person to visit `/signup` creates one.
+## Path A — Vercel + Turso (no terminal)
 
-4. Press **Deploy** and wait a minute or two.
+### 1. Turso (the database)
 
-## Step 3 — use it
+1. <https://app.turso.tech>, sign up with GitHub.
+2. Create a database named `q86`, region closest to your users
+   (Stockholm = `arn`).
+3. Copy the **URL** (`libsql://…`) and a **token** ("Create token").
 
-Open `https://<your-project>.vercel.app` and create an account at
-`/signup`. The very first page load takes a few extra seconds while the
-app installs its question bank into your Turso database — that happens
-only once. Bookmark it on your phone; a session lasts 30 days per device
-and slides forward while you keep training.
+### 2. Vercel (the site)
 
-If your Turso database already held history from before accounts existed,
-that history migrates into a single legacy owner account on first boot.
-Claim it from a terminal with
-`pnpm claim-owner --email=you@example.com --password='…'` (with
-`TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` set) rather than signing up
-fresh — a new signup would start from zero.
+1. <https://vercel.com/new>, sign up with GitHub so it can see the repo.
+2. Import **Q86**. It is detected as a Next.js app; change nothing.
+3. Before pressing Deploy, add the environment variables below.
+4. Deploy.
 
-From now on, any update pushed to the repository's main branch deploys
-itself automatically.
+### 3. Environment variables
 
-## Good to know
+**Required**
 
-- **Backups**: Turso keeps its own point-in-time backups of your
-  database.
-- **Your laptop's copy is separate.** Running the app locally uses a
-  local file database; the website uses Turso. Train on the website so
-  all your statistics live in one place.
-- **Region tip** (optional): in Vercel's project settings you can set
-  the function region to match your Turso region (e.g. Stockholm =
-  `arn1`) for snappier pages.
+| Name | Value |
+| --- | --- |
+| `TURSO_DATABASE_URL` | the `libsql://…` URL |
+| `TURSO_AUTH_TOKEN` | the token |
+| `NEXT_PUBLIC_SITE_URL` | `https://<your-project>.vercel.app`, or your domain |
 
-## Alternative: any Docker host with a disk
+**Payments** — without these the pricing page says so, in Swedish
 
-The repo also ships a `Dockerfile`, self-provisioning entrypoint, and
-`fly.toml`. On Fly.io/Railway/a VPS the app runs in file mode against a
-volume mounted at `/app/data` — no Turso involved. Set
-`NEXT_PUBLIC_SITE_URL` and deploy.
+| Name | Value |
+| --- | --- |
+| `STRIPE_SECRET_KEY` | `sk_test_…` first; `sk_live_…` only after `docs/BILLING.md` has been run end to end |
+| `STRIPE_WEBHOOK_SECRET` | from the Stripe webhook you point at `<your URL>/api/billing/webhook` |
+| `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_SPRINT` | the two price ids |
+| `STRIPE_ENABLE_SWISH` | `1` only if your Stripe account offers Swish |
+
+**Mail** — without these every lifecycle message is written to the log
+
+| Name | Value |
+| --- | --- |
+| `RESEND_API_KEY` | from Resend |
+| `EMAIL_FROM` | a verified sender on your sending domain. Required once the key is set; sending refuses without it rather than sending from an address nobody controls |
+
+**Optional**
+
+| Name | Value |
+| --- | --- |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | the address the legal pages tell people to write to |
+| `ANTHROPIC_API_KEY` | the coach, report import and question generation |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google sign-in; register `<your URL>/api/auth/google/callback` as the redirect URI |
+| `SENTRY_DSN` | error reporting; without it errors go to the log |
+| `AI_USER_MONTHLY_CAP_ORE` | per-account AI cap, default `5000` (50 kr) |
+| `AI_GLOBAL_MONTHLY_CAP_ORE` | whole-service AI cap, default `200000` (2 000 kr) |
+
+### 4. After the first deploy
+
+1. Open the site and create an account at `/signup`. The first page load
+   takes a few extra seconds while the bank is installed — once only.
+2. Make yourself an admin, then open `/admin` to see which of the
+   variables above actually took effect:
+
+       turso db shell q86 "update users set role='admin' where email='you@example.com'"
+
+3. Schedule the lifecycle mail. On Vercel, a cron in `vercel.json`
+   pointing at a route, or an external scheduler running
+   `pnpm email:lifecycle` hourly. It is safe to run more often — every
+   message claims its window by primary key before it sends.
+4. If the database already held history from before accounts existed,
+   claim it rather than signing up fresh:
+
+       pnpm claim-owner --email=you@example.com --password='…'
+
+---
+
+## Path B — Docker on a host with a disk
+
+Fly.io, Railway, or any VPS. The app runs in file mode against a volume
+mounted at `/app/data`; no Turso involved. Scratch images live inside the
+database, so that one file is the whole thing.
+
+    fly launch --no-deploy          # reads fly.toml
+    fly volumes create q86_data --size 1 --region arn
+    fly secrets set NEXT_PUBLIC_SITE_URL=https://<app>.fly.dev
+    fly deploy
+
+`fly.toml` sets `auto_stop_machines`, so an idle instance costs nothing
+and the first request after a pause takes a second longer.
+
+Set the same secrets as the Vercel table above with `fly secrets set`.
+
+### Backups on a volume
+
+Turso keeps its own point-in-time backups; a volume does not.
+
+    fly ssh console -C "pnpm backup"     # → backups/q86-<timestamp>/q86.db
+
+and pull it down. `pnpm restore <file>` puts one back, and refuses to be
+careless about it — see `docs/OPERATIONS.md`.
+
+---
+
+## What deploys automatically
+
+Nothing, until you connect it. Vercel deploys on push to the branch you
+choose when importing. `.github/workflows/ci.yml` runs lint, typecheck,
+tests, the bank verifier and Playwright on every push, but it does not
+deploy — a green CI run is a precondition for deploying, not the deploy
+itself.
+
+---
+
+## Things that will bite you
+
+- **`NEXT_PUBLIC_SITE_URL` unset.** Reset emails send people to
+  localhost. This is the single most common broken deploy.
+- **A Stripe webhook pointed at the wrong path.** It is
+  `/api/billing/webhook`, and it authenticates by signature, not by
+  session.
+- **`EMAIL_FROM` on an unverified domain.** Resend accepts the key and
+  rejects the message.
+- **Running `pnpm db:push` against production.** See the warning at the
+  top.
+- **Forgetting the AI caps.** The defaults are deliberately low. Raise
+  them on purpose, not by discovering a refusal.

@@ -1,6 +1,13 @@
-# Fly.io config for a personal Q86 instance. See DEPLOY.md for the
-# three-command setup. The volume holds ./data (SQLite + scratch photos);
-# auto-stop keeps cost near zero when you are not training.
+# Fly.io config for a Q86 instance. See DEPLOY.md.
+#
+# The volume holds ./data — the SQLite database, which contains the
+# question bank, every account and the scratch photos, so that one file is
+# the whole deployment's state. auto-stop keeps cost near zero when nobody
+# is training.
+#
+# There is no release_command: the Next.js instrumentation hook applies
+# pending migrations on every server boot, which is the same path Vercel
+# takes. Adding one here would run the migrations twice.
 app = "q86"
 primary_region = "arn"
 
@@ -21,3 +28,10 @@ primary_region = "arn"
 [[vm]]
   size = "shared-cpu-1x"
   memory = "512mb"
+
+[env]
+  # Everything secret is set with `fly secrets set`, never here — this
+  # file is committed. NEXT_PUBLIC_SITE_URL is the one that must be set
+  # before the first real user: password-reset and referral links resolve
+  # against it, and unset it points at localhost.
+  NODE_ENV = "production"

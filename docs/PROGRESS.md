@@ -12,6 +12,21 @@ unverified.
 
 ## Current milestone
 
+**All seven milestones are done.** The most recent work is a deployment
+fix found while preparing to deploy: the Docker/Fly entrypoint ran
+`pnpm db:push` before starting the server, which crash-looped on first
+boot with ``table `users` already exists`` once migrations existed. The
+entrypoint now only starts the server — the instrumentation hook already
+applies migrations correctly — and the boot path detects a `db:push`
+database at any point in the schema's history rather than assuming 0001.
+`DEPLOY.md` was five milestones out of date and has been rewritten.
+
+**Not deployed.** Deploying needs a Vercel or Fly account, a Turso
+database and a domain, none of which exist in this environment; the
+checklist and the environment table in `DEPLOY.md` are what that needs.
+
+### Previously
+
 **M7 — Marketing kit.** Complete, and nothing has been posted anywhere.
 `docs/marketing/` holds the positioning, the messaging rules with the
 basis for every claim, a launch checklist in dependency order, and drafts
@@ -135,6 +150,11 @@ Commands run in this session and what they printed.
 | `pnpm test` (vitest) | **168 passed**, 13 files, 0 failed | M7 |
 | `pnpm build` | `✓ Compiled successfully in 13.2s` | M7 |
 | `npx playwright test` | **35 passed**, 0 failed, 47.1s | M7 |
+| `drizzle-kit push` then boot (before the fix) | ``BOOT FAILED: SQLITE_ERROR: table `users` already exists`` — the Docker/Fly path, reproduced | deploy fix |
+| `drizzle-kit push` then boot (after) | `adopted the migration ledger … (through migration 0005)`, `BOOT OK`, 360 verified questions, 6 migrations stamped | deploy fix |
+| fresh volume → boot | 23 tables, 360 verified questions, 6 migrations stamped | deploy fix |
+| `pnpm test` (vitest) | **173 passed**, 14 files, 0 failed | deploy fix |
+| `npx playwright test` | **35 passed**, 0 failed, 46.5s | deploy fix |
 | `npx drizzle-kit generate --name retention` | produced an additive 0004 (4 nullable columns, 2 tables); kept as generated | M5 |
 
 ## Known broken
@@ -424,6 +444,31 @@ browser. The seven-step procedure to close the gap is in
   Flashback draft carried no trademark line, and the rule that accepted
   "Admin har godkänt" as a disclosure was wrong, because permission from
   a moderator is not a statement of authorship.
+
+## The deployment fix (after M7)
+
+- **`docker-entrypoint.sh` ran `pnpm db:push` before `pnpm start`.** That
+  was right when there were no migrations and became a crash-loop once
+  0002 existed: `db:push` creates today's tables without a ledger, the
+  boot path then stamped the ledger at 0001, and `migrate()` replayed
+  0002 against tables that already existed. Reproduced before fixing.
+  The entrypoint now does nothing but `exec pnpm start`; the
+  instrumentation hook has applied migrations on every boot since M1.
+- **`adoptLedger()` now stamps through whatever the schema satisfies.**
+  It reads the tables each migration introduced (`users`,
+  `subscriptions`, `access_grants`, `api_usage`) and stamps up to the
+  newest one present, instead of assuming a pre-accounts database. The
+  legacy DDL is skipped entirely when the database is past 0001.
+- **`tests/unit/bootstrap-dbpush-current.test.ts`** builds the fixture by
+  applying every migration and dropping the ledger — faithful to what
+  `db:push` leaves behind, and it cannot drift as migrations are added.
+  Verified non-vacuous by restoring `adoptLedger(1)` and watching the
+  original error come back.
+- **`DEPLOY.md` was rewritten.** It claimed 180 questions (there are 360)
+  and predated Stripe, Resend, Sentry, the cost caps, the support address
+  and the admin promotion. It now carries the full environment table,
+  both deployment paths, and the five things that actually break a
+  deploy.
 
 ## Baseline facts established by reading the code
 
